@@ -468,9 +468,9 @@ function loadSaques() {
       tbody.innerHTML = data.map(function(s) {
         var dt = new Date(s.created_at).toLocaleString('pt-BR');
         var statusColor = s.status === 'pending' ? '#ffc107' : s.status === 'paid' ? '#00e676' : '#ff4757';
-        var action = s.status === 'pending'
-          ? '<button class="btn btn-confirm" onclick="pagarSaque(\"'+s.id+'\")" >Marcar pago</button> <button class="btn btn-reject" style="margin-left:4px" onclick="cancelarSaque(\"'+s.id+'\")" >Cancelar</button>'
-          : '<span style="color:#5a6878;font-size:0.8rem">' + s.status + '</span>';
+        var btnPagar = '<button class="btn btn-confirm" onclick="pagarSaque(this)" data-id="'+s.id+'">Marcar pago</button>';
+        var btnCancelar = '<button class="btn btn-reject" style="margin-left:4px" onclick="cancelarSaque(this)" data-id="'+s.id+'">Cancelar</button>';
+        var action = s.status === 'pending' ? btnPagar + ' ' + btnCancelar : '<span style="color:#5a6878;font-size:0.8rem">'+s.status+'</span>';
         return '<tr>' +
           '<td>' + (s.username || '-') + '</td>' +
           '<td style="color:#00e676;font-weight:600">R$' + parseFloat(s.amount).toFixed(2) + '</td>' +
@@ -484,7 +484,8 @@ function loadSaques() {
     }).catch(function(e){ console.error(e); });
 }
 
-function pagarSaque(id) {
+function pagarSaque(btn) {
+  var id = btn.getAttribute('data-id');
   fetch(API + '/admin/withdrawals/' + id + '/pay', { method: 'POST' })
     .then(function(r){ return r.json(); })
     .then(function(d){ 
@@ -495,7 +496,8 @@ function pagarSaque(id) {
     .catch(function(e){ alert('Erro: ' + e.message); });
 }
 
-function cancelarSaque(id) {
+function cancelarSaque(btn) {
+  var id = btn.getAttribute('data-id');
   if (!confirm('Cancelar saque e devolver saldo ao usuário?')) return;
   fetch(API + '/admin/withdrawals/' + id + '/cancel', { method: 'POST' })
     .then(function(r){ return r.json(); })

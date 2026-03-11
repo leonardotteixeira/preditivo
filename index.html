@@ -746,7 +746,7 @@ function renderMarkets() {
       data-yes="${m.yes}" 
       data-no="${m.no}" 
       data-cat="${m.cat}"
-      onclick="window.location.href='/market/'+m.id"
+      onclick="window.location.href='/market/${m.id}'"
 >
       <div class="mc-header">
         <span class="mc-category cat-${m.cat}">${catLabel(m.cat)}</span>
@@ -1045,7 +1045,7 @@ async function loadMarketsFromAPI() {
             yes, no: 100 - yes,
             volume: 'R$0',
             traders: 0,
-            ends: m.closes_at ? new Date(m.closes_at).toLocaleDateString('pt-BR') : '—',
+            ends: m.ends_at ? new Date(m.ends_at).toLocaleDateString('pt-BR') : '—',
             resolved_at: m.resolved_at || null,
             hot: false, new: true
           });

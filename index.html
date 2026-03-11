@@ -658,11 +658,13 @@ function renderMarkets() {
   if (state.tabFilter === 'closing') filtered = filtered.filter(m => m.closing);
 
     // Store markets in a map for lookup by id
-  window._marketsMap = {};
-  filtered.forEach(m => window._marketsMap[m.id] = m);
-
   grid.innerHTML = filtered.map(m => `
-    <div class="market-card" onclick="openBetById(${m.id})">
+    <div class="market-card" 
+      data-id="${m.id}" 
+      data-title="${m.title.replace(/"/g,'&quot;')}" 
+      data-yes="${m.yes}" 
+      data-no="${m.no}" 
+      data-cat="${m.cat}">
       <div class="mc-header">
         <span class="mc-category cat-${m.cat}">${catLabel(m.cat)}</span>
         <span class="mc-volume">Vol ${m.volume}</span>
@@ -673,9 +675,9 @@ function renderMarkets() {
         <div class="mc-prob-item yes"><span>${m.yes}%</span><span>SIM</span></div>
         <div class="mc-prob-item no"><span>${m.no}%</span><span>NÃO</span></div>
       </div>
-      <div class="mc-actions" onclick="event.stopPropagation()">
-        <button class="mc-btn yes" onclick="openBetById(${m.id}, 'yes')">Comprar SIM</button>
-        <button class="mc-btn no" onclick="openBetById(${m.id}, 'no')">Comprar NÃO</button>
+      <div class="mc-actions">
+        <button class="mc-btn yes" onclick="event.stopPropagation();openBetById(this,'yes')">Comprar SIM</button>
+        <button class="mc-btn no" onclick="event.stopPropagation();openBetById(this,'no')">Comprar NÃO</button>
       </div>
       <div class="mc-footer">
         <div class="mc-footer-item">👥 ${m.traders}</div>
@@ -707,11 +709,16 @@ function setCatFilter(cat, el) {
 }
 
 // ---- BET MODAL ----
-function openBetById(id, side='yes') {
-  // id from HTML comes as number, API ids may be numbers or strings
-  const market = markets.find(m => String(m.id) === String(id));
-  if (market) openBet(market, side);
-  else console.warn('Market not found:', id, markets.map(m=>m.id));
+function openBetById(btn, side) {
+  const card = btn.closest('.market-card') || btn;
+  const market = {
+    id: card.dataset.id,
+    title: card.dataset.title,
+    yes: parseInt(card.dataset.yes),
+    no: parseInt(card.dataset.no),
+    cat: card.dataset.cat
+  };
+  openBet(market, side);
 }
 
 function openBet(market, side='yes') {

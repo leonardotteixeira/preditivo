@@ -159,7 +159,7 @@ let resolveMarketId = null;
 // ---- LOGIN ----
 async function adminLogin() {
   const pass = document.getElementById('adminPass').value;
-  if (pass !== ADMIN_PASS) { showToast('❌ Senha incorreta'); return; }
+  if (pass !== ADMIN_PASS) { showToast('Senha incorreta'); return; }
   adminToken = 'admin';
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('dashboard').style.display = 'block';
@@ -190,7 +190,7 @@ async function loadDeposits() {
     document.getElementById('statDeposited').textContent = 'R$' + total.toFixed(0);
 
     const tbody = document.getElementById('depositsTable');
-    if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhum depósito ainda</td></tr>'; return; }
+    if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhum deposito ainda</td></tr>'; return; }
 
     tbody.innerHTML = data.map(d => `
       <tr>
@@ -198,12 +198,12 @@ async function loadDeposits() {
         <td>${d.username || d.user_id}</td>
         <td style="color:#00e676;font-family:'DM Mono',monospace">R$${parseFloat(d.amount).toFixed(2)}</td>
         <td style="color:#5a6878;font-size:0.8rem">${new Date(d.created_at).toLocaleString('pt-BR')}</td>
-        <td><span class="status-${d.status}">${d.status === 'pending' ? '⏳ Pendente' : d.status === 'confirmed' ? '✅ Confirmado' : '❌ Rejeitado'}</span></td>
+        <td><span class="status-${d.status}">${d.status === 'pending' ? 'Pendente' : d.status === 'confirmed' ? 'Confirmado' : 'Rejeitado'}</span></td>
         <td>
           ${d.status === 'pending' ? `
-            <button class="btn-confirm" onclick="confirmDeposit('${d.id}', '${d.user_id}', ${d.amount})">✅ Confirmar</button>
-            <button class="btn-reject" onclick="rejectDeposit('${d.id}')">❌</button>
-          ` : '—'}
+            <button class="btn-confirm" onclick="confirmDeposit('${d.id}', '${d.user_id}', ${d.amount})">Confirmar</button>
+            <button class="btn-reject" onclick="rejectDeposit('${d.id}')">Rejeitar</button>
+          ` : '-'}
         </td>
       </tr>
     `).join('');
@@ -231,7 +231,7 @@ async function loadMarkets() {
             <span style="color:#ff4757;font-family:'DM Mono',monospace">${100-probYes}%</span>
           </td>
           <td style="font-family:'DM Mono',monospace;color:#ffc107">R$${Math.max(0,volume)}</td>
-          <td style="color:#5a6878;font-size:0.8rem">${m.closes_at ? new Date(m.closes_at).toLocaleDateString('pt-BR') : '—'}</td>
+          <td style="color:#5a6878;font-size:0.8rem">${m.closes_at ? new Date(m.closes_at).toLocaleDateString('pt-BR') : '-'}</td>
           <td>${m.resolved_at ? '<span style="color:#5a6878">Resolvido</span>' : `<button class="btn-resolve" onclick="openResolve(${m.id}, '${m.title.replace(/'/g,"\\'")}')">Resolver</button>`}</td>
         </tr>
       `;
@@ -270,10 +270,10 @@ async function confirmDeposit(depositId, userId, amount) {
       headers: { 'Content-Type':'application/json' },
       body: JSON.stringify({ user_id: userId, amount })
     });
-    showToast('✅ Depósito confirmado — R$' + parseFloat(amount).toFixed(2) + ' creditado');
+    showToast('Deposito confirmado - R$' + parseFloat(amount).toFixed(2) + ' creditado');
     loadDeposits();
     loadUsers();
-  } catch(e) { showToast('❌ Erro ao confirmar'); }
+  } catch(e) { showToast('Erro ao confirmar'); }
 }
 
 async function rejectDeposit(depositId) {
@@ -282,9 +282,9 @@ async function rejectDeposit(depositId) {
       method: 'POST',
       headers: {}
     });
-    showToast('❌ Depósito rejeitado');
+    showToast('Deposito rejeitado');
     loadDeposits();
-  } catch(e) { showToast('❌ Erro'); }
+  } catch(e) { showToast('Erro'); }
 }
 
 function openResolve(marketId, title) {
@@ -305,14 +305,14 @@ async function confirmResolve(outcome) {
       headers: { 'Content-Type':'application/json' },
       body: JSON.stringify({ outcome })
     });
-    showToast('✅ Mercado resolvido — vencedores pagos!');
+    showToast('Mercado resolvido - vencedores pagos!');
     closeResolve();
     loadMarkets();
-  } catch(e) { showToast('❌ Erro ao resolver'); }
+  } catch(e) { showToast('Erro ao resolver'); }
 }
 
 async function adjustBalance(userId, name) {
-  const amt = prompt(`Ajustar saldo de ${name}\n\nValor (positivo para crédito, negativo para débito):`);
+  const amt = prompt(`Ajustar saldo de ${name}\n\nValor (positivo para credito, negativo para debito):`);
   if (!amt || isNaN(parseFloat(amt))) return;
   try {
     await fetch(API + '/admin/balance', {
@@ -320,9 +320,9 @@ async function adjustBalance(userId, name) {
       headers: { 'Content-Type':'application/json' },
       body: JSON.stringify({ user_id: userId, amount: parseFloat(amt) })
     });
-    showToast('✅ Saldo ajustado');
+    showToast('Saldo ajustado');
     loadUsers();
-  } catch(e) { showToast('❌ Erro'); }
+  } catch(e) { showToast('Erro'); }
 }
 
 // ---- UI ----

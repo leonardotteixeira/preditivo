@@ -3,341 +3,342 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Preditivo — Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Preditivo - Admin</title>
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Space Grotesk',sans-serif; background:#080c10; color:#e8edf2; min-height:100vh; }
-  .header { background:#0e1419; border-bottom:1px solid rgba(255,255,255,0.07); padding:16px 24px; display:flex; align-items:center; justify-content:space-between; }
-  .logo { font-size:1.2rem; font-weight:700; background:linear-gradient(135deg,#00e676,#00b4ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-  .admin-badge { background:rgba(255,193,7,0.15); color:#ffc107; padding:4px 12px; border-radius:100px; font-size:0.75rem; font-weight:600; }
-  .main { max-width:1100px; margin:0 auto; padding:32px 24px; }
-  .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:32px; }
-  .stat-card { background:#0e1419; border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:20px; }
-  .stat-label { font-size:0.75rem; color:#5a6878; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px; }
-  .stat-value { font-size:1.8rem; font-weight:700; font-family:'DM Mono',monospace; }
-  .stat-value.green { color:#00e676; }
-  .stat-value.gold { color:#ffc107; }
-  .stat-value.blue { color:#00b4ff; }
-
-  .section-title { font-size:1.1rem; font-weight:600; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
-  .badge { padding:3px 10px; border-radius:100px; font-size:0.7rem; font-weight:700; }
-  .badge-pending { background:rgba(255,193,7,0.15); color:#ffc107; }
-  .badge-done { background:rgba(0,230,118,0.12); color:#00e676; }
-
-  table { width:100%; border-collapse:collapse; background:#0e1419; border-radius:12px; overflow:hidden; margin-bottom:32px; }
-  th { padding:12px 16px; text-align:left; font-size:0.75rem; color:#5a6878; text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid rgba(255,255,255,0.07); }
-  td { padding:14px 16px; font-size:0.9rem; border-bottom:1px solid rgba(255,255,255,0.04); }
-  tr:last-child td { border-bottom:none; }
-  tr:hover td { background:rgba(255,255,255,0.02); }
-
-  .status-pending { color:#ffc107; font-size:0.8rem; font-weight:600; }
-  .status-confirmed { color:#00e676; font-size:0.8rem; font-weight:600; }
-  .status-rejected { color:#ff4757; font-size:0.8rem; font-weight:600; }
-
-  .btn-confirm { background:rgba(0,230,118,0.12); border:1px solid rgba(0,230,118,0.3); color:#00e676; padding:6px 14px; border-radius:6px; cursor:pointer; font-size:0.8rem; font-weight:600; font-family:inherit; transition:all 0.2s; }
-  .btn-confirm:hover { background:#00e676; color:#080c10; }
-  .btn-reject { background:rgba(255,71,87,0.12); border:1px solid rgba(255,71,87,0.3); color:#ff4757; padding:6px 14px; border-radius:6px; cursor:pointer; font-size:0.8rem; font-weight:600; font-family:inherit; transition:all 0.2s; margin-left:6px; }
-  .btn-reject:hover { background:#ff4757; color:#fff; }
-  .btn-resolve { background:rgba(0,180,255,0.12); border:1px solid rgba(0,180,255,0.3); color:#00b4ff; padding:6px 14px; border-radius:6px; cursor:pointer; font-size:0.8rem; font-weight:600; font-family:inherit; transition:all 0.2s; }
-  .btn-resolve:hover { background:#00b4ff; color:#080c10; }
-
-  .login-screen { max-width:380px; margin:100px auto; background:#0e1419; border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:32px; }
-  .login-screen h2 { margin-bottom:8px; }
-  .login-screen p { color:#5a6878; font-size:0.9rem; margin-bottom:24px; }
-  input { width:100%; background:#141c24; border:1px solid rgba(255,255,255,0.07); border-radius:8px; padding:12px 16px; color:#e8edf2; font-size:1rem; font-family:inherit; outline:none; margin-bottom:12px; }
-  input:focus { border-color:#00e676; }
-  .btn-primary { width:100%; padding:13px; background:#00e676; color:#080c10; font-weight:700; font-size:1rem; border:none; border-radius:8px; cursor:pointer; font-family:inherit; }
-
-  .resolve-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(8px); z-index:1000; align-items:center; justify-content:center; }
-  .resolve-modal.active { display:flex; }
-  .resolve-box { background:#0e1419; border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:32px; width:90%; max-width:440px; }
-  .resolve-box h3 { margin-bottom:8px; }
-  .resolve-box p { color:#5a6878; font-size:0.85rem; margin-bottom:24px; }
-  .resolve-btns { display:flex; gap:12px; }
-  .btn-yes { flex:1; padding:14px; background:rgba(0,230,118,0.12); border:1px solid rgba(0,230,118,0.3); color:#00e676; font-weight:700; font-size:1rem; border-radius:8px; cursor:pointer; font-family:inherit; transition:all 0.2s; }
-  .btn-yes:hover { background:#00e676; color:#080c10; }
-  .btn-no-res { flex:1; padding:14px; background:rgba(255,71,87,0.12); border:1px solid rgba(255,71,87,0.3); color:#ff4757; font-weight:700; font-size:1rem; border-radius:8px; cursor:pointer; font-family:inherit; transition:all 0.2s; }
-  .btn-no-res:hover { background:#ff4757; color:#fff; }
-  .btn-cancel { padding:14px 24px; background:transparent; border:1px solid rgba(255,255,255,0.07); color:#5a6878; font-weight:600; font-size:1rem; border-radius:8px; cursor:pointer; font-family:inherit; }
-
-  .toast { position:fixed; bottom:24px; right:24px; background:#0e1419; border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:14px 20px; font-size:0.9rem; z-index:2000; transform:translateY(100px); opacity:0; transition:all 0.3s; box-shadow:0 8px 32px rgba(0,0,0,0.4); }
-  .toast.show { transform:translateY(0); opacity:1; }
-
-  .tab-btns { display:flex; gap:4px; margin-bottom:24px; border-bottom:1px solid rgba(255,255,255,0.07); }
-  .tab-btn { padding:10px 20px; background:transparent; border:none; color:#5a6878; cursor:pointer; font-family:inherit; font-size:0.9rem; font-weight:500; border-bottom:2px solid transparent; margin-bottom:-1px; transition:all 0.2s; }
-  .tab-btn.active { color:#00e676; border-bottom-color:#00e676; }
-
-  .empty { text-align:center; padding:40px; color:#5a6878; }
-  .mono { font-family:'DM Mono',monospace; font-size:0.85rem; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#07111C; color:#e0e6ef; font-family:'Segoe UI',sans-serif; min-height:100vh; }
+.header { background:#0e1419; border-bottom:1px solid rgba(255,255,255,0.07); padding:16px 24px; display:flex; align-items:center; justify-content:space-between; }
+.logo { font-size:1.2rem; font-weight:700; color:#00e676; }
+.admin-badge { background:rgba(255,193,7,0.15); color:#ffc107; padding:4px 12px; border-radius:100px; font-size:0.75rem; font-weight:600; }
+.main { max-width:1100px; margin:0 auto; padding:32px 24px; }
+.stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:32px; }
+.stat-card { background:#0e1419; border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:20px; }
+.stat-label { font-size:0.75rem; color:#5a6878; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px; }
+.stat-value { font-size:1.8rem; font-weight:700; }
+.stat-value.green { color:#00e676; }
+.stat-value.gold { color:#ffc107; }
+.stat-value.blue { color:#00b4ff; }
+.stat-value.white { color:#fff; }
+.tabs { display:flex; gap:4px; margin-bottom:24px; border-bottom:1px solid rgba(255,255,255,0.07); }
+.tab { padding:10px 20px; background:none; border:none; color:#5a6878; cursor:pointer; font-size:0.9rem; border-bottom:2px solid transparent; margin-bottom:-1px; }
+.tab.active { color:#00e676; border-bottom-color:#00e676; }
+.section { display:none; }
+.section.active { display:block; }
+.section-title { font-size:1.1rem; font-weight:600; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+.badge { background:rgba(255,193,7,0.2); color:#ffc107; padding:2px 8px; border-radius:100px; font-size:0.75rem; }
+table { width:100%; border-collapse:collapse; }
+th { text-align:left; padding:10px 12px; font-size:0.7rem; color:#5a6878; text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid rgba(255,255,255,0.07); }
+td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.04); font-size:0.85rem; }
+tr:hover td { background:rgba(255,255,255,0.02); }
+.btn { padding:6px 14px; border:none; border-radius:6px; cursor:pointer; font-size:0.8rem; font-weight:600; }
+.btn-confirm { background:rgba(0,230,118,0.15); color:#00e676; border:1px solid rgba(0,230,118,0.3); }
+.btn-confirm:hover { background:rgba(0,230,118,0.25); }
+.btn-reject { background:rgba(255,71,87,0.15); color:#ff4757; border:1px solid rgba(255,71,87,0.3); margin-left:6px; }
+.btn-reject:hover { background:rgba(255,71,87,0.25); }
+.btn-resolve { background:rgba(0,180,255,0.15); color:#00b4ff; border:1px solid rgba(0,180,255,0.3); }
+.btn-resolve:hover { background:rgba(0,180,255,0.25); }
+.status-pending { color:#ffc107; }
+.status-confirmed { color:#00e676; }
+.status-rejected { color:#ff4757; }
+.login-screen { min-height:100vh; display:flex; align-items:center; justify-content:center; }
+.login-card { background:#0e1419; border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:40px; width:360px; text-align:center; }
+.login-card h2 { margin-bottom:8px; color:#fff; }
+.login-card p { color:#5a6878; margin-bottom:24px; font-size:0.9rem; }
+.input { width:100%; padding:12px 16px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:#fff; font-size:0.95rem; margin-bottom:12px; }
+.btn-primary { width:100%; padding:12px; background:linear-gradient(135deg,#00e676,#00b4ff); border:none; border-radius:8px; color:#07111C; font-weight:700; font-size:1rem; cursor:pointer; }
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; z-index:100; }
+.modal-overlay.active { display:flex; }
+.modal { background:#0e1419; border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:32px; width:400px; }
+.modal h3 { margin-bottom:16px; }
+.modal-btns { display:flex; gap:8px; margin-top:16px; }
+.btn-yes { flex:1; padding:12px; background:rgba(0,230,118,0.2); border:1px solid #00e676; color:#00e676; border-radius:8px; cursor:pointer; font-weight:700; font-size:1rem; }
+.btn-no { flex:1; padding:12px; background:rgba(255,71,87,0.2); border:1px solid #ff4757; color:#ff4757; border-radius:8px; cursor:pointer; font-weight:700; font-size:1rem; }
+.btn-cancel { width:100%; padding:10px; background:none; border:1px solid rgba(255,255,255,0.1); color:#5a6878; border-radius:8px; cursor:pointer; margin-top:8px; }
+.toast { position:fixed; bottom:24px; right:24px; background:#1a2535; border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:12px 20px; font-size:0.9rem; z-index:200; opacity:0; transition:opacity 0.3s; pointer-events:none; }
+.toast.show { opacity:1; }
 </style>
 </head>
 <body>
 
-<!-- RESOLVE MODAL -->
-<div class="resolve-modal" id="resolveModal">
-  <div class="resolve-box">
-    <h3>Resolver Mercado</h3>
-    <p id="resolveMarketTitle">—</p>
-    <div class="resolve-btns">
-      <button class="btn-yes" onclick="confirmResolve('yes')">✅ SIM aconteceu</button>
-      <button class="btn-no-res" onclick="confirmResolve('no')">❌ NÃO aconteceu</button>
-    </div>
-    <button class="btn-cancel" style="width:100%;margin-top:10px" onclick="closeResolve()">Cancelar</button>
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <h2>Preditivo Admin</h2>
+    <p>Acesso restrito</p>
+    <input id="adminPass" class="input" type="password" placeholder="Senha admin" onkeydown="if(event.key==='Enter')adminLogin()">
+    <button class="btn-primary" onclick="adminLogin()">Entrar</button>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
-
-<!-- LOGIN -->
-<div id="loginScreen" class="login-screen">
-  <h2>🔐 Admin</h2>
-  <p>Acesso restrito ao administrador do Preditivo</p>
-  <input type="password" id="adminPass" placeholder="Senha admin" onkeydown="if(event.key==='Enter')adminLogin()">
-  <button class="btn-primary" onclick="adminLogin()">Entrar</button>
-</div>
-
-<!-- DASHBOARD -->
 <div id="dashboard" style="display:none">
   <div class="header">
-    <div class="logo">Preditivo<span style="color:#5a6878;-webkit-text-fill-color:#5a6878">.io</span></div>
+    <div class="logo">Preditivo.io</div>
     <div style="display:flex;align-items:center;gap:12px">
-      <span class="admin-badge">⚡ Admin</span>
-      <button onclick="logout()" style="background:none;border:none;color:#5a6878;cursor:pointer;font-family:inherit;font-size:0.85rem">Sair</button>
+      <span class="admin-badge">Admin</span>
+      <button style="background:none;border:none;color:#5a6878;cursor:pointer" onclick="logout()">Sair</button>
     </div>
   </div>
 
   <div class="main">
-    <div class="stats-row" id="statsRow">
-      <div class="stat-card"><div class="stat-label">Depósitos Pendentes</div><div class="stat-value gold" id="statPending">—</div></div>
-      <div class="stat-card"><div class="stat-label">Total Depositado</div><div class="stat-value green" id="statDeposited">—</div></div>
-      <div class="stat-card"><div class="stat-label">Usuários</div><div class="stat-value blue" id="statUsers">—</div></div>
-      <div class="stat-card"><div class="stat-label">Apostas Abertas</div><div class="stat-value" id="statBets">—</div></div>
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Depositos Pendentes</div>
+        <div class="stat-value gold" id="statPending">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Depositado</div>
+        <div class="stat-value green" id="statDeposited">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Usuarios</div>
+        <div class="stat-value blue" id="statUsers">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Apostas Abertas</div>
+        <div class="stat-value white" id="statBets">-</div>
+      </div>
     </div>
 
-    <div class="tab-btns">
-      <button class="tab-btn active" onclick="switchTab('deposits',this)">💰 Depósitos</button>
-      <button class="tab-btn" onclick="switchTab('markets',this)">📊 Mercados</button>
-      <button class="tab-btn" onclick="switchTab('users',this)">👥 Usuários</button>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('deposits',this)">Depositos</button>
+      <button class="tab" onclick="switchTab('markets',this)">Mercados</button>
+      <button class="tab" onclick="switchTab('users',this)">Usuarios</button>
     </div>
 
-    <!-- DEPOSITS TAB -->
-    <div id="tab-deposits">
-      <div class="section-title">Depósitos Pendentes <span class="badge badge-pending" id="pendingCount">0</span></div>
+    <div id="sec-deposits" class="section active">
+      <div class="section-title">Depositos Pendentes <span class="badge" id="pendingCount">0</span></div>
       <table>
-        <thead><tr><th>Código</th><th>Usuário</th><th>Valor</th><th>Horário</th><th>Status</th><th>Ações</th></tr></thead>
-        <tbody id="depositsTable"><tr><td colspan="6" class="empty">Carregando...</td></tr></tbody>
+        <thead><tr><th>Codigo</th><th>Usuario</th><th>Valor</th><th>Horario</th><th>Status</th><th>Acoes</th></tr></thead>
+        <tbody id="depositsTbody"><tr><td colspan="6" style="text-align:center;padding:40px;color:#5a6878">Carregando...</td></tr></tbody>
       </table>
     </div>
 
-    <!-- MARKETS TAB -->
-    <div id="tab-markets" style="display:none">
-      <div class="section-title">Mercados Ativos</div>
+    <div id="sec-markets" class="section">
+      <div class="section-title">Mercados</div>
       <table>
-        <thead><tr><th>Mercado</th><th>Categoria</th><th>Prob SIM</th><th>Volume</th><th>Encerra</th><th>Ação</th></tr></thead>
-        <tbody id="marketsTable"><tr><td colspan="6" class="empty">Carregando...</td></tr></tbody>
+        <thead><tr><th>Titulo</th><th>Categoria</th><th>Prob SIM/NAO</th><th>Volume</th><th>Encerra</th><th>Acao</th></tr></thead>
+        <tbody id="marketsTbody"><tr><td colspan="6" style="text-align:center;padding:40px;color:#5a6878">Carregando...</td></tr></tbody>
       </table>
     </div>
 
-    <!-- USERS TAB -->
-    <div id="tab-users" style="display:none">
-      <div class="section-title">Usuários Cadastrados</div>
+    <div id="sec-users" class="section">
+      <div class="section-title">Usuarios</div>
       <table>
-        <thead><tr><th>Nome</th><th>Email</th><th>Saldo</th><th>Cadastro</th><th>Ação</th></tr></thead>
-        <tbody id="usersTable"><tr><td colspan="5" class="empty">Carregando...</td></tr></tbody>
+        <thead><tr><th>Nome</th><th>Email</th><th>Saldo</th><th>Cadastro</th><th>Acao</th></tr></thead>
+        <tbody id="usersTbody"><tr><td colspan="5" style="text-align:center;padding:40px;color:#5a6878">Carregando...</td></tr></tbody>
       </table>
     </div>
   </div>
 </div>
 
-<script>
-const API = 'https://preditivo-backend-production.up.railway.app';
-const ADMIN_PASS = 'preditivo_admin_2026'; // troque por uma senha sua
-let adminToken = null;
-let resolveMarketId = null;
+<div id="resolveModal" class="modal-overlay">
+  <div class="modal">
+    <h3>Resolver Mercado</h3>
+    <p id="resolveMarketTitle" style="color:#5a6878;margin-bottom:16px;font-size:0.9rem"></p>
+    <p style="margin-bottom:8px;font-size:0.9rem">Qual foi o resultado?</p>
+    <div class="modal-btns">
+      <button class="btn-yes" onclick="confirmResolve('yes')">SIM</button>
+      <button class="btn-no" onclick="confirmResolve('no')">NAO</button>
+    </div>
+    <button class="btn-cancel" onclick="closeModal('resolveModal')">Cancelar</button>
+  </div>
+</div>
 
-// ---- LOGIN ----
-async function adminLogin() {
-  const pass = document.getElementById('adminPass').value;
+<div id="toast" class="toast"></div>
+
+<script>
+var API = 'https://preditivo-backend-production.up.railway.app';
+var ADMIN_PASS = 'preditivo_admin_2026';
+var resolveMarketId = null;
+var allDeposits = [];
+
+function adminLogin() {
+  var pass = document.getElementById('adminPass').value;
   if (pass !== ADMIN_PASS) { showToast('Senha incorreta'); return; }
-  adminToken = 'admin';
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('dashboard').style.display = 'block';
   loadAll();
 }
 
 function logout() {
-  adminToken = null;
-  document.getElementById('loginScreen').style.display = 'block';
+  document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('dashboard').style.display = 'none';
 }
 
-// ---- LOAD DATA ----
-async function loadAll() {
-  await Promise.all([loadDeposits(), loadMarkets(), loadUsers()]);
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
+  el.classList.add('active');
+  document.getElementById('sec-' + name).classList.add('active');
 }
 
-async function loadDeposits() {
-  try {
-    const res = await fetch(API + '/admin/deposits');
-    const data = await res.json();
-    if (!Array.isArray(data)) return;
-
-    const pending = data.filter(d => d.status === 'pending');
-    document.getElementById('pendingCount').textContent = pending.length;
-    document.getElementById('statPending').textContent = pending.length;
-    const total = data.filter(d=>d.status==='confirmed').reduce((s,d)=>s+parseFloat(d.amount),0);
-    document.getElementById('statDeposited').textContent = 'R$' + total.toFixed(0);
-
-    const tbody = document.getElementById('depositsTable');
-    if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhum deposito ainda</td></tr>'; return; }
-
-    tbody.innerHTML = data.map(d => `
-      <tr>
-        <td><span class="mono">${d.code}</span></td>
-        <td>${d.username || d.user_id}</td>
-        <td style="color:#00e676;font-family:'DM Mono',monospace">R$${parseFloat(d.amount).toFixed(2)}</td>
-        <td style="color:#5a6878;font-size:0.8rem">${new Date(d.created_at).toLocaleString('pt-BR')}</td>
-        <td><span class="status-${d.status}">${d.status === 'pending' ? 'Pendente' : d.status === 'confirmed' ? 'Confirmado' : 'Rejeitado'}</span></td>
-        <td>
-          ${d.status === 'pending' ? `
-            <button class="btn-confirm" onclick="confirmDeposit('${d.id}', '${d.user_id}', ${d.amount})">Confirmar</button>
-            <button class="btn-reject" onclick="rejectDeposit('${d.id}')">Rejeitar</button>
-          ` : '-'}
-        </td>
-      </tr>
-    `).join('');
-  } catch(e) { console.log('deposits error', e); }
-}
-
-async function loadMarkets() {
-  try {
-    const res = await fetch(API + '/markets');
-    const data = await res.json();
-    if (!Array.isArray(data)) return;
-
-    const tbody = document.getElementById('marketsTable');
-    tbody.innerHTML = data.map(m => {
-      const total = parseFloat(m.q_yes) + parseFloat(m.q_no);
-      const probYes = Math.round(parseFloat(m.q_yes) / total * 100);
-      const volume = (total - 200).toFixed(0);
-      const mid = m.id;
-      return '<tr>' +
-        '<td style="max-width:300px">' + m.title + '</td>' +
-        '<td style="color:#5a6878;font-size:0.8rem">' + m.category + '</td>' +
-        '<td><span style="color:#00e676;font-family:monospace">' + probYes + '%</span> / <span style="color:#ff4757;font-family:monospace">' + (100-probYes) + '%</span></td>' +
-        '<td style="font-family:monospace;color:#ffc107">R$' + Math.max(0,volume) + '</td>' +
-        '<td style="color:#5a6878;font-size:0.8rem">' + (m.closes_at ? new Date(m.closes_at).toLocaleDateString('pt-BR') : '-') + '</td>' +
-        '<td>' + (m.resolved_at ? '<span style="color:#5a6878">Resolvido</span>' : '<button class="btn-resolve" onclick="openResolve(' + mid + ')">Resolver</button>') + '</td>' +
-        '</tr>';
-    }).join('');
-  } catch(e) { console.log('markets error', e); }
-}
-
-async function loadUsers() {
-  try {
-    const res = await fetch(API + '/admin/users');
-    const data = await res.json();
-    if (!Array.isArray(data)) return;
-
-    document.getElementById('statUsers').textContent = data.length;
-
-    const tbody = document.getElementById('usersTable');
-    tbody.innerHTML = data.map(u => `
-      <tr>
-        <td>${u.username || u.name}</td>
-        <td style="color:#5a6878">${u.email}</td>
-        <td style="color:#00e676;font-family:'DM Mono',monospace">R$${parseFloat(u.balance).toFixed(2)}</td>
-        <td style="color:#5a6878;font-size:0.8rem">${new Date(u.created_at).toLocaleDateString('pt-BR')}</td>
-        <td>
-          <button class="btn-confirm" onclick="adjustBalance('${u.id}', '${u.username || u.name}')">Ajustar saldo</button>
-        </td>
-      </tr>
-    `).join('');
-  } catch(e) { console.log('users error', e); }
-}
-
-// ---- ACTIONS ----
-async function confirmDeposit(depositId, userId, amount) {
-  try {
-    await fetch(API + '/admin/deposits/' + depositId + '/confirm', {
-      method: 'POST',
-      headers: { 'Content-Type':'application/json' },
-      body: JSON.stringify({ user_id: userId, amount })
-    });
-    showToast('Deposito confirmado - R$' + parseFloat(amount).toFixed(2) + ' creditado');
-    loadDeposits();
-    loadUsers();
-  } catch(e) { showToast('Erro ao confirmar'); }
-}
-
-async function rejectDeposit(depositId) {
-  try {
-    await fetch(API + '/admin/deposits/' + depositId + '/reject', {
-      method: 'POST',
-      headers: {}
-    });
-    showToast('Deposito rejeitado');
-    loadDeposits();
-  } catch(e) { showToast('Erro'); }
-}
-
-function openResolve(marketId) {
-  resolveMarketId = marketId;
-  document.getElementById('resolveMarketTitle').textContent = 'Mercado ID: ' + marketId;
-  document.getElementById('resolveModal').classList.add('active');
-}
-
-function closeResolve() {
-  document.getElementById('resolveModal').classList.remove('active');
-  resolveMarketId = null;
-}
-
-async function confirmResolve(outcome) {
-  try {
-    await fetch(API + '/markets/' + resolveMarketId + '/resolve', {
-      method: 'POST',
-      headers: { 'Content-Type':'application/json' },
-      body: JSON.stringify({ outcome })
-    });
-    showToast('Mercado resolvido - vencedores pagos!');
-    closeResolve();
-    loadMarkets();
-  } catch(e) { showToast('Erro ao resolver'); }
-}
-
-async function adjustBalance(userId, name) {
-  const amt = prompt(`Ajustar saldo de ${name}\n\nValor (positivo para credito, negativo para debito):`);
-  if (!amt || isNaN(parseFloat(amt))) return;
-  try {
-    await fetch(API + '/admin/balance', {
-      method: 'POST',
-      headers: { 'Content-Type':'application/json' },
-      body: JSON.stringify({ user_id: userId, amount: parseFloat(amt) })
-    });
-    showToast('Saldo ajustado');
-    loadUsers();
-  } catch(e) { showToast('Erro'); }
-}
-
-// ---- UI ----
-function switchTab(tab, btn) {
-  ['deposits','markets','users'].forEach(t => {
-    document.getElementById('tab-'+t).style.display = t === tab ? 'block' : 'none';
-  });
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
 }
 
 function showToast(msg) {
-  const t = document.getElementById('toast');
+  var t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
+  setTimeout(function(){ t.classList.remove('show'); }, 3000);
 }
 
-// Auto-refresh a cada 30s
-setInterval(loadDeposits, 30000);
+function loadAll() {
+  loadDeposits();
+  loadMarkets();
+  loadUsers();
+}
+
+function loadDeposits() {
+  fetch(API + '/admin/deposits')
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      allDeposits = data;
+      var pending = data.filter(function(d){ return d.status === 'pending'; });
+      document.getElementById('statPending').textContent = pending.length;
+      document.getElementById('pendingCount').textContent = pending.length;
+      var total = data.filter(function(d){ return d.status === 'confirmed'; })
+        .reduce(function(s,d){ return s + parseFloat(d.amount); }, 0);
+      document.getElementById('statDeposited').textContent = 'R$' + total.toFixed(0);
+
+      var tbody = document.getElementById('depositsTbody');
+      if (!pending.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#5a6878">Nenhum deposito pendente</td></tr>';
+        return;
+      }
+      tbody.innerHTML = pending.map(function(d) {
+        var btnC = '<button class="btn btn-confirm" onclick="confirmDeposit(\'' + d.id + '\',\'' + d.user_id + '\',' + d.amount + ')">Confirmar</button>';
+        var btnR = '<button class="btn btn-reject" onclick="rejectDeposit(\'' + d.id + '\')">Rejeitar</button>';
+        return '<tr>' +
+          '<td style="font-family:monospace;font-size:0.8rem">' + (d.code||'-') + '</td>' +
+          '<td>' + (d.username||'-') + '</td>' +
+          '<td style="color:#00e676;font-weight:600">R$ ' + parseFloat(d.amount).toFixed(2) + '</td>' +
+          '<td style="color:#5a6878;font-size:0.8rem">' + new Date(d.created_at).toLocaleString('pt-BR') + '</td>' +
+          '<td class="status-' + d.status + '">' + d.status + '</td>' +
+          '<td>' + btnC + btnR + '</td>' +
+          '</tr>';
+      }).join('');
+    })
+    .catch(function(e){ console.error(e); showToast('Erro ao carregar depositos'); });
+}
+
+function loadMarkets() {
+  fetch(API + '/markets')
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      var tbody = document.getElementById('marketsTbody');
+      tbody.innerHTML = data.map(function(m) {
+        var total = parseFloat(m.q_yes||100) + parseFloat(m.q_no||100);
+        var pYes = Math.round(parseFloat(m.q_yes||100) / total * 100);
+        var vol = Math.max(0, total - 200).toFixed(0);
+        var closes = m.closes_at ? new Date(m.closes_at).toLocaleDateString('pt-BR') : '-';
+        var action = m.resolved_at
+          ? '<span style="color:#5a6878;font-size:0.8rem">Resolvido</span>'
+          : '<button class="btn btn-resolve" onclick="openResolve(\'' + m.id + '\',\'' + m.title.substring(0,40).replace(/'/g,'') + '\')">Resolver</button>';
+        return '<tr>' +
+          '<td style="max-width:280px;font-size:0.85rem">' + m.title + '</td>' +
+          '<td style="color:#5a6878;font-size:0.8rem">' + m.category + '</td>' +
+          '<td><span style="color:#00e676">' + pYes + '%</span> / <span style="color:#ff4757">' + (100-pYes) + '%</span></td>' +
+          '<td style="color:#ffc107">R$' + vol + '</td>' +
+          '<td style="color:#5a6878;font-size:0.8rem">' + closes + '</td>' +
+          '<td>' + action + '</td>' +
+          '</tr>';
+      }).join('');
+    })
+    .catch(function(e){ console.error(e); });
+}
+
+function loadUsers() {
+  fetch(API + '/admin/users')
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      document.getElementById('statUsers').textContent = data.length;
+      var tbody = document.getElementById('usersTbody');
+      tbody.innerHTML = data.map(function(u) {
+        var name = u.username || u.name || '-';
+        var btn = '<button class="btn btn-confirm" onclick="adjustBalance(\'' + u.id + '\',\'' + name + '\')">Ajustar saldo</button>';
+        return '<tr>' +
+          '<td>' + name + '</td>' +
+          '<td style="color:#5a6878">' + u.email + '</td>' +
+          '<td style="color:#00e676;font-weight:600">R$ ' + parseFloat(u.balance).toFixed(2) + '</td>' +
+          '<td style="color:#5a6878;font-size:0.8rem">' + new Date(u.created_at).toLocaleDateString('pt-BR') + '</td>' +
+          '<td>' + btn + '</td>' +
+          '</tr>';
+      }).join('');
+    })
+    .catch(function(e){ console.error(e); });
+}
+
+function confirmDeposit(id, userId, amount) {
+  if (!confirm('Confirmar deposito de R$ ' + parseFloat(amount).toFixed(2) + '?')) return;
+  fetch(API + '/admin/deposits/' + id + '/confirm', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: userId, amount: amount })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data) {
+    if (data.ok) { showToast('Deposito confirmado - R$ ' + parseFloat(amount).toFixed(2) + ' creditado'); loadDeposits(); }
+    else showToast('Erro: ' + (data.error||''));
+  })
+  .catch(function(){ showToast('Erro ao confirmar'); });
+}
+
+function rejectDeposit(id) {
+  if (!confirm('Rejeitar este deposito?')) return;
+  fetch(API + '/admin/deposits/' + id + '/reject', { method: 'POST' })
+  .then(function(r){ return r.json(); })
+  .then(function(data) {
+    if (data.ok) { showToast('Deposito rejeitado'); loadDeposits(); }
+    else showToast('Erro: ' + (data.error||''));
+  })
+  .catch(function(){ showToast('Erro ao rejeitar'); });
+}
+
+function openResolve(marketId, title) {
+  resolveMarketId = marketId;
+  document.getElementById('resolveMarketTitle').textContent = title || ('Mercado ' + marketId);
+  document.getElementById('resolveModal').classList.add('active');
+}
+
+function confirmResolve(outcome) {
+  if (!resolveMarketId) return;
+  fetch(API + '/markets/' + resolveMarketId + '/resolve', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ outcome: outcome })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data) {
+    closeModal('resolveModal');
+    if (data.success) {
+      showToast('Mercado resolvido! ' + data.winners_paid + ' vencedores pagos');
+      loadMarkets();
+    } else showToast('Erro: ' + (data.error||''));
+  })
+  .catch(function(){ showToast('Erro ao resolver'); });
+}
+
+function adjustBalance(userId, username) {
+  var amt = prompt('Ajuste de saldo para ' + username + ' (positivo para credito, negativo para debito):');
+  if (!amt || isNaN(parseFloat(amt))) return;
+  fetch(API + '/admin/balance', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: userId, amount: parseFloat(amt) })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data) {
+    if (data.ok) { showToast('Saldo ajustado'); loadUsers(); }
+    else showToast('Erro: ' + (data.error||''));
+  })
+  .catch(function(){ showToast('Erro ao ajustar'); });
+}
+
+// Load apostas abertas count
+fetch(API + '/admin/bets/open')
+  .then(function(r){ return r.json(); })
+  .then(function(data){ document.getElementById('statBets').textContent = data.count||'-'; })
+  .catch(function(){});
 </script>
 </body>
 </html>

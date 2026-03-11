@@ -339,7 +339,7 @@ function renderPage() {
     '</div>' +
 
     '<div class="stats-grid">' +
-      '<div class="stat-card"><div class="stat-label">Saldo</div><div class="stat-value" style="color:var(--green)">R$' + parseFloat(u.balance).toFixed(2) + '</div></div>' +
+      '<div class="stat-card"><div class="stat-label">Saldo</div><div class="stat-value" style="color:var(--green)">R$' + parseFloat(u.balance || 0).toFixed(2) + '</div></div>' +
       '<div class="stat-card"><div class="stat-label">Apostas</div><div class="stat-value">' + totalBets + '</div></div>' +
       '<div class="stat-card"><div class="stat-label">Taxa de acerto</div><div class="stat-value" style="color:' + (winRate >= 50 ? 'var(--green)' : 'var(--red)') + '">' + winRate + '%</div></div>' +
       '<div class="stat-card"><div class="stat-label">P&L Total</div><div class="stat-value ' + (pnl >= 0 ? 'pnl-pos' : 'pnl-neg') + '">' + (pnl >= 0 ? '+' : '') + 'R$' + pnl.toFixed(2) + '</div></div>' +
@@ -417,7 +417,7 @@ function updateAuthUI() {
     area.innerHTML = '<div class="user-chip">' +
       '<div class="user-avatar">' + state.user.name.slice(0,2).toUpperCase() + '</div>' +
       '<span>' + state.user.name + '</span>' +
-      '<span style="color:var(--green);font-family:DM Mono,monospace;font-size:0.8rem;margin-left:4px">R$' + parseFloat(state.user.balance).toFixed(0) + '</span>' +
+      '<span style="color:var(--green);font-family:DM Mono,monospace;font-size:0.8rem;margin-left:4px">R$' + parseFloat(state.user.balance || 0).toFixed(0) + '</span>' +
       '</div>';
   }
 }

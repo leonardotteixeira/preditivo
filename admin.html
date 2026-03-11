@@ -137,6 +137,18 @@ tr:hover td { background:rgba(255,255,255,0.02); }
   </div>
 </div>
 
+
+<div id="descModal" class="modal-overlay">
+  <div class="modal">
+    <h3>Regras de resolucao</h3>
+    <p style="color:#5a6878;font-size:0.85rem;margin-bottom:12px">Descreva como este mercado sera resolvido — fonte de dados, criterio de decisao, prazo.</p>
+    <textarea id="descText" style="width:100%;background:#141c24;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:12px;color:#e8edf2;font-family:inherit;font-size:0.9rem;resize:vertical;min-height:120px;outline:none" placeholder="Ex: Sera resolvido como SIM se qualquer ministro do STF sofrer impeachment aprovado pelo Senado antes de 31/12/2026. Fonte: Senado Federal."></textarea>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn" style="flex:1;background:#00e676;color:#080c10;font-weight:700" onclick="saveDesc()">Salvar</button>
+      <button class="btn-cancel" style="flex:1" onclick="closeModal('descModal')">Cancelar</button>
+    </div>
+  </div>
+</div>
 <div id="resolveModal" class="modal-overlay">
   <div class="modal">
     <h3>Resolver Mercado</h3>
@@ -155,6 +167,34 @@ tr:hover td { background:rgba(255,255,255,0.02); }
 <script>
 var API = 'https://preditivo-backend-production.up.railway.app';
 var ADMIN_PASS = 'preditivo_admin_2026';
+var descMarketId = null;
+function openDesc(marketId) {
+  descMarketId = marketId;
+  // Load current description
+  fetch(API + '/markets/' + marketId)
+    .then(function(r){ return r.json(); })
+    .then(function(m){
+      document.getElementById('descText').value = m.description || '';
+      document.getElementById('descModal').classList.add('active');
+    });
+}
+function saveDesc() {
+  if (!descMarketId) return;
+  var desc = document.getElementById('descText').value.trim();
+  fetch(API + '/markets/' + descMarketId + '/description', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ description: desc })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(){
+    closeModal('descModal');
+    showToast('Regras salvas!');
+    loadMarkets();
+  })
+  .catch(function(){ showToast('Erro ao salvar'); });
+}
+
 var resolveMarketId = null;
 var allDeposits = [];
 
@@ -276,6 +316,8 @@ function loadMarkets() {
         var pYes = Math.round(parseFloat(m.q_yes||100) / total * 100);
         var vol = Math.max(0, total - 200).toFixed(0);
         var closes = m.closes_at ? new Date(m.closes_at).toLocaleDateString('pt-BR') : '-';
+        var descLabel = (m.description && m.description.length > 0) ? 'Editar regras' : '+ Regras';
+        var descBtn = '<button onclick="openDesc(\'' + m.id + '\')">'+descLabel+'</button>';
         var action = m.resolved_at
           ? '<span style="color:#5a6878;font-size:0.8rem">Resolvido</span>'
           : '<button class="btn btn-resolve" onclick="openResolve(\'' + m.id + '\',\'' + m.title.substring(0,40).replace(/'/g,'') + '\')">Resolver</button>';
@@ -285,7 +327,7 @@ function loadMarkets() {
           '<td><span style="color:#00e676">' + pYes + '%</span> / <span style="color:#ff4757">' + (100-pYes) + '%</span></td>' +
           '<td style="color:#ffc107">R$' + vol + '</td>' +
           '<td style="color:#5a6878;font-size:0.8rem">' + closes + '</td>' +
-          '<td>' + action + '</td>' +
+          '<td>' + action + '<br>' + descBtn + '</td>' +
           '</tr>';
       }).join('');
     })

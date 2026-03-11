@@ -792,17 +792,10 @@ async function confirmBet() {
       if (data.error) { showToast('❌','Erro',data.error); return; }
 
       state.balance = parseFloat(data.new_balance);
-      // Update market probability in local array
-      if (data.new_prob_yes !== undefined) {
-        const mkt = markets.find(m => String(m.id) === String(state.currentBet.id));
-        if (mkt) {
-          mkt.yes = data.new_prob_yes;
-          mkt.no = data.new_prob_no;
-        }
-        renderMarkets();
-      }
       closeModal('betModal');
       showToast('✅','Aposta confirmada!',`${side.toUpperCase()} - R$${amt} @ ${prob}%`);
+      // Reload markets from API to get fresh probabilities
+      await loadMarketsFromAPI();
       await loadPortfolioFromAPI();
       return;
     } catch(e) {

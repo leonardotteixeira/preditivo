@@ -251,10 +251,10 @@ function formatDate(d) {
 
 function switchTab(name) {
   document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
-  if (name === 'indicacoes') loadIndicacoes();
   document.querySelectorAll('.tab-content').forEach(function(c){ c.classList.remove('active'); });
   document.getElementById('tab-btn-' + name).classList.add('active');
   document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'indicacoes') loadIndicacoes();
 }
 
 function renderPage() {
@@ -375,6 +375,11 @@ function renderPage() {
         '<button class="btn-save" onclick="saveProfile()">Salvar alterações</button>' +
         '<div class="form-feedback" id="editFeedback"></div>' +
       '</div>' +
+    '</div>' +
+
+    // BUG FIX 1: tab-indicacoes agora existe no HTML com sec-indicacoes dentro
+    '<div class="tab-content" id="tab-indicacoes">' +
+      '<div id="sec-indicacoes"><div style="text-align:center;padding:40px;color:var(--muted)">Clique na aba para carregar...</div></div>' +
     '</div>';
 
   document.getElementById('pageContent').innerHTML = html;
@@ -463,7 +468,8 @@ function loadIndicacoes() {
   if (!section) return;
   section.innerHTML = '<div style="text-align:center;padding:40px;color:#5a6878">Carregando...</div>';
 
-  fetch(API + '/referrals/me', { headers: { 'Authorization': 'Bearer ' + token } })
+  // BUG FIX 2: era "token" (undefined), agora é "state.token"
+  fetch(API + '/referrals/me', { headers: { 'Authorization': 'Bearer ' + state.token } })
     .then(function(r){ return r.json(); })
     .then(function(data) {
       if (data.error) { section.innerHTML = '<p style="color:#ff4757">Erro: ' + data.error + '</p>'; return; }
@@ -516,7 +522,7 @@ function copyRefLink() {
   var input = document.getElementById('refLink');
   input.select();
   document.execCommand('copy');
-  alert('Link copiado!');
+  showToast('Link copiado!');
 }
 
 </script>

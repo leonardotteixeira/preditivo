@@ -739,12 +739,12 @@ function renderMarkets() {
       data-yes="${m.yes}" 
       data-no="${m.no}" 
       data-cat="${m.cat}"
-      onclick="window.location.href='/market/'+m.id">
+>
       <div class="mc-header">
         <span class="mc-category cat-${m.cat}">${catLabel(m.cat)}</span>
         <span class="mc-volume">Vol ${m.volume}</span>
       </div>
-      <div class="mc-title">${m.title}</div>
+      <div class="mc-title"><a href="/market/${m.id}" style="color:inherit;text-decoration:none;" onclick="event.stopPropagation()">${m.title}</a></div>
       <div class="mc-bar"><div class="mc-bar-yes" style="width:${m.yes}%"></div></div>
       <div class="mc-probs">
         <div class="mc-prob-item yes"><span>${m.yes}%</span><span>SIM</span></div>

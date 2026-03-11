@@ -946,8 +946,8 @@ async function loadMarketsFromAPI() {
     if (Array.isArray(data) && data.length > 0) {
       // Map API markets to frontend format
       data.forEach(m => {
-        const total = parseFloat(m.shares_yes) + parseFloat(m.shares_no) || 200;
-        const yes = Math.round((parseFloat(m.shares_yes) / total) * 100) || 50;
+        const total = parseFloat(m.q_yes) + parseFloat(m.q_no) || 200;
+        const yes = Math.round((parseFloat(m.q_yes) / total) * 100) || 50;
         const existing = markets.find(x => x.id === m.id);
         if (!existing) {
           markets.push({

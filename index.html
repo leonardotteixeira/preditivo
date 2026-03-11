@@ -750,8 +750,10 @@ function renderMarkets() {
         <div class="mc-prob-item no"><span>${m.no}%</span><span>NÃO</span></div>
       </div>
       <div class="mc-actions">
-        <button class="mc-btn yes" onclick="event.stopPropagation();openBetById(this,'yes')">Comprar SIM</button>
-        <button class="mc-btn no" onclick="event.stopPropagation();openBetById(this,'no')">Comprar NÃO</button>
+        ${m.resolved_at
+          ? '<div style="width:100%;text-align:center;padding:10px;color:var(--muted);font-size:0.85rem;background:var(--surface2);border-radius:8px;border:1px solid var(--border)">Mercado encerrado</div>'
+          : '<button class="mc-btn yes" onclick="event.stopPropagation();openBetById(this,'yes')">Comprar SIM</button><button class="mc-btn no" onclick="event.stopPropagation();openBetById(this,'no')">Comprar NÃO</button>'
+        }
       </div>
       <div class="mc-footer">
         <div class="mc-footer-item">👥 ${m.traders}</div>
@@ -1038,12 +1040,13 @@ async function loadMarketsFromAPI() {
             volume: 'R$0',
             traders: 0,
             ends: m.closes_at ? new Date(m.closes_at).toLocaleDateString('pt-BR') : '—',
+            resolved_at: m.resolved_at || null,
             hot: false, new: true
           });
         } else {
-          // Always update probabilities from API
           existing.yes = yes;
           existing.no = 100 - yes;
+          existing.resolved_at = m.resolved_at || null;
         }
       });
       renderMarkets();

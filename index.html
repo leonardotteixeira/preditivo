@@ -622,6 +622,7 @@
 // ---- STATE ----
 let state = {
   user: null,
+  token: null,
   walletConnected: false,
   walletAddress: null,
   balance: 1000,
@@ -858,27 +859,113 @@ function renderChart() {
   });
 }
 
-// ---- AUTH ----
-function doLogin() {
-  const email = document.getElementById('loginEmail').value;
-  if (!email) return;
-  const name = email.split('@')[0];
-  state.user = { name, email };
-  closeModal('loginModal');
-  updateAuthUI();
-  showToast('👋','Bem-vindo de volta!',`Logado como ${name}`);
-  renderPortfolio();
+// ---- API ----
+const API = 'https://preditivo-backend-production.up.railway.app';
+
+async function apiPost(path, body, token) {
+  const res = await fetch(API + path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+    body: JSON.stringify(body)
+  });
+  return res.json();
 }
 
-function doRegister() {
-  const user = document.getElementById('regUser').value;
-  if (!user) return;
-  state.user = { name: user, email: document.getElementById('regEmail').value };
-  state.balance = 1000;
-  closeModal('registerModal');
-  updateAuthUI();
-  showToast('🎉','Conta criada!','Você recebeu $1.000 USDC de boas-vindas');
-  renderPortfolio();
+async function apiGet(path, token) {
+  const res = await fetch(API + path, {
+    headers: token ? { Authorization: 'Bearer ' + token } : {}
+  });
+  return res.json();
+}
+
+async function loadMarketsFromAPI() {
+  try {
+    const data = await apiGet('/markets');
+    if (Array.isArray(data) && data.length > 0) {
+      // Map API markets to frontend format
+      data.forEach(m => {
+        const total = parseFloat(m.shares_yes) + parseFloat(m.shares_no) || 200;
+        const yes = Math.round((parseFloat(m.shares_yes) / total) * 100) || 50;
+        const existing = markets.find(x => x.id === m.id);
+        if (!existing) {
+          markets.push({
+            id: m.id,
+            title: m.title,
+            cat: m.category || 'politica',
+            yes, no: 100 - yes,
+            volume: 'R$0',
+            traders: 0,
+            ends: m.closes_at ? new Date(m.closes_at).toLocaleDateString('pt-BR') : '—',
+            hot: false, new: true
+          });
+        }
+      });
+      renderMarkets();
+    }
+  } catch(e) { console.log('API markets error', e); }
+}
+
+async function loadRankingFromAPI() {
+  try {
+    const data = await apiGet('/ranking');
+    if (Array.isArray(data) && data.length > 0) {
+      // Merge with local ranking
+      const colors = ['#00e676','#00b4ff','#ffc107','#c864ff','#ff6b6b'];
+      rankingData.splice(0, rankingData.length);
+      data.forEach((u, i) => {
+        rankingData.push({
+          name: u.name,
+          avatar: u.name.slice(0,2).toUpperCase(),
+          color: colors[i % colors.length],
+          profit: '+R$' + parseFloat(u.total_profit || 0).toFixed(0),
+          trades: u.total_bets || 0,
+          accuracy: (u.win_rate || 0) + '%'
+        });
+      });
+    }
+  } catch(e) { console.log('API ranking error', e); }
+}
+
+// ---- AUTH ----
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPass').value;
+  if (!email || !password) { showToast('⚠️','Preencha todos os campos',''); return; }
+  try {
+    const data = await apiPost('/auth/login', { email, password });
+    if (data.error) { showToast('❌','Erro',data.error); return; }
+    state.user = data.user;
+    state.token = data.token;
+    state.balance = parseFloat(data.user.balance);
+    localStorage.setItem('preditivo_token', data.token);
+    closeModal('loginModal');
+    updateAuthUI();
+    showToast('👋','Bem-vindo de volta!',`Logado como ${data.user.name}`);
+    renderPortfolio();
+  } catch(e) {
+    showToast('❌','Erro de conexão','Tente novamente');
+  }
+}
+
+async function doRegister() {
+  const name = document.getElementById('regUser').value;
+  const email = document.getElementById('regEmail').value;
+  const password = document.getElementById('regPass').value;
+  if (!name || !email || !password) { showToast('⚠️','Preencha todos os campos',''); return; }
+  try {
+    const data = await apiPost('/auth/register', { name, email, password });
+    if (data.error) { showToast('❌','Erro',data.error); return; }
+    state.user = data.user;
+    state.token = data.token;
+    state.balance = parseFloat(data.user.balance);
+    localStorage.setItem('preditivo_token', data.token);
+    closeModal('registerModal');
+    updateAuthUI();
+    showToast('🎉','Conta criada!','Você recebeu $1.000 USDC de boas-vindas');
+    renderPortfolio();
+  } catch(e) {
+    showToast('❌','Erro de conexão','Tente novamente');
+  }
 }
 
 function connectWallet() {
@@ -950,17 +1037,39 @@ function showToast(icon, title, msg) {
 }
 
 // ---- INIT ----
-renderMarkets();
-renderPortfolio();
+async function init() {
+  renderMarkets();
+  renderPortfolio();
 
-// Animate stats
-let vol = 2.4; let players = 3200;
-setInterval(() => {
-  vol += (Math.random()-0.4)*0.05;
-  players += Math.floor((Math.random()-0.3)*5);
-  document.getElementById('totalVolume').textContent = 'R$'+vol.toFixed(1)+'M';
-  document.getElementById('activePlayers').textContent = (players/1000).toFixed(1)+'k';
-}, 3000);
+  // Restore session
+  const savedToken = localStorage.getItem('preditivo_token');
+  if (savedToken) {
+    try {
+      const user = await apiGet('/auth/me', savedToken);
+      if (user && user.id) {
+        state.user = user;
+        state.token = savedToken;
+        state.balance = parseFloat(user.balance);
+        updateAuthUI();
+      }
+    } catch(e) { localStorage.removeItem('preditivo_token'); }
+  }
+
+  // Load real markets and ranking
+  loadMarketsFromAPI();
+  loadRankingFromAPI();
+
+  // Animate stats
+  let vol = 2.4; let players = 3200;
+  setInterval(() => {
+    vol += (Math.random()-0.4)*0.05;
+    players += Math.floor((Math.random()-0.3)*5);
+    document.getElementById('totalVolume').textContent = 'R$'+vol.toFixed(1)+'M';
+    document.getElementById('activePlayers').textContent = (players/1000).toFixed(1)+'k';
+  }, 3000);
+}
+
+init();
 </script>
 </body>
 </html>

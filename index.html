@@ -639,6 +639,7 @@
       <a onclick="showSection('home')" id="nav-home" class="active">Mercados</a>
       <a onclick="showSection('portfolio')" id="nav-portfolio">Portfólio</a>
       <a onclick="showSection('ranking')" id="nav-ranking">Ranking</a>
+      <a onclick="openModal('comoFuncionaModal')" style="cursor:pointer">Como funciona</a>
     </nav>
     <div class="header-right">
       <button class="wallet-btn" id="walletBtn" onclick="connectWallet()">
@@ -1363,5 +1364,98 @@ async function init() {
 
 init();
 </script>
+
+<!-- FOOTER -->
+<footer style="background:var(--surface);border-top:1px solid var(--border);padding:32px 24px;margin-top:60px;text-align:center">
+  <div style="max-width:1100px;margin:0 auto">
+    <div style="font-size:1.1rem;font-weight:700;color:var(--green);margin-bottom:8px">PrevBR<span style="color:var(--text)">.io</span></div>
+    <p style="color:var(--muted);font-size:0.82rem;margin-bottom:16px;max-width:500px;margin-left:auto;margin-right:auto">
+      Plataforma de mercados de previsão. Aposte com dados, não com sorte.
+    </p>
+    <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:16px">
+      <a onclick="openModal('comoFuncionaModal')" style="color:var(--muted);font-size:0.82rem;cursor:pointer;text-decoration:none">Como funciona</a>
+      <a onclick="openModal('termosModal')" style="color:var(--muted);font-size:0.82rem;cursor:pointer;text-decoration:none">Termos de uso</a>
+      <a onclick="openModal('termosModal')" style="color:var(--muted);font-size:0.82rem;cursor:pointer;text-decoration:none">Privacidade</a>
+    </div>
+    <p style="color:var(--border);font-size:0.75rem">© 2026 PrevBR.io — Plataforma educacional e de entretenimento. Não constitui consultoria financeira.</p>
+  </div>
+</footer>
+
+<!-- COMO FUNCIONA MODAL -->
+<div class="modal-overlay" id="comoFuncionaModal">
+  <div class="modal" style="max-width:600px;max-height:80vh;overflow-y:auto">
+    <button class="modal-close" onclick="closeModal('comoFuncionaModal')">✕</button>
+    <h2>🎯 Como funciona</h2>
+
+    <div style="display:flex;flex-direction:column;gap:20px;margin-top:8px">
+      <div style="background:var(--surface2);border-radius:12px;padding:16px">
+        <div style="font-size:1.1rem;margin-bottom:6px">1️⃣ Escolha um mercado</div>
+        <p style="color:var(--muted);font-size:0.88rem;margin:0">Explore mercados sobre política, economia e esportes. Cada mercado tem uma pergunta com resposta SIM ou NÃO.</p>
+      </div>
+      <div style="background:var(--surface2);border-radius:12px;padding:16px">
+        <div style="font-size:1.1rem;margin-bottom:6px">2️⃣ Aposte na sua previsão</div>
+        <p style="color:var(--muted);font-size:0.88rem;margin:0">Escolha SIM ou NÃO e defina o valor da sua aposta. O sistema calcula automaticamente seu retorno potencial com base na probabilidade atual do mercado.</p>
+      </div>
+      <div style="background:var(--surface2);border-radius:12px;padding:16px">
+        <div style="font-size:1.1rem;margin-bottom:6px">3️⃣ O mercado se move</div>
+        <p style="color:var(--muted);font-size:0.88rem;margin:0">As probabilidades mudam conforme mais pessoas apostam. Quanto antes você apostar no lado certo, maior o retorno potencial.</p>
+      </div>
+      <div style="background:var(--surface2);border-radius:12px;padding:16px">
+        <div style="font-size:1.1rem;margin-bottom:6px">4️⃣ Resolução e pagamento</div>
+        <p style="color:var(--muted);font-size:0.88rem;margin:0">Quando o evento acontece, o mercado é resolvido com base em fontes verificáveis. Quem acertou recebe o pagamento automaticamente no saldo.</p>
+      </div>
+      <div style="background:var(--surface2);border-radius:12px;padding:16px">
+        <div style="font-size:1.1rem;margin-bottom:6px">💰 Depósito e saque</div>
+        <p style="color:var(--muted);font-size:0.88rem;margin:0">Deposite via PIX com um código único. Saques são processados em até 24h úteis também via PIX. Taxa da plataforma: 2% por aposta.</p>
+      </div>
+      <div style="background:rgba(0,153,116,0.1);border:1px solid var(--green);border-radius:12px;padding:16px">
+        <div style="font-size:1rem;margin-bottom:6px;color:var(--green)">🎁 Bônus de cadastro</div>
+        <p style="color:var(--muted);font-size:0.88rem;margin:0">Todo novo usuário recebe R$100 de saldo virtual para explorar a plataforma. Deposite para usar saldo real.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TERMOS DE USO MODAL -->
+<div class="modal-overlay" id="termosModal">
+  <div class="modal" style="max-width:600px;max-height:80vh;overflow-y:auto">
+    <button class="modal-close" onclick="closeModal('termosModal')">✕</button>
+    <h2>📋 Termos de Uso e Privacidade</h2>
+
+    <div style="color:var(--muted);font-size:0.85rem;line-height:1.7;display:flex;flex-direction:column;gap:16px;margin-top:8px">
+      <div>
+        <strong style="color:var(--text)">1. Sobre a plataforma</strong>
+        <p style="margin:6px 0 0 0">O PrevBR.io é uma plataforma de mercados de previsão de caráter educacional e de entretenimento. Não constitui consultoria financeira ou de investimentos.</p>
+      </div>
+      <div>
+        <strong style="color:var(--text)">2. Elegibilidade</strong>
+        <p style="margin:6px 0 0 0">Para usar a plataforma você deve ter 18 anos ou mais e estar em conformidade com as leis da sua localidade. O uso é de responsabilidade exclusiva do usuário.</p>
+      </div>
+      <div>
+        <strong style="color:var(--text)">3. Depósitos e saques</strong>
+        <p style="margin:6px 0 0 0">Depósitos são processados manualmente em até 2h úteis após confirmação do PIX. Saques são processados em até 24h úteis. O valor mínimo de saque é R$20.</p>
+      </div>
+      <div>
+        <strong style="color:var(--text)">4. Taxa da plataforma</strong>
+        <p style="margin:6px 0 0 0">A plataforma cobra uma taxa de 2% sobre o valor de cada aposta. Essa taxa é descontada automaticamente no momento da aposta.</p>
+      </div>
+      <div>
+        <strong style="color:var(--text)">5. Resolução de mercados</strong>
+        <p style="margin:6px 0 0 0">Os mercados são resolvidos pela equipe do PrevBR.io com base em fontes verificáveis e públicas. A decisão de resolução é final e não está sujeita a recurso.</p>
+      </div>
+      <div>
+        <strong style="color:var(--text)">6. Privacidade de dados</strong>
+        <p style="margin:6px 0 0 0">Coletamos apenas os dados necessários para operação da plataforma (nome, email, histórico de apostas). Não compartilhamos dados com terceiros sem sua autorização.</p>
+      </div>
+      <div>
+        <strong style="color:var(--text)">7. Responsabilidade</strong>
+        <p style="margin:6px 0 0 0">O PrevBR.io não se responsabiliza por perdas financeiras decorrentes do uso da plataforma. Aposte com responsabilidade e apenas o que você pode perder.</p>
+      </div>
+      <div style="background:var(--surface2);border-radius:8px;padding:12px;font-size:0.8rem">
+        Última atualização: Março de 2026. Dúvidas? Entre em contato pelo email: <span style="color:var(--green)">contato@prevbr.io</span>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>

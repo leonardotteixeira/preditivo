@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Preditivo — Mercado</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 :root {
@@ -50,6 +50,7 @@ header {
 }
 
 .page { max-width:1100px; margin:0 auto; padding:32px 24px 80px; position:relative; z-index:1; }
+@media(max-width:600px) { .page { padding:16px 12px 60px; } }
 
 /* SKELETON */
 .skeleton { background:linear-gradient(90deg,var(--surface) 25%,var(--surface2) 50%,var(--surface) 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:8px; }
@@ -57,7 +58,8 @@ header {
 
 /* LAYOUT */
 .market-layout { display:grid; grid-template-columns:1fr 360px; gap:24px; align-items:start; }
-@media(max-width:900px) { .market-layout { grid-template-columns:1fr; } }
+@media(max-width:1000px) { .market-layout { grid-template-columns:1fr; } }
+@media(max-width:600px) { .market-title { font-size:1.3rem; } .prob-yes,.prob-no { font-size:1.4rem; } .stats-row { grid-template-columns:1fr 1fr; } }
 
 /* LEFT COLUMN */
 .market-main {}
@@ -120,6 +122,7 @@ header {
   background:var(--surface); border:1px solid var(--border);
   border-radius:16px; padding:24px; position:sticky; top:88px;
 }
+@media(max-width:1000px) { .bet-widget { position:static; } }
 .bet-widget-title { font-size:0.85rem; color:var(--muted); margin-bottom:16px; }
 .bet-tabs { display:flex; gap:8px; margin-bottom:16px; }
 .bet-tab {
@@ -306,7 +309,7 @@ function renderPage() {
 
       '<div class="stats-row">' +
         '<div class="stat-chip"><div class="stat-chip-label">Volume</div><div class="stat-chip-value" style="color:var(--gold)">R$' + volume + '</div></div>' +
-        '<div class="stat-chip"><div class="stat-chip-label">Encerra</div><div class="stat-chip-value" style="font-size:0.9rem;font-family:inherit">' + formatDate(m.closes_at) + '</div></div>' +
+        '<div class="stat-chip"><div class="stat-chip-label">Encerra</div><div class="stat-chip-value" style="font-size:0.9rem;font-family:inherit">' + formatDate(m.ends_at) + '</div></div>' +
         '<div class="stat-chip"><div class="stat-chip-label">Status</div><div class="stat-chip-value" style="font-size:0.9rem;font-family:inherit;color:' + (isResolved ? 'var(--muted)' : 'var(--green)') + '">' + (isResolved ? 'Encerrado' : 'Aberto') + '</div></div>' +
       '</div>' +
 
@@ -332,8 +335,8 @@ function renderPage() {
             '<div class="tl-content"><div class="tl-label">Mercado aberto</div><div class="tl-date">' + formatDate(m.created_at) + '</div></div>' +
           '</div>' +
           '<div class="tl-item">' +
-            '<div class="tl-line"><div class="tl-dot ' + (isResolved ? 'done' : (m.closes_at && new Date(m.closes_at) < new Date() ? 'active' : '')) + '"></div><div class="tl-connector"></div></div>' +
-            '<div class="tl-content"><div class="tl-label">Encerramento de apostas</div><div class="tl-date">' + formatDate(m.closes_at) + '</div></div>' +
+            '<div class="tl-line"><div class="tl-dot ' + (isResolved ? 'done' : (m.ends_at && new Date(m.ends_at) < new Date() ? 'active' : '')) + '"></div><div class="tl-connector"></div></div>' +
+            '<div class="tl-content"><div class="tl-label">Encerramento de apostas</div><div class="tl-date">' + formatDate(m.ends_at) + '</div></div>' +
           '</div>' +
           '<div class="tl-item">' +
             '<div class="tl-line"><div class="tl-dot ' + (isResolved ? 'done' : '') + '"></div></div>' +

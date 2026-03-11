@@ -221,20 +221,15 @@ async function loadMarkets() {
       const total = parseFloat(m.q_yes) + parseFloat(m.q_no);
       const probYes = Math.round(parseFloat(m.q_yes) / total * 100);
       const volume = (total - 200).toFixed(0);
-      return `
-        <tr>
-          <td style="max-width:300px">${m.title}</td>
-          <td style="color:#5a6878;font-size:0.8rem">${m.category}</td>
-          <td>
-            <span style="color:#00e676;font-family:'DM Mono',monospace">${probYes}%</span>
-            <span style="color:#5a6878"> / </span>
-            <span style="color:#ff4757;font-family:'DM Mono',monospace">${100-probYes}%</span>
-          </td>
-          <td style="font-family:'DM Mono',monospace;color:#ffc107">R$${Math.max(0,volume)}</td>
-          <td style="color:#5a6878;font-size:0.8rem">${m.closes_at ? new Date(m.closes_at).toLocaleDateString('pt-BR') : '-'}</td>
-          <td>${m.resolved_at ? '<span style="color:#5a6878">Resolvido</span>' : `<button class="btn-resolve" onclick="openResolve(${m.id}, '${m.title.replace(/'/g,"\\'")}')">Resolver</button>`}</td>
-        </tr>
-      `;
+      const mid = m.id;
+      return '<tr>' +
+        '<td style="max-width:300px">' + m.title + '</td>' +
+        '<td style="color:#5a6878;font-size:0.8rem">' + m.category + '</td>' +
+        '<td><span style="color:#00e676;font-family:monospace">' + probYes + '%</span> / <span style="color:#ff4757;font-family:monospace">' + (100-probYes) + '%</span></td>' +
+        '<td style="font-family:monospace;color:#ffc107">R$' + Math.max(0,volume) + '</td>' +
+        '<td style="color:#5a6878;font-size:0.8rem">' + (m.closes_at ? new Date(m.closes_at).toLocaleDateString('pt-BR') : '-') + '</td>' +
+        '<td>' + (m.resolved_at ? '<span style="color:#5a6878">Resolvido</span>' : '<button class="btn-resolve" onclick="openResolve(' + mid + ')">Resolver</button>') + '</td>' +
+        '</tr>';
     }).join('');
   } catch(e) { console.log('markets error', e); }
 }
@@ -287,9 +282,9 @@ async function rejectDeposit(depositId) {
   } catch(e) { showToast('Erro'); }
 }
 
-function openResolve(marketId, title) {
+function openResolve(marketId) {
   resolveMarketId = marketId;
-  document.getElementById('resolveMarketTitle').textContent = title;
+  document.getElementById('resolveMarketTitle').textContent = 'Mercado ID: ' + marketId;
   document.getElementById('resolveModal').classList.add('active');
 }
 

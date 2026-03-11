@@ -427,6 +427,26 @@
   .toast strong { display:block;font-weight:600; }
   .toast span { color:var(--muted);font-size:0.8rem; }
 
+
+  /* ---- DEPOSIT MODAL ---- */
+  .deposit-steps { display:flex; flex-direction:column; gap:12px; margin-bottom:20px; }
+  .deposit-step { display:flex; align-items:flex-start; gap:12px; padding:14px; background:var(--surface2); border-radius:10px; }
+  .step-num { width:24px; height:24px; border-radius:50%; background:var(--green); color:#080c10; font-weight:700; font-size:0.8rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .step-content { flex:1; }
+  .step-title { font-size:0.9rem; font-weight:600; margin-bottom:4px; }
+  .step-desc { font-size:0.8rem; color:var(--muted); }
+  .pix-key-box { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:14px 16px; margin:12px 0; display:flex; align-items:center; justify-content:space-between; }
+  .pix-key { font-family:'DM Mono',monospace; font-size:0.8rem; color:var(--green); word-break:break-all; flex:1; margin-right:12px; }
+  .copy-btn { background:var(--green-dim); border:1px solid rgba(0,230,118,0.3); color:var(--green); padding:6px 12px; border-radius:6px; cursor:pointer; font-size:0.8rem; font-weight:600; font-family:inherit; white-space:nowrap; transition:all 0.2s; }
+  .copy-btn:hover { background:var(--green); color:#080c10; }
+  .deposit-amount-row { display:flex; gap:8px; margin-bottom:16px; }
+  .deposit-presets { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+  .deposit-preset { padding:8px 16px; background:var(--surface2); border:1px solid var(--border); border-radius:6px; color:var(--muted); font-size:0.85rem; cursor:pointer; font-family:inherit; transition:all 0.2s; }
+  .deposit-preset:hover { border-color:var(--green); color:var(--green); }
+  .deposit-code { text-align:center; padding:12px; background:var(--green-dim); border:1px solid rgba(0,230,118,0.2); border-radius:8px; margin-bottom:16px; }
+  .deposit-code span { font-family:'DM Mono',monospace; font-size:1.1rem; font-weight:700; color:var(--green); letter-spacing:2px; }
+  .deposit-warning { font-size:0.78rem; color:var(--muted); text-align:center; line-height:1.5; }
+
   /* ---- RESPONSIVE ---- */
   @media(max-width:900px) {
     .hero { grid-template-columns:1fr;gap:32px; }
@@ -493,6 +513,60 @@
     </div>
     <button class="btn-primary" onclick="confirmBet()">Confirmar Aposta</button>
     <div class="balance-info">Saldo disponível: <span id="userBalanceDisplay">—</span> USDC</div>
+  </div>
+</div>
+
+
+<!-- DEPOSIT MODAL -->
+<div class="modal-overlay" id="depositModal">
+  <div class="modal" style="max-width:480px">
+    <button class="modal-close" onclick="closeModal('depositModal')">✕</button>
+    <h2>💰 Depositar</h2>
+    <p>Faça um PIX e seu saldo será creditado em até 15 minutos</p>
+
+    <div class="deposit-presets">
+      <button class="deposit-preset" onclick="setDepositAmount(10)">R$10</button>
+      <button class="deposit-preset" onclick="setDepositAmount(25)">R$25</button>
+      <button class="deposit-preset" onclick="setDepositAmount(50)">R$50</button>
+      <button class="deposit-preset" onclick="setDepositAmount(100)">R$100</button>
+      <button class="deposit-preset" onclick="setDepositAmount(200)">R$200</button>
+    </div>
+    <input class="modal-input" type="number" id="depositAmount" placeholder="Valor (mín. R$10)" min="10">
+
+    <div class="deposit-code">
+      <div style="font-size:0.75rem;color:var(--muted);margin-bottom:4px">Seu código de depósito</div>
+      <span id="depositCode">—</span>
+    </div>
+
+    <div class="deposit-steps">
+      <div class="deposit-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Copie a chave PIX</div>
+          <div class="pix-key-box">
+            <span class="pix-key">9bf0d836-a584-4436-8f45-61c650167cf3</span>
+            <button class="copy-btn" onclick="copyPixKey()">Copiar</button>
+          </div>
+        </div>
+      </div>
+      <div class="deposit-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Faça o PIX com o valor escolhido</div>
+          <div class="step-desc">No campo "mensagem" ou "descrição" do PIX, coloque seu código acima</div>
+        </div>
+      </div>
+      <div class="deposit-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Aguarde a confirmação</div>
+          <div class="step-desc">Seu saldo será creditado em até 15 minutos após o pagamento</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="confirmDepositRequest()">✅ Já fiz o PIX</button>
+    <div class="deposit-warning" style="margin-top:12px">Depósito mínimo R$10 · Saque disponível após 24h · Suporte: suporte@preditivo.com.br</div>
   </div>
 </div>
 
@@ -1064,7 +1138,13 @@ function connectWallet() {
 function updateAuthUI() {
   const area = document.getElementById('authArea');
   if (state.user) {
-    area.innerHTML = `<div class="user-chip"><div class="user-avatar">${state.user.name.slice(0,2).toUpperCase()}</div><span>${state.user.name}</span></div>`;
+    area.innerHTML = `
+      <button class="btn-secondary" style="padding:7px 14px;font-size:0.82rem;margin-right:8px;width:auto" onclick="openDepositModal()">+ Depositar</button>
+      <div class="user-chip" onclick="showSection('portfolio')" style="cursor:pointer">
+        <div class="user-avatar">${state.user.name.slice(0,2).toUpperCase()}</div>
+        <span>${state.user.name}</span>
+        <span style="color:var(--green);font-family:'DM Mono',monospace;font-size:0.8rem;margin-left:4px">R$${state.balance.toFixed(0)}</span>
+      </div>`;
   }
 }
 
@@ -1100,6 +1180,44 @@ function showToast(icon, title, msg) {
   document.getElementById('toastMsg').textContent = msg;
   t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+
+// ---- DEPOSIT ----
+function generateDepositCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = 'DEP-';
+  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+
+function openDepositModal() {
+  if (!state.user) { openModal('loginModal'); return; }
+  const code = generateDepositCode();
+  state.depositCode = code;
+  document.getElementById('depositCode').textContent = code;
+  document.getElementById('depositAmount').value = '';
+  openModal('depositModal');
+}
+
+function setDepositAmount(v) {
+  document.getElementById('depositAmount').value = v;
+}
+
+function copyPixKey() {
+  navigator.clipboard.writeText('9bf0d836-a584-4436-8f45-61c650167cf3');
+  showToast('✅', 'Copiado!', 'Chave PIX copiada');
+}
+
+async function confirmDepositRequest() {
+  const amt = parseFloat(document.getElementById('depositAmount').value);
+  if (!amt || amt < 10) { showToast('⚠️', 'Valor inválido', 'Mínimo R$10'); return; }
+  const code = state.depositCode;
+  try {
+    await apiPost('/deposits', { amount: amt, code, user_id: state.user.id }, state.token);
+  } catch(e) {}
+  closeModal('depositModal');
+  showToast('⏳', 'Solicitação registrada!', `Código ${code} · Crédito em até 15min`);
 }
 
 // ---- INIT ----

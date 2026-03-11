@@ -160,15 +160,7 @@ let resolveMarketId = null;
 async function adminLogin() {
   const pass = document.getElementById('adminPass').value;
   if (pass !== ADMIN_PASS) { showToast('❌ Senha incorreta'); return; }
-  // Login com conta admin
-  try {
-    const res = await fetch(API + '/auth/login', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ email: 'admin@preditivo.com.br', password: pass })
-    });
-    const data = await res.json();
-    adminToken = data.token || 'admin';
-  } catch(e) { adminToken = 'admin'; }
+  adminToken = 'admin';
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('dashboard').style.display = 'block';
   loadAll();
@@ -187,7 +179,7 @@ async function loadAll() {
 
 async function loadDeposits() {
   try {
-    const res = await fetch(API + '/admin/deposits', { headers: { Authorization: 'Bearer ' + adminToken } });
+    const res = await fetch(API + '/admin/deposits');
     const data = await res.json();
     if (!Array.isArray(data)) return;
 
@@ -249,7 +241,7 @@ async function loadMarkets() {
 
 async function loadUsers() {
   try {
-    const res = await fetch(API + '/admin/users', { headers: { Authorization: 'Bearer ' + adminToken } });
+    const res = await fetch(API + '/admin/users');
     const data = await res.json();
     if (!Array.isArray(data)) return;
 
@@ -275,7 +267,7 @@ async function confirmDeposit(depositId, userId, amount) {
   try {
     await fetch(API + '/admin/deposits/' + depositId + '/confirm', {
       method: 'POST',
-      headers: { 'Content-Type':'application/json', Authorization: 'Bearer ' + adminToken },
+      headers: { 'Content-Type':'application/json' },
       body: JSON.stringify({ user_id: userId, amount })
     });
     showToast('✅ Depósito confirmado — R$' + parseFloat(amount).toFixed(2) + ' creditado');
@@ -288,7 +280,7 @@ async function rejectDeposit(depositId) {
   try {
     await fetch(API + '/admin/deposits/' + depositId + '/reject', {
       method: 'POST',
-      headers: { Authorization: 'Bearer ' + adminToken }
+      headers: {}
     });
     showToast('❌ Depósito rejeitado');
     loadDeposits();
@@ -310,7 +302,7 @@ async function confirmResolve(outcome) {
   try {
     await fetch(API + '/markets/' + resolveMarketId + '/resolve', {
       method: 'POST',
-      headers: { 'Content-Type':'application/json', Authorization: 'Bearer ' + adminToken },
+      headers: { 'Content-Type':'application/json' },
       body: JSON.stringify({ outcome })
     });
     showToast('✅ Mercado resolvido — vencedores pagos!');
@@ -325,7 +317,7 @@ async function adjustBalance(userId, name) {
   try {
     await fetch(API + '/admin/balance', {
       method: 'POST',
-      headers: { 'Content-Type':'application/json', Authorization: 'Bearer ' + adminToken },
+      headers: { 'Content-Type':'application/json' },
       body: JSON.stringify({ user_id: userId, amount: parseFloat(amt) })
     });
     showToast('✅ Saldo ajustado');

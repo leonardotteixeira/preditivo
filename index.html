@@ -708,8 +708,10 @@ function setCatFilter(cat, el) {
 
 // ---- BET MODAL ----
 function openBetById(id, side='yes') {
-  const market = (window._marketsMap || {})[id] || markets.find(m => m.id === id);
+  // id from HTML comes as number, API ids may be numbers or strings
+  const market = markets.find(m => String(m.id) === String(id));
   if (market) openBet(market, side);
+  else console.warn('Market not found:', id, markets.map(m=>m.id));
 }
 
 function openBet(market, side='yes') {

@@ -774,7 +774,10 @@ async function confirmBet() {
   if (!amt || amt <= 0) { showToast('⚠️','Valor inválido','Insira um valor para apostar'); return; }
   if (amt > state.balance) { showToast('❌','Saldo insuficiente','Você não tem saldo suficiente'); return; }
 
-  const side = state.betSide;
+  // Read side directly from which tab is active, not from state
+  const activeTab = document.getElementById('betTabYes').classList.contains('active') ? 'yes' : 'no';
+  const side = activeTab;
+  console.log('Confirmando aposta - side:', side, 'state.betSide:', state.betSide);
   const prob = side==='yes' ? state.currentBet.yes : state.currentBet.no;
 
   // Se logado, salva na API

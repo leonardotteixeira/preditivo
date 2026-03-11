@@ -469,7 +469,7 @@ function loadSaques() {
         var dt = new Date(s.created_at).toLocaleString('pt-BR');
         var statusColor = s.status === 'pending' ? '#ffc107' : s.status === 'paid' ? '#00e676' : '#ff4757';
         var action = s.status === 'pending'
-          ? '<button class="btn btn-confirm" onclick="pagarSaque(''+s.id+'')">Marcar pago</button> <button class="btn btn-reject" style="margin-left:4px" onclick="cancelarSaque(''+s.id+'')">Cancelar</button>'
+          ? '<button class="btn btn-confirm" onclick="pagarSaque(\"'+s.id+'\")" >Marcar pago</button> <button class="btn btn-reject" style="margin-left:4px" onclick="cancelarSaque(\"'+s.id+'\")" >Cancelar</button>'
           : '<span style="color:#5a6878;font-size:0.8rem">' + s.status + '</span>';
         return '<tr>' +
           '<td>' + (s.username || '-') + '</td>' +

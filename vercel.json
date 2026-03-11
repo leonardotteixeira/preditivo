@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/market/:id", "destination": "/market.html" }
+  ]
+}

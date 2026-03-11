@@ -50,7 +50,7 @@ header {
   background:var(--surface); border:1px solid var(--border);
   border-radius:20px; padding:32px; margin-bottom:24px;
   display:flex; align-items:center; gap:24px;
-  position:relative; overflow:hidden;
+  position:relative; overflow:hidden; isolation:isolate;
 }
 .profile-header::before {
   content:''; position:absolute; top:-40px; right:-40px;
@@ -74,7 +74,7 @@ header {
 .btn-edit {
   padding:10px 20px; background:var(--surface2); border:1px solid var(--border);
   border-radius:8px; color:var(--text); cursor:pointer; font-family:inherit;
-  font-size:0.85rem; font-weight:600; transition:all 0.2s;
+  font-size:0.85rem; font-weight:600; transition:all 0.2s; position:relative; z-index:2;
 }
 .btn-edit:hover { border-color:var(--green); color:var(--green); }
 

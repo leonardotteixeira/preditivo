@@ -102,6 +102,7 @@ tr:hover td { background:rgba(255,255,255,0.02); }
       <button class="tab active" onclick="switchTab('deposits',this)">Depositos</button>
       <button class="tab" onclick="switchTab('markets',this)">Mercados</button>
       <button class="tab" onclick="switchTab('users',this)">Usuarios</button>
+      <button class="tab" onclick="switchTab('receita',this)">Receita</button>
     </div>
 
     <div id="sec-deposits" class="section active">
@@ -127,6 +128,12 @@ tr:hover td { background:rgba(255,255,255,0.02); }
         <tbody id="usersTbody"><tr><td colspan="5" style="text-align:center;padding:40px;color:#5a6878">Carregando...</td></tr></tbody>
       </table>
     </div>
+
+    <div id="sec-receita" class="section">
+      <div class="section-title">Receita da Casa</div>
+      <div id="receitaContent">Carregando...</div>
+    </div>
+
   </div>
 </div>
 
@@ -169,6 +176,7 @@ function switchTab(name, el) {
   document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
   el.classList.add('active');
   document.getElementById('sec-' + name).classList.add('active');
+  if (name === 'receita') loadReceita();
 }
 
 function closeModal(id) {
@@ -186,6 +194,41 @@ function loadAll() {
   loadDeposits();
   loadMarkets();
   loadUsers();
+}
+
+function loadReceita() {
+  fetch(API + '/admin/receita')
+    .then(function(r){ return r.json(); })
+    .then(function(d) {
+      var spread = d.spread_retido;
+      var html = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px">' +
+        '<div class="stat-card"><div class="stat-label">Total Apostado</div><div class="stat-value green">R$ ' + parseFloat(d.total_apostado).toFixed(2) + '</div></div>' +
+        '<div class="stat-card"><div class="stat-label">Total Pago em Premios</div><div class="stat-value" style="color:#ff4757">R$ ' + parseFloat(d.total_pago).toFixed(2) + '</div></div>' +
+        '<div class="stat-card"><div class="stat-label">Spread Retido (Receita)</div><div class="stat-value gold">R$ ' + parseFloat(spread).toFixed(2) + '</div></div>' +
+        '<div class="stat-card"><div class="stat-label">Total Depositado</div><div class="stat-value blue">R$ ' + parseFloat(d.total_depositado).toFixed(2) + '</div></div>' +
+        '</div>';
+
+      html += '<div class="section-title" style="margin-bottom:12px">Por Mercado</div>';
+      html += '<table><thead><tr><th>Mercado</th><th>Categoria</th><th>Apostas</th><th>Total Apostado</th><th>Premio Pago</th><th>Spread da Casa</th><th>Resultado</th></tr></thead><tbody>';
+
+      d.por_mercado.forEach(function(m) {
+        var spread = parseFloat(m.spread);
+        var spreadColor = spread >= 0 ? '#00e676' : '#ff4757';
+        html += '<tr>' +
+          '<td style="max-width:280px;font-size:0.85rem">' + m.title + '</td>' +
+          '<td style="color:#5a6878;font-size:0.8rem">' + m.category + '</td>' +
+          '<td style="font-family:monospace">' + m.total_apostas + '</td>' +
+          '<td style="color:#00e676;font-family:monospace">R$ ' + parseFloat(m.total_apostado).toFixed(2) + '</td>' +
+          '<td style="color:#ff4757;font-family:monospace">R$ ' + parseFloat(m.total_pago).toFixed(2) + '</td>' +
+          '<td style="color:' + spreadColor + ';font-family:monospace;font-weight:700">R$ ' + spread.toFixed(2) + '</td>' +
+          '<td style="color:#5a6878;font-size:0.8rem">' + (m.resolved_outcome ? m.resolved_outcome.toUpperCase() : 'Aberto') + '</td>' +
+          '</tr>';
+      });
+
+      html += '</tbody></table>';
+      document.getElementById('receitaContent').innerHTML = html;
+    })
+    .catch(function(e){ document.getElementById('receitaContent').innerHTML = 'Erro ao carregar'; });
 }
 
 function loadDeposits() {

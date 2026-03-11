@@ -487,15 +487,24 @@ function loadSaques() {
 function pagarSaque(id) {
   fetch(API + '/admin/withdrawals/' + id + '/pay', { method: 'POST' })
     .then(function(r){ return r.json(); })
-    .then(function(){ showToast('Saque marcado como pago!'); loadSaques(); })
-    .catch(function(){ showToast('Erro ao atualizar'); });
+    .then(function(d){ 
+      if (d.error) { alert('Erro: ' + d.error); return; }
+      alert('Saque marcado como pago!'); 
+      loadSaques(); 
+    })
+    .catch(function(e){ alert('Erro: ' + e.message); });
 }
 
 function cancelarSaque(id) {
+  if (!confirm('Cancelar saque e devolver saldo ao usuário?')) return;
   fetch(API + '/admin/withdrawals/' + id + '/cancel', { method: 'POST' })
     .then(function(r){ return r.json(); })
-    .then(function(){ showToast('Saque cancelado e saldo devolvido'); loadSaques(); })
-    .catch(function(){ showToast('Erro ao cancelar'); });
+    .then(function(d){ 
+      if (d.error) { alert('Erro: ' + d.error); return; }
+      alert('Saque cancelado e saldo devolvido!'); 
+      loadSaques(); 
+    })
+    .catch(function(e){ alert('Erro: ' + e.message); });
 }
 
 function criarMercado() {

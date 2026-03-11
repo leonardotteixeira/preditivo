@@ -95,6 +95,7 @@ tr:hover td { background:rgba(255,255,255,0.02); }
       <button class="tab" onclick="switchTab('users',this)">Usuarios</button>
       <button class="tab" onclick="switchTab('receita',this)">Receita</button>
       <button class="tab" onclick="switchTab('novo',this)">+ Novo Mercado</button>
+      <button class="tab" onclick="switchTab('saques',this)">Saques</button>
     </div>
 
     <!-- DEPOSITOS -->
@@ -128,6 +129,15 @@ tr:hover td { background:rgba(255,255,255,0.02); }
     <div id="sec-receita" class="section">
       <div class="section-title">Receita da Casa</div>
       <div id="receitaContent">Carregando...</div>
+    </div>
+
+
+    <div id="sec-saques" class="section">
+      <div class="section-title">Saques Pendentes <span class="badge" id="saquesCount">0</span></div>
+      <table>
+        <thead><tr><th>Usuario</th><th>Valor</th><th>Chave PIX</th><th>Tipo</th><th>Solicitado</th><th>Status</th><th>Acao</th></tr></thead>
+        <tbody id="saquesTbody"><tr><td colspan="7" style="text-align:center;padding:40px;color:#5a6878">Carregando...</td></tr></tbody>
+      </table>
     </div>
 
     <!-- NOVO MERCADO -->
@@ -239,6 +249,7 @@ function switchTab(name, el) {
   if (name === 'markets') loadMarkets();
   if (name === 'users') loadUsers();
   if (name === 'receita') loadReceita();
+  if (name === 'saques') loadSaques();
 }
 
 function openModal(id) { document.getElementById(id).classList.add('active'); }
@@ -443,6 +454,48 @@ function saveBalance() {
   })
   .then(function(){ closeModal('balanceModal'); showToast('Saldo atualizado!'); loadUsers(); })
   .catch(function(){ showToast('Erro ao atualizar'); });
+}
+
+
+function loadSaques() {
+  fetch(API + '/admin/withdrawals')
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      var pending = data.filter(function(s){ return s.status === 'pending'; }).length;
+      document.getElementById('saquesCount').textContent = pending;
+      var tbody = document.getElementById('saquesTbody');
+      if (!data.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#5a6878">Nenhum saque</td></tr>'; return; }
+      tbody.innerHTML = data.map(function(s) {
+        var dt = new Date(s.created_at).toLocaleString('pt-BR');
+        var statusColor = s.status === 'pending' ? '#ffc107' : s.status === 'paid' ? '#00e676' : '#ff4757';
+        var action = s.status === 'pending'
+          ? '<button class="btn btn-confirm" onclick="pagarSaque(''+s.id+'')">Marcar pago</button> <button class="btn btn-reject" style="margin-left:4px" onclick="cancelarSaque(''+s.id+'')">Cancelar</button>'
+          : '<span style="color:#5a6878;font-size:0.8rem">' + s.status + '</span>';
+        return '<tr>' +
+          '<td>' + (s.username || '-') + '</td>' +
+          '<td style="color:#00e676;font-weight:600">R$' + parseFloat(s.amount).toFixed(2) + '</td>' +
+          '<td style="font-family:monospace;font-size:0.85rem">' + s.pix_key + '</td>' +
+          '<td style="color:#5a6878;font-size:0.8rem">' + s.pix_key_type + '</td>' +
+          '<td style="color:#5a6878;font-size:0.8rem">' + dt + '</td>' +
+          '<td><span style="color:' + statusColor + '">' + s.status + '</span></td>' +
+          '<td>' + action + '</td>' +
+          '</tr>';
+      }).join('');
+    }).catch(function(e){ console.error(e); });
+}
+
+function pagarSaque(id) {
+  fetch(API + '/admin/withdrawals/' + id + '/pay', { method: 'POST' })
+    .then(function(r){ return r.json(); })
+    .then(function(){ showToast('Saque marcado como pago!'); loadSaques(); })
+    .catch(function(){ showToast('Erro ao atualizar'); });
+}
+
+function cancelarSaque(id) {
+  fetch(API + '/admin/withdrawals/' + id + '/cancel', { method: 'POST' })
+    .then(function(r){ return r.json(); })
+    .then(function(){ showToast('Saque cancelado e saldo devolvido'); loadSaques(); })
+    .catch(function(){ showToast('Erro ao cancelar'); });
 }
 
 function criarMercado() {

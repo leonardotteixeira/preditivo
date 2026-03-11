@@ -657,8 +657,12 @@ function renderMarkets() {
   if (state.tabFilter === 'new') filtered = filtered.filter(m => m.new);
   if (state.tabFilter === 'closing') filtered = filtered.filter(m => m.closing);
 
+    // Store markets in a map for lookup by id
+  window._marketsMap = {};
+  filtered.forEach(m => window._marketsMap[m.id] = m);
+
   grid.innerHTML = filtered.map(m => `
-    <div class="market-card" onclick="openBet(${JSON.stringify(m).replace(/"/g,"'")})">
+    <div class="market-card" onclick="openBetById(${m.id})">
       <div class="mc-header">
         <span class="mc-category cat-${m.cat}">${catLabel(m.cat)}</span>
         <span class="mc-volume">Vol ${m.volume}</span>
@@ -670,8 +674,8 @@ function renderMarkets() {
         <div class="mc-prob-item no"><span>${m.no}%</span><span>NÃO</span></div>
       </div>
       <div class="mc-actions" onclick="event.stopPropagation()">
-        <button class="mc-btn yes" onclick="openBet(${JSON.stringify(m).replace(/"/g,"'")}, 'yes')">Comprar SIM</button>
-        <button class="mc-btn no" onclick="openBet(${JSON.stringify(m).replace(/"/g,"'")}, 'no')">Comprar NÃO</button>
+        <button class="mc-btn yes" onclick="openBetById(${m.id}, 'yes')">Comprar SIM</button>
+        <button class="mc-btn no" onclick="openBetById(${m.id}, 'no')">Comprar NÃO</button>
       </div>
       <div class="mc-footer">
         <div class="mc-footer-item">👥 ${m.traders}</div>
@@ -703,6 +707,11 @@ function setCatFilter(cat, el) {
 }
 
 // ---- BET MODAL ----
+function openBetById(id, side='yes') {
+  const market = (window._marketsMap || {})[id] || markets.find(m => m.id === id);
+  if (market) openBet(market, side);
+}
+
 function openBet(market, side='yes') {
   if (!state.user && !state.walletConnected) {
     openModal('loginModal');

@@ -738,7 +738,8 @@ function renderMarkets() {
       data-title="${m.title.replace(/"/g,'&quot;')}" 
       data-yes="${m.yes}" 
       data-no="${m.no}" 
-      data-cat="${m.cat}">
+      data-cat="${m.cat}"
+      onclick="window.location.href='/market/'+m.id">
       <div class="mc-header">
         <span class="mc-category cat-${m.cat}">${catLabel(m.cat)}</span>
         <span class="mc-volume">Vol ${m.volume}</span>

@@ -120,8 +120,8 @@ tr:hover td { background:rgba(255,255,255,0.02); }
     <div id="sec-users" class="section">
       <div class="section-title">Usuarios</div>
       <table>
-        <thead><tr><th>Nome</th><th>Email</th><th>Saldo</th><th>Cadastro</th><th>Acao</th></tr></thead>
-        <tbody id="usersTbody"><tr><td colspan="5" style="text-align:center;padding:40px;color:#5a6878">Carregando...</td></tr></tbody>
+        <thead><tr><th>Nome</th><th>Email</th><th>Saldo</th><th>Bonus Locked</th><th>Apostas Bonus</th><th>Cadastro</th><th>Acao</th></tr></thead>
+        <tbody id="usersTbody"><tr><td colspan="7" style="text-align:center;padding:40px;color:#5a6878">Carregando...</td></tr></tbody>
       </table>
     </div>
 
@@ -131,7 +131,7 @@ tr:hover td { background:rgba(255,255,255,0.02); }
       <div id="receitaContent">Carregando...</div>
     </div>
 
-
+    <!-- SAQUES -->
     <div id="sec-saques" class="section">
       <div class="section-title">Saques Pendentes <span class="badge" id="saquesCount">0</span></div>
       <table>
@@ -165,7 +165,7 @@ tr:hover td { background:rgba(255,255,255,0.02); }
         </div>
         <div class="form-group">
           <label class="form-label">Regras de resolucao</label>
-          <textarea id="nm-desc" class="form-textarea" placeholder="Descreva como este mercado sera resolvido, qual a fonte de dados e o criterio de decisao..."></textarea>
+          <textarea id="nm-desc" class="form-textarea" placeholder="Descreva como este mercado sera resolvido..."></textarea>
         </div>
         <div class="info-box">
           <strong>Probabilidade inicial:</strong> 50% SIM / 50% NAO<br>
@@ -176,7 +176,6 @@ tr:hover td { background:rgba(255,255,255,0.02); }
         <div id="nm-feedback" style="margin-top:12px;font-size:0.85rem"></div>
       </div>
     </div>
-
   </div>
 </div>
 
@@ -196,7 +195,7 @@ tr:hover td { background:rgba(255,255,255,0.02); }
   <div class="modal">
     <h3>Regras de resolucao</h3>
     <p style="color:#5a6878;font-size:0.85rem;margin-bottom:12px">Descreva como este mercado sera resolvido.</p>
-    <textarea id="descText" class="form-textarea" style="margin-bottom:12px" placeholder="Ex: Sera resolvido como SIM se qualquer ministro do STF sofrer impeachment aprovado pelo Senado antes de 31/12/2026."></textarea>
+    <textarea id="descText" class="form-textarea" style="margin-bottom:12px" placeholder="Ex: Sera resolvido como SIM se..."></textarea>
     <div style="display:flex;gap:8px">
       <button class="btn" style="flex:1;background:#00e676;color:#080c10;font-weight:700" onclick="saveDesc()">Salvar</button>
       <button class="btn-cancel" style="flex:1;margin-top:0" onclick="closeModal('descModal')">Cancelar</button>
@@ -208,8 +207,9 @@ tr:hover td { background:rgba(255,255,255,0.02); }
 <div id="balanceModal" class="modal-overlay">
   <div class="modal">
     <h3>Ajustar Saldo</h3>
-    <p id="balanceUserName" style="color:#5a6878;margin-bottom:16px;font-size:0.9rem"></p>
-    <input id="balanceVal" class="form-input" type="number" placeholder="Novo saldo (ex: 500)" style="margin-bottom:12px">
+    <p id="balanceUserName" style="color:#5a6878;margin-bottom:8px;font-size:0.9rem"></p>
+    <p style="color:#5a6878;font-size:0.8rem;margin-bottom:16px">Digite o valor a <strong style="color:#00e676">adicionar</strong> ao saldo atual. Use número negativo para remover.</p>
+    <input id="balanceVal" class="form-input" type="number" placeholder="Ex: 100 para adicionar, -50 para remover" style="margin-bottom:12px">
     <div style="display:flex;gap:8px">
       <button class="btn" style="flex:1;background:#00e676;color:#080c10;font-weight:700" onclick="saveBalance()">Salvar</button>
       <button class="btn-cancel" style="flex:1;margin-top:0" onclick="closeModal('balanceModal')">Cancelar</button>
@@ -283,19 +283,22 @@ function loadDeposits() {
     .then(function(r){ return r.json(); })
     .then(function(data) {
       allDeposits = data;
-      var pending = data.filter(function(d){ return d.status==='pending'; });
+      var pending = data.filter(function(d){ return d.status === 'pending'; });
       document.getElementById('pendingCount').textContent = pending.length;
       var tbody = document.getElementById('depositsTbody');
-      if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#5a6878">Nenhum deposito</td></tr>'; return; }
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#5a6878">Nenhum deposito</td></tr>';
+        return;
+      }
       tbody.innerHTML = data.map(function(d) {
         var dt = new Date(d.created_at).toLocaleString('pt-BR');
-        var statusColor = d.status==='pending' ? '#ffc107' : d.status==='confirmed' ? '#00e676' : '#ff4757';
+        var statusColor = d.status === 'pending' ? '#ffc107' : d.status === 'confirmed' ? '#00e676' : '#ff4757';
         var actions = d.status === 'pending'
-          ? '<button class="btn btn-confirm" onclick="confirmDeposit(\''+d.id+'\')">Confirmar</button> <button class="btn btn-reject" style="margin-left:4px" onclick="rejectDeposit(\''+d.id+'\')">Rejeitar</button>'
+          ? '<button class="btn btn-confirm" onclick="confirmDeposit(\'' + d.id + '\')">Confirmar</button> <button class="btn btn-reject" style="margin-left:4px" onclick="rejectDeposit(\'' + d.id + '\')">Rejeitar</button>'
           : '<span style="color:#5a6878;font-size:0.8rem">' + d.status + '</span>';
         return '<tr>' +
           '<td style="font-family:monospace;font-size:0.85rem">' + d.code + '</td>' +
-          '<td>' + (d.username||'-') + '</td>' +
+          '<td>' + (d.username || '-') + '</td>' +
           '<td style="color:#00e676;font-weight:600">R$' + parseFloat(d.amount).toFixed(2) + '</td>' +
           '<td style="color:#5a6878;font-size:0.8rem">' + dt + '</td>' +
           '<td><span style="color:' + statusColor + '">' + d.status + '</span></td>' +
@@ -305,15 +308,27 @@ function loadDeposits() {
     }).catch(function(e){ console.error(e); });
 }
 
+// FIX: agora passa user_id e amount no body
 function confirmDeposit(id) {
-  fetch(API + '/admin/deposits/' + id + '/confirm', { method:'POST' })
-    .then(function(r){ return r.json(); })
-    .then(function(){ showToast('Deposito confirmado!'); loadDeposits(); loadStats(); })
-    .catch(function(){ showToast('Erro ao confirmar'); });
+  var dep = allDeposits.find(function(d){ return d.id === id; });
+  if (!dep) { showToast('Deposito nao encontrado'); return; }
+  fetch(API + '/admin/deposits/' + id + '/confirm', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: dep.user_id, amount: dep.amount })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if (d.error) { showToast('Erro: ' + d.error); return; }
+    showToast('Deposito confirmado!');
+    loadDeposits();
+    loadStats();
+  })
+  .catch(function(){ showToast('Erro ao confirmar'); });
 }
 
 function rejectDeposit(id) {
-  fetch(API + '/admin/deposits/' + id + '/reject', { method:'POST' })
+  fetch(API + '/admin/deposits/' + id + '/reject', { method: 'POST' })
     .then(function(r){ return r.json(); })
     .then(function(){ showToast('Deposito rejeitado'); loadDeposits(); })
     .catch(function(){ showToast('Erro ao rejeitar'); });
@@ -325,19 +340,19 @@ function loadMarkets() {
     .then(function(data) {
       var tbody = document.getElementById('marketsTbody');
       tbody.innerHTML = data.map(function(m) {
-        var total = parseFloat(m.q_yes||100) + parseFloat(m.q_no||100);
-        var pYes = Math.round(parseFloat(m.q_yes||100) / total * 100);
+        var total = parseFloat(m.q_yes || 100) + parseFloat(m.q_no || 100);
+        var pYes = Math.round(parseFloat(m.q_yes || 100) / total * 100);
         var vol = Math.max(0, total - 200).toFixed(0);
         var closes = m.ends_at ? new Date(m.ends_at).toLocaleDateString('pt-BR') : '-';
         var action = m.resolved_at
-          ? '<span style="color:#5a6878;font-size:0.8rem">Resolvido</span>'
-          : '<button class="btn btn-resolve" onclick="openResolve(\''+m.id+'\',\''+m.title.substring(0,40).replace(/'/g,'')+'\')">Resolver</button>';
+          ? '<span style="color:#5a6878;font-size:0.8rem">Resolvido: ' + (m.resolved_outcome || '').toUpperCase() + '</span>'
+          : '<button class="btn btn-resolve" onclick="openResolve(\'' + m.id + '\',\'' + m.title.substring(0, 40).replace(/'/g, '') + '\')">Resolver</button>';
         var descLabel = (m.description && m.description.length > 0) ? 'Editar regras' : '+ Regras';
-        var descBtn = '<button class="btn btn-green" style="margin-top:4px;font-size:0.75rem" onclick="openDesc(\''+m.id+'\')">'+descLabel+'</button>';
+        var descBtn = '<button class="btn btn-green" style="margin-top:4px;font-size:0.75rem" onclick="openDesc(\'' + m.id + '\')">' + descLabel + '</button>';
         return '<tr>' +
           '<td style="max-width:280px;font-size:0.85rem">' + m.title + '</td>' +
           '<td style="color:#5a6878;font-size:0.8rem">' + m.category + '</td>' +
-          '<td><span style="color:#00e676">' + pYes + '%</span> / <span style="color:#ff4757">' + (100-pYes) + '%</span></td>' +
+          '<td><span style="color:#00e676">' + pYes + '%</span> / <span style="color:#ff4757">' + (100 - pYes) + '%</span></td>' +
           '<td style="color:#ffc107">R$' + vol + '</td>' +
           '<td style="color:#5a6878;font-size:0.8rem">' + closes + '</td>' +
           '<td style="display:flex;flex-direction:column;gap:4px;align-items:flex-start">' + action + descBtn + '</td>' +
@@ -353,12 +368,17 @@ function loadUsers() {
       var tbody = document.getElementById('usersTbody');
       tbody.innerHTML = data.map(function(u) {
         var dt = new Date(u.created_at).toLocaleDateString('pt-BR');
+        var balance = parseFloat(u.balance || 0);
+        var locked = parseFloat(u.bonus_locked || 0);
+        var betsCount = u.bonus_bets_count || 0;
         return '<tr>' +
-          '<td>' + (u.username||u.name||'-') + '</td>' +
+          '<td>' + (u.username || u.name || '-') + '</td>' +
           '<td style="color:#5a6878;font-size:0.85rem">' + u.email + '</td>' +
-          '<td style="color:#00e676;font-weight:600">R$' + parseFloat(u.balance).toFixed(2) + '</td>' +
+          '<td style="color:#00e676;font-weight:600">R$' + balance.toFixed(2) + '</td>' +
+          '<td style="color:#ffc107">' + (locked > 0 ? 'R$' + locked.toFixed(2) : '-') + '</td>' +
+          '<td style="color:#5a6878;text-align:center">' + (locked > 0 ? betsCount + '/3' : '-') + '</td>' +
           '<td style="color:#5a6878;font-size:0.8rem">' + dt + '</td>' +
-          '<td><button class="btn" onclick="openBalance(\''+u.id+'\',\''+( u.username||u.name||'').replace(/'/g,'')+'\','+parseFloat(u.balance)+')">Ajustar saldo</button></td>' +
+          '<td><button class="btn" onclick="openBalance(\'' + u.id + '\',\'' + (u.username || u.name || '').replace(/'/g, '') + '\',' + balance + ')">Ajustar saldo</button></td>' +
           '</tr>';
       }).join('');
     }).catch(function(e){ console.error(e); });
@@ -369,11 +389,11 @@ function loadReceita() {
     .then(function(r){ return r.json(); })
     .then(function(d) {
       var html = '<div class="receita-grid">' +
-        '<div class="receita-card"><div class="receita-label">Total Apostado</div><div class="receita-val" style="color:#00b4ff">R$' + parseFloat(d.total_apostado||0).toFixed(2) + '</div></div>' +
-        '<div class="receita-card"><div class="receita-label">Total Pago em Premios</div><div class="receita-val" style="color:#ff4757">R$' + parseFloat(d.total_pago||0).toFixed(2) + '</div></div>' +
-        '<div class="receita-card"><div class="receita-label">Taxa 2% Coletada</div><div class="receita-val" style="color:#00e676">R$' + parseFloat(d.taxa_coletada||0).toFixed(2) + '</div></div>' +
-        '<div class="receita-card"><div class="receita-label">Spread Retido</div><div class="receita-val" style="color:#ffc107">R$' + parseFloat(d.spread_retido||0).toFixed(2) + '</div></div>' +
-        '<div class="receita-card"><div class="receita-label">Total Depositado</div><div class="receita-val" style="color:#e8edf2">R$' + parseFloat(d.total_depositado||0).toFixed(2) + '</div></div>' +
+        '<div class="receita-card"><div class="receita-label">Total Apostado</div><div class="receita-val" style="color:#00b4ff">R$' + parseFloat(d.total_apostado || 0).toFixed(2) + '</div></div>' +
+        '<div class="receita-card"><div class="receita-label">Total Pago em Premios</div><div class="receita-val" style="color:#ff4757">R$' + parseFloat(d.total_pago || 0).toFixed(2) + '</div></div>' +
+        '<div class="receita-card"><div class="receita-label">Taxa 2% Coletada</div><div class="receita-val" style="color:#00e676">R$' + parseFloat(d.taxa_coletada || 0).toFixed(2) + '</div></div>' +
+        '<div class="receita-card"><div class="receita-label">Spread Retido</div><div class="receita-val" style="color:#ffc107">R$' + parseFloat(d.spread_retido || 0).toFixed(2) + '</div></div>' +
+        '<div class="receita-card"><div class="receita-label">Total Depositado</div><div class="receita-val" style="color:#e8edf2">R$' + parseFloat(d.total_depositado || 0).toFixed(2) + '</div></div>' +
         '</div>';
       if (d.por_mercado && d.por_mercado.length) {
         html += '<div class="section-title" style="margin-top:8px">Por Mercado</div>';
@@ -381,8 +401,8 @@ function loadReceita() {
         d.por_mercado.forEach(function(m) {
           html += '<tr>' +
             '<td style="font-size:0.85rem">' + m.title + '</td>' +
-            '<td style="color:#00b4ff">R$' + parseFloat(m.total_apostado||0).toFixed(2) + '</td>' +
-            '<td style="color:#00e676">R$' + parseFloat(m.taxa_coletada||0).toFixed(2) + '</td>' +
+            '<td style="color:#00b4ff">R$' + parseFloat(m.total_apostado || 0).toFixed(2) + '</td>' +
+            '<td style="color:#00e676">R$' + parseFloat(m.taxa_coletada || 0).toFixed(2) + '</td>' +
             '<td style="color:#5a6878;font-size:0.8rem">' + (m.resolved_outcome ? m.resolved_outcome.toUpperCase() : 'Aberto') + '</td>' +
             '</tr>';
         });
@@ -398,17 +418,19 @@ function openResolve(marketId, title) {
   openModal('resolveModal');
 }
 
+// FIX: agora chama /admin/markets/:id/resolve
 function confirmResolve(outcome) {
   if (!resolveMarketId) return;
-  fetch(API + '/markets/' + resolveMarketId + '/resolve', {
+  fetch(API + '/admin/markets/' + resolveMarketId + '/resolve', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ outcome: outcome })
   })
   .then(function(r){ return r.json(); })
   .then(function(data) {
+    if (data.error) { showToast('Erro: ' + data.error); return; }
     closeModal('resolveModal');
-    showToast('Resolvido! ' + (data.winners_paid||0) + ' ganhadores pagos.');
+    showToast('Resolvido! ' + (data.resolved || ''));
     loadMarkets();
   })
   .catch(function(){ showToast('Erro ao resolver'); });
@@ -438,24 +460,30 @@ function saveDesc() {
 
 function openBalance(userId, name, balance) {
   balanceUserId = userId;
-  document.getElementById('balanceUserName').textContent = name + ' — saldo atual: R$' + balance.toFixed(2);
-  document.getElementById('balanceVal').value = balance.toFixed(2);
+  document.getElementById('balanceUserName').textContent = name + ' — saldo atual: R$' + parseFloat(balance).toFixed(2);
+  document.getElementById('balanceVal').value = '';
   openModal('balanceModal');
 }
 
+// FIX: passa "amount" (valor a adicionar/remover) em vez de "balance"
 function saveBalance() {
   if (!balanceUserId) return;
   var val = parseFloat(document.getElementById('balanceVal').value);
-  if (isNaN(val)) { showToast('Valor invalido'); return; }
+  if (isNaN(val) || val === 0) { showToast('Informe um valor valido'); return; }
   fetch(API + '/admin/balance', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ user_id: balanceUserId, balance: val })
+    body: JSON.stringify({ user_id: balanceUserId, amount: val })
   })
-  .then(function(){ closeModal('balanceModal'); showToast('Saldo atualizado!'); loadUsers(); })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if (d.error) { showToast('Erro: ' + d.error); return; }
+    closeModal('balanceModal');
+    showToast('Saldo atualizado!');
+    loadUsers();
+  })
   .catch(function(){ showToast('Erro ao atualizar'); });
 }
-
 
 function loadSaques() {
   fetch(API + '/admin/withdrawals')
@@ -464,13 +492,16 @@ function loadSaques() {
       var pending = data.filter(function(s){ return s.status === 'pending'; }).length;
       document.getElementById('saquesCount').textContent = pending;
       var tbody = document.getElementById('saquesTbody');
-      if (!data.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#5a6878">Nenhum saque</td></tr>'; return; }
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#5a6878">Nenhum saque</td></tr>';
+        return;
+      }
       tbody.innerHTML = data.map(function(s) {
         var dt = new Date(s.created_at).toLocaleString('pt-BR');
         var statusColor = s.status === 'pending' ? '#ffc107' : s.status === 'paid' ? '#00e676' : '#ff4757';
-        var btnPagar = '<button class="btn btn-confirm" onclick="pagarSaque(this)" data-id="'+s.id+'">Marcar pago</button>';
-        var btnCancelar = '<button class="btn btn-reject" style="margin-left:4px" onclick="cancelarSaque(this)" data-id="'+s.id+'">Cancelar</button>';
-        var action = s.status === 'pending' ? btnPagar + ' ' + btnCancelar : '<span style="color:#5a6878;font-size:0.8rem">'+s.status+'</span>';
+        var btnPagar = '<button class="btn btn-confirm" onclick="pagarSaque(this)" data-id="' + s.id + '">Marcar pago</button>';
+        var btnCancelar = '<button class="btn btn-reject" style="margin-left:4px" onclick="cancelarSaque(this)" data-id="' + s.id + '">Cancelar</button>';
+        var action = s.status === 'pending' ? btnPagar + ' ' + btnCancelar : '<span style="color:#5a6878;font-size:0.8rem">' + s.status + '</span>';
         return '<tr>' +
           '<td>' + (s.username || '-') + '</td>' +
           '<td style="color:#00e676;font-weight:600">R$' + parseFloat(s.amount).toFixed(2) + '</td>' +
@@ -488,25 +519,25 @@ function pagarSaque(btn) {
   var id = btn.getAttribute('data-id');
   fetch(API + '/admin/withdrawals/' + id + '/pay', { method: 'POST' })
     .then(function(r){ return r.json(); })
-    .then(function(d){ 
-      if (d.error) { alert('Erro: ' + d.error); return; }
-      alert('Saque marcado como pago!'); 
-      loadSaques(); 
+    .then(function(d){
+      if (d.error) { showToast('Erro: ' + d.error); return; }
+      showToast('Saque marcado como pago!');
+      loadSaques();
     })
-    .catch(function(e){ alert('Erro: ' + e.message); });
+    .catch(function(e){ showToast('Erro: ' + e.message); });
 }
 
 function cancelarSaque(btn) {
   var id = btn.getAttribute('data-id');
-  if (!confirm('Cancelar saque e devolver saldo ao usuário?')) return;
+  if (!confirm('Cancelar saque e devolver saldo ao usuario?')) return;
   fetch(API + '/admin/withdrawals/' + id + '/cancel', { method: 'POST' })
     .then(function(r){ return r.json(); })
-    .then(function(d){ 
-      if (d.error) { alert('Erro: ' + d.error); return; }
-      alert('Saque cancelado e saldo devolvido!'); 
-      loadSaques(); 
+    .then(function(d){
+      if (d.error) { showToast('Erro: ' + d.error); return; }
+      showToast('Saque cancelado e saldo devolvido!');
+      loadSaques();
     })
-    .catch(function(e){ alert('Erro: ' + e.message); });
+    .catch(function(e){ showToast('Erro: ' + e.message); });
 }
 
 function criarMercado() {
@@ -516,10 +547,10 @@ function criarMercado() {
   var desc = document.getElementById('nm-desc').value.trim();
   var fb = document.getElementById('nm-feedback');
 
-  if (!title) { fb.style.color='#ff4757'; fb.textContent='Informe o titulo do mercado.'; return; }
-  if (!date) { fb.style.color='#ff4757'; fb.textContent='Informe a data de encerramento.'; return; }
+  if (!title) { fb.style.color = '#ff4757'; fb.textContent = 'Informe o titulo do mercado.'; return; }
+  if (!date) { fb.style.color = '#ff4757'; fb.textContent = 'Informe a data de encerramento.'; return; }
 
-  fb.style.color='#5a6878'; fb.textContent='Criando...';
+  fb.style.color = '#5a6878'; fb.textContent = 'Criando...';
 
   fetch(API + '/admin/markets', {
     method: 'POST',
@@ -528,19 +559,14 @@ function criarMercado() {
   })
   .then(function(r){ return r.json(); })
   .then(function(data) {
-    if (data.error) { fb.style.color='#ff4757'; fb.textContent='Erro: ' + data.error; return; }
-    fb.style.color='#00e676'; fb.textContent='Mercado criado com sucesso!';
+    if (data.error) { fb.style.color = '#ff4757'; fb.textContent = 'Erro: ' + data.error; return; }
+    fb.style.color = '#00e676'; fb.textContent = 'Mercado criado com sucesso!';
     document.getElementById('nm-title').value = '';
     document.getElementById('nm-date').value = '';
     document.getElementById('nm-desc').value = '';
   })
-  .catch(function(){ fb.style.color='#ff4757'; fb.textContent='Erro de conexao.'; });
+  .catch(function(){ fb.style.color = '#ff4757'; fb.textContent = 'Erro de conexao.'; });
 }
-
-fetch(API + '/admin/bets/open')
-  .then(function(r){ return r.json(); })
-  .then(function(data){ document.getElementById('statBets').textContent = data.count||'-'; })
-  .catch(function(){});
 </script>
 </body>
 </html>

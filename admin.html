@@ -103,6 +103,8 @@ tr:hover td { background:rgba(255,255,255,0.02); }
       <button class="tab" onclick="switchTab('markets',this)">Mercados</button>
       <button class="tab" onclick="switchTab('users',this)">Usuarios</button>
       <button class="tab" onclick="switchTab('receita',this)">Receita</button>
+      <button class="tab" onclick="switchTab('novo',this)">+ Novo Mercado</button>
+      <button class="tab" onclick="switchTab('novo',this)">+ Novo Mercado</button>
     </div>
 
     <div id="sec-deposits" class="section active">
@@ -426,6 +428,72 @@ fetch(API + '/admin/bets/open')
   .then(function(r){ return r.json(); })
   .then(function(data){ document.getElementById('statBets').textContent = data.count||'-'; })
   .catch(function(){});
+
+    <div id="sec-novo" class="section">
+      <div class="section-title">Criar Novo Mercado</div>
+      <div style="max-width:600px">
+        <div style="margin-bottom:16px">
+          <label style="display:block;font-size:0.8rem;color:#5a6878;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">Titulo</label>
+          <input id="nm-title" type="text" placeholder="Ex: Lula vence as eleicoes de 2026?" style="width:100%;background:#141c24;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:12px;color:#e8edf2;font-family:inherit;font-size:0.95rem;outline:none">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+          <div>
+            <label style="display:block;font-size:0.8rem;color:#5a6878;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">Categoria</label>
+            <select id="nm-cat" style="width:100%;background:#141c24;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:12px;color:#e8edf2;font-family:inherit;font-size:0.95rem;outline:none">
+              <option value="politica">Politica</option>
+              <option value="economia">Economia</option>
+              <option value="futebol">Futebol</option>
+              <option value="tech">Tech</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block;font-size:0.8rem;color:#5a6878;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">Data de encerramento</label>
+            <input id="nm-date" type="date" style="width:100%;background:#141c24;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:12px;color:#e8edf2;font-family:inherit;font-size:0.95rem;outline:none">
+          </div>
+        </div>
+        <div style="margin-bottom:24px">
+          <label style="display:block;font-size:0.8rem;color:#5a6878;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">Regras de resolucao</label>
+          <textarea id="nm-desc" placeholder="Descreva como este mercado sera resolvido..." style="width:100%;background:#141c24;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:12px;color:#e8edf2;font-family:inherit;font-size:0.9rem;resize:vertical;min-height:100px;outline:none"></textarea>
+        </div>
+        <div style="background:#141c24;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:16px;margin-bottom:20px;font-size:0.85rem;color:#5a6878;line-height:1.6">
+          <strong style="color:#e8edf2">Probabilidade inicial:</strong> 50% SIM / 50% NAO<br>
+          <strong style="color:#e8edf2">Liquidez inicial:</strong> R$100 automatico<br>
+          O mercado fica visivel imediatamente apos criar.
+        </div>
+        <button class="btn" style="background:#00e676;color:#080c10;font-weight:700;font-size:1rem;padding:14px 32px" onclick="criarMercado()">Criar Mercado</button>
+        <div id="nm-feedback" style="margin-top:12px;font-size:0.85rem"></div>
+      </div>
+    </div>
+
+function criarMercado() {
+  var title = document.getElementById('nm-title').value.trim();
+  var cat = document.getElementById('nm-cat').value;
+  var date = document.getElementById('nm-date').value;
+  var desc = document.getElementById('nm-desc').value.trim();
+  var fb = document.getElementById('nm-feedback');
+
+  if (!title) { fb.style.color='#ff4757'; fb.textContent='Informe o titulo do mercado.'; return; }
+  if (!date) { fb.style.color='#ff4757'; fb.textContent='Informe a data de encerramento.'; return; }
+
+  fb.style.color='#5a6878'; fb.textContent='Criando...';
+
+  fetch(API + '/admin/markets', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title: title, category: cat, ends_at: date, description: desc })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data) {
+    if (data.error) { fb.style.color='#ff4757'; fb.textContent='Erro: ' + data.error; return; }
+    fb.style.color='#00e676'; fb.textContent='Mercado criado com sucesso!';
+    document.getElementById('nm-title').value='';
+    document.getElementById('nm-date').value='';
+    document.getElementById('nm-desc').value='';
+    setTimeout(function(){ loadMarkets(); }, 1000);
+  })
+  .catch(function(){ fb.style.color='#ff4757'; fb.textContent='Erro de conexao.'; });
+}
+
 </script>
 </body>
 </html>

@@ -323,7 +323,7 @@ function renderPage() {
           '</div>' +
         '</div>' +
         (allHistory.length > 0
-          ? '<canvas id="probChart" height="200"></canvas>'
+          ? '<div style="position:relative;height:220px;width:100%"><canvas id="probChart"></canvas></div>'
           : '<div class="chart-empty">Nenhuma aposta ainda — o grafico aparece apos a primeira aposta</div>') +
       '</div>' +
 
@@ -407,6 +407,7 @@ function renderChart(data) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      animation: { duration: 600 },
       interaction: { mode: 'index', intersect: false },
       plugins: {
         legend: { labels: { color: '#5a6878', font: { family: 'Space Grotesk' } } },

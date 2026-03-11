@@ -721,7 +721,8 @@ function openBetById(btn, side) {
   openBet(market, side);
 }
 
-function openBet(market, side='yes') {
+function openBet(market, side) {
+  if (!side) side = 'yes';
   if (!state.user && !state.walletConnected) {
     openModal('loginModal');
     return;
@@ -733,7 +734,14 @@ function openBet(market, side='yes') {
   document.getElementById('betNoProb').textContent = market.no+'%';
   document.getElementById('betAmount').value = '';
   document.getElementById('userBalanceDisplay').textContent = state.balance.toFixed(2);
-  selectBetSide(side);
+  // Force reset both tabs before setting active
+  document.getElementById('betTabYes').classList.remove('active');
+  document.getElementById('betTabNo').classList.remove('active');
+  if (side === 'yes') {
+    document.getElementById('betTabYes').classList.add('active');
+  } else {
+    document.getElementById('betTabNo').classList.add('active');
+  }
   updateBetSummary();
   openModal('betModal');
 }

@@ -743,21 +743,64 @@ function updateBetSummary() {
   document.getElementById('summaryProb').textContent = prob ? prob+'%' : '—';
 }
 
-function confirmBet() {
+async function confirmBet() {
   const amt = parseFloat(document.getElementById('betAmount').value);
   if (!amt || amt <= 0) { showToast('⚠️','Valor inválido','Insira um valor para apostar'); return; }
-  if (amt > state.balance) { showToast('❌','Saldo insuficiente','Você não tem USDC suficiente'); return; }
+  if (amt > state.balance) { showToast('❌','Saldo insuficiente','Você não tem saldo suficiente'); return; }
+
   const side = state.betSide;
   const prob = side==='yes' ? state.currentBet.yes : state.currentBet.no;
+
+  // Se logado, salva na API
+  if (state.token) {
+    try {
+      const data = await apiPost('/bets', {
+        market_id: state.currentBet.id,
+        side,
+        amount: amt
+      }, state.token);
+
+      if (data.error) { showToast('❌','Erro',data.error); return; }
+
+      state.balance = parseFloat(data.new_balance);
+      closeModal('betModal');
+      showToast('✅','Aposta confirmada!',`${side.toUpperCase()} - R$${amt} @ ${prob}%`);
+      await loadPortfolioFromAPI();
+      return;
+    } catch(e) {
+      showToast('❌','Erro de conexão','Tente novamente');
+      return;
+    }
+  }
+
+  // Fallback local (sem login)
   const ret = (amt / (prob/100)).toFixed(2);
   state.balance -= amt;
-  state.positions.push({ title: state.currentBet.title, side, amount: amt, potential: parseFloat(ret), pnl: (Math.random()-0.4)*amt*0.3 });
+  state.positions.push({ title: state.currentBet.title, side, amount: amt, potential: parseFloat(ret), pnl: 0 });
   closeModal('betModal');
-  showToast('✅','Aposta confirmada!',`${side.toUpperCase()} - $${amt} @ ${prob}%`);
+  showToast('✅','Aposta confirmada!',`${side.toUpperCase()} - R$${amt} @ ${prob}%`);
   renderPortfolio();
 }
 
 // ---- PORTFOLIO ----
+async function loadPortfolioFromAPI() {
+  if (!state.token) { renderPortfolio(); return; }
+  try {
+    const data = await apiGet('/bets/my', state.token);
+    if (Array.isArray(data)) {
+      state.positions = data.map(b => ({
+        title: b.market_title || b.market_id,
+        side: b.side,
+        amount: parseFloat(b.amount),
+        potential: parseFloat(b.potential_payout || 0),
+        pnl: b.payout ? parseFloat(b.payout) - parseFloat(b.amount) : 0,
+        status: b.status
+      }));
+    }
+  } catch(e) { console.log('portfolio error', e); }
+  renderPortfolio();
+}
+
 function renderPortfolio() {
   const c = document.getElementById('portfolioContent');
   const totalInvested = state.positions.reduce((s,p)=>s+p.amount,0);
@@ -768,18 +811,18 @@ function renderPortfolio() {
   }
   c.innerHTML = `
     <div class="portfolio-header">
-      <div class="portfolio-stat"><div class="ps-label">Saldo Disponível</div><div class="ps-value">$${state.balance.toFixed(2)}</div></div>
-      <div class="portfolio-stat"><div class="ps-label">Em posições</div><div class="ps-value">$${totalInvested.toFixed(2)}</div></div>
-      <div class="portfolio-stat"><div class="ps-label">P&L estimado</div><div class="ps-value" style="color:${totalPnl>=0?'var(--green)':'var(--red)'}">$${totalPnl>=0?'+':''}${totalPnl.toFixed(2)}</div><div class="ps-change ${totalPnl>=0?'pos':'neg'}">${totalPnl>=0?'▲':'▼'} ${Math.abs(totalPnl/totalInvested*100).toFixed(1)}%</div></div>
+      <div class="portfolio-stat"><div class="ps-label">Saldo Disponível</div><div class="ps-value">R$${state.balance.toFixed(2)}</div></div>
+      <div class="portfolio-stat"><div class="ps-label">Em posições</div><div class="ps-value">R$${totalInvested.toFixed(2)}</div></div>
+      <div class="portfolio-stat"><div class="ps-label">P&L</div><div class="ps-value" style="color:${totalPnl>=0?'var(--green)':'var(--red)'}">R$${totalPnl>=0?'+':''}${totalPnl.toFixed(2)}</div></div>
     </div>
     <div class="positions-list">
       ${state.positions.map(p=>`
         <div class="position-item">
-          <div class="pos-side ${p.side}">${p.side.toUpperCase()}</div>
+          <div class="pos-side ${p.side}">${p.side==='yes'?'SIM':'NÃO'}</div>
           <div class="pos-title">${p.title}</div>
           <div class="pos-data">
-            <div class="pos-amount">$${p.amount.toFixed(2)}</div>
-            <div class="pos-pnl ${p.pnl>=0?'pos':'neg'}">${p.pnl>=0?'+':''}$${p.pnl.toFixed(2)}</div>
+            <div class="pos-amount">R$${p.amount.toFixed(2)}</div>
+            <div class="pos-pnl ${p.pnl>=0?'pos':'neg'}">${p.status==='open'?'Em aberto':p.pnl>=0?'+R$'+p.pnl.toFixed(2):'-R$'+Math.abs(p.pnl).toFixed(2)}</div>
           </div>
         </div>
       `).join('')}
@@ -1004,7 +1047,7 @@ function showSection(name) {
   document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));
   document.getElementById('nav-'+name).classList.add('active');
   if (name === 'ranking') { renderRanking(); setTimeout(renderChart, 100); }
-  if (name === 'portfolio') renderPortfolio();
+  if (name === 'portfolio') loadPortfolioFromAPI();
 }
 
 // ---- MODALS ----

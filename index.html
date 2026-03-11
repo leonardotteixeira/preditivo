@@ -1157,7 +1157,8 @@ async function doRegister() {
   const password = document.getElementById('regPass').value;
   if (!name || !email || !password) { showToast('⚠️','Preencha todos os campos',''); return; }
   try {
-    const data = await apiPost('/auth/register', { name, email, password });
+    const urlRef = new URLSearchParams(window.location.search).get('ref') || localStorage.getItem('preditivo_ref') || '';
+    const data = await apiPost('/auth/register', { name, email, password, ref: urlRef });
     if (data.error) { showToast('❌','Erro',data.error); return; }
     state.user = data.user;
     state.token = data.token;
@@ -1165,7 +1166,7 @@ async function doRegister() {
     localStorage.setItem('preditivo_token', data.token);
     closeModal('registerModal');
     updateAuthUI();
-    showToast('🎉','Conta criada!','Você recebeu $1.000 USDC de boas-vindas');
+    showToast('🎉','Conta criada!','Bem-vindo ao Preditivo!');
     renderPortfolio();
   } catch(e) {
     showToast('❌','Erro de conexão','Tente novamente');
@@ -1361,6 +1362,12 @@ async function init() {
     document.getElementById('activePlayers').textContent = (players/1000).toFixed(1)+'k';
   }, 3000);
 }
+
+// Salva ref da URL
+(function() {
+  const ref = new URLSearchParams(window.location.search).get('ref');
+  if (ref) localStorage.setItem('preditivo_ref', ref);
+})();
 
 init();
 </script>

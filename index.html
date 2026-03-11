@@ -1155,7 +1155,7 @@ function updateAuthUI() {
   if (state.user) {
     area.innerHTML = `
       <button class="btn-secondary" style="padding:7px 14px;font-size:0.82rem;margin-right:8px;width:auto" onclick="openDepositModal()">+ Depositar</button>
-      <div class="user-chip" onclick="showSection('portfolio')" style="cursor:pointer">
+      <div class="user-chip" onclick="window.location.href='/profile'" style="cursor:pointer">
         <div class="user-avatar">${state.user.name.slice(0,2).toUpperCase()}</div>
         <span>${state.user.name}</span>
         <span style="color:var(--green);font-family:'DM Mono',monospace;font-size:0.8rem;margin-left:4px">R$${state.balance.toFixed(0)}</span>

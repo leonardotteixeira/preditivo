@@ -454,6 +454,14 @@
   .deposit-code span { font-family:'DM Mono',monospace; font-size:1.1rem; font-weight:700; color:var(--green); letter-spacing:2px; }
   .deposit-warning { font-size:0.78rem; color:var(--muted); text-align:center; line-height:1.5; }
 
+
+  .pix-type-btn {
+    padding:6px 14px; background:var(--surface2); border:1px solid var(--border);
+    border-radius:6px; color:var(--muted); font-size:0.82rem; cursor:pointer;
+    font-family:inherit; transition:all 0.2s;
+  }
+  .pix-type-btn.active { border-color:var(--green); color:var(--green); background:var(--green-dim); }
+
   /* ---- RESPONSIVE ---- */
   @media(max-width:900px) {
     .hero { grid-template-columns:1fr;gap:32px; }
@@ -574,6 +582,46 @@
 
     <button class="btn-primary" onclick="confirmDepositRequest()">✅ Já fiz o PIX</button>
     <div class="deposit-warning" style="margin-top:12px">Depósito mínimo R$10 · Saque disponível após 24h · Suporte: suporte@preditivo.com.br</div>
+  </div>
+</div>
+
+
+<!-- WITHDRAWAL MODAL -->
+<div class="modal-overlay" id="withdrawModal">
+  <div class="modal" style="max-width:460px">
+    <button class="modal-close" onclick="closeModal('withdrawModal')">✕</button>
+    <h2>💸 Sacar via PIX</h2>
+    <p>Informe sua chave PIX e o valor. O pagamento é feito em até 24h.</p>
+
+    <div style="margin-bottom:12px">
+      <div style="font-size:0.8rem;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">Tipo de chave PIX</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="pix-type-btn active" onclick="selectPixType('cpf',this)">CPF</button>
+        <button class="pix-type-btn" onclick="selectPixType('email',this)">Email</button>
+        <button class="pix-type-btn" onclick="selectPixType('telefone',this)">Telefone</button>
+        <button class="pix-type-btn" onclick="selectPixType('aleatoria',this)">Aleatória</button>
+      </div>
+    </div>
+
+    <input class="modal-input" type="text" id="withdrawPixKey" placeholder="Sua chave PIX">
+    
+    <div style="margin-bottom:8px">
+      <div style="font-size:0.8rem;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">Valor (mín. R$20)</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+      <button class="deposit-preset" onclick="setWithdrawAmount(20)">R$20</button>
+      <button class="deposit-preset" onclick="setWithdrawAmount(50)">R$50</button>
+      <button class="deposit-preset" onclick="setWithdrawAmount(100)">R$100</button>
+      <button class="deposit-preset" onclick="setWithdrawAmount(500)">R$500</button>
+    </div>
+    <input class="modal-input" type="number" id="withdrawAmount" placeholder="Valor (mín. R$20)" min="20">
+
+    <div style="background:var(--surface2);border-radius:8px;padding:12px;margin-bottom:16px;font-size:0.82rem;color:var(--muted)">
+      Saldo disponível: <span id="withdrawBalanceDisplay" style="color:var(--green);font-weight:600">-</span><br>
+      O saldo será debitado imediatamente. Pagamento em até 24h úteis.
+    </div>
+
+    <button class="btn-primary" onclick="confirmWithdraw()">Solicitar Saque</button>
   </div>
 </div>
 
@@ -1154,7 +1202,7 @@ function updateAuthUI() {
   const area = document.getElementById('authArea');
   if (state.user) {
     area.innerHTML = `
-      <button class="btn-secondary" style="padding:7px 14px;font-size:0.82rem;margin-right:8px;width:auto" onclick="openDepositModal()">+ Depositar</button>
+      <button class="btn-secondary" style="padding:7px 14px;font-size:0.82rem;margin-right:4px;width:auto" onclick="openDepositModal()">+ Depositar</button><button class="btn-secondary" style="padding:7px 14px;font-size:0.82rem;margin-right:8px;width:auto" onclick="openWithdrawModal()">Sacar</button>
       <div class="user-chip" onclick="window.location.href='/profile'" style="cursor:pointer">
         <div class="user-avatar">${state.user.name.slice(0,2).toUpperCase()}</div>
         <span>${state.user.name}</span>
@@ -1233,6 +1281,51 @@ async function confirmDepositRequest() {
   } catch(e) {}
   closeModal('depositModal');
   showToast('⏳', 'Solicitação registrada!', `Código ${code} · Crédito em até 15min`);
+}
+
+
+// ---- WITHDRAW ----
+var withdrawPixType = 'cpf';
+
+function selectPixType(type, el) {
+  withdrawPixType = type;
+  document.querySelectorAll('.pix-type-btn').forEach(function(b){ b.classList.remove('active'); });
+  el.classList.add('active');
+  var placeholders = { cpf:'000.000.000-00', email:'seu@email.com', telefone:'+55 11 99999-9999', aleatoria:'Chave aleatória (UUID)' };
+  document.getElementById('withdrawPixKey').placeholder = placeholders[type] || 'Sua chave PIX';
+}
+
+function setWithdrawAmount(v) {
+  document.getElementById('withdrawAmount').value = v;
+}
+
+function openWithdrawModal() {
+  if (!state.user) { openModal('loginModal'); return; }
+  document.getElementById('withdrawBalanceDisplay').textContent = 'R$' + state.balance.toFixed(2);
+  document.getElementById('withdrawAmount').value = '';
+  document.getElementById('withdrawPixKey').value = '';
+  openModal('withdrawModal');
+}
+
+async function confirmWithdraw() {
+  if (!state.token) { openModal('loginModal'); return; }
+  var amount = parseFloat(document.getElementById('withdrawAmount').value);
+  var pixKey = document.getElementById('withdrawPixKey').value.trim();
+
+  if (!amount || amount < 20) { showToast('⚠️','Valor inválido','Mínimo R$20'); return; }
+  if (!pixKey) { showToast('⚠️','Chave PIX','Informe sua chave PIX'); return; }
+  if (amount > state.balance) { showToast('❌','Saldo insuficiente','Você não tem saldo suficiente'); return; }
+
+  try {
+    var data = await apiPost('/withdrawals', { amount, pix_key: pixKey, pix_key_type: withdrawPixType }, state.token);
+    if (data.error) { showToast('❌','Erro',data.error); return; }
+    state.balance = parseFloat(data.new_balance);
+    closeModal('withdrawModal');
+    updateAuthUI();
+    showToast('✅','Saque solicitado!','Pagamento em até 24h úteis');
+  } catch(e) {
+    showToast('❌','Erro de conexão','Tente novamente');
+  }
 }
 
 // ---- INIT ----

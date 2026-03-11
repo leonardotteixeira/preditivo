@@ -891,6 +891,11 @@ async function confirmBet() {
 async function loadPortfolioFromAPI() {
   if (!state.token) { renderPortfolio(); return; }
   try {
+    const me = await apiGet('/auth/me', state.token);
+    if (me && me.balance != null) {
+      state.balance = parseFloat(me.balance);
+      updateAuthUI();
+    }
     const data = await apiGet('/bets/my', state.token);
     if (Array.isArray(data)) {
       state.positions = data.map(b => ({
@@ -898,7 +903,8 @@ async function loadPortfolioFromAPI() {
         side: b.side,
         amount: parseFloat(b.amount),
         potential: parseFloat(b.potential_payout || 0),
-        pnl: b.payout ? parseFloat(b.payout) - parseFloat(b.amount) : 0,
+        pnl: b.status === 'won' ? parseFloat(b.potential_payout || 0) - parseFloat(b.amount) :
+             b.status === 'lost' ? -parseFloat(b.amount) : 0,
         status: b.status
       }));
     }
@@ -908,8 +914,8 @@ async function loadPortfolioFromAPI() {
 
 function renderPortfolio() {
   const c = document.getElementById('portfolioContent');
-  const totalInvested = state.positions.reduce((s,p)=>s+p.amount,0);
-  const totalPnl = state.positions.reduce((s,p)=>s+p.pnl,0);
+  const totalInvested = state.positions.filter(p=>p.status==='open').reduce((s,p)=>s+p.amount,0);
+  const totalPnl = state.positions.filter(p=>p.status==='won'||p.status==='lost').reduce((s,p)=>s+p.pnl,0);
   if (state.positions.length === 0) {
     c.innerHTML = `<div style="text-align:center;padding:60px;color:var(--muted)"><div style="font-size:3rem;margin-bottom:16px">📊</div><div style="font-size:1.1rem;margin-bottom:8px">Nenhuma posição aberta</div><div style="font-size:0.85rem">Explore os mercados e faça sua primeira aposta</div><button class="btn-hero" style="margin-top:24px;width:auto;padding:12px 28px" onclick="showSection('home')">Ver mercados →</button></div>`;
     return;

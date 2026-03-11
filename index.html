@@ -750,10 +750,7 @@ function renderMarkets() {
         <div class="mc-prob-item no"><span>${m.no}%</span><span>NÃO</span></div>
       </div>
       <div class="mc-actions">
-        ${m.resolved_at
-          ? '<div style="width:100%;text-align:center;padding:10px;color:var(--muted);font-size:0.85rem;background:var(--surface2);border-radius:8px;border:1px solid var(--border)">Mercado encerrado</div>'
-          : '<button class="mc-btn yes" onclick="event.stopPropagation();openBetById(this,'yes')">Comprar SIM</button><button class="mc-btn no" onclick="event.stopPropagation();openBetById(this,'no')">Comprar NÃO</button>'
-        }
+        ${m.resolved_at ? '<div style="text-align:center;padding:10px;color:#5a6878;font-size:0.85rem;background:#141c24;border-radius:8px;width:100%">Mercado encerrado</div>' : '<button class="mc-btn yes" onclick="event.stopPropagation();openBetById(this,&quot;yes&quot;)">Comprar SIM</button><button class="mc-btn no" onclick="event.stopPropagation();openBetById(this,&quot;no&quot;)">Comprar NAO</button>'}
       </div>
       <div class="mc-footer">
         <div class="mc-footer-item">👥 ${m.traders}</div>

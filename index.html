@@ -290,9 +290,16 @@
   .markets-grid {
     display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:16px;
   }
-  .market-card {
+  
+.market-card:hover {
+  border-color:rgba(0,230,118,0.35);
+  background:rgba(14,20,25,0.95);
+  transform:translateY(-2px);
+  box-shadow:0 8px 32px rgba(0,0,0,0.3);
+}
+.market-card {
     background:var(--surface);border:1px solid var(--border);
-    border-radius:16px;padding:20px;transition:all 0.25s;cursor:pointer;
+    border-radius:16px;padding:20px;cursor:pointer;transition:all 0.25s;cursor:pointer;
     position:relative;overflow:hidden;
   }
   .market-card::after {
@@ -739,12 +746,13 @@ function renderMarkets() {
       data-yes="${m.yes}" 
       data-no="${m.no}" 
       data-cat="${m.cat}"
+      onclick="window.location.href='/market/'+m.id"
 >
       <div class="mc-header">
         <span class="mc-category cat-${m.cat}">${catLabel(m.cat)}</span>
         <span class="mc-volume">Vol ${m.volume}</span>
       </div>
-      <div class="mc-title"><a href="/market/${m.id}" style="color:inherit;text-decoration:none;" onclick="event.stopPropagation()">${m.title}</a></div>
+      <div class="mc-title">${m.title}</div>
       <div class="mc-bar"><div class="mc-bar-yes" style="width:${m.yes}%"></div></div>
       <div class="mc-probs">
         <div class="mc-prob-item yes"><span>${m.yes}%</span><span>SIM</span></div>

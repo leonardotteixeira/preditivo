@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PrevBR — Mercados de Previsão</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://global.transak.com/sdk/v1.1/widget.js"></script>
 <style>
   :root {
     --bg: #080c10;
@@ -453,6 +454,13 @@
   .deposit-code { text-align:center; padding:12px; background:var(--green-dim); border:1px solid rgba(0,230,118,0.2); border-radius:8px; margin-bottom:16px; }
   .deposit-code span { font-family:'DM Mono',monospace; font-size:1.1rem; font-weight:700; color:var(--green); letter-spacing:2px; }
   .deposit-warning { font-size:0.78rem; color:var(--muted); text-align:center; line-height:1.5; }
+  .deposit-tabs { display:flex; gap:8px; margin-bottom:20px; }
+  .dep-tab { flex:1; padding:10px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; color:var(--muted); font-size:0.9rem; font-family:inherit; cursor:pointer; transition:all 0.2s; }
+  .dep-tab.active { border-color:var(--green); color:var(--green); background:var(--green-dim); }
+  .usdc-info { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:16px; margin-bottom:16px; }
+  .usdc-info p { color:var(--text); font-size:0.9rem; line-height:1.6; }
+  .usdc-info .usdc-meta { color:var(--muted); font-size:0.8rem; margin-top:8px; display:flex; gap:16px; flex-wrap:wrap; }
+  .usdc-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(0,180,255,0.1); border:1px solid rgba(0,180,255,0.2); color:#00b4ff; border-radius:6px; padding:4px 10px; font-size:0.78rem; margin-bottom:12px; }
 
 
   .pix-type-btn {
@@ -537,51 +545,97 @@
   <div class="modal" style="max-width:480px">
     <button class="modal-close" onclick="closeModal('depositModal')">✕</button>
     <h2>💰 Depositar</h2>
-    <p>Faça um PIX e seu saldo será creditado em até 15 minutos</p>
 
-    <div class="deposit-presets">
-      <button class="deposit-preset" onclick="setDepositAmount(10)">R$10</button>
-      <button class="deposit-preset" onclick="setDepositAmount(25)">R$25</button>
-      <button class="deposit-preset" onclick="setDepositAmount(50)">R$50</button>
-      <button class="deposit-preset" onclick="setDepositAmount(100)">R$100</button>
-      <button class="deposit-preset" onclick="setDepositAmount(200)">R$200</button>
-    </div>
-    <input class="modal-input" type="number" id="depositAmount" placeholder="Valor (mín. R$10)" min="10">
-
-    <div class="deposit-code">
-      <div style="font-size:0.75rem;color:var(--muted);margin-bottom:4px">Seu código de depósito</div>
-      <span id="depositCode">—</span>
+    <!-- Abas -->
+    <div class="deposit-tabs">
+      <button class="dep-tab active" id="tabBtnPix" onclick="switchDepTab('pix')">🏦 PIX (BRL)</button>
+      <button class="dep-tab" id="tabBtnUsdc" onclick="switchDepTab('usdc')">💎 USDC (Crypto)</button>
     </div>
 
-    <div class="deposit-steps">
-      <div class="deposit-step">
-        <div class="step-num">1</div>
-        <div class="step-content">
-          <div class="step-title">Copie a chave PIX</div>
-          <div class="pix-key-box">
-            <span class="pix-key">9bf0d836-a584-4436-8f45-61c650167cf3</span>
-            <button class="copy-btn" onclick="copyPixKey()">Copiar</button>
+    <!-- PIX -->
+    <div id="depTabPix">
+      <p style="color:var(--muted);font-size:0.9rem;margin-bottom:16px">Faça um PIX e seu saldo será creditado em até 15 minutos</p>
+      <div class="deposit-presets">
+        <button class="deposit-preset" onclick="setDepositAmount(10)">R$10</button>
+        <button class="deposit-preset" onclick="setDepositAmount(25)">R$25</button>
+        <button class="deposit-preset" onclick="setDepositAmount(50)">R$50</button>
+        <button class="deposit-preset" onclick="setDepositAmount(100)">R$100</button>
+        <button class="deposit-preset" onclick="setDepositAmount(200)">R$200</button>
+      </div>
+      <input class="modal-input" type="number" id="depositAmount" placeholder="Valor (mín. R$10)" min="10">
+      <div class="deposit-code">
+        <div style="font-size:0.75rem;color:var(--muted);margin-bottom:4px">Seu código de depósito</div>
+        <span id="depositCode">—</span>
+      </div>
+      <div class="deposit-steps">
+        <div class="deposit-step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Copie a chave PIX</div>
+            <div class="pix-key-box">
+              <span class="pix-key">9bf0d836-a584-4436-8f45-61c650167cf3</span>
+              <button class="copy-btn" onclick="copyPixKey()">Copiar</button>
+            </div>
+          </div>
+        </div>
+        <div class="deposit-step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">Faça o PIX com o valor escolhido</div>
+            <div class="step-desc">No campo "mensagem" ou "descrição" do PIX, coloque seu código acima</div>
+          </div>
+        </div>
+        <div class="deposit-step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">Aguarde a confirmação</div>
+            <div class="step-desc">Seu saldo será creditado em até 15 minutos após o pagamento</div>
           </div>
         </div>
       </div>
-      <div class="deposit-step">
-        <div class="step-num">2</div>
-        <div class="step-content">
-          <div class="step-title">Faça o PIX com o valor escolhido</div>
-          <div class="step-desc">No campo "mensagem" ou "descrição" do PIX, coloque seu código acima</div>
-        </div>
-      </div>
-      <div class="deposit-step">
-        <div class="step-num">3</div>
-        <div class="step-content">
-          <div class="step-title">Aguarde a confirmação</div>
-          <div class="step-desc">Seu saldo será creditado em até 15 minutos após o pagamento</div>
-        </div>
-      </div>
+      <button class="btn-primary" onclick="confirmDepositRequest()">✅ Já fiz o PIX</button>
+      <div class="deposit-warning" style="margin-top:12px">Depósito mínimo R$10 · Saque disponível após 24h · Suporte: suporte@preditivo.com.br</div>
     </div>
 
-    <button class="btn-primary" onclick="confirmDepositRequest()">✅ Já fiz o PIX</button>
-    <div class="deposit-warning" style="margin-top:12px">Depósito mínimo R$10 · Saque disponível após 24h · Suporte: suporte@preditivo.com.br</div>
+    <!-- USDC via Transak -->
+    <div id="depTabUsdc" style="display:none">
+      <div class="usdc-badge">⛓ Polygon Network · USDC</div>
+      <div class="usdc-info">
+        <p>Compre USDC com PIX, cartão ou cripto. O valor em reais é creditado automaticamente após a confirmação.</p>
+        <div class="usdc-meta">
+          <span>✅ Crédito automático</span>
+          <span>💸 Taxa ~1.5%</span>
+          <span>⚡ Mínimo 10 USDC</span>
+        </div>
+      </div>
+      <div class="deposit-steps">
+        <div class="deposit-step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Clique em "Comprar USDC"</div>
+            <div class="step-desc">O widget da Transak abrirá — escolha o valor e o método de pagamento</div>
+          </div>
+        </div>
+        <div class="deposit-step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">Conclua o pagamento</div>
+            <div class="step-desc">Aceite as verificações da Transak e finalize. O USDC vai direto para a plataforma</div>
+          </div>
+        </div>
+        <div class="deposit-step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">Saldo creditado automaticamente</div>
+            <div class="step-desc">Assim que confirmado na blockchain, seu saldo é atualizado sem ação manual</div>
+          </div>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="openTransak()" style="background:linear-gradient(135deg,#00b4ff,#0088cc)">
+        💎 Comprar USDC
+      </button>
+      <div class="deposit-warning" style="margin-top:12px">Processado pela Transak · Regulamentado · Suporte: suporte@preditivo.com.br</div>
+    </div>
   </div>
 </div>
 
@@ -1281,6 +1335,45 @@ function setDepositAmount(v) {
 function copyPixKey() {
   navigator.clipboard.writeText('9bf0d836-a584-4436-8f45-61c650167cf3');
   showToast('✅', 'Copiado!', 'Chave PIX copiada');
+}
+
+function switchDepTab(tab) {
+  document.getElementById('depTabPix').style.display  = tab === 'pix'  ? '' : 'none';
+  document.getElementById('depTabUsdc').style.display = tab === 'usdc' ? '' : 'none';
+  document.getElementById('tabBtnPix').classList.toggle('active',  tab === 'pix');
+  document.getElementById('tabBtnUsdc').classList.toggle('active', tab === 'usdc');
+}
+
+function openTransak() {
+  if (!state.user) { showToast('⚠️', 'Faça login', 'Você precisa estar logado'); return; }
+
+  const transak = new TransakSDK({
+    apiKey: 'e7651b6e-1d88-4700-95cb-c509fe52203d',
+    environment: 'STAGING',
+    defaultCryptoCurrency: 'USDC',
+    network: 'polygon',
+    walletAddress: '0x63e8f13be1160741902092D0E0629ba741FDe3b6',
+    fiatCurrency: 'BRL',
+    fiatAmount: 60,
+    email: state.user.email,
+    partnerOrderId: state.user.id,
+    themeColor: '00e676',
+    hostURL: window.location.origin,
+    widgetHeight: '600px',
+    widgetWidth: '450px',
+  });
+
+  transak.init();
+
+  transak.on(transak.EVENTS.TRANSAK_ORDER_SUCCESSFUL, () => {
+    showToast('✅', 'Pagamento enviado!', 'Seu saldo será creditado automaticamente em breve');
+    transak.close();
+    closeModal('depositModal');
+  });
+
+  transak.on(transak.EVENTS.TRANSAK_WIDGET_CLOSE, () => {
+    transak.close();
+  });
 }
 
 async function confirmDepositRequest() {

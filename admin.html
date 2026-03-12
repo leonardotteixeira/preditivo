@@ -221,18 +221,29 @@ tr:hover td { background:rgba(255,255,255,0.02); }
 
 <script>
 var API = 'https://preditivo-backend-production.up.railway.app';
-var ADMIN_PASS = 'preditivo_admin_2026';
+var ADMIN_SECRET = '';
 var resolveMarketId = null;
 var descMarketId = null;
 var balanceUserId = null;
 var allDeposits = [];
 
+function adminHeaders() {
+  return { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET };
+}
+
 function adminLogin() {
   var pass = document.getElementById('adminPass').value;
-  if (pass !== ADMIN_PASS) { showToast('Senha incorreta'); return; }
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('dashboard').style.display = 'block';
-  loadAll();
+  if (!pass) { showToast('Digite a senha'); return; }
+  // Testa o secret no backend antes de liberar o painel
+  fetch(API + '/admin/deposits', { headers: { 'x-admin-secret': pass } })
+    .then(function(r) {
+      if (r.status === 403) { showToast('Senha incorreta'); return; }
+      ADMIN_SECRET = pass;
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      loadAll();
+    })
+    .catch(function() { showToast('Erro de conexão'); });
 }
 
 function logout() {
@@ -268,10 +279,10 @@ function loadAll() {
 }
 
 function loadStats() {
-  fetch(API + '/admin/users').then(function(r){ return r.json(); }).then(function(data){
+  fetch(API + '/admin/users', { headers: adminHeaders() }).then(function(r){ return r.json(); }).then(function(data){
     document.getElementById('statUsers').textContent = data.length || 0;
   }).catch(function(){});
-  fetch(API + '/admin/deposits').then(function(r){ return r.json(); }).then(function(data){
+  fetch(API + '/admin/deposits', { headers: adminHeaders() }).then(function(r){ return r.json(); }).then(function(data){
     var pending = data.filter(function(d){ return d.status === 'pending'; }).length;
     document.getElementById('statDep').textContent = pending;
     document.getElementById('pendingCount').textContent = pending;
@@ -279,7 +290,7 @@ function loadStats() {
 }
 
 function loadDeposits() {
-  fetch(API + '/admin/deposits')
+  fetch(API + '/admin/deposits', { headers: adminHeaders() })
     .then(function(r){ return r.json(); })
     .then(function(data) {
       allDeposits = data;
@@ -320,7 +331,7 @@ function confirmDeposit(id) {
   if (!dep) { showToast('Deposito nao encontrado'); return; }
   fetch(API + '/admin/deposits/' + id + '/confirm', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: adminHeaders(),
     body: JSON.stringify({ user_id: dep.user_id, amount: dep.amount })
   })
   .then(function(r){ return r.json(); })
@@ -334,7 +345,7 @@ function confirmDeposit(id) {
 }
 
 function rejectDeposit(id) {
-  fetch(API + '/admin/deposits/' + id + '/reject', { method: 'POST' })
+  fetch(API + '/admin/deposits/' + id + '/reject', { method: 'POST', headers: adminHeaders() })
     .then(function(r){ return r.json(); })
     .then(function(){ showToast('Deposito rejeitado'); loadDeposits(); })
     .catch(function(){ showToast('Erro ao rejeitar'); });
@@ -368,7 +379,7 @@ function loadMarkets() {
 }
 
 function loadUsers() {
-  fetch(API + '/admin/users')
+  fetch(API + '/admin/users', { headers: adminHeaders() })
     .then(function(r){ return r.json(); })
     .then(function(data) {
       var tbody = document.getElementById('usersTbody');
@@ -391,7 +402,7 @@ function loadUsers() {
 }
 
 function loadReceita() {
-  fetch(API + '/admin/receita')
+  fetch(API + '/admin/receita', { headers: adminHeaders() })
     .then(function(r){ return r.json(); })
     .then(function(d) {
       var html = '<div class="receita-grid">' +
@@ -429,7 +440,7 @@ function confirmResolve(outcome) {
   if (!resolveMarketId) return;
   fetch(API + '/admin/markets/' + resolveMarketId + '/resolve', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: adminHeaders(),
     body: JSON.stringify({ outcome: outcome })
   })
   .then(function(r){ return r.json(); })
@@ -457,7 +468,7 @@ function saveDesc() {
   var desc = document.getElementById('descText').value.trim();
   fetch(API + '/markets/' + descMarketId + '/description', {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
+    headers: adminHeaders(),
     body: JSON.stringify({ description: desc })
   })
   .then(function(){ closeModal('descModal'); showToast('Regras salvas!'); loadMarkets(); })
@@ -478,7 +489,7 @@ function saveBalance() {
   if (isNaN(val) || val === 0) { showToast('Informe um valor valido'); return; }
   fetch(API + '/admin/balance', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: adminHeaders(),
     body: JSON.stringify({ user_id: balanceUserId, amount: val })
   })
   .then(function(r){ return r.json(); })
@@ -492,7 +503,7 @@ function saveBalance() {
 }
 
 function loadSaques() {
-  fetch(API + '/admin/withdrawals')
+  fetch(API + '/admin/withdrawals', { headers: adminHeaders() })
     .then(function(r){ return r.json(); })
     .then(function(data) {
       var pending = data.filter(function(s){ return s.status === 'pending'; }).length;
@@ -523,7 +534,7 @@ function loadSaques() {
 
 function pagarSaque(btn) {
   var id = btn.getAttribute('data-id');
-  fetch(API + '/admin/withdrawals/' + id + '/pay', { method: 'POST' })
+  fetch(API + '/admin/withdrawals/' + id + '/pay', { method: 'POST', headers: adminHeaders() })
     .then(function(r){ return r.json(); })
     .then(function(d){
       if (d.error) { showToast('Erro: ' + d.error); return; }
@@ -536,7 +547,7 @@ function pagarSaque(btn) {
 function cancelarSaque(btn) {
   var id = btn.getAttribute('data-id');
   if (!confirm('Cancelar saque e devolver saldo ao usuario?')) return;
-  fetch(API + '/admin/withdrawals/' + id + '/cancel', { method: 'POST' })
+  fetch(API + '/admin/withdrawals/' + id + '/cancel', { method: 'POST', headers: adminHeaders() })
     .then(function(r){ return r.json(); })
     .then(function(d){
       if (d.error) { showToast('Erro: ' + d.error); return; }
@@ -560,7 +571,7 @@ function criarMercado() {
 
   fetch(API + '/admin/markets', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: adminHeaders(),
     body: JSON.stringify({ title: title, category: cat, ends_at: date, description: desc })
   })
   .then(function(r){ return r.json(); })

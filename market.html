@@ -318,6 +318,7 @@ function renderPage() {
           '<div class="chart-title">Probabilidade historica</div>' +
           '<div class="chart-periods">' +
             '<button class="period-btn active" onclick="filterChart(\'all\',this)">Tudo</button>' +
+            '<button class="period-btn" onclick="filterChart(\'1m\',this)">1M</button>' +
             '<button class="period-btn" onclick="filterChart(\'7d\',this)">7D</button>' +
             '<button class="period-btn" onclick="filterChart(\'24h\',this)">24H</button>' +
           '</div>' +
@@ -436,7 +437,10 @@ function filterChart(period, el) {
   el.classList.add('active');
   var now = new Date();
   var filtered = allHistory;
-  if (period === '7d') {
+  if (period === '1m') {
+    var cutoff1m = new Date(now - 30 * 24 * 60 * 60 * 1000);
+    filtered = allHistory.filter(function(h){ return new Date(h.created_at) >= cutoff1m; });
+  } else if (period === '7d') {
     var cutoff = new Date(now - 7 * 24 * 60 * 60 * 1000);
     filtered = allHistory.filter(function(h){ return new Date(h.created_at) >= cutoff; });
   } else if (period === '24h') {

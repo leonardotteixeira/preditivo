@@ -615,7 +615,12 @@
           <div class="step-num">2</div>
           <div class="step-content">
             <div class="step-title">Informe o valor enviado (em USDC)</div>
-            <input class="modal-input" type="number" id="usdcAmount" placeholder="Quantidade de USDC (mín. 10)" min="10" style="margin-top:8px;margin-bottom:0">
+            <input class="modal-input" type="number" id="usdcAmount" placeholder="Quantidade de USDC (mín. 10)" min="10" style="margin-top:8px;margin-bottom:6px" oninput="calcUsdcBrl()">
+            <div id="usdcConversion" style="display:none;background:var(--green-dim);border:1px solid rgba(0,230,118,0.2);border-radius:8px;padding:10px 14px;font-size:0.9rem">
+              <span style="color:var(--muted)">Você receberá ≈ </span>
+              <span id="usdcBrlValue" style="color:var(--green);font-weight:700;font-size:1.05rem"></span>
+              <span style="color:var(--muted);font-size:0.78rem;margin-left:6px">· cotação ao vivo</span>
+            </div>
           </div>
         </div>
         <div class="deposit-step">
@@ -1345,17 +1350,50 @@ function copyUsdcAddress() {
   showToast('✅', 'Copiado!', 'Endereço Polygon copiado');
 }
 
-async function confirmUsdcDeposit() {
-  const amt = parseFloat(document.getElementById('usdcAmount').value);
-  const txHash = document.getElementById('usdcTxHash').value.trim();
-  if (!amt || amt < 10) { showToast('⚠️', 'Valor inválido', 'Mínimo 10 USDC'); return; }
-  if (!txHash || !txHash.startsWith('0x')) { showToast('⚠️', 'Hash inválido', 'Cole o hash da transação começando com 0x'); return; }
+let usdBrlRate = null;
+
+async function fetchUsdBrlRate() {
+  if (usdBrlRate) return usdBrlRate;
   try {
-    await apiPost('/deposits', { amount: amt, code: txHash, method: 'usdc' }, state.token);
-    showToast('✅', 'Solicitação enviada!', 'O admin confirmará em breve e seu saldo será creditado');
+    const r = await fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL');
+    const d = await r.json();
+    usdBrlRate = parseFloat(d.USDBRL.bid);
+    return usdBrlRate;
+  } catch(e) {
+    return null;
+  }
+}
+
+async function calcUsdcBrl() {
+  const usdc = parseFloat(document.getElementById('usdcAmount').value);
+  const convEl = document.getElementById('usdcConversion');
+  const valEl  = document.getElementById('usdcBrlValue');
+  if (!usdc || usdc <= 0) { convEl.style.display = 'none'; return; }
+  const rate = await fetchUsdBrlRate();
+  if (!rate) { convEl.style.display = 'none'; return; }
+  const brl = (usdc * rate).toFixed(2);
+  valEl.textContent = 'R$' + brl;
+  convEl.style.display = '';
+}
+
+async function confirmUsdcDeposit() {
+  const usdc = parseFloat(document.getElementById('usdcAmount').value);
+  const txHash = document.getElementById('usdcTxHash').value.trim();
+  if (!usdc || usdc < 10) { showToast('⚠️', 'Valor inválido', 'Mínimo 10 USDC'); return; }
+  if (!txHash || !txHash.startsWith('0x')) { showToast('⚠️', 'Hash inválido', 'Cole o hash da transação começando com 0x'); return; }
+
+  const rate = await fetchUsdBrlRate();
+  if (!rate) { showToast('❌', 'Erro de cotação', 'Não foi possível obter a cotação. Tente novamente.'); return; }
+  const amountBrl = parseFloat((usdc * rate).toFixed(2));
+
+  try {
+    await apiPost('/deposits', { amount: amountBrl, code: txHash, method: 'usdc' }, state.token);
+    showToast('✅', 'Solicitação enviada!', `${usdc} USDC ≈ R$${amountBrl} · O admin confirmará em breve`);
     closeModal('depositModal');
     document.getElementById('usdcAmount').value = '';
     document.getElementById('usdcTxHash').value = '';
+    document.getElementById('usdcConversion').style.display = 'none';
+    usdBrlRate = null; // reseta pra buscar cotação nova na próxima vez
   } catch(e) {
     showToast('❌', 'Erro', e.message || 'Tente novamente');
   }

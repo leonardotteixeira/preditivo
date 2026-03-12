@@ -219,8 +219,9 @@ tr:hover td { background:rgba(255,255,255,0.02); }
 
 <div id="toast" class="toast"></div>
 
+<script src="./config.js"></script>
 <script>
-var API = 'https://preditivo-backend-production.up.railway.app';
+var API = window.PREDITIVO_CONFIG.API_BASE;
 var ADMIN_SECRET = '';
 var resolveMarketId = null;
 var descMarketId = null;

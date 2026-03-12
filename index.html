@@ -803,6 +803,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="./config.js"></script>
 <script>
 // ---- STATE ----
 let state = {
@@ -1114,7 +1115,7 @@ function renderChart() {
 }
 
 // ---- API ----
-const API = 'https://preditivo-backend-production.up.railway.app';
+const API = window.PREDITIVO_CONFIG.API_BASE;
 
 async function apiPost(path, body, token) {
   const res = await fetch(API + path, {

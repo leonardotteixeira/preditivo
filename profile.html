@@ -209,8 +209,9 @@ header {
 
 <div class="toast" id="toast"></div>
 
+<script src="./config.js"></script>
 <script>
-var API = 'https://preditivo-backend-production.up.railway.app';
+var API = window.PREDITIVO_CONFIG.API_BASE;
 var state = { user: null, token: null, bets: [], deposits: [] };
 
 function showToast(msg) {

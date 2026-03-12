@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PrevBR — Mercados de Previsão</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://global.transak.com/sdk/v1.1/widget.js"></script>
 <style>
   :root {
     --bg: #080c10;
@@ -597,44 +596,41 @@
       <div class="deposit-warning" style="margin-top:12px">Depósito mínimo R$10 · Saque disponível após 24h · Suporte: suporte@preditivo.com.br</div>
     </div>
 
-    <!-- USDC via Transak -->
+    <!-- USDC Manual -->
     <div id="depTabUsdc" style="display:none">
       <div class="usdc-badge">⛓ Polygon Network · USDC</div>
-      <div class="usdc-info">
-        <p>Compre USDC com PIX, cartão ou cripto. O valor em reais é creditado automaticamente após a confirmação.</p>
-        <div class="usdc-meta">
-          <span>✅ Crédito automático</span>
-          <span>💸 Taxa ~1.5%</span>
-          <span>⚡ Mínimo 10 USDC</span>
-        </div>
-      </div>
       <div class="deposit-steps">
         <div class="deposit-step">
           <div class="step-num">1</div>
           <div class="step-content">
-            <div class="step-title">Clique em "Comprar USDC"</div>
-            <div class="step-desc">O widget da Transak abrirá — escolha o valor e o método de pagamento</div>
+            <div class="step-title">Copie o endereço da carteira</div>
+            <div class="pix-key-box">
+              <span class="pix-key" style="font-size:0.72rem">0x63e8f13be1160741902092D0E0629ba741FDe3b6</span>
+              <button class="copy-btn" onclick="copyUsdcAddress()">Copiar</button>
+            </div>
+            <div class="step-desc" style="margin-top:6px">⚠️ Envie somente <strong>USDC na rede Polygon</strong>. Outras redes causarão perda dos fundos.</div>
           </div>
         </div>
         <div class="deposit-step">
           <div class="step-num">2</div>
           <div class="step-content">
-            <div class="step-title">Conclua o pagamento</div>
-            <div class="step-desc">Aceite as verificações da Transak e finalize. O USDC vai direto para a plataforma</div>
+            <div class="step-title">Informe o valor enviado (em USDC)</div>
+            <input class="modal-input" type="number" id="usdcAmount" placeholder="Quantidade de USDC (mín. 10)" min="10" style="margin-top:8px;margin-bottom:0">
           </div>
         </div>
         <div class="deposit-step">
           <div class="step-num">3</div>
           <div class="step-content">
-            <div class="step-title">Saldo creditado automaticamente</div>
-            <div class="step-desc">Assim que confirmado na blockchain, seu saldo é atualizado sem ação manual</div>
+            <div class="step-title">Cole o hash da transação</div>
+            <input class="modal-input" id="usdcTxHash" placeholder="0x... (hash do Polygonscan)" style="margin-top:8px;margin-bottom:0;font-family:monospace;font-size:0.8rem">
+            <div class="step-desc" style="margin-top:4px">Encontre o hash no seu app de carteira ou no <a href="https://polygonscan.com" target="_blank" style="color:var(--blue)">Polygonscan</a></div>
           </div>
         </div>
       </div>
-      <button class="btn-primary" onclick="openTransak()" style="background:linear-gradient(135deg,#00b4ff,#0088cc)">
-        💎 Comprar USDC
+      <button class="btn-primary" onclick="confirmUsdcDeposit()" style="background:linear-gradient(135deg,#00b4ff,#0088cc)">
+        💎 Já enviei o USDC
       </button>
-      <div class="deposit-warning" style="margin-top:12px">Processado pela Transak · Regulamentado · Suporte: suporte@preditivo.com.br</div>
+      <div class="deposit-warning" style="margin-top:12px">Mínimo 10 USDC · Confirmação em até 1h pelo admin · Suporte: suporte@preditivo.com.br</div>
     </div>
   </div>
 </div>
@@ -1344,36 +1340,25 @@ function switchDepTab(tab) {
   document.getElementById('tabBtnUsdc').classList.toggle('active', tab === 'usdc');
 }
 
-function openTransak() {
-  if (!state.user) { showToast('⚠️', 'Faça login', 'Você precisa estar logado'); return; }
+function copyUsdcAddress() {
+  navigator.clipboard.writeText('0x63e8f13be1160741902092D0E0629ba741FDe3b6');
+  showToast('✅', 'Copiado!', 'Endereço Polygon copiado');
+}
 
-  const transak = new TransakSDK({
-    apiKey: 'e7651b6e-1d88-4700-95cb-c509fe52203d',
-    environment: 'STAGING',
-    defaultCryptoCurrency: 'USDC',
-    network: 'polygon',
-    walletAddress: '0x63e8f13be1160741902092D0E0629ba741FDe3b6',
-    fiatCurrency: 'BRL',
-    fiatAmount: 60,
-    email: state.user.email,
-    partnerOrderId: state.user.id,
-    themeColor: '00e676',
-    hostURL: window.location.origin,
-    widgetHeight: '600px',
-    widgetWidth: '450px',
-  });
-
-  transak.init();
-
-  transak.on(transak.EVENTS.TRANSAK_ORDER_SUCCESSFUL, () => {
-    showToast('✅', 'Pagamento enviado!', 'Seu saldo será creditado automaticamente em breve');
-    transak.close();
+async function confirmUsdcDeposit() {
+  const amt = parseFloat(document.getElementById('usdcAmount').value);
+  const txHash = document.getElementById('usdcTxHash').value.trim();
+  if (!amt || amt < 10) { showToast('⚠️', 'Valor inválido', 'Mínimo 10 USDC'); return; }
+  if (!txHash || !txHash.startsWith('0x')) { showToast('⚠️', 'Hash inválido', 'Cole o hash da transação começando com 0x'); return; }
+  try {
+    await apiPost('/deposits', { amount: amt, code: txHash, method: 'usdc' }, state.token);
+    showToast('✅', 'Solicitação enviada!', 'O admin confirmará em breve e seu saldo será creditado');
     closeModal('depositModal');
-  });
-
-  transak.on(transak.EVENTS.TRANSAK_WIDGET_CLOSE, () => {
-    transak.close();
-  });
+    document.getElementById('usdcAmount').value = '';
+    document.getElementById('usdcTxHash').value = '';
+  } catch(e) {
+    showToast('❌', 'Erro', e.message || 'Tente novamente');
+  }
 }
 
 async function confirmDepositRequest() {

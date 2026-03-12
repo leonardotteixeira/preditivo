@@ -296,10 +296,16 @@ function loadDeposits() {
         var actions = d.status === 'pending'
           ? '<button class="btn btn-confirm" onclick="confirmDeposit(\'' + d.id + '\')">Confirmar</button> <button class="btn btn-reject" style="margin-left:4px" onclick="rejectDeposit(\'' + d.id + '\')">Rejeitar</button>'
           : '<span style="color:#5a6878;font-size:0.8rem">' + d.status + '</span>';
+        var isUsdc = d.method === 'usdc';
+        var codeCell = isUsdc
+          ? '<span style="background:rgba(0,180,255,0.15);color:#00b4ff;border-radius:4px;padding:2px 7px;font-size:0.75rem;margin-right:6px">USDC</span>' +
+            '<a href="https://polygonscan.com/tx/' + d.code + '" target="_blank" style="color:#00b4ff;font-family:monospace;font-size:0.75rem">' + (d.code || '').substring(0,18) + '…</a>'
+          : '<span style="background:rgba(0,230,118,0.1);color:#00e676;border-radius:4px;padding:2px 7px;font-size:0.75rem;margin-right:6px">PIX</span>' +
+            '<span style="font-family:monospace;font-size:0.85rem">' + (d.code || '-') + '</span>';
         return '<tr>' +
-          '<td style="font-family:monospace;font-size:0.85rem">' + d.code + '</td>' +
+          '<td>' + codeCell + '</td>' +
           '<td>' + (d.username || '-') + '</td>' +
-          '<td style="color:#00e676;font-weight:600">R$' + parseFloat(d.amount).toFixed(2) + '</td>' +
+          '<td style="color:#00e676;font-weight:600">' + (isUsdc ? '' : 'R$') + parseFloat(d.amount).toFixed(2) + (isUsdc ? ' USDC' : '') + '</td>' +
           '<td style="color:#5a6878;font-size:0.8rem">' + dt + '</td>' +
           '<td><span style="color:' + statusColor + '">' + d.status + '</span></td>' +
           '<td>' + actions + '</td>' +

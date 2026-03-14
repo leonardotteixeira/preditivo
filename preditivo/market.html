@@ -238,6 +238,8 @@ header {
 /* TOAST */
 .toast { position:fixed; bottom:24px; right:24px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 20px; font-size:0.9rem; z-index:2000; transform:translateY(100px); opacity:0; transition:all 0.3s; }
 .toast.show { transform:translateY(0); opacity:1; }
+#obLiveFeed.yes-only .no-row { display: none; }
+#obLiveFeed.no-only .yes-row { display: none; }
 </style>
 </head>
 <body>
@@ -417,11 +419,7 @@ function renderPage() {
         '<table class="ob-table">' +
           '<thead><tr><th>Price</th><th>Contracts</th><th>Total</th></tr></thead>' +
           '<tbody id="obLiveFeed">' +
-          '<tr class="yes-row"><td>' + probYes + '¢</td><td>8,287</td><td>$22.59K</td></tr>' +
-          '<tr class="yes-row"><td>' + (Math.max(1, probYes-1)) + '¢</td><td>50</td><td>$100.00</td></tr>' +
-          '<tr class="yes-row"><td>' + (Math.max(1, probYes-2)) + '¢</td><td>331</td><td>$620.00</td></tr>' +
-          '<tr class="no-row"><td>' + probNo + '¢</td><td>1,048</td><td>$4.42K</td></tr>' +
-          '<tr class="no-row"><td>' + (Math.max(1, probNo-1)) + '¢</td><td>200</td><td>$840.00</td></tr>' +
+            '<!-- Populado via JS com dados reais -->' +
           '</tbody>' +
         '</table>' +
       '</div>' +
@@ -597,19 +595,15 @@ function switchObTab(tab) {
   var feed = document.getElementById('obLiveFeed');
   if (tab === 'yes') {
     document.getElementById('tabObYes').classList.add('active');
-    feed.style.display = '';
-    Array.from(feed.children).forEach(function(tr) { tr.style.display = tr.classList.contains('yes-row') ? '' : 'none'; });
+    feed.className = 'yes-only';
   } else if (tab === 'no') {
     document.getElementById('tabObNo').classList.add('active');
-    feed.style.display = '';
-    Array.from(feed.children).forEach(function(tr) { tr.style.display = tr.classList.contains('no-row') ? '' : 'none'; });
+    feed.className = 'no-only';
   } else if (tab === 'graph') {
     document.getElementById('tabObGraph').classList.add('active');
+    feed.className = '';
     showToast('Visualizando gráfico principal...');
     document.querySelector('.chart-card').scrollIntoView({behavior: 'smooth'});
-    // Restaura visualizacao
-    feed.style.display = '';
-    Array.from(feed.children).forEach(function(tr) { tr.style.display = ''; });
   }
 }
 
@@ -660,29 +654,34 @@ function updateSummary() {
   document.getElementById('sumReturn').textContent = 'R$ ' + parseFloat(retorno).toFixed(2);
 }
 
-// ==== LIVE ORDER BOOK FEED SIMULADOR ====
-const feedNames = ['Victor', 'AnaL', 'Pedro_', 'Bruna', 'rafaelMkt', 'Joao7', 'carol', 'MarcoMx', 'lucas_sp', 'Davi88'];
-setInterval(function() {
-  var tbody = document.getElementById('obLiveFeed');
-  if (!tbody) return;
-  var isYes = Math.random() > 0.5;
-  var price = isYes ? market.probYes : market.probNo;
-  var amt = Math.floor(Math.random() * 500) + 10;
-  var contracts = Math.floor(amt / (price/100));
-  var clss = isYes ? 'yes-row' : 'no-row';
-  var newRow = document.createElement('tr');
-  newRow.className = clss;
-  newRow.style.animation = 'fadeIn 0.5s';
-  newRow.innerHTML = '<td>' + price + '¢</td><td>' + contracts + '</td><td>$' + amt.toFixed(2) + ' <span style="font-size:0.7rem;color:var(--muted);margin-left:8px">by @' + feedNames[Math.floor(Math.random()*feedNames.length)] + '</span></td>';
-  
-  var activeYes = document.getElementById('tabObYes') && document.getElementById('tabObYes').classList.contains('active');
-  var activeNo = document.getElementById('tabObNo') && document.getElementById('tabObNo').classList.contains('active');
-  if (activeYes && !isYes) newRow.style.display = 'none';
-  if (activeNo && isYes) newRow.style.display = 'none';
-  
-  tbody.insertBefore(newRow, tbody.firstChild);
-  if (tbody.children.length > 8) { tbody.removeChild(tbody.lastChild); }
-}, 3500);
+// ==== LIVE ORDER BOOK REAL ====
+async function loadOrderBook() {
+  try {
+    const data = await apiGet('/bets/market/' + marketId + '/book');
+    const tbody = document.getElementById('obLiveFeed');
+    if (!tbody || !data) return;
+
+    tbody.innerHTML = '';
+    data.forEach(bet => {
+      const isYes = bet.side === 'yes';
+      const row = document.createElement('tr');
+      row.className = isYes ? 'yes-row' : 'no-row';
+      
+      const probStr = parseFloat(bet.potential_payout) > 0 
+        ? (Math.min(99, Math.max(1, (parseFloat(bet.amount) / parseFloat(bet.potential_payout)) * 100))).toFixed(0)
+        : (isYes ? market.probYes : market.probNo);
+
+      row.innerHTML = `
+        <td>${probStr}¢</td>
+        <td>${(parseFloat(bet.amount) / (probStr/100)).toFixed(0)}</td>
+        <td>R$ ${parseFloat(bet.amount).toFixed(2)}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  } catch (e) { console.error('Error loading book:', e); }
+}
+
+setInterval(loadOrderBook, 10000);
 
 async function confirmBet() {
   if (!state.token) { openModal('loginModal'); return; }
@@ -757,6 +756,7 @@ async function loadMarket() {
     market = data;
     allHistory = data.history || [];
     renderPage();
+    loadOrderBook();
   } catch(e) {
     document.getElementById('pageContent').innerHTML = '<div style="text-align:center;padding:80px;color:var(--muted)">Erro ao carregar mercado.</div>';
   }

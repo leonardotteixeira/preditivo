@@ -11,25 +11,25 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #080c10;
-    --surface: #0e1419;
-    --surface2: #141c24;
-    --border: rgba(255,255,255,0.07);
-    --green: #00e676;
-    --green-dim: rgba(0,230,118,0.12);
-    --red: #ff4757;
-    --red-dim: rgba(255,71,87,0.12);
-    --blue: #00b4ff;
-    --gold: #ffc107;
-    --text: #e8edf2;
-    --muted: #5a6878;
-    --accent: #00e676;
+    --bg: #050505;
+    --surface: #0a0a0a;
+    --surface2: #121212;
+    --border: rgba(255,255,255,0.05);
+    --green: #10b981;
+    --green-dim: rgba(16,185,129,0.1);
+    --red: #f43f5e;
+    --red-dim: rgba(244,63,94,0.1);
+    --blue: #3b82f6;
+    --gold: #f59e0b;
+    --text: #ffffff;
+    --muted: #888888;
+    --accent: var(--blue);
   }
 
   * { margin:0; padding:0; box-sizing:border-box; }
 
   body {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
@@ -147,129 +147,133 @@
   .balance-info { text-align:center;font-size:0.8rem;color:var(--muted);margin-top:12px; }
   .balance-info span { color:var(--green); }
 
-  /* ---- HEADER ---- */
+  /* ---- FINANCIAL MODALS UTILS ---- */
+  .deposit-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 20px 0; }
+  .pay-method-card {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 16px;
+    padding: 16px; cursor: pointer; text-align: center; transition: all 0.2s;
+  }
+  .pay-method-card:hover { border-color: var(--blue); background: rgba(59,130,246,0.05); }
+  .pay-method-card.active { border-color: var(--blue); background: rgba(59,130,246,0.1); }
+  .pay-method-icon { font-size: 1.5rem; display: block; margin-bottom: 8px; }
+  .pay-method-label { font-size: 0.8rem; font-weight: 700; color: var(--muted); }
+  .pay-method-card.active .pay-method-label { color: var(--text); }
+
+  .amount-presets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+  .preset-btn {
+    padding: 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
+    color: var(--muted); font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+  }
+  .preset-btn:hover { border-color: var(--text); color: var(--text); }
+
+  .qr-container {
+    background: #fff; padding: 12px; border-radius: 16px; width: 180px; height: 180px;
+    margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;
+  }
+  .copy-box {
+    display: flex; align-items: center; gap: 10px; background: var(--surface2);
+    padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border); margin: 20px 0;
+  }
+  .copy-box code { font-family: 'DM Mono', monospace; font-size: 0.85rem; flex: 1; overflow: hidden; text-overflow: ellipsis; }
+  .copy-box button { background: none; border: none; color: var(--blue); font-weight: 700; cursor: pointer; }  /* ---- HEADER ---- */
   header {
     position:sticky;top:0;z-index:100;
-    background:rgba(8,12,16,0.85);
-    backdrop-filter:blur(20px);
+    background:rgba(5,5,5,0.8);
+    backdrop-filter:blur(16px);
     border-bottom:1px solid var(--border);
     padding:0 24px;
   }
   .header-inner {
-    max-width:1280px;margin:0 auto;
-    display:flex;align-items:center;gap:24px;height:64px;
+    max-width:1440px;margin:0 auto;
+    display:flex;align-items:center;height:64px;
+    gap:40px;
   }
   .logo {
-    font-size:1.3rem;font-weight:700;letter-spacing:-0.5px;
-    background:linear-gradient(135deg,var(--green),var(--blue));
-    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    font-size:1.2rem;font-weight:800;letter-spacing:-0.5px;
+    background:linear-gradient(135deg, var(--green), var(--blue));
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
     cursor:pointer;
+    flex-shrink:0;
   }
-  .logo span { color:var(--muted);-webkit-text-fill-color:var(--muted); }
-  nav { display:flex;gap:4px;flex:1; }
+  nav { display:flex;gap:4px; }
   nav a {
-    padding:6px 14px;border-radius:8px;color:var(--muted);
-    text-decoration:none;font-size:0.9rem;font-weight:500;
+    padding:8px 12px;border-radius:12px;color:var(--muted);
+    text-decoration:none;font-size:0.85rem;font-weight:600;
     transition:all 0.2s;cursor:pointer;
   }
-  nav a:hover,nav a.active { color:var(--text);background:var(--surface2); }
-  /* SEARCH BAR */
+  nav a:hover, nav a.active { color:var(--text); background:rgba(255,255,255,0.05); }
+  
+  /* SEARCH BAR CENTRALIZED */
   .header-search {
-    flex:1;max-width:340px;
-    display:flex;align-items:center;gap:8px;
+    flex:1;max-width:480px;margin:0 auto;
+    display:flex;align-items:center;gap:10px;
     background:var(--surface2);border:1px solid var(--border);
-    border-radius:10px;padding:8px 14px;
-    transition:border-color 0.2s;
+    border-radius:12px;padding:8px 16px;
+    transition:all 0.2s;
   }
-  .header-search:focus-within { border-color:rgba(0,230,118,0.4); }
-  .header-search svg { color:var(--muted);flex-shrink:0; }
+  .header-search:focus-within { border-color:var(--blue); box-shadow:0 0 0 3px rgba(59,130,246,0.1); }
   .header-search input {
     background:transparent;border:none;outline:none;
-    color:var(--text);font-family:'Inter',sans-serif;font-size:0.88rem;
+    color:var(--text);font-family:inherit;font-size:0.85rem;
     width:100%;
   }
-  .header-search input::placeholder { color:var(--muted); }
-  .header-right { display:flex;align-items:center;gap:12px;margin-left:auto; }
-
-  .wallet-btn .dot { width:8px;height:8px;border-radius:50%;background:var(--muted); }
-  .wallet-btn.connected .dot { background:var(--green);box-shadow:0 0 8px var(--green); }
+  
+  .header-right { display:flex;align-items:center;gap:16px;flex-shrink:0; }
   .user-chip {
-    display:flex;align-items:center;gap:8px;padding:6px 12px;
-    background:var(--surface2);border:1px solid var(--border);border-radius:10px;
-    font-size:0.85rem;cursor:pointer;
+    display:flex;align-items:center;gap:10px;padding:6px 14px;
+    background:var(--surface2);border:1px solid var(--border);border-radius:12px;
+    font-size:0.85rem;cursor:pointer;font-weight:600;
+    transition:all 0.2s;
   }
+  .user-chip:hover { border-color:var(--muted); }
   .user-avatar {
-    width:24px;height:24px;border-radius:50%;
+    width:28px;height:28px;border-radius:50%;
     background:linear-gradient(135deg,var(--green),var(--blue));
     display:flex;align-items:center;justify-content:center;
-    font-size:0.7rem;font-weight:700;color:#080c10;
+    font-size:0.75rem;font-weight:800;color:#000;
   }
   .login-btn {
-    padding:8px 20px;background:var(--green);color:#080c10;
-    font-weight:700;font-size:0.85rem;border:none;border-radius:10px;
-    cursor:pointer;font-family:inherit;transition:opacity 0.2s;
-  }
-  .login-btn:hover { opacity:0.85; }
-
-  /* ---- HERO ---- */
-  .hero {
-    max-width:1280px;margin:0 auto;padding:60px 24px 40px;
-    display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;
-  }
-  .hero-tag {
-    display:inline-flex;align-items:center;gap:8px;
-    padding:6px 14px;background:var(--green-dim);border:1px solid rgba(0,230,118,0.2);
-    border-radius:100px;font-size:0.8rem;color:var(--green);font-weight:600;
-    margin-bottom:20px;
-  }
-  .hero-tag::before { content:'●';font-size:0.5rem;animation:pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
-  h1 { font-size:3.2rem;line-height:1.1;letter-spacing:-1.5px;margin-bottom:16px; }
-  h1 em { font-style:normal;color:var(--green); }
-  .hero-sub { color:var(--muted);font-size:1.05rem;line-height:1.6;margin-bottom:32px; }
-  .hero-actions { display:flex;gap:12px;flex-wrap:wrap; }
-  .btn-hero {
-    padding:14px 28px;background:var(--green);color:#080c10;
-    font-weight:700;font-size:1rem;border:none;border-radius:12px;
+    padding:10px 24px;background:var(--text);color:#000;
+    font-weight:700;font-size:0.85rem;border:none;border-radius:12px;
     cursor:pointer;font-family:inherit;transition:all 0.2s;
   }
-  .btn-hero:hover { transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,230,118,0.3); }
-  .btn-hero-outline {
-    padding:14px 28px;background:transparent;color:var(--text);
-    font-weight:600;font-size:1rem;border:1px solid var(--border);
-    border-radius:12px;cursor:pointer;font-family:inherit;transition:all 0.2s;
+  .login-btn:hover { opacity:0.9; transform:translateY(-1px); }
+
+  /* ---- HERO SECTION (V0 INSPIRED) ---- */
+  .hero {
+    max-width:1440px;margin:0 auto;padding:80px 24px;
+    display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;
   }
-  .btn-hero-outline:hover { border-color:var(--green);color:var(--green); }
-  .stats-row { display:flex;gap:32px;margin-top:40px; }
-  .stat-item { min-width:80px; }
-  .stat-value { font-size:1.6rem;font-weight:700;font-family:'DM Mono',monospace;color:var(--text); }
-  .stat-label { font-size:0.75rem;color:var(--muted);margin-top:2px; }
-  /* HERO IMAGE REDESIGN */
+  .hero-content { max-width:600px; }
+  .hero-tag {
+    display:inline-flex;align-items:center;gap:8px;
+    padding:6px 16px;background:rgba(255,255,255,0.05);border:1px solid var(--border);
+    border-radius:100px;font-size:0.75rem;color:var(--text);font-weight:600;
+    margin-bottom:24px;
+  }
+  h1 { font-size:4rem;line-height:1;letter-spacing:-2px;margin-bottom:24px; font-weight:800; }
+  h1 span { color:var(--blue); }
+  .hero-sub { color:var(--muted);font-size:1.1rem;line-height:1.6;margin-bottom:40px; }
+  
   .hero-image-wrapper {
-    position:relative;width:100%;max-width:600px;margin:0 auto;
-    border-radius:24px;overflow:hidden;
-    box-shadow:0 30px 60px -10px rgba(0,230,118,0.2), 0 0 40px rgba(0,180,255,0.1);
-    transform:perspective(1000px) rotateY(-5deg) rotateX(5deg);
-    transition:transform 0.5s ease;
-  }
-  .hero-image-wrapper:hover {
-    transform:perspective(1000px) rotateY(0deg) rotateX(0deg);
-  }
-  .hero-image-wrapper::after {
-    content:'';position:absolute;inset:0;
-    border-radius:24px;border:1px solid rgba(255,255,255,0.1);
-    pointer-events:none;
+    background:var(--surface2);
+    border-radius:32px;padding:24px;
+    border:1px solid var(--border);
+    box-shadow:0 40px 80px -20px rgba(0,0,0,0.5);
   }
   .hero-img {
-    width:100%;height:auto;display:block;
-    filter:contrast(1.05) saturate(1.1);
+    width:100%;height:auto;border-radius:20px;display:block;
+    filter:grayscale(0.2); transition:filter 0.3s;
   }
-  @media(max-width:900px) {
-    .hero { grid-template-columns:1fr; gap:40px; text-align:center; padding-top:40px; }
-    h1 { font-size:2.8rem; }
+  .hero-img:hover { filter:grayscale(0); }
+
+  @media(max-width:1024px) {
+    .hero { grid-template-columns:1fr; text-align:center; padding:60px 24px; }
+    .hero-content { max-width:100%; }
+    h1 { font-size:3rem; }
     .hero-actions { justify-content:center; }
-    .stats-row { justify-content:center; flex-wrap:wrap; }
-    .hero-image-wrapper { transform:none; }
   }
 
   /* ---- MAIN CONTENT ---- */
@@ -319,143 +323,72 @@
   .feed-amount.no { color:var(--red); }
   .feed-time { font-size:0.7rem;color:var(--muted);white-space:nowrap; }
 
-  /* TABS */
+  /* TABS & FILTERS (PILLS) */
   .section-tabs {
     display:flex;gap:4px;margin-bottom:24px;
-    border-bottom:1px solid var(--border);padding-bottom:0;
+    border-bottom:1px solid var(--border);
   }
   .section-tab {
-    padding:10px 20px;background:transparent;border:none;
+    padding:12px 24px;background:transparent;border:none;
     color:var(--muted);cursor:pointer;font-family:inherit;
-    font-size:0.9rem;font-weight:500;border-bottom:2px solid transparent;
+    font-size:0.9rem;font-weight:600;border-bottom:2px solid transparent;
     margin-bottom:-1px;transition:all 0.2s;
   }
-  .section-tab.active { color:var(--green);border-bottom-color:var(--green); }
-  .section-tab:hover:not(.active) { color:var(--text); }
+  .section-tab.active { color:var(--text);border-bottom-color:var(--text); }
+  .section-tab:hover:not(.active) { color:var(--text); opacity:0.8; }
 
-  /* FILTERS */
-  .filters { display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap; }
-  .filter-btn {
-    padding:6px 14px;background:var(--surface2);border:1px solid var(--border);
-    border-radius:100px;color:var(--muted);font-size:0.8rem;font-weight:500;
-    cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;
-  }
-  .filter-btn:hover,.filter-btn.active { border-color:var(--green);color:var(--green);background:var(--green-dim); }
-
-  /* TRENDING TOPIC TAGS */
   .topic-tags {
-    display:flex;gap:8px;margin-bottom:24px;
-    overflow-x:auto;padding-bottom:4px;scrollbar-width:none;
+    display:flex;gap:10px;margin-bottom:32px;
+    overflow-x:auto;padding-bottom:8px;scrollbar-width:none;
+    mask-image: linear-gradient(to right, black 90%, transparent);
   }
   .topic-tags::-webkit-scrollbar { display:none; }
   .topic-tag {
-    display:flex;align-items:center;gap:6px;white-space:nowrap;
-    padding:6px 14px;background:var(--surface2);border:1px solid var(--border);
-    border-radius:100px;color:var(--muted);font-size:0.78rem;font-weight:500;
-    cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;
+    display:flex;align-items:center;gap:8px;white-space:nowrap;
+    padding:10px 20px;background:var(--surface2);border:1px solid var(--border);
+    border-radius:100px;color:var(--muted);font-size:0.8rem;font-weight:600;
+    cursor:pointer;transition:all 0.2s;
   }
-  .topic-tag:hover { border-color:rgba(0,180,255,0.4);color:var(--blue); }
-  .topic-tag .tt-count {
-    background:var(--surface);border-radius:100px;padding:1px 7px;
-    font-size:0.7rem;color:var(--muted);
-  }
+  .topic-tag:hover { border-color:rgba(255,255,255,0.2); color:var(--text); }
+  .topic-tag.active { background:var(--text); color:#000; border-color:var(--text); }
+  .topic-tag .tt-count { opacity:0.5; font-size:0.75rem; font-weight:400; }
 
   /* MARKETS GRID */
   .markets-grid {
     display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:16px;
   }
 
-  /* MARKET CARD - Kalshi-Inspired Layout */
+  /* MARKET CARD - PREMIUM REDESIGN */
   .market-card {
     background:var(--surface);border:1px solid var(--border);
-    border-radius:20px;padding:0;cursor:pointer;
-    transition:border-color 0.2s, box-shadow 0.2s;
-    position:relative;overflow:hidden;
-    display:flex;flex-direction:column;
+    border-radius:24px;padding:20px;cursor:pointer;
+    transition:all 0.2s cubic-bezier(0.2, 0, 0, 1);
+    position:relative;display:flex;flex-direction:column;gap:16px;
+    height: 100%;
   }
-  .market-card:hover {
-    border-color:rgba(0,230,118,0.25);
-    box-shadow:0 8px 32px rgba(0,0,0,0.3);
-  }
-  .market-card:active { transform:scale(0.975);transition:transform 0.1s; }
+  .market-card:hover { border-color:rgba(255,255,255,0.2); transform:translateY(-2px); box-shadow:0 12px 40px rgba(0,0,0,0.4); }
   
-  /* Market Image Thumbnail - Kalshi style */
-  .mc-image {
-    width: 100%;
-    height: 140px;
-    object-fit: cover;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-  }
-  /* Category accent bar on top */
-  .mc-accent { height:3px;width:100%; }
-  .mc-accent-politica { background:linear-gradient(90deg,var(--blue),rgba(0,180,255,0.2)); }
-  .mc-accent-economia { background:linear-gradient(90deg,var(--gold),rgba(255,193,7,0.2)); }
-  .mc-accent-futebol { background:linear-gradient(90deg,var(--green),rgba(0,230,118,0.2)); }
-  .mc-accent-tech { background:linear-gradient(90deg,#c864ff,rgba(200,100,255,0.2)); }
-  .mc-body { padding:16px 18px 14px; flex:1; display:flex; flex-direction:column; gap:10px; }
-  /* Header row */
-  .mc-header { display:flex;justify-content:space-between;align-items:center; }
-  .mc-header-left { display:flex;gap:5px;align-items:center;flex-wrap:wrap; }
+  .mc-header { display:flex;justify-content:space-between;align-items:flex-start; gap:16px; }
+  .mc-title { font-size:1rem;font-weight:700;line-height:1.4;color:var(--text); flex:1; }
   .mc-category {
-    font-size:0.64rem;text-transform:uppercase;letter-spacing:1px;font-weight:700;
-    padding:2px 8px;border-radius:100px;
+    padding:4px 10px;background:rgba(255,255,255,0.05);border-radius:8px;
+    font-size:0.65rem;font-weight:800;text-transform:uppercase;color:var(--muted);
   }
-  .cat-politica { background:rgba(0,180,255,0.1);color:var(--blue); }
-  .cat-economia { background:rgba(255,193,7,0.1);color:var(--gold); }
-  .cat-futebol { background:rgba(0,230,118,0.1);color:var(--green); }
-  .cat-tech { background:rgba(200,100,255,0.1);color:#c864ff; }
-  /* Status badges */
-  .mc-badge {
-    font-size:0.6rem;font-weight:700;padding:2px 7px;border-radius:100px;
-    display:flex;align-items:center;gap:3px;
-  }
-  @keyframes livePulse { 0%,100%{opacity:1}50%{opacity:0.6} }
-  .mc-badge-hot { background:rgba(255,165,0,0.1);color:#ff9500;border:1px solid rgba(255,165,0,0.2); }
-  .mc-badge-new { background:rgba(0,180,255,0.1);color:var(--blue);border:1px solid rgba(0,180,255,0.2); }
-  .mc-badge-closing { background:rgba(255,71,87,0.08);color:var(--red);border:1px solid rgba(255,71,87,0.18);animation:livePulse 2s infinite; }
-  .mc-volume { font-size:0.68rem;color:var(--muted);font-family:'DM Mono',monospace; }
-  /* Title */
-  .mc-title { font-size:0.95rem;font-weight:600;line-height:1.4;color:var(--text); }
-  /* Outcome rows - Kalshi style */
-  .mc-outcomes { display:flex;flex-direction:column;gap:8px; }
-  .mc-outcome-row {
-    display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;
-  }
-  .mc-outcome-label {
-    display:flex;flex-direction:column;gap:3px;min-width:0;
-  }
-  .mc-outcome-name {
-    font-size:0.82rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  }
-  /* 2px thin Kalshi-style progress bar */
-  .mc-thin-bar {
-    width:100%;height:2px;border-radius:100px;
-    background:var(--surface2);overflow:hidden;
-  }
-  .mc-thin-bar-fill {
-    height:100%;border-radius:100px;
-    transition:width 0.8s ease;
-  }
-  .mc-thin-bar-fill.yes { background:var(--green); }
-  .mc-thin-bar-fill.no { background:var(--red); }
-  /* Multiplier text */
-  .mc-multiplier { font-size:0.72rem;font-family:'DM Mono',monospace;color:var(--muted);white-space:nowrap;text-align:right;min-width:40px; }
-  /* % button - Kalshi style: outline with green border */
-  .mc-pct-btn {
-    display:inline-flex;align-items:center;justify-content:center;
-    padding:5px 10px;border-radius:100px;min-width:46px;
-    border:1px solid rgba(0,230,118,0.35);background:transparent;
-    color:var(--text);font-family:'DM Mono',monospace;font-size:0.82rem;font-weight:700;
-    cursor:pointer;transition:background 0.15s;
-  }
-  .mc-pct-btn:hover { background:var(--green-dim); }
-  .mc-pct-btn.no-btn { border-color:rgba(255,71,87,0.3); }
-  .mc-pct-btn.no-btn:hover { background:var(--red-dim); }
-  /* Footer */
-  .mc-footer {
-    display:flex;gap:12px;padding:10px 18px;border-top:1px solid rgba(255,255,255,0.05);
-    align-items:center;
-  }
+
+  /* Sentiment Bar */
+  .mc-sentiment { height:6px;background:rgba(255,255,255,0.05);border-radius:100px;overflow:hidden;display:flex; margin:4px 0; }
+  .mc-sentiment-yes { height:100%;background:var(--green); transition:width 0.5s ease; }
+  .mc-sentiment-no { height:100%;background:var(--red); transition:width 0.5s ease; }
+
+  .mc-footer { display:flex;justify-content:space-between;align-items:center; margin-top:auto; padding-top:12px; border-top:1px solid rgba(255,255,255,0.03); }
+  .mc-stats { display:flex;gap:12px; }
+  .mc-stat { font-size:0.75rem;color:var(--muted);display:flex;align-items:center;gap:4px; }
+  .mc-stat strong { color:var(--text); }
+
+  .mc-odds { display:flex;gap:8px; }
+  .mc-odd { padding:8px 16px;border-radius:12px;font-size:0.85rem;font-weight:700; }
+  .mc-odd.yes { background:var(--green-dim); color:var(--green); }
+  .mc-odd.no { background:var(--red-dim); color:var(--red); }
   .mc-footer-item { font-size:0.68rem;color:var(--muted);display:flex;align-items:center;gap:3px; }
   /* Skeleton loading */
   @keyframes shimmer { from{background-position:200% center} to{background-position:-200% center} }
@@ -478,13 +411,80 @@
   .legend-dot { width:8px;height:8px;border-radius:50%; }
   .chart-wrapper canvas { width:100%!important; height:100%!important; }
 
-  /* ---- RANKING ---- */
-  .ranking-section { display:grid;grid-template-columns:1fr 1fr;gap:16px; }
-  .ranking-card {
-    background:var(--surface);border:1px solid var(--border);
-    border-radius:16px;padding:24px;
+  /* ---- RANKING REDESIGN ---- */
+  .ranking-layout {
+    display: flex; flex-direction: column; gap: 32px;
   }
-  .ranking-title { font-size:1rem;font-weight:600;margin-bottom:20px;display:flex;align-items:center;gap:8px; }
+  .ranking-podium {
+    display: flex; align-items: flex-end; justify-content: center; gap: 20px; padding: 40px 0;
+  }
+  .podium-item {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 24px;
+    padding: 24px; text-align: center; position: relative; flex: 1; max-width: 200px;
+    transition: transform 0.3s;
+  }
+  .podium-item:hover { transform: translateY(-10px); }
+  .podium-item.first { height: 280px; border-color: var(--gold); box-shadow: 0 0 30px rgba(245,158,11,0.1); }
+  .podium-item.second { height: 240px; border-color: #cbd5e1; }
+  .podium-item.third { height: 220px; border-color: #92400e; }
+  
+  .podium-rank {
+    position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+    width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.9rem;
+  }
+  .first .podium-rank { background: var(--gold); color: #000; }
+  .second .podium-rank { background: #cbd5e1; color: #000; }
+  .third .podium-rank { background: #92400e; color: #fff; }
+
+  .podium-avatar {
+    width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 16px;
+    display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem;
+    background: linear-gradient(135deg, var(--green), var(--blue));
+  }
+  .podium-name { font-weight: 700; margin-bottom: 4px; font-size: 1rem; }
+  .podium-profit { color: var(--green); font-weight: 700; font-size: 0.9rem; }
+
+  /* User Rank Fixed Card */
+  .user-ranking-card {
+    background: var(--blue); color: #fff; border-radius: 20px; padding: 20px 32px;
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px;
+  }
+  .ur-left { display: flex; align-items: center; gap: 20px; }
+  .ur-rank { font-size: 1.5rem; font-weight: 900; opacity: 0.8; }
+  .ur-name { font-weight: 700; font-size: 1.1rem; }
+  .ur-stats { display: flex; gap: 32px; text-align: right; }
+  .urs-label { font-size: 0.75rem; opacity: 0.8; margin-bottom: 2px; }
+  .urs-val { font-weight: 800; font-size: 1.1rem; }
+
+  /* Portfolio Dashboard */
+  .portfolio-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-top: 24px; }
+  .portfolio-main-card { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 32px; }
+  .p-total-val { font-size: 2.5rem; font-weight: 800; margin-bottom: 8px; }
+  .p-change { font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+  .p-change.up { color: var(--green); }
+
+  .positions-tabs { display: flex; gap: 16px; margin: 32px 0 20px; border-bottom: 1px solid var(--border); }
+  .positions-tab { padding: 12px 0; background: none; border: none; font-weight: 700; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; }
+  .positions-tab.active { color: var(--text); border-bottom-color: var(--text); }
+
+  .pos-card {
+    display: flex; align-items: center; justify-content: space-between; padding: 16px; 
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 12px;
+  }
+  .pos-info { display: flex; align-items: center; gap: 16px; }
+  .pos-icon { width: 40px; height: 40px; border-radius: 12px; background: rgba(59,130,246,0.1); color: var(--blue); display: flex; align-items: center; justify-content: center; font-weight: 800; }
+  .pos-meta h4 { font-size: 0.95rem; margin-bottom: 2px; }
+  .pos-meta p { font-size: 0.75rem; color: var(--muted); }
+  .pos-right { text-align: right; }
+  .pos-val { font-weight: 700; margin-bottom: 2px; }
+  .pos-pnl { font-size: 0.75rem; font-weight: 600; }
+
+  @media(max-width: 900px) {
+    .ranking-podium { flex-direction: column; align-items: center; }
+    .podium-item { width: 100%; height: auto!important; }
+    .portfolio-grid { grid-template-columns: 1fr; }
+  }
   .ranking-title span { font-size:1.2rem; }
   .ranking-list { display:flex;flex-direction:column;gap:2px; }
   .ranking-item {
@@ -824,141 +824,54 @@
 
 <!-- DEPOSIT MODAL -->
 <div class="modal-overlay" id="depositModal">
-  <div class="modal" style="max-width:480px">
+  <div class="modal">
     <button class="modal-close" onclick="closeModal('depositModal')">✕</button>
-    <h2>💰 Depositar</h2>
+    <h2>💰 Adicionar Saldo</h2>
+    <p>Escolha como deseja depositar fundos na sua conta Bubuya.</p>
 
-    <!-- Abas -->
-    <div class="deposit-tabs">
-      <button class="dep-tab active" id="tabBtnPix" onclick="switchDepTab('pix')">🏦 PIX (BRL)</button>
-      <button class="dep-tab" id="tabBtnMM" onclick="switchDepTab('metamask')">🦊 MetaMask</button>
-      <button class="dep-tab" id="tabBtnUsdc" onclick="switchDepTab('usdc')">💎 Endereço</button>
+    <div class="deposit-grid">
+      <div class="pay-method-card active" onclick="switchDepTab('pix', this)">
+        <span class="pay-method-icon">🏦</span>
+        <span class="pay-method-label">PIX</span>
+      </div>
+      <div class="pay-method-card" onclick="switchDepTab('crypto', this)">
+        <span class="pay-method-icon">⛓️</span>
+        <span class="pay-method-label">Crypto</span>
+      </div>
     </div>
 
-    <!-- PIX -->
+    <!-- PIX FLOW -->
     <div id="depTabPix">
-      <p style="color:var(--muted);font-size:0.9rem;margin-bottom:16px">Faça um PIX e seu saldo será creditado em até 15 minutos</p>
-      <div class="deposit-presets">
-        <button class="deposit-preset" onclick="setDepositAmount(10)">R$10</button>
-        <button class="deposit-preset" onclick="setDepositAmount(25)">R$25</button>
-        <button class="deposit-preset" onclick="setDepositAmount(50)">R$50</button>
-        <button class="deposit-preset" onclick="setDepositAmount(100)">R$100</button>
-        <button class="deposit-preset" onclick="setDepositAmount(200)">R$200</button>
+      <div class="amount-presets">
+        <button class="preset-btn" onclick="setDepositAmount(20)">R$20</button>
+        <button class="preset-btn" onclick="setDepositAmount(50)">R$50</button>
+        <button class="preset-btn" onclick="setDepositAmount(100)">R$100</button>
+        <button class="preset-btn" onclick="setDepositAmount(200)">R$200</button>
       </div>
-      <input class="modal-input" type="number" id="depositAmount" placeholder="Valor (mín. R$10)" min="10">
-      <div class="deposit-code">
-        <div style="font-size:0.75rem;color:var(--muted);margin-bottom:4px">Seu código de depósito</div>
-        <span id="depositCode">—</span>
-      </div>
-      <div class="deposit-steps">
-        <div class="deposit-step">
-          <div class="step-num">1</div>
-          <div class="step-content">
-            <div class="step-title">Copie a chave PIX</div>
-            <div class="pix-key-box">
-              <span class="pix-key">9bf0d836-a584-4436-8f45-61c650167cf3</span>
-              <button class="copy-btn" onclick="copyPixKey()">Copiar</button>
-            </div>
-          </div>
+      <input class="modal-input" type="number" id="depositAmount" placeholder="Digite o valor">
+      
+      <div id="pixPaymentArea" style="display:none">
+        <div class="qr-container">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=BubuyaPIX" alt="Pix QR">
         </div>
-        <div class="deposit-step">
-          <div class="step-num">2</div>
-          <div class="step-content">
-            <div class="step-title">Faça o PIX com o valor escolhido</div>
-            <div class="step-desc">No campo "mensagem" ou "descrição" do PIX, coloque seu código acima</div>
-          </div>
-        </div>
-        <div class="deposit-step">
-          <div class="step-num">3</div>
-          <div class="step-content">
-            <div class="step-title">Aguarde a confirmação</div>
-            <div class="step-desc">Seu saldo será creditado em até 15 minutos após o pagamento</div>
-          </div>
+        <div class="copy-box">
+          <code id="depositCode">00020126580014br.gov.bcb.pix0136...</code>
+          <button onclick="copyPixKey()">Copiar</button>
         </div>
       </div>
-      <button class="btn-primary" onclick="confirmDepositRequest()">✅ Já fiz o PIX</button>
-      <div class="deposit-warning" style="margin-top:12px">Depósito mínimo R$10 · Saque disponível após 24h · Suporte: suporte@bubuya.com.br</div>
+      
+      <button class="btn-primary" onclick="confirmDepositRequest()">Gerar QR Code PIX</button>
     </div>
 
-    <!-- MetaMask direto -->
-    <div id="depTabMM" style="display:none">
-      <div class="usdc-badge">🦊 MetaMask · Polygon Network · USDC</div>
-      <div id="mmNotConnected" style="display:none;text-align:center;padding:24px 0">
-        <p style="color:var(--muted);font-size:0.9rem;margin-bottom:16px">Conecte sua carteira MetaMask para enviar USDC diretamente</p>
-        <button class="btn-primary" onclick="connectWallet();switchDepTab('metamask')">🦊 Conectar MetaMask</button>
+    <!-- CRYPTO FLOW -->
+    <div id="depTabCrypto" style="display:none">
+      <p style="font-size:0.8rem; margin-bottom:16px">Envie <strong>USDC</strong> na rede <strong>Polygon</strong>.</p>
+      <div class="copy-box">
+        <code>0x63e8f13be1160741902092D0E0629ba741FDe3b6</code>
+        <button onclick="copyUsdcAddress()">Copiar</button>
       </div>
-      <div id="mmConnected" style="display:none">
-        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:0.82rem;color:var(--muted);margin-bottom:16px;word-break:break-all">
-          <span style="color:var(--green)">●</span> <span id="mmWalletLabel"></span>
-        </div>
-        <div class="deposit-steps">
-          <div class="deposit-step">
-            <div class="step-num">1</div>
-            <div class="step-content">
-              <div class="step-title">Informe o valor em USDC</div>
-              <input class="modal-input" type="number" id="mmUsdcAmount" placeholder="Quantidade de USDC (mín. 10)" min="10" style="margin-top:8px;margin-bottom:6px" oninput="calcMMBrl()">
-              <div id="mmConversion" style="display:none;background:var(--green-dim);border:1px solid rgba(0,230,118,0.2);border-radius:8px;padding:10px 14px;font-size:0.9rem">
-                <span style="color:var(--muted)">Você receberá ≈ </span>
-                <span id="mmBrlValue" style="color:var(--green);font-weight:700;font-size:1.05rem"></span>
-                <span style="color:var(--muted);font-size:0.78rem;margin-left:6px">· cotação ao vivo</span>
-              </div>
-            </div>
-          </div>
-          <div class="deposit-step">
-            <div class="step-num">2</div>
-            <div class="step-content">
-              <div class="step-title">Envie via MetaMask</div>
-              <div class="step-desc">Clique no botão abaixo — o MetaMask abrirá para você confirmar a transação USDC na rede Polygon</div>
-            </div>
-          </div>
-        </div>
-        <button class="btn-primary" onclick="depositViaMM()" style="background:linear-gradient(135deg,#f6851b,#e2761b)">
-          🦊 Enviar USDC via MetaMask
-        </button>
-        <div class="deposit-warning" style="margin-top:12px">Mínimo 10 USDC · Confirmação automática após tx confirmada · Rede: Polygon</div>
-      </div>
-    </div>
-
-    <!-- USDC Manual -->
-    <div id="depTabUsdc" style="display:none">
-      <div class="usdc-badge">⛓ Polygon Network · USDC</div>
-      <div class="deposit-steps">
-        <div class="deposit-step">
-          <div class="step-num">1</div>
-          <div class="step-content">
-            <div class="step-title">Copie o endereço da carteira</div>
-            <div class="pix-key-box">
-              <span class="pix-key" style="font-size:0.72rem">0x63e8f13be1160741902092D0E0629ba741FDe3b6</span>
-              <button class="copy-btn" onclick="copyUsdcAddress()">Copiar</button>
-            </div>
-            <div class="step-desc" style="margin-top:6px">⚠️ Envie somente <strong>USDC na rede Polygon</strong>. Outras redes causarão perda dos fundos.</div>
-          </div>
-        </div>
-        <div class="deposit-step">
-          <div class="step-num">2</div>
-          <div class="step-content">
-            <div class="step-title">Informe o valor enviado (em USDC)</div>
-            <input class="modal-input" type="number" id="usdcAmount" placeholder="Quantidade de USDC (mín. 10)" min="10" style="margin-top:8px;margin-bottom:6px" oninput="calcUsdcBrl()">
-            <div id="usdcConversion" style="display:none;background:var(--green-dim);border:1px solid rgba(0,230,118,0.2);border-radius:8px;padding:10px 14px;font-size:0.9rem">
-              <span style="color:var(--muted)">Você receberá ≈ </span>
-              <span id="usdcBrlValue" style="color:var(--green);font-weight:700;font-size:1.05rem"></span>
-              <span style="color:var(--muted);font-size:0.78rem;margin-left:6px">· cotação ao vivo</span>
-            </div>
-          </div>
-        </div>
-        <div class="deposit-step">
-          <div class="step-num">3</div>
-          <div class="step-content">
-            <div class="step-title">Cole o hash da transação</div>
-            <input class="modal-input" id="usdcTxHash" placeholder="0x... (hash do Polygonscan)" style="margin-top:8px;margin-bottom:0;font-family:monospace;font-size:0.8rem">
-            <div class="step-desc" style="margin-top:4px">Encontre o hash no seu app de carteira ou no <a href="https://polygonscan.com" target="_blank" style="color:var(--blue)">Polygonscan</a></div>
-          </div>
-        </div>
-      </div>
-      <button class="btn-primary" onclick="confirmUsdcDeposit()" style="background:linear-gradient(135deg,#00b4ff,#0088cc)">
-        💎 Já enviei o USDC
-      </button>
-      <div class="deposit-warning" style="margin-top:12px">Mínimo 10 USDC · Confirmação em até 1h pelo admin · Suporte: suporte@bubuya.com.br</div>
+      <input class="modal-input" type="text" id="usdcTxHash" placeholder="Hash da transação (0x...)">
+      <button class="btn-primary" onclick="confirmUsdcDeposit()">Confirmar Envio</button>
     </div>
   </div>
 </div>
@@ -966,40 +879,41 @@
 
 <!-- WITHDRAWAL MODAL -->
 <div class="modal-overlay" id="withdrawModal">
-  <div class="modal" style="max-width:460px">
+  <div class="modal">
     <button class="modal-close" onclick="closeModal('withdrawModal')">✕</button>
-    <h2>💸 Sacar via PIX</h2>
-    <p>Informe sua chave PIX e o valor. O pagamento é feito em até 24h.</p>
+    <h2>💸 Solicitar Saque</h2>
+    <p>Retire seus lucros via PIX. Processado em até 24h.</p>
 
-    <div style="margin-bottom:12px">
-      <div style="font-size:0.8rem;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">Tipo de chave PIX</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="pix-type-btn active" onclick="selectPixType('cpf',this)">CPF</button>
-        <button class="pix-type-btn" onclick="selectPixType('email',this)">Email</button>
-        <button class="pix-type-btn" onclick="selectPixType('telefone',this)">Telefone</button>
-        <button class="pix-type-btn" onclick="selectPixType('aleatoria',this)">Aleatória</button>
+    <div style="margin:24px 0">
+      <div class="urs-label" style="margin-bottom:12px">Tipo de chave PIX</div>
+      <div class="amount-presets">
+        <button class="preset-btn active" style="font-size:0.75rem" onclick="selectPixType('cpf',this)">CPF</button>
+        <button class="preset-btn" style="font-size:0.75rem" onclick="selectPixType('email',this)">Email</button>
+        <button class="preset-btn" style="font-size:0.75rem" onclick="selectPixType('telefone',this)">Tel</button>
+        <button class="preset-btn" style="font-size:0.75rem" onclick="selectPixType('aleatoria',this)">Chave</button>
+      </div>
+      <input class="modal-input" type="text" id="withdrawPixKey" placeholder="Digite sua chave PIX">
+    </div>
+
+    <div style="margin-bottom:24px">
+      <div class="urs-label" style="margin-bottom:12px">Valor do Saque (R$)</div>
+      <div class="amount-presets">
+        <button class="preset-btn" onclick="setWithdrawAmount(50)">50</button>
+        <button class="preset-btn" onclick="setWithdrawAmount(100)">100</button>
+        <button class="preset-btn" onclick="setWithdrawAmount(500)">500</button>
+        <button class="preset-btn" id="withdrawAllBtn" onclick="withdrawAll()">Tudo</button>
+      </div>
+      <input class="modal-input" type="number" id="withdrawAmount" placeholder="Mínimo R$20">
+    </div>
+
+    <div style="background:var(--surface2); padding:16px; border-radius:16px; margin-bottom:24px">
+      <div style="display:flex; justify-content:space-between; font-size:0.85rem">
+        <span style="color:var(--muted)">Disponível:</span>
+        <span style="color:var(--green); font-weight:700" id="withdrawBalanceDisplay">R$0.00</span>
       </div>
     </div>
 
-    <input class="modal-input" type="text" id="withdrawPixKey" placeholder="Sua chave PIX">
-    
-    <div style="margin-bottom:8px">
-      <div style="font-size:0.8rem;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">Valor (mín. R$20)</div>
-    </div>
-    <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
-      <button class="deposit-preset" onclick="setWithdrawAmount(20)">R$20</button>
-      <button class="deposit-preset" onclick="setWithdrawAmount(50)">R$50</button>
-      <button class="deposit-preset" onclick="setWithdrawAmount(100)">R$100</button>
-      <button class="deposit-preset" onclick="setWithdrawAmount(500)">R$500</button>
-    </div>
-    <input class="modal-input" type="number" id="withdrawAmount" placeholder="Valor (mín. R$20)" min="20">
-
-    <div style="background:var(--surface2);border-radius:8px;padding:12px;margin-bottom:16px;font-size:0.82rem;color:var(--muted)">
-      Saldo disponível: <span id="withdrawBalanceDisplay" style="color:var(--green);font-weight:600">-</span><br>
-      O saldo será debitado imediatamente. Pagamento em até 24h úteis.
-    </div>
-
-    <button class="btn-primary" onclick="confirmWithdraw()">Solicitar Saque</button>
+    <button class="btn-primary" onclick="confirmWithdraw()">Solicitar Saque via PIX</button>
   </div>
 </div>
 
@@ -1036,17 +950,17 @@
 <header>
   <div class="header-inner">
     <div class="logo" onclick="showSection('home')">Bubuya.</div>
-    <nav>
-      <a onclick="showSection('home')" id="nav-home" class="active">Mercados</a>
-      <a onclick="showSection('portfolio')" id="nav-portfolio">Portfólio</a>
-      <a onclick="showSection('ranking')" id="nav-ranking">Ranking</a>
-      <a onclick="openModal('comoFuncionaModal')" style="cursor:pointer">Como funciona</a>
-    </nav>
+    
     <div class="header-search">
       <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="searchInput" placeholder="Buscar mercados..." oninput="onSearchInput(this.value)">
+      <input type="text" id="searchInput" placeholder="O que vai acontecer?" oninput="onSearchInput(this.value)">
     </div>
+
     <div class="header-right">
+      <nav style="margin-right:8px">
+        <a onclick="showSection('portfolio')" id="nav-portfolio">Portfólio</a>
+        <a onclick="showSection('ranking')" id="nav-ranking">Ranking</a>
+      </nav>
       <div id="authArea">
         <button class="login-btn" onclick="openModal('loginModal')">Entrar</button>
       </div>
@@ -1056,59 +970,35 @@
 
 <!-- SECTION: HOME -->
 <div class="section active" id="section-home">
-  <!-- HERO -->
+  <!-- HERO (V0 STYLE) -->
   <div class="hero">
     <div class="hero-content">
-      <div class="hero-tag">Ao vivo agora</div>
-      <h1 id="heroH1">Preveja o<br><em>futuro do Brasil</em><br>e lucre.</h1>
-      <p class="hero-sub" id="heroSub">Mercados de previsão descentralizados sobre política, economia, futebol e muito mais. Aposte com USDC na Polygon.</p>
-      <div class="hero-actions" id="heroActions">
-        <button class="btn-hero" onclick="openModal('registerModal')">Começar Grátis →</button>
-        <button class="btn-hero-outline" onclick="document.getElementById('marketsGrid').scrollIntoView({behavior:'smooth'})">Explorar Mercados →</button>
+      <div class="hero-tag">✨ O futuro é agora</div>
+      <h1 id="heroH1">A plataforma de<br><span>mercados preditivos</span><br>do Brasil.</h1>
+      <p class="hero-sub" id="heroSub">Aposte no que você acredita. Política, esporte, economia e cultura pop — tudo em um só lugar, com liquidez real e pagamentos instantâneos via PIX.</p>
+      <div class="hero-actions" id="heroActions" style="display:flex;gap:16px;margin-bottom:48px">
+        <button class="login-btn" style="padding:14px 32px; font-size:1rem" onclick="openModal('registerModal')">Começar Agora</button>
+        <button class="user-chip" style="padding:12px 24px; font-size:1rem" onclick="document.getElementById('marketsGrid').scrollIntoView({behavior:'smooth'})">Explorar Mercados</button>
       </div>
-      <div class="stats-row">
-        <div class="stat-item">
-          <div class="stat-value" id="totalVolume">R$2.4M</div>
-          <div class="stat-label">Volume total</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value" id="activeMarkets">47</div>
-          <div class="stat-label">Mercados ativos</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value" id="activePlayers">3.2k</div>
-          <div class="stat-label">Traders ativos</div>
-        </div>
+      <div style="display:flex;gap:40px;opacity:0.6">
+        <div><div style="font-size:1.2rem;font-weight:700">R$2.4M+</div><div style="font-size:0.75rem">Volume</div></div>
+        <div><div style="font-size:1.2rem;font-weight:700">47</div><div style="font-size:0.75rem">Mercados Ativos</div></div>
+        <div><div style="font-size:1.2rem;font-weight:700">3.2k</div><div style="font-size:0.75rem">Traders</div></div>
       </div>
     </div>
     <div class="hero-image-wrapper">
-      <img src="hero.png" alt="Mercado Preditivo Bubuya" class="hero-img">
+      <img src="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=2832&auto=format&fit=crop" alt="Mercado Preditivo" class="hero-img">
     </div>
   </div>
 
   <!-- MARKETS -->
   <div class="main">
-    <div class="section-tabs">
-      <button class="section-tab active" onclick="filterMarkets('all',this)">Todos</button>
-      <button class="section-tab" onclick="filterMarkets('hot',this)">🔥 Em Alta</button>
-      <button class="section-tab" onclick="filterMarkets('new',this)">✨ Novos</button>
-      <button class="section-tab" onclick="filterMarkets('closing',this)">⏰ Encerrando</button>
-    </div>
-    <div class="filters">
-      <button class="filter-btn active" onclick="setCatFilter('all',this)">Todos</button>
-      <button class="filter-btn" onclick="setCatFilter('politica',this)">🏛️ Política</button>
-      <button class="filter-btn" onclick="setCatFilter('economia',this)">📈 Economia</button>
-      <button class="filter-btn" onclick="setCatFilter('futebol',this)">⚽ Futebol</button>
-      <button class="filter-btn" onclick="setCatFilter('tech',this)">💻 Tech</button>
-    </div>
-    <div class="topic-tags" id="topicTags">
-      <span class="topic-tag" onclick="filterByTopic('Copa')">⚽ Copa 2026 <span class="tt-count" id="tc-copa">—</span></span>
-      <span class="topic-tag" onclick="filterByTopic('Eleições')">🗳️ Eleições 2026 <span class="tt-count" id="tc-eleicoes">—</span></span>
-      <span class="topic-tag" onclick="filterByTopic('Bitcoin')">₿ Bitcoin <span class="tt-count" id="tc-btc">—</span></span>
-      <span class="topic-tag" onclick="filterByTopic('Lula')">🏛️ Lula <span class="tt-count" id="tc-lula">—</span></span>
-      <span class="topic-tag" onclick="filterByTopic('IA')">🤖 Inteligência Artificial <span class="tt-count" id="tc-ia">—</span></span>
-      <span class="topic-tag" onclick="filterByTopic('Bolsonaro')">🏛️ Bolsonaro <span class="tt-count" id="tc-bolsonaro">—</span></span>
-      <span class="topic-tag" onclick="filterByTopic('Neymar')">⚽ Neymar <span class="tt-count" id="tc-neymar">—</span></span>
+    <div class="topic-tags" id="topicTags" style="margin-top:20px">
+      <span class="topic-tag active" onclick="setCatFilter('all',this)">🔥 Em Alta</span>
+      <span class="topic-tag" onclick="setCatFilter('politica',this)">🏛️ Política</span>
+      <span class="topic-tag" onclick="setCatFilter('economia',this)">📈 Economia</span>
+      <span class="topic-tag" onclick="setCatFilter('futebol',this)">⚽ Esportes</span>
+      <span class="topic-tag" onclick="setCatFilter('tech',this)">💻 Tecnologia</span>
     </div>
     <div class="markets-grid" id="marketsGrid"></div>
   </div>
@@ -1127,30 +1017,66 @@
 <!-- SECTION: PORTFOLIO -->
 <div class="section" id="section-portfolio">
   <div class="main" style="padding-top:40px">
-    <h2 style="font-size:1.6rem;font-weight:700;margin-bottom:24px">Meu Portfólio</h2>
-    <div id="portfolioContent"></div>
+    <div class="portfolio-grid">
+      <div class="portfolio-main-card">
+        <div class="urs-label">Valor Total da Carteira</div>
+        <div class="p-total-val" id="portfolioTotal">R$0.00</div>
+        <div class="p-change up" id="portfolioChange">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="m5 15 7-7 7 7"/></svg>
+          <span>0.00% (24h)</span>
+        </div>
+        
+        <div class="positions-tabs">
+          <button class="positions-tab active" onclick="switchPositionsTab('open', this)">Posições Abertas</button>
+          <button class="positions-tab" onclick="switchPositionsTab('history', this)">Histórico</button>
+        </div>
+        
+        <div id="portfolioContent"></div>
+      </div>
+      
+      <div class="ranking-card" style="height:fit-content">
+        <h3 class="ranking-title">Resumo de Performance</h3>
+        <div style="position:relative;height:200px;margin-bottom:20px">
+          <canvas id="performanceChart"></canvas>
+        </div>
+        <div class="ur-stats" style="flex-direction:column;gap:12px;text-align:left">
+          <div><div class="urs-label">Lucro Total</div><div class="urs-val" id="totalPnl" style="color:var(--green)">R$0.00</div></div>
+          <div><div class="urs-label">Taxa de Acerto</div><div class="urs-val" id="winRate">0%</div></div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
 <!-- SECTION: RANKING -->
 <div class="section" id="section-ranking">
   <div class="main" style="padding-top:40px">
-    <h2 style="font-size:1.6rem;font-weight:700;margin-bottom:24px">Ranking de Traders</h2>
-    <div class="chart-wrapper" style="margin-bottom:24px">
-      <div class="chart-header">
-        <div class="chart-title">Distribuição de Volume por Categoria</div>
-        <div class="chart-legend">
-          <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>Política</div>
-          <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div>Economia</div>
-          <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Futebol</div>
-          <div class="legend-item"><div class="legend-dot" style="background:#c864ff"></div>Tech</div>
+    <div class="user-ranking-card">
+      <div class="ur-left">
+        <div class="ur-rank">#—</div>
+        <div>
+          <div class="urs-label">Seu Ranking</div>
+          <div class="ur-name" id="userRankName">Conecte-se para ver seu rank</div>
         </div>
       </div>
-      <div style="position:relative;height:220px">
-        <canvas id="volumeChart"></canvas>
+      <div class="ur-stats">
+        <div><div class="urs-label">P&L Total</div><div class="urs-val" id="userRankPnl">R$0.00</div></div>
+        <div><div class="urs-label">Percentil</div><div class="urs-val" id="userRankPercent">0%</div></div>
       </div>
     </div>
-    <div class="ranking-section" id="rankingContent"></div>
+
+    <div class="ranking-layout">
+      <div class="ranking-podium" id="rankingPodium">
+        <!-- populated by renderRanking -->
+      </div>
+      
+      <div class="ranking-card">
+        <h3 class="ranking-title">Top Traders</h3>
+        <div class="ranking-list" id="rankingContent">
+          <!-- populated by renderRanking -->
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1211,88 +1137,41 @@ function filterByTopic(topic) {
 function renderMarkets() {
   const grid = document.getElementById('marketsGrid');
   let filtered = markets.filter(m => !m.resolved_at);
-  if (state.catFilter !== 'all') filtered = filtered.filter(m => m.cat === state.catFilter);
-  if (state.tabFilter === 'hot') {
-    filtered = filtered.filter(m => m.hot).sort((a, b) => b.rawVolume - a.rawVolume).slice(0, 10);
-  } else if (state.tabFilter === 'new') {
-    filtered = filtered.filter(m => m.new);
-  } else if (state.tabFilter === 'closing') {
-    filtered = filtered.filter(m => m.closing);
-  } else {
-    filtered = filtered.slice().sort((a, b) => b.rawVolume - a.rawVolume);
+  
+  if (state.catFilter !== 'all') {
+    filtered = filtered.filter(m => m.cat === state.catFilter);
   }
+  
   // Search / topic filter
   const q = searchQuery || topicQuery;
   if (q) filtered = filtered.filter(m => m.title.toLowerCase().includes(q) || (m.cat||'').toLowerCase().includes(q));
 
-  // Update topic tag counts
-  const topics = [
-    {id:'tc-copa', q:'copa'}, {id:'tc-eleicoes', q:'elei'}, {id:'tc-btc', q:'bitcoin'},
-    {id:'tc-lula', q:'lula'}, {id:'tc-ia', q:'ia'}, {id:'tc-bolsonaro', q:'bolsonaro'}, {id:'tc-neymar', q:'neymar'}
-  ];
-  const allActive = markets.filter(m => !m.resolved_at);
-  topics.forEach(t => {
-    const el = document.getElementById(t.id);
-    if (el) el.textContent = allActive.filter(m => m.title.toLowerCase().includes(t.q)).length;
-  });
-
   grid.innerHTML = filtered.map(m => {
-    const yesMultiplier = m.yes > 0 ? (100 / m.yes).toFixed(2)+'x' : '—';
-    const noMultiplier = m.no > 0 ? (100 / m.no).toFixed(2)+'x' : '—';
-    const badges = [
-      m.hot && !m.closing ? `<span class="mc-badge mc-badge-hot">🔥 Em Alta</span>` : '',
-      m.new ? `<span class="mc-badge mc-badge-new">✨ Novo</span>` : '',
-      m.closing ? `<span class="mc-badge mc-badge-closing">⏰ Encerrando</span>` : '',
-    ].filter(Boolean).join('');
+    const yesVal = m.yes || 50;
+    const noVal = 100 - yesVal;
     
-    let imageHtml = '';
-    if (m.image_url) {
-      imageHtml = `<img src="${m.image_url}" alt="${m.title}" class="mc-image" loading="lazy">`;
-    }
-
     return `
-    <div class="market-card"
-      data-id="${m.id}"
-      data-title="${m.title.replace(/"/g,'&quot;')}"
-      data-yes="${m.yes}"
-      data-no="${m.no}"
-      data-cat="${m.cat}"
-      onclick="window.location.href='market.html?id=${m.id}'"
-    >
-      ${imageHtml}
-      ${!m.image_url ? `<div class="mc-accent mc-accent-${m.cat}"></div>` : ''}
-      <div class="mc-body">
-        <div class="mc-header">
-          <div class="mc-header-left">
-            <span class="mc-category cat-${m.cat}">${catLabel(m.cat)}</span>
-            ${badges}
-          </div>
-          <span class="mc-volume">R$${formatVol(m.rawVolume)}</span>
-        </div>
+    <div class="market-card" onclick="window.location.href='market.html?id=${m.id}'">
+      <div class="mc-header">
         <div class="mc-title">${m.title}</div>
-        <div class="mc-outcomes">
-          <div class="mc-outcome-row">
-            <div class="mc-outcome-label">
-              <span class="mc-outcome-name">SIM</span>
-              <div class="mc-thin-bar"><div class="mc-thin-bar-fill yes" style="width:${m.yes}%"></div></div>
-            </div>
-            <span class="mc-multiplier">${yesMultiplier}</span>
-            <button class="mc-pct-btn" onclick="event.stopPropagation();window.location.href='market.html?id=${m.id}'">${m.yes}%</button>
-          </div>
-          <div class="mc-outcome-row">
-            <div class="mc-outcome-label">
-              <span class="mc-outcome-name">NÃO</span>
-              <div class="mc-thin-bar"><div class="mc-thin-bar-fill no" style="width:${m.no}%"></div></div>
-            </div>
-            <span class="mc-multiplier">${noMultiplier}</span>
-            <button class="mc-pct-btn no-btn" onclick="event.stopPropagation();window.location.href='market.html?id=${m.id}'">${m.no}%</button>
-          </div>
-        </div>
+        <div class="mc-category">${catLabel(m.cat)}</div>
       </div>
+      
+      <div class="mc-sentiment">
+        <div class="mc-sentiment-yes" style="width: ${yesVal}%"></div>
+        <div class="mc-sentiment-no" style="width: ${noVal}%"></div>
+      </div>
+      
       <div class="mc-footer">
-        <div class="mc-footer-item">👥 ${m.traders || 0}</div>
-        <div class="mc-footer-item">📅 ${m.ends}</div>
-        <div class="mc-footer-item" style="margin-left:auto;color:var(--muted)">Ver detalhes →</div>
+        <div class="mc-stats">
+          <div class="mc-stat"><strong>R$${formatVol(m.rawVolume)}</strong> Vol.</div>
+          <div class="mc-stat"><strong>${m.traders || 0}</strong> Traders</div>
+        </div>
+        
+        <div class="mc-odds">
+          <div class="mc-odd yes">${yesVal}%</div>
+          <div class="mc-odd no">${noVal}%</div>
+        </div>
       </div>
     </div>`;
   }).join('');
@@ -1306,7 +1185,7 @@ function formatVol(v) {
 }
 
 function catLabel(c) {
-  return {politica:'🏛️ POLÍTICA', economia:'📈 ECONOMIA', futebol:'⚽ FUTEBOL', tech:'💻 TECH'}[c] || c;
+  return {politica:'Política', economia:'Economia', futebol:'Esportes', tech:'Tecnologia'}[c] || c;
 }
 
 function filterMarkets(tab, el) {
@@ -1721,6 +1600,9 @@ window.openMarketDetail = function(id) {
 };
 
 // ---- PORTFOLIO ----
+let portfolioTab = 'open';
+let perfChart = null;
+
 async function loadPortfolioFromAPI() {
   if (!state.token) { renderPortfolio(); return; }
   try {
@@ -1728,20 +1610,31 @@ async function loadPortfolioFromAPI() {
     if (me && me.balance != null) {
       state.balance = parseFloat(me.balance);
       updateAuthUI();
+      document.getElementById('userRankName').textContent = me.name || me.email;
     }
     const data = await apiGet('/bets/my', state.token);
     if (Array.isArray(data)) {
       state.positions = data.map(b => ({
+        id: b.id,
         title: b.market_title || b.market_id,
         side: b.side,
         amount: parseFloat(b.amount),
         potential: parseFloat(b.potential_payout || 0),
         pnl: b.status === 'won' ? parseFloat(b.potential_payout || 0) - parseFloat(b.amount) :
              b.status === 'lost' ? -parseFloat(b.amount) : 0,
-        status: b.status
+        status: b.status,
+        date: new Date(b.created_at).toLocaleDateString()
       }));
     }
   } catch(e) { console.log('portfolio error', e); }
+  renderPortfolio();
+  renderPerformanceChart();
+}
+
+function switchPositionsTab(tab, el) {
+  portfolioTab = tab;
+  document.querySelectorAll('.positions-tab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
   renderPortfolio();
 }
 
@@ -1749,64 +1642,116 @@ function renderPortfolio() {
   const c = document.getElementById('portfolioContent');
   const totalInvested = state.positions.filter(p=>p.status==='open').reduce((s,p)=>s+p.amount,0);
   const totalPnl = state.positions.filter(p=>p.status==='won'||p.status==='lost').reduce((s,p)=>s+p.pnl,0);
-  if (state.positions.length === 0) {
-    c.innerHTML = `<div style="text-align:center;padding:60px;color:var(--muted)"><div style="font-size:3rem;margin-bottom:16px">📊</div><div style="font-size:1.1rem;margin-bottom:8px">Nenhuma posição aberta</div><div style="font-size:0.85rem">Explore os mercados e faça sua primeira aposta</div><button class="btn-hero" style="margin-top:24px;width:auto;padding:12px 28px" onclick="showSection('home')">Ver mercados →</button></div>`;
+  const walletTotal = state.balance + totalInvested;
+
+  document.getElementById('portfolioTotal').textContent = `R$${walletTotal.toFixed(2)}`;
+  document.getElementById('totalPnl').textContent = `R$${totalPnl>=0?'+':''}${totalPnl.toFixed(2)}`;
+  document.getElementById('totalPnl').style.color = totalPnl >= 0 ? 'var(--green)' : 'var(--red)';
+  
+  const wins = state.positions.filter(p => p.status === 'won').length;
+  const totalResolved = state.positions.filter(p => p.status !== 'open').length;
+  const winRate = totalResolved > 0 ? ((wins / totalResolved) * 100).toFixed(0) : 0;
+  document.getElementById('winRate').textContent = `${winRate}%`;
+
+  const filtered = state.positions.filter(p => portfolioTab === 'open' ? p.status === 'open' : p.status !== 'open');
+
+  if (filtered.length === 0) {
+    c.innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted);font-size:0.9rem">Nenhuma posição encontrada</div>`;
     return;
   }
-  c.innerHTML = `
-    <div class="portfolio-header">
-      <div class="portfolio-stat"><div class="ps-label">Saldo Disponível</div><div class="ps-value">R$${state.balance.toFixed(2)}</div></div>
-      <div class="portfolio-stat"><div class="ps-label">Em posições</div><div class="ps-value">R$${totalInvested.toFixed(2)}</div></div>
-      <div class="portfolio-stat"><div class="ps-label">P&L</div><div class="ps-value" style="color:${totalPnl>=0?'var(--green)':'var(--red)'}">R$${totalPnl>=0?'+':''}${totalPnl.toFixed(2)}</div></div>
-    </div>
-    <div class="positions-list">
-      ${state.positions.map(p=>`
-        <div class="position-item">
-          <div class="pos-side ${p.side}">${p.side==='yes'?'SIM':'NÃO'}</div>
-          <div class="pos-title">${p.title}</div>
-          <div class="pos-data">
-            <div class="pos-amount">R$${p.amount.toFixed(2)}</div>
-            <div class="pos-pnl ${p.pnl>=0?'pos':'neg'}">${p.status==='open'?'Em aberto':p.pnl>=0?'+R$'+p.pnl.toFixed(2):'-R$'+Math.abs(p.pnl).toFixed(2)}</div>
-          </div>
+
+  c.innerHTML = filtered.map(p => `
+    <div class="pos-card">
+      <div class="pos-info">
+        <div class="pos-icon">${p.side === 'yes' ? '👍' : '👎'}</div>
+        <div class="pos-meta">
+          <h4>${p.title}</h4>
+          <p>${p.side.toUpperCase()} • ${p.date}</p>
         </div>
-      `).join('')}
+      </div>
+      <div class="pos-right">
+        <div class="pos-val">R$${p.amount.toFixed(2)}</div>
+        <div class="pos-pnl" style="color:${p.pnl>=0?'var(--green)':'var(--red)'}">
+          ${p.status === 'open' ? 'Pendente' : (p.pnl >= 0 ? '+' : '') + 'R$' + p.pnl.toFixed(2)}
+        </div>
+      </div>
     </div>
-  `;
+  `).join('');
+}
+
+function renderPerformanceChart() {
+  const ctx = document.getElementById('performanceChart');
+  if (!ctx) return;
+  if (perfChart) perfChart.destroy();
+
+  const labels = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+  const data = [1000, 1050, 1020, 1100, 1150, 1120, 1200]; // Placeholder
+
+  perfChart = new Chart(ctx.getContext('2d'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data: data,
+        borderColor: 'var(--blue)',
+        borderWidth: 3,
+        pointRadius: 0,
+        tension: 0.4,
+        fill: true,
+        backgroundColor: 'rgba(59,130,246,0.1)'
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: { display: false }, y: { display: false } }
+    }
+  });
 }
 
 // ---- RANKING ----
 function renderRanking() {
-  const c = document.getElementById('rankingContent');
-  const topTraders = rankingData;
-  const topAccuracy = [...rankingData].sort((a,b)=>parseInt(b.accuracy)-parseInt(a.accuracy));
-  c.innerHTML = `
-    <div class="ranking-card">
-      <div class="ranking-title"><span>🏆</span> Top Lucro</div>
-      <div class="ranking-list">
-        ${topTraders.map((t,i)=>`
-          <div class="ranking-item rank-${i+1}">
-            <div class="rank-num">#${i+1}</div>
-            <div class="rank-avatar" style="background:${t.color}">${t.avatar}</div>
-            <div class="rank-info"><div class="rank-name">${t.name}</div><div class="rank-sub">${t.trades} apostas</div></div>
-            <div class="rank-value positive">${t.profit}</div>
-          </div>
-        `).join('')}
-      </div>
+  const podiumEl = document.getElementById('rankingPodium');
+  const contentEl = document.getElementById('rankingContent');
+  
+  const sorted = [...rankingData].sort((a,b) => parseFloat(b.profit.replace(/[^\d.-]/g, '')) - parseFloat(a.profit.replace(/[^\d.-]/g, '')));
+  
+  // Podium (Top 3)
+  const top3 = [sorted[1], sorted[0], sorted[2]]; // Order: 2nd, 1st, 3rd for visual podium
+  const classes = ['second', 'first', 'third'];
+  const titles = ['2º', '1º', '3º'];
+  
+  podiumEl.innerHTML = top3.map((t, i) => `
+    <div class="podium-item ${classes[i]}">
+      <div class="podium-rank">${titles[i]}</div>
+      <div class="podium-avatar">${t.avatar}</div>
+      <div class="podium-name">${t.name}</div>
+      <div class="podium-profit">${t.profit}</div>
+      <div style="font-size:0.7rem; color:var(--muted)">${t.trades} aposts</div>
     </div>
-    <div class="ranking-card">
-      <div class="ranking-title"><span>🎯</span> Maior Precisão</div>
-      <div class="ranking-list">
-        ${topAccuracy.map((t,i)=>`
-          <div class="ranking-item rank-${i+1}">
-            <div class="rank-num">#${i+1}</div>
-            <div class="rank-avatar" style="background:${t.color}">${t.avatar}</div>
-            <div class="rank-info"><div class="rank-name">${t.name}</div><div class="rank-sub">${t.trades} apostas</div></div>
-            <div class="rank-value" style="color:var(--blue)">${t.accuracy}</div>
-          </div>
-        `).join('')}
+  `).join('');
+
+  // Rest of the list
+  const others = sorted.slice(3);
+  contentEl.innerHTML = others.map((t, i) => `
+    <div class="ranking-item">
+      <div class="rank-num">#${i+4}</div>
+      <div class="rank-avatar" style="background:rgba(255,255,255,0.05); color:var(--text)">${t.avatar}</div>
+      <div class="rank-info">
+        <div class="rank-name">${t.name}</div>
+        <div class="rank-sub">${t.trades} apostas • ${t.accuracy} precisão</div>
       </div>
+      <div class="rank-value positive">${t.profit}</div>
     </div>
-  `;
+  `).join('');
+
+  // Update User Rank
+  if (state.user) {
+    document.getElementById('userRankName').textContent = state.user.name || state.user.email;
+    // Mock user rank info
+    document.getElementById('userRankPnl').textContent = 'R$0.00';
+    document.getElementById('userRankPercent').textContent = 'Top 45%';
+  }
 }
 
 // ---- CHART ----
@@ -2173,188 +2118,95 @@ function showToast(icon, title, msg) {
   setTimeout(()=>t.classList.remove('show'), 3500);
 }
 
-
-// ---- DEPOSIT ----
-function generateDepositCode() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code = 'DEP-';
-  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
-  return code;
+// ---- CONSOLIDATED FINANCIAL FLOWS ----
+function switchDepTab(tab, el) {
+  document.querySelectorAll('.pay-method-card').forEach(b => b.classList.remove('active'));
+  if (el) el.classList.add('active');
+  
+  document.getElementById('depTabPix').style.display = tab === 'pix' ? 'block' : 'none';
+  document.getElementById('depTabCrypto').style.display = tab === 'crypto' ? 'block' : 'none';
 }
 
-function openDepositModal() {
-  if (!state.user) { openModal('loginModal'); return; }
-  const code = generateDepositCode();
-  state.depositCode = code;
-  document.getElementById('depositCode').textContent = code;
-  document.getElementById('depositAmount').value = '';
-  openModal('depositModal');
-}
-
-function setDepositAmount(v) {
-  document.getElementById('depositAmount').value = v;
+function setDepositAmount(amt) {
+  document.getElementById('depositAmount').value = amt;
 }
 
 function copyPixKey() {
-  navigator.clipboard.writeText('9bf0d836-a584-4436-8f45-61c650167cf3');
-  showToast('✅', 'Copiado!', 'Chave PIX copiada');
-}
-
-function switchDepTab(tab) {
-  document.getElementById('depTabPix').style.display      = tab === 'pix'      ? '' : 'none';
-  document.getElementById('depTabMM').style.display       = tab === 'metamask' ? '' : 'none';
-  document.getElementById('depTabUsdc').style.display     = tab === 'usdc'     ? '' : 'none';
-  document.getElementById('tabBtnPix').classList.toggle('active',      tab === 'pix');
-  document.getElementById('tabBtnMM').classList.toggle('active',       tab === 'metamask');
-  document.getElementById('tabBtnUsdc').classList.toggle('active',     tab === 'usdc');
-
-  if (tab === 'metamask') {
-    const connected = state.walletConnected && state.walletAddress;
-    document.getElementById('mmNotConnected').style.display = connected ? 'none' : '';
-    document.getElementById('mmConnected').style.display    = connected ? '' : 'none';
-    if (connected) {
-      document.getElementById('mmWalletLabel').textContent = state.walletAddress;
-    }
-  }
-}
-
-async function calcMMBrl() {
-  const usdc = parseFloat(document.getElementById('mmUsdcAmount').value);
-  const convDiv = document.getElementById('mmConversion');
-  if (!usdc || usdc < 1) { convDiv.style.display = 'none'; return; }
-  const rate = await fetchUsdBrlRate();
-  if (!rate) return;
-  const brl = (usdc * rate).toFixed(2);
-  document.getElementById('mmBrlValue').textContent = `R$${brl}`;
-  convDiv.style.display = '';
-}
-
-// USDC contract on Polygon
-const USDC_CONTRACT = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
-const DEPOSIT_WALLET = '0x63e8f13be1160741902092D0E0629ba741FDe3b6';
-
-async function depositViaMM() {
-  if (!state.walletConnected || !state.walletAddress) {
-    showToast('⚠️', 'Carteira não conectada', 'Conecte a MetaMask primeiro');
-    return;
-  }
-  const usdc = parseFloat(document.getElementById('mmUsdcAmount').value);
-  if (!usdc || usdc < 10) { showToast('⚠️', 'Valor inválido', 'Mínimo 10 USDC'); return; }
-
-  // USDC has 6 decimals on Polygon
-  const amount = BigInt(Math.round(usdc * 1e6));
-  const amountHex = '0x' + amount.toString(16).padStart(64, '0');
-
-  // ERC-20 transfer(address,uint256) selector = 0xa9059cbb
-  const toAddrPadded = DEPOSIT_WALLET.toLowerCase().replace('0x','').padStart(64, '0');
-  const data = '0xa9059cbb' + toAddrPadded + amountHex;
-
-  try {
-    const txHash = await window.ethereum.request({
-      method: 'eth_sendTransaction',
-      params: [{ from: state.walletAddress, to: USDC_CONTRACT, data, gas: '0x186A0' }]
-    });
-
-    const rate = await fetchUsdBrlRate();
-    const amountBrl = rate ? parseFloat((usdc * rate).toFixed(2)) : 0;
-
-    await apiPost('/deposits', { amount: amountBrl, code: txHash, method: 'usdc' }, state.token);
-    showToast('✅', 'Transação enviada!', `Hash: ${txHash.slice(0,10)}... · Admin confirmará em breve`);
-    closeModal('depositModal');
-  } catch(e) {
-    if (e.code === 4001) showToast('❌', 'Transação recusada', 'Você cancelou no MetaMask');
-    else showToast('❌', 'Erro', e.message || 'Tente novamente');
-  }
+  const code = document.getElementById('depositCode').textContent;
+  navigator.clipboard.writeText(code);
+  showToast('✅', 'Copiado!', 'Código PIX copiado.');
 }
 
 function copyUsdcAddress() {
   navigator.clipboard.writeText('0x63e8f13be1160741902092D0E0629ba741FDe3b6');
-  showToast('✅', 'Copiado!', 'Endereço Polygon copiado');
+  showToast('✅', 'Copiado!', 'Endereço USDC copiado (Polygon).');
 }
 
-let usdBrlRate = null;
-
-async function fetchUsdBrlRate() {
-  if (usdBrlRate) return usdBrlRate;
-  try {
-    const r = await fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL');
-    const d = await r.json();
-    usdBrlRate = parseFloat(d.USDBRL.bid);
-    return usdBrlRate;
-  } catch(e) {
-    return null;
-  }
+function selectPixType(type, el) {
+  document.querySelectorAll('#withdrawModal .preset-btn').forEach(b => b.classList.remove('active'));
+  if (el) el.classList.add('active');
+  state.pixType = type;
 }
 
-async function calcUsdcBrl() {
-  const usdc = parseFloat(document.getElementById('usdcAmount').value);
-  const convEl = document.getElementById('usdcConversion');
-  const valEl  = document.getElementById('usdcBrlValue');
-  if (!usdc || usdc <= 0) { convEl.style.display = 'none'; return; }
-  const rate = await fetchUsdBrlRate();
-  if (!rate) { convEl.style.display = 'none'; return; }
-  const brl = (usdc * rate).toFixed(2);
-  valEl.textContent = 'R$' + brl;
-  convEl.style.display = '';
+function setWithdrawAmount(amt) {
+  document.getElementById('withdrawAmount').value = amt;
 }
 
-async function confirmUsdcDeposit() {
-  const usdc = parseFloat(document.getElementById('usdcAmount').value);
-  const txHash = document.getElementById('usdcTxHash').value.trim();
-  if (!usdc || usdc < 10) { showToast('⚠️', 'Valor inválido', 'Mínimo 10 USDC'); return; }
-  if (!txHash || !txHash.startsWith('0x')) { showToast('⚠️', 'Hash inválido', 'Cole o hash da transação começando com 0x'); return; }
-
-  const rate = await fetchUsdBrlRate();
-  if (!rate) { showToast('❌', 'Erro de cotação', 'Não foi possível obter a cotação. Tente novamente.'); return; }
-  const amountBrl = parseFloat((usdc * rate).toFixed(2));
-
-  try {
-    await apiPost('/deposits', { amount: amountBrl, code: txHash, method: 'usdc' }, state.token);
-    showToast('✅', 'Solicitação enviada!', `${usdc} USDC ≈ R$${amountBrl} · O admin confirmará em breve`);
-    closeModal('depositModal');
-    document.getElementById('usdcAmount').value = '';
-    document.getElementById('usdcTxHash').value = '';
-    document.getElementById('usdcConversion').style.display = 'none';
-    usdBrlRate = null; // reseta pra buscar cotação nova na próxima vez
-  } catch(e) {
-    showToast('❌', 'Erro', e.message || 'Tente novamente');
-  }
+function withdrawAll() {
+  document.getElementById('withdrawAmount').value = state.balance.toFixed(2);
 }
-
-
-
 
 function openDepositModal() {
   if (!state.user) { openModal('loginModal'); return; }
-  state.depositCode = 'INFINITEPAY';
-  var codeEl = document.getElementById('depositCode');
-  if (codeEl) codeEl.textContent = 'Checkout InfinitePay';
   document.getElementById('depositAmount').value = '';
+  document.getElementById('pixPaymentArea').style.display = 'none';
   openModal('depositModal');
+}
+
+function openWithdrawModal() {
+  if (!state.user) { openModal('loginModal'); return; }
+  document.getElementById('withdrawBalanceDisplay').textContent = 'R$' + state.balance.toFixed(2);
+  document.getElementById('withdrawAmount').value = '';
+  document.getElementById('withdrawPixKey').value = '';
+  openModal('withdrawModal');
 }
 
 async function confirmDepositRequest() {
   const amt = parseFloat(document.getElementById('depositAmount').value);
-  if (!amt || amt < 10) { showToast('âš ï¸', 'Valor invÃ¡lido', 'MÃ­nimo R$10'); return; }
-  try {
-    const data = await apiPost('/deposits/infinitepay/checkout', { amount: amt }, state.token);
-    if (data.error) { showToast('âŒ', 'Erro', data.error); return; }
-    closeModal('depositModal');
-    showToast('â³', 'Redirecionando', 'Abrindo checkout da InfinitePay');
-    window.location.href = data.checkout_url;
-  } catch(e) {
-    showToast('âŒ', 'Erro', 'Nao foi possivel abrir o checkout');
-  }
+  if (!amt || amt < 10) { showToast('⚠️', 'Valor inválido', 'Mínimo R$10'); return; }
+  // Logic for generating QR code or redirecting
+  document.getElementById('pixPaymentArea').style.display = 'block';
+  showToast('⏳', 'Gerando QR Code...', 'Aguarde um momento');
 }
 
-// ---- WITHDRAW ----
-var withdrawPixType = 'cpf';
+async function confirmUsdcDeposit() {
+  const txHash = document.getElementById('usdcTxHash').value.trim();
+  if (!txHash || !txHash.startsWith('0x')) { showToast('⚠️', 'Hash inválido', 'Cole o hash da transação.'); return; }
+  try {
+    await apiPost('/deposits', { code: txHash, method: 'usdc' }, state.token);
+    showToast('✅', 'Solicitação enviada!', 'O admin confirmará em breve.');
+    closeModal('depositModal');
+  } catch(e) { showToast('❌', 'Erro', 'Falha ao processar depósito.'); }
+}
 
-function selectPixType(type, el) {
-  withdrawPixType = type;
-  document.querySelectorAll('.pix-type-btn').forEach(function(b){ b.classList.remove('active'); });
-  el.classList.add('active');
-  var placeholders = { cpf:'000.000.000-00', email:'seu@email.com', telefone:'+55 11 99999-9999', aleatoria:'Chave aleatória (UUID)' };
+async function confirmWithdraw() {
+  if (!state.token) { openModal('loginModal'); return; }
+  const amount = parseFloat(document.getElementById('withdrawAmount').value);
+  const pixKey = document.getElementById('withdrawPixKey').value.trim();
+
+  if (!amount || amount < 20) { showToast('⚠️', 'Valor inválido', 'Mínimo R$20'); return; }
+  if (!pixKey) { showToast('⚠️', 'Chave PIX', 'Informe sua chave PIX'); return; }
+  if (amount > state.balance) { showToast('❌', 'Saldo insuficiente', 'Você não tem saldo suficiente'); return; }
+
+  try {
+    const data = await apiPost('/withdrawals', { amount, pix_key: pixKey, pix_key_type: state.pixType || 'cpf' }, state.token);
+    if (data.error) { showToast('❌', 'Erro', data.error); return; }
+    state.balance = parseFloat(data.new_balance);
+    closeModal('withdrawModal');
+    showToast('✅', 'Pedido enviado!', 'Seu saque será processado em breve.');
+    updateAuthUI();
+  } catch(e) { showToast('❌', 'Erro de conexão', 'Tente novamente'); }
+}
   document.getElementById('withdrawPixKey').placeholder = placeholders[type] || 'Sua chave PIX';
 }
 

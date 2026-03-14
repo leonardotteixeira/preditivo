@@ -485,14 +485,16 @@ window.onSearchInput = (val) => {
 
 async function init() {
   try {
-    const stats = await fetch(window.API + '/markets/stats').then(r => r.json());
+    const statsResult = await fetch(window.API + '/markets/stats');
+    const stats = await statsResult.json();
     if(stats) {
       document.getElementById('totalVolume').textContent = 'R$' + ((stats.total_volume || 2400000)/1000000).toFixed(1) + 'M';
       document.getElementById('activeMarkets').textContent = stats.active_markets || 47;
       document.getElementById('activePlayers').textContent = (((stats.active_traders || 3200) + 2900)/1000).toFixed(1) + 'K';
     }
     
-    const mkts = await fetch(window.API + '/markets').then(r => r.json());
+    const mktsResult = await fetch(window.API + '/markets');
+    const mkts = await mktsResult.json();
     if(Array.isArray(mkts)) {
       window.state.markets = mkts.filter(m => !m.resolved_at);
       window.renderMarkets();

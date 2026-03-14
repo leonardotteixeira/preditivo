@@ -111,6 +111,7 @@ tr:hover td { background:rgba(255,255,255,0.02); }
       <button class="tab" onclick="switchTab('novo',this)">+ Novo Mercado</button>
       <button class="tab" onclick="switchTab('saques',this)">Saques</button>
       <button class="tab" onclick="switchTab('bots',this)">🤖 Bots</button>
+      <button class="tab" onclick="switchTab('config',this)">⚙️ Configurações</button>
     </div>
 
     <!-- DEPOSITOS -->
@@ -258,6 +259,26 @@ tr:hover td { background:rgba(255,255,255,0.02); }
         <div id="nm-feedback" style="margin-top:12px;font-size:0.85rem"></div>
       </div>
     </div>
+
+    <!-- CONFIGURAÇÕES -->
+    <div id="sec-config" class="section">
+      <div class="section-title">Configurações do Site</div>
+      <div style="max-width:600px">
+        <div style="background:#0e1419;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:24px;margin-bottom:24px">
+          <div class="section-title" style="font-size:0.95rem;margin-bottom:12px">🖼️ Imagem de Capa (Hero)</div>
+          <p style="color:#5a6878;font-size:0.85rem;margin-bottom:16px">Defina a URL da imagem principal que aparece no topo da página inicial.</p>
+          <div class="form-group">
+            <label class="form-label">URL da Imagem</label>
+            <input id="cfg-hero-url" class="form-input" type="url" placeholder="Ex: ./hero-bg.png">
+          </div>
+          <button class="btn btn-green" style="width:100%;padding:14px" onclick="saveGlobalConfig()">Salvar Alterações</button>
+        </div>
+
+        <div class="info-box">
+          <strong>Persistência:</strong> No momento, as alterações de layout são aplicadas localmente no seu navegador. Para persistência global em todos os usuários, as configurações serão migradas para o banco de dados Supabase na próxima atualização do backend.
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -361,6 +382,7 @@ function switchTab(name, el) {
   if (name === 'receita') loadReceita();
   if (name === 'saques') loadSaques();
   if (name === 'bots') loadBotStats();
+  if (name === 'config') loadGlobalConfig();
 }
 
 function openModal(id) { document.getElementById(id).classList.add('active'); }
@@ -958,6 +980,18 @@ function criarMercado() {
     if (document.getElementById('nm-image')) document.getElementById('nm-image').value = '';
   })
   .catch(function(){ fb.style.color = '#ff4757'; fb.textContent = 'Erro de conexao.'; });
+}
+
+function loadGlobalConfig() {
+  const url = localStorage.getItem('custom_hero_image') || './hero-bg.png';
+  document.getElementById('cfg-hero-url').value = url;
+}
+
+function saveGlobalConfig() {
+  const url = document.getElementById('cfg-hero-url').value.trim();
+  if(!url) return showToast('Informe uma URL válida');
+  localStorage.setItem('custom_hero_image', url);
+  showToast('Configurações salvas localmente!');
 }
 </script>
 </body>

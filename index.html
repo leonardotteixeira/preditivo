@@ -1,62 +1,461 @@
-﻿<!DOCTYPE html>
-<html lang='pt-BR'>
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
-<meta charset='UTF-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1.0'>
-<title>Bubuya - Mercados de Previs&#227;o</title>
-<link rel='preconnect' href='https://fonts.googleapis.com'>
-<link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
-<link href='https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap' rel='stylesheet'>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<title>Bubuya &mdash; Mercados de Previs&acute;o</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
 <style>
-  :root { --bg: #050505; --text: #fff; --green: #10b981; --blue: #3b82f6; --surface: #121212; --border: rgba(255,255,255,0.1); }
-  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; }
-  header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; }
-  .logo { font-size: 1.5rem; font-weight: 800; color: var(--green); cursor: pointer; }
-  .hero { text-align: center; padding: 4rem 2rem; max-width: 800px; margin: 0 auto; }
-  h1 { font-size: 3.5rem; margin-bottom: 1rem; }
-  h1 span { color: var(--blue); }
-  .markets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; padding: 2rem; max-width: 1200px; margin: 0 auto; }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 1rem; padding: 1.5rem; cursor: pointer; transition: 0.2s; }
-  .card:hover { transform: translateY(-4px); border-color: var(--green); }
-  .btn { background: var(--green); color: #000; padding: 0.8rem 1.5rem; border-radius: 0.5rem; border: none; font-weight: 700; cursor: pointer; }
-  .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--surface); padding: 1rem; border-radius: 1rem; border: 1px solid var(--green); display: none; }
+  :root {
+    --bg: #050505;
+    --surface: #0a0a0a;
+    --surface2: #121212;
+    --border: rgba(255,255,255,0.05);
+    --green: #10b981;
+    --green-dim: rgba(16,185,129,0.1);
+    --red: #f43f5e;
+    --red-dim: rgba(244,63,94,0.1);
+    --blue: #3b82f6;
+    --gold: #f59e0b;
+    --text: #ffffff;
+    --muted: #888888;
+    --accent: var(--blue);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* NOISE TEXTURE */
+  body::before {
+    content:'';
+    position:fixed;
+    inset:0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events:none;
+    z-index:0;
+    opacity:0.5;
+  }
+
+  /* GRID BG */
+  body::after {
+    content:'';
+    position:fixed;
+    inset:0;
+    background-image: linear-gradient(rgba(16,185,129,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(16,185,129,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events:none;
+    z-index:0;
+  }
+
+  /* ---- HEADERS & NAV ---- */
+  header {
+    position:sticky; top:0; z-index:100;
+    background:rgba(5,5,5,0.8);
+    backdrop-filter:blur(16px);
+    border-bottom:1px solid var(--border);
+    padding:0 24px;
+  }
+  .header-inner {
+    max-width:1440px; margin:0 auto;
+    display:flex; align-items:center; height:64px;
+    gap:40px;
+  }
+  .logo {
+    font-size:1.4rem; font-weight:800; letter-spacing:-0.5px;
+    background:linear-gradient(135deg, var(--green), var(--blue));
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    cursor:pointer;
+  }
+  
+  .header-search {
+    flex:1; max-width:480px; margin:0 auto;
+    display:flex; align-items:center; gap:10px;
+    background:var(--surface2); border:1px solid var(--border);
+    border-radius:12px; padding:8px 16px;
+    transition:all 0.2s;
+  }
+  .header-search:focus-within { border-color:var(--blue); box-shadow:0 0 0 3px rgba(59,130,246,0.1); }
+  .header-search input {
+    background:transparent; border:none; outline:none;
+    color:var(--text); font-family:inherit; font-size:0.85rem; width:100%;
+  }
+
+  .header-right { display:flex; align-items:center; gap:16px; }
+  nav { display:flex; gap:4px; }
+  nav a {
+    padding:8px 12px; border-radius:12px; color:var(--muted);
+    text-decoration:none; font-size:0.85rem; font-weight:600;
+    transition:all 0.2s; cursor:pointer;
+  }
+  nav a:hover, nav a.active { color:var(--text); background:rgba(255,255,255,0.05); }
+
+  /* ---- BUTTONS ---- */
+  .btn-primary {
+    background:var(--green); color:#080c10; font-weight:700;
+    padding:12px 24px; border-radius:12px; border:none; cursor:pointer;
+    transition:all 0.2s; font-family:inherit;
+  }
+  .btn-primary:hover { opacity:0.9; transform:translateY(-1px); }
+  
+  .btn-secondary {
+    background:var(--surface2); color:var(--text); font-weight:600;
+    padding:10px 20px; border-radius:12px; border:1px solid var(--border);
+    cursor:pointer; transition:all 0.2s; font-family:inherit;
+  }
+  .btn-secondary:hover { border-color:var(--muted); }
+
+  /* ---- HERO SECTION ---- */
+  .hero {
+    max-width:1440px; margin:0 auto; padding:80px 24px;
+    display:grid; grid-template-columns: 1.2fr 0.8fr; gap:64px; align-items:center;
+  }
+  .hero-tag {
+    display:inline-flex; align-items:center; gap:8px;
+    padding:6px 16px; background:rgba(255,255,255,0.05); border:1px solid var(--border);
+    border-radius:100px; font-size:0.8rem; color:var(--green); font-weight:600;
+    margin-bottom:24px;
+  }
+  h1 { font-size:4.5rem; line-height:0.9; letter-spacing:-3px; margin-bottom:24px; font-weight:800; }
+  h1 span { color:var(--blue); }
+  .hero-sub { color:var(--muted); font-size:1.2rem; line-height:1.6; margin-bottom:48px; max-width:540px; }
+  
+  .hero-actions { display:flex; gap:16px; margin-bottom:64px; }
+  
+  .hero-stats { display:flex; gap:48px; border-top:1px solid var(--border); padding-top:32px; }
+  .hero-stat-item { display:flex; flex-direction:column; gap:4px; }
+  .hero-stat-val { font-size:1.8rem; font-weight:800; font-family:'Space Grotesk', sans-serif; }
+  .hero-stat-lbl { font-size:0.8rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; font-weight:600; }
+
+  .hero-image-wrapper {
+    position:relative;
+  }
+  .hero-card-featured {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:24px; padding:32px;
+    box-shadow: 0 40px 80px -20px rgba(0,0,0,0.6);
+    position:relative; z-index:2;
+  }
+  .hc-hot { color:var(--red); font-weight:800; font-size:0.7rem; text-transform:uppercase; margin-bottom:12px; display:block; }
+  .hc-title { font-size:1.4rem; font-weight:800; line-height:1.3; margin-bottom:24px; }
+  .hc-progress { height:8px; background:var(--surface2); border-radius:10px; overflow:hidden; display:flex; margin-bottom:12px; }
+  .hc-fill { background:var(--green); height:100%; transition:width 1s ease; }
+  .hc-probs { display:flex; justify-content:space-between; font-weight:700; font-size:0.9rem; margin-bottom:24px; }
+  .hc-yes { color:var(--green); }
+  .hc-no { color:var(--red); }
+  .hc-meta { display:flex; gap:16px; }
+  .hc-chip { padding:6px 12px; background:var(--surface2); border-radius:10px; font-size:0.75rem; color:var(--muted); font-weight:600; }
+
+  /* ---- SECTIONS ---- */
+  .section { display:none; max-width:1440px; margin:0 auto; padding:48px 24px 100px; }
+  .section.active { display:block; }
+
+  /* ---- MARKET GRID ---- */
+  .topic-tags { display:flex; gap:12px; margin-bottom:32px; overflow-x:auto; scrollbar-width:none; padding:4px 0; }
+  .topic-tag {
+    padding:10px 20px; background:var(--surface2); border:1px solid var(--border);
+    border-radius:100px; color:var(--muted); font-size:0.85rem; font-weight:600;
+    cursor:pointer; transition:all 0.2s; white-space:nowrap;
+  }
+  .topic-tag:hover { color:var(--text); border-color:var(--muted); }
+  .topic-tag.active { background:var(--text); color:var(--bg); border-color:var(--text); }
+
+  .markets-grid {
+    display:grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap:20px;
+  }
+  .market-card {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:24px; padding:24px; cursor:pointer;
+    transition:all 0.3s cubic-bezier(0.2, 0, 0, 1);
+    display:flex; flex-direction:column; gap:20px;
+    height: 100%;
+  }
+  .market-card:hover { border-color:rgba(255,255,255,0.2); transform:translateY(-4px); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5); }
+  
+  .mc-title { font-size:1.1rem; font-weight:700; line-height:1.4; color:var(--text); }
+  .mc-category { font-size:0.75rem; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+  
+  .mc-sentiment { height:6px; background:var(--surface2); border-radius:10px; overflow:hidden; display:flex; }
+  .mc-sentiment-yes { background:var(--green); height:100%; transition: width 0.6s; }
+  .mc-sentiment-no { background:var(--red); height:100%; transition: width 0.6s; }
+  
+  .mc-footer { display:flex; justify-content:space-between; align-items:center; margin-top:auto; padding-top:16px; border-top:1px solid var(--border); }
+  .mc-stat { font-size:0.85rem; color:var(--muted); }
+  .mc-stat strong { color:var(--text); }
+  .mc-odds { display:flex; gap:8px; }
+  .mc-odd { padding:8px 16px; border-radius:12px; font-weight:700; font-size:0.9rem; }
+  .mc-odd.yes { background:var(--green-dim); color:var(--green); }
+  .mc-odd.no { background:var(--red-dim); color:var(--red); }
+
+  /* ---- MODALS ---- */
+  .modal-overlay {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,0.85); backdrop-filter:blur(8px);
+    z-index:1000; align-items:center; justify-content:center;
+  }
+  .modal-overlay.active { display:flex; }
+  .modal {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:24px; padding:32px; width:90%; max-width:480px;
+    position:relative; animation: modalIn 0.3s cubic-bezier(0.2, 0, 0, 1);
+  }
+  @keyframes modalIn { from{opacity:0; transform:scale(0.95) translateY(20px)} to{opacity:1; transform:scale(1) translateY(0)} }
+  .modal-close { position:absolute; top:20px; right:20px; background:none; border:none; color:var(--muted); cursor:pointer; font-size:1.5rem; }
+  .modal-title { font-size:1.5rem; font-weight:800; margin-bottom:8px; }
+  .modal-sub { color:var(--muted); font-size:0.9rem; margin-bottom:24px; }
+  
+  .modal-input {
+    width:100%; background:var(--surface2); border:1px solid var(--border);
+    border-radius:12px; padding:14px 16px; color:var(--text); font-size:1rem;
+    margin-bottom:12px; outline:none; transition:border-color 0.2s;
+  }
+  .modal-input:focus { border-color:var(--blue); }
+
+  /* ---- TOAST ---- */
+  .toast {
+    position:fixed; bottom:32px; right:32px; z-index:2000;
+    background:var(--surface); border:1px solid var(--border);
+    padding:16px 24px; border-radius:16px; display:flex; align-items:center; gap:16px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    transform:translateY(150%); opacity:0; transition:all 0.4s cubic-bezier(0.2, 0, 0, 1);
+  }
+  .toast.show { transform:translateY(0); opacity:1; }
+  .toast-icon { font-size:1.5rem; }
+  .toast-title { font-weight:800; font-size:0.95rem; display:block; }
+  .toast-msg { color:var(--muted); font-size:0.85rem; }
+
+  /* FINANCIAL MODALS UTILS */
+  .deposit-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 20px 0; }
+  .pay-method-card {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 16px;
+    padding: 16px; cursor: pointer; text-align: center; transition: all 0.2s;
+  }
+  .pay-method-card.active { border-color: var(--blue); background: rgba(59,130,246,0.1); }
+  .amount-presets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 24px; }
+  .preset-btn {
+    padding: 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px;
+    color: var(--muted); font-weight: 700; cursor: pointer; transition: all 0.2s;
+  }
+  .preset-btn.active, .preset-btn:hover { border-color: var(--text); color: var(--text); }
+  
+  .qr-container { background: #fff; padding: 12px; border-radius: 16px; width: 180px; height: 180px; margin: 0 auto 20px; }
+  .copy-box {
+    display:flex; align-items:center; gap:12px; background:var(--surface2);
+    padding:14px; border-radius:12px; border:1px solid var(--border); margin-bottom:20px;
+  }
+  .copy-box code { font-family:'DM Mono', monospace; font-size:0.85rem; flex:1; overflow:hidden; text-overflow:ellipsis; }
+  .copy-box button { background:none; border:none; color:var(--blue); font-weight:800; cursor:pointer; }
+
+  @media(max-width: 1024px) {
+    .hero { grid-template-columns: 1fr; text-align:center; gap:48px; }
+    h1 { font-size:3.2rem; }
+    .hero-sub { margin-left:auto; margin-right:auto; }
+    .hero-actions { justify-content:center; }
+    .hero-stats { justify-content:center; }
+  }
+
+  /* RANKING & PORTFOLIO GRID */
+  .dashboard-grid { display:grid; grid-template-columns: 2fr 1fr; gap:24px; }
+  .ranking-card { background:var(--surface); border:1px solid var(--border); border-radius:24px; padding:24px; }
+  .ranking-item { display:flex; align-items:center; gap:16px; padding:12px; border-bottom:1px solid var(--border); }
+  .ranking-rank { font-weight:800; color:var(--muted); width:24px; }
+  .ranking-avatar { width:36px; height:36px; border-radius:50%; background:var(--blue); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.8rem; }
+  .ranking-info { flex:1; }
+  .ranking-name { font-weight:700; font-size:0.95rem; }
+  .ranking-profit { color:var(--green); font-weight:800; font-family:'DM Mono', monospace; }
+
 </style>
 </head>
 <body>
-<header>
-  <div class='logo'>Bubuya.</div>
-  <nav id='authArea'><button class='btn' onclick='location.reload()'>Login</button></nav>
-</header>
-<div class='hero'>
-  <h1>A plataforma de<br><span>mercados preditivos</span><br>do Brasil.</h1>
-  <p>Aposte no que voc&#234; acredita. Pix instant&#226;neo.</p>
-  <div style='margin-top: 2rem; display: flex; justify-content: center; gap: 2rem;'>
-    <div><b id='vol'>R</b><br><small>Volume</small></div>
-    <div><b id='mkts'>0</b><br><small>Mercados</small></div>
-    <div><b id='users'>0</b><br><small>Traders</small></div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <div class="toast-icon" id="toastIcon">&#x2728;</div>
+  <div>
+    <span class="toast-title" id="toastTitle">Sucesso</span>
+    <span class="toast-msg" id="toastMsg">Opera&ccedil;&atilde;o realizada.</span>
   </div>
 </div>
-<div class='markets-grid' id='grid'>Carregando mercados...</div>
-<script src='./config.js'></script>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="logo" onclick="showSection('home')">Bubuya.</div>
+    
+    <div class="header-search">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="O que vai acontecer?" oninput="onSearchInput(this.value)">
+    </div>
+
+    <div class="header-right">
+      <nav>
+        <a onclick="showSection('home')" id="nav-home" class="active">Explorar</a>
+        <a onclick="showSection('portfolio')" id="nav-portfolio">Portf&oacute;lio</a>
+        <a onclick="showSection('ranking')" id="nav-ranking">Ranking</a>
+      </nav>
+      <div id="authArea">
+        <button class="btn-primary" onclick="openModal('loginModal')">Entrar</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- SECTION: HOME -->
+<div class="section active" id="section-home">
+  <div class="hero">
+    <div class="hero-content">
+      <div class="hero-tag">✨ Acelerando o Futuro</div>
+      <h1 id="heroH1">A plataforma de<br><span>mercados preditivos</span><br>do Brasil.</h1>
+      <p class="hero-sub" id="heroSub">Aposte no que voc&ecirc; acredita. Pol&iacute;tica, esportes e economia com liquidez real e pagamentos instant&acirc;neos via PIX.</p>
+      
+      <div class="hero-actions" id="heroActions" style="display: flex; gap: 16px;">
+        <button class="btn-primary" style="padding:16px 40px; font-size:1.1rem" onclick="openModal('registerModal')">Come&ccedil;ar Agora &mdash; R$100 Gr&aacute;tis</button>
+      </div>
+
+      <div class="hero-stats">
+        <div class="hero-stat-item">
+          <span class="hero-stat-val" id="totalVolume">R$2.4M</span>
+          <span class="hero-stat-lbl">Volume Pago</span>
+        </div>
+        <div class="hero-stat-item">
+          <span class="hero-stat-val" id="activeMarkets">47</span>
+          <span class="hero-stat-lbl">Mercados Ativos</span>
+        </div>
+        <div class="hero-stat-item">
+          <span class="hero-stat-val" id="activePlayers">3.2k</span>
+          <span class="hero-stat-lbl">Traders Ativos</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-image-wrapper">
+      <div class="hero-card-featured" id="featuredMarketCard" onclick="heroCardClick()" style="cursor:pointer">
+        <span class="hc-hot">&#x1F525; Mercado em Destaque</span>
+        <div class="hc-title" id="heroTitle">Carregando mercado...</div>
+        <div class="hc-progress"><div class="hc-fill" id="heroBarFill" style="width: 50%"></div></div>
+        <div class="hc-probs">
+          <span class="hc-yes" id="heroYes">--% SIM</span>
+          <span class="hc-no" id="heroNo">--% N&Atilde;O</span>
+        </div>
+        <div class="hc-meta" id="heroMeta"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="topic-tags" id="topicTags">
+    <span class="topic-tag active" onclick="setCatFilter('all', this)">&#x1F525; Em Alta</span>
+    <span class="topic-tag" onclick="setCatFilter('politica', this)">🏛️ Pol&iacute;tica</span>
+    <span class="topic-tag" onclick="setCatFilter('economia', this)">📈 Economia</span>
+    <span class="topic-tag" onclick="setCatFilter('futebol', this)">⚽ Esportes</span>
+    <span class="topic-tag" onclick="setCatFilter('tech', this)">💻 Tecnologia</span>
+  </div>
+
+  <div class="markets-grid" id="marketsGrid">
+    <div style="text-align:center; grid-column:1/-1; padding:60px; color:var(--muted)">Carregando mercados...</div>
+  </div>
+</div>
+
+<!-- SECTION: PORTFOLIO -->
+<div class="section" id="section-portfolio">
+  <div class="dashboard-grid">
+    <div class="ranking-card">
+      <h2 class="modal-title">Suas Posi&ccedil;&otilde;es</h2>
+      <div id="portfolioContent" style="padding:40px; text-align:center; color:var(--muted)">Conecte-se para ver.</div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS EXAMPLES (LOGIN / DEPOSIT) -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
+    <h2 class="modal-title">Entrar</h2>
+    <input class="modal-input" type="email" id="loginEmail" placeholder="Email">
+    <input class="modal-input" type="password" id="loginPass" placeholder="Senha">
+    <button class="btn-primary" style="width:100%" onclick="doLogin()">Entrar</button>
+  </div>
+</div>
+
+<script src="./config.js"></script>
 <script>
-  console.log('BUBUYA-BOOT: Iniciando...');
   const API = window.PREDITIVO_CONFIG.API_BASE;
+  let state = { markets: [], user: null, balance: 0 };
+
+  function showToast(i, t, m) { console.log(t, m); }
+  function openModal(id) { document.getElementById(id).classList.add('active'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
   async function init() {
     try {
+      // Stats
       const stats = await fetch(API + '/markets/stats').then(r => r.json());
-      document.getElementById('vol').textContent = 'R$' + ((stats.total_volume || 2400000)/1000000).toFixed(1) + 'M';
-      document.getElementById('mkts').textContent = stats.active_markets || 47;
-      document.getElementById('users').textContent = (((stats.active_traders || 3200) + 2900)/1000).toFixed(1) + 'k';
+      document.getElementById('totalVolume').textContent = 'R$' + ((stats.total_volume || 2400000)/1000000).toFixed(1) + 'M';
+      document.getElementById('activeMarkets').textContent = stats.active_markets || 47;
+      document.getElementById('activePlayers').textContent = (((stats.active_traders || 3200) + 2900)/1000).toFixed(1) + 'k';
       
+      // Markets
       const mkts = await fetch(API + '/markets').then(r => r.json());
-      const grid = document.getElementById('grid');
-      grid.innerHTML = mkts.filter(m => !m.resolved_at).map(m => {
-        const total = parseFloat(m.q_yes) + parseFloat(m.q_no) || 200;
-        const yes = Math.round((parseFloat(m.q_yes) / total) * 100) || 50;
-        return \"<div class='card' onclick='window.location.href=\"market.html?id=\" + m.id + \"\"'><div style='font-size:0.8rem; color:#888'>\" + (m.category || 'Geral') + \"</div><div style='font-weight:700; margin:0.5rem 0'>\" + m.title + \"</div><div style='display:flex; justify-content:space-between; font-weight:700'><span style='color:#10b981'>\" + yes + \"% SIM</span><span style='color:#f43f5e'>\" + (100-yes) + \"% N&#195;O</span></div></div>\";
-      }).join('');
-    } catch(e) { console.error('ERRO:', e); }
+      state.markets = mkts.filter(m => !m.resolved_at);
+      renderMarkets();
+      
+      // Featured
+      const feat = state.markets.sort((a,b) => b.volume - a.volume)[0];
+      if (feat) {
+        document.getElementById('heroTitle').textContent = feat.title;
+        const total = (parseFloat(feat.q_yes) + parseFloat(feat.q_no)) || 100;
+        const yes = Math.round((parseFloat(feat.q_yes)/total)*100);
+        document.getElementById('heroBarFill').style.width = yes + '%';
+        document.getElementById('heroYes').textContent = yes + '% SIM';
+        document.getElementById('heroNo').textContent = (100-yes) + '% N&Atilde;O';
+      }
+    } catch(e) { console.error(e); }
   }
+
+  function renderMarkets() {
+    const grid = document.getElementById('marketsGrid');
+    grid.innerHTML = state.markets.map(m => {
+      const total = (parseFloat(m.q_yes) + parseFloat(m.q_no)) || 100;
+      const yes = Math.round((parseFloat(m.q_yes)/total)*100);
+      return `
+        <div class="market-card" onclick="window.location.href='market.html?id=${m.id}'">
+          <div>
+            <div class="mc-category">${m.category || 'Geral'}</div>
+            <div class="mc-title">${m.title}</div>
+          </div>
+          <div class="mc-sentiment">
+            <div class="mc-sentiment-yes" style="width: ${yes}%"></div>
+            <div class="mc-sentiment-no" style="width: ${100-yes}%"></div>
+          </div>
+          <div class="mc-footer">
+            <div class="mc-stat">Vol: <strong>R$${(parseFloat(m.volume)||0).toLocaleString('pt-BR')}</strong></div>
+            <div class="mc-odds">
+              <div class="mc-odd yes">${yes}%</div>
+              <div class="mc-odd no">${100-yes}%</div>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function showSection(name) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById('section-' + name).classList.add('active');
+  }
+
   init();
 </script>
 </body>

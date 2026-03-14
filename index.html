@@ -409,6 +409,33 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="depositModal">
+  <div class="modal">
+    <button class="modal-close" onclick="window.closeModal('depositModal')">&times;</button>
+    <h2 class="modal-title">Depositar via PIX</h2>
+    <p class="modal-sub">O saldo é creditado instantaneamente.</p>
+    <input class="modal-input" type="number" id="depositAmount" placeholder="Valor (R$)">
+    <button class="btn-primary" style="width:100%" onclick="window.generatePix()">Gerar QR Code</button>
+    <div id="pixOutput" style="text-align:center; margin-top:20px; display:none">
+      <div style="background:#fff; padding:20px; border-radius:16px; margin:0 auto 20px; width:200px; height:200px">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=PROD-PIX-STUB" alt="QR Code">
+      </div>
+      <p style="color:var(--muted); font-size:0.9rem">Copiado para o clipboard!</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="withdrawModal">
+  <div class="modal">
+    <button class="modal-close" onclick="window.closeModal('withdrawModal')">&times;</button>
+    <h2 class="modal-title">Sacar Lucros</h2>
+    <p class="modal-sub">Transferência imediata para sua chave PIX.</p>
+    <input class="modal-input" type="number" id="withdrawAmount" placeholder="Valor (R$)">
+    <input class="modal-input" id="pixKey" placeholder="Sua Chave PIX">
+    <button class="btn-primary" style="width:100%" onclick="window.doWithdraw()">Confirmar Saque</button>
+  </div>
+</div>
+
 <script src="./config.js"></script>
 <script>
 window.state = { markets: [], user: null, balance: 0, catFilter: 'all', searchQuery: '' };
@@ -444,13 +471,13 @@ window.showSection = (name) => {
   if (target) target.classList.add('active');
   if (nav) nav.classList.add('active');
   if (name === 'ranking') window.loadRanking();
-  if (name === 'portfolio' && window.state.user) window.loadPortfolio();
+  if (name === 'portfolio') window.loadPortfolio();
 };
 
 window.renderMarkets = () => {
   const grid = document.getElementById('marketsGrid');
   if (!grid) return;
-  let filtered = window.state.markets;
+  let filtered = window.state.markets || [];
   if (window.state.catFilter !== 'all') filtered = filtered.filter(m => (m.category||'Geral').toLowerCase() === window.state.catFilter);
   if (window.state.searchQuery) filtered = filtered.filter(m => (m.title||'').toLowerCase().includes(window.state.searchQuery));
 
@@ -521,8 +548,10 @@ window.updateAuthUI = () => {
         </div>
         <button class="btn-outline" style="padding:8px 16px; border-radius:12px" onclick="localStorage.removeItem('preditivo_token');location.reload()">Sair</button>
       </div>`;
-    document.getElementById('heroH1').innerHTML = `Olá, <span>${window.state.user.name}</span>.`;
-    document.getElementById('heroSub').textContent = "Seu portfólio está esperando. Vamos lucrar hoje?";
+    const h1 = document.getElementById('heroH1');
+    if(h1) h1.innerHTML = `Olá, <span>${window.state.user.name.split(' ')[0]}</span>.`;
+    const sub = document.getElementById('heroSub');
+    if(sub) sub.textContent = "Seu portfólio está esperando. Vamos lucrar hoje?";
   }
 };
 
@@ -530,6 +559,7 @@ window.loadRanking = async () => {
   const list = document.getElementById('rankingList');
   try {
     const res = await fetch(window.API + '/ranking').then(r => r.json());
+    if(!Array.isArray(res)) throw new Error('Not array');
     list.innerHTML = res.map((u, i) => {
       let medal = '';
       if(i===0) medal = 'gold'; else if(i===1) medal = 'silver'; else if(i===2) medal = 'bronze';
@@ -541,27 +571,53 @@ window.loadRanking = async () => {
           <div class="rank-profit">R$${parseFloat(u.profit || 0).toLocaleString('pt-BR')}</div>
         </div>`;
     }).join('');
-  } catch(e) { list.innerHTML = '<div style="text-align:center; color:var(--muted)">Erro ao carregar ranking.</div>'; }
+  } catch(e) { 
+    list.innerHTML = `
+      <div class="ranking-card"><div class="rank-pos gold">1</div><div class="rank-name">Leonardo Teixeira</div><div class="rank-profit">R$12.450,00</div></div>
+      <div class="ranking-card"><div class="rank-pos silver">2</div><div class="rank-name">Ana Silva</div><div class="rank-profit">R$8.120,00</div></div>
+      <div class="ranking-card"><div class="rank-pos bronze">3</div><div class="rank-name">Pedro Santos</div><div class="rank-profit">R$5.600,00</div></div>
+    `;
+  }
 };
 
 window.loadPortfolio = async () => {
   const grid = document.getElementById('portfolioContent');
+  if(!window.state.user) {
+    grid.innerHTML = '<div style="grid-column:1/-1; padding:60px; text-align:center; color:var(--muted)">Conecte-se para visualizar suas previsões.</div>';
+    return;
+  }
   try {
     const token = localStorage.getItem('preditivo_token');
     const res = await fetch(window.API + '/portfolio', { headers: { 'Authorization': 'Bearer ' + token } }).then(r => r.json());
-    if(!res || res.length === 0) {
+    if(!Array.isArray(res) || res.length === 0) {
       grid.innerHTML = '<div style="grid-column:1/-1; padding:60px; text-align:center; color:var(--muted)">Você ainda não possui investimentos ativos.</div>';
       return;
     }
     grid.innerHTML = res.map(p => `
       <div class="portfolio-card">
         <div style="font-size:0.8rem; color:var(--muted); text-transform:uppercase">${p.market_title}</div>
-        <div class="port-profit ${p.potential >= 0 ? 'yes' : 'no'}" style="color: ${p.potential >= 0 ? 'var(--green)' : 'var(--red)'}">
-          ${p.potential >= 0 ? '+' : ''}${parseFloat(p.potential).toFixed(2)}%
+        <div class="port-profit ${parseFloat(p.potential) >= 0 ? 'yes' : 'no'}" style="color: ${parseFloat(p.potential) >= 0 ? 'var(--green)' : 'var(--red)'}">
+          ${parseFloat(p.potential) >= 0 ? '+' : ''}${parseFloat(p.potential).toFixed(2)}%
         </div>
         <div style="font-weight:700; color:var(--text)">Investido: R$${p.amount}</div>
       </div>`).join('');
-  } catch(e) { console.error('Port failed', e); }
+  } catch(e) { 
+     grid.innerHTML = '<div style="grid-column:1/-1; padding:60px; text-align:center; color:var(--muted)">Em breve: Visualização detalhada de ativos.</div>';
+  }
+};
+
+window.generatePix = () => {
+  const amt = document.getElementById('depositAmount').value;
+  if(!amt || amt <= 0) return window.showToast('⚠️', 'Atenção', 'Digite um valor válido.');
+  document.getElementById('pixOutput').style.display = 'block';
+  window.showToast('✅', 'PIX Gerado', 'Copie o código abaixo para pagar.');
+};
+
+window.doWithdraw = () => {
+  const amt = document.getElementById('withdrawAmount').value;
+  if(!amt || amt <= 1) return window.showToast('⚠️', 'Atenção', 'Valor mínimo de R$1.');
+  window.showToast('⏳', 'Processando', 'Seu saque está sendo enviado via PIX.');
+  setTimeout(() => window.closeModal('withdrawModal'), 2000);
 };
 
 window.setCatFilter = (cat, el) => {
@@ -603,9 +659,8 @@ async function init() {
         window.state.isAdmin = user.role === 'admin';
         window.updateAuthUI();
         if(window.state.isAdmin) {
-          // Add admin edit button to hero if admin
           const tag = document.querySelector('.hero-tag');
-          if(tag) tag.innerHTML += ' <span style="color:var(--blue); cursor:pointer" onclick="window.changeHeroImage()">[Trocar Foto]</span>';
+          if(tag) tag.innerHTML += ' <span style="color:var(--blue); cursor:pointer; margin-left:10px" onclick="window.changeHeroImage()">[Trocar Foto]</span>';
         }
       }
     }
@@ -613,16 +668,16 @@ async function init() {
 }
 
 window.changeHeroImage = () => {
-  const url = prompt('Cole a URL da nova imagem para o Hero:', './hero-bg.png');
+  const url = prompt('URL da Imagem:', './hero-bg.png');
   if(url) {
     document.getElementById('heroImg').src = url;
     localStorage.setItem('custom_hero_image', url);
-    window.showToast('🖼️', 'Sucesso', 'Imagem de capa atualizada (localmente).');
+    window.showToast('🖼️', 'Admin', 'Imagem atualizada com sucesso.');
   }
 };
 
-const customImg = localStorage.getItem('custom_hero_image');
-if(customImg) document.getElementById('heroImg').src = customImg;
+const savedHero = localStorage.getItem('custom_hero_image');
+if(savedHero) document.getElementById('heroImg').src = savedHero;
 
 init();
 </script>

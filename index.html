@@ -313,7 +313,7 @@
     </div>
 
     <div class="hero-image-wrapper">
-      <img src="./brain/c8c20472-8310-4a97-82db-c29769793e04/bubuya_hero_future_brasil_1773513518681.png" alt="Futuro do Brasil" class="hero-image-main">
+      <img src="./hero-bg.png" alt="Futuro do Brasil" class="hero-image-main">
     </div>
   </div>
 
@@ -378,6 +378,7 @@ window.API = window.PREDITIVO_CONFIG.API_BASE;
 
 window.showToast = (icon, title, msg) => {
   const t = document.getElementById('toast');
+  if(!t) return;
   document.getElementById('toastIcon').textContent = icon;
   document.getElementById('toastTitle').textContent = title;
   document.getElementById('toastMsg').textContent = msg;
@@ -401,8 +402,13 @@ window.renderMarkets = () => {
   const grid = document.getElementById('marketsGrid');
   if (!grid) return;
   let filtered = window.state.markets;
-  if (window.state.catFilter !== 'all') filtered = filtered.filter(m => m.category.toLowerCase() === window.state.catFilter);
-  if (window.state.searchQuery) filtered = filtered.filter(m => m.title.toLowerCase().includes(window.state.searchQuery));
+  if (window.state.catFilter !== 'all') filtered = filtered.filter(m => (m.category||'Geral').toLowerCase() === window.state.catFilter);
+  if (window.state.searchQuery) filtered = filtered.filter(m => (m.title||'').toLowerCase().includes(window.state.searchQuery));
+
+  if(filtered.length === 0) {
+    grid.innerHTML = '<div style=\"text-align:center; grid-column:1/-1; padding:60px; color:var(--muted)\">Nenhum mercado encontrado.</div>';
+    return;
+  }
 
   grid.innerHTML = filtered.map(m => {
     const total = (parseFloat(m.q_yes) + parseFloat(m.q_no)) || 100;
@@ -480,13 +486,17 @@ window.onSearchInput = (val) => {
 async function init() {
   try {
     const stats = await fetch(window.API + '/markets/stats').then(r => r.json());
-    document.getElementById('totalVolume').textContent = 'R$' + ((stats.total_volume || 2400000)/1000000).toFixed(1) + 'M';
-    document.getElementById('activeMarkets').textContent = stats.active_markets || 47;
-    document.getElementById('activePlayers').textContent = (((stats.active_traders || 3200) + 2900)/1000).toFixed(1) + 'K';
+    if(stats) {
+      document.getElementById('totalVolume').textContent = 'R$' + ((stats.total_volume || 2400000)/1000000).toFixed(1) + 'M';
+      document.getElementById('activeMarkets').textContent = stats.active_markets || 47;
+      document.getElementById('activePlayers').textContent = (((stats.active_traders || 3200) + 2900)/1000).toFixed(1) + 'K';
+    }
     
     const mkts = await fetch(window.API + '/markets').then(r => r.json());
-    window.state.markets = mkts.filter(m => !m.resolved_at);
-    window.renderMarkets();
+    if(Array.isArray(mkts)) {
+      window.state.markets = mkts.filter(m => !m.resolved_at);
+      window.renderMarkets();
+    }
 
     const token = localStorage.getItem('preditivo_token');
     if (token) {

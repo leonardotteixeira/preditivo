@@ -677,7 +677,11 @@ window.changeHeroImage = () => {
 };
 
 const savedHero = localStorage.getItem('custom_hero_image');
-if(savedHero) document.getElementById('heroImg').src = savedHero;
+if(savedHero && savedHero.startsWith('http')) {
+  document.getElementById('heroImg').src = savedHero;
+} else {
+  document.getElementById('heroImg').src = './hero-bg.png';
+}
 
 init();
 </script>

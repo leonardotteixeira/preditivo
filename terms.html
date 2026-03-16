@@ -7,10 +7,9 @@
 <title>Bubuya — Termos de Uso e Política de Privacidade</title>
 <meta name="description" content="Leia os Termos de Uso e a Política de Privacidade da Bubuya, plataforma brasileira de mercados de previsão.">
 
-<!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
   :root {
@@ -21,6 +20,10 @@
     --green: #10b981;
     --green-dim: rgba(16,185,129,0.1);
     --blue: #3b82f6;
+    --blue-dim: rgba(59,130,246,0.1);
+    --red: #f43f5e;
+    --red-dim: rgba(244,63,94,0.08);
+    --gold: #f59e0b;
     --text: #ffffff;
     --muted: #888888;
     --glow-blue: rgba(59,130,246,0.12);
@@ -37,38 +40,26 @@
     overflow-x: hidden;
   }
 
-  /* NOISE TEXTURE */
   body::before {
-    content:'';
-    position:fixed;
-    inset:0;
+    content:''; position:fixed; inset:0;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events:none;
-    z-index:0;
-    opacity:0.3;
+    pointer-events:none; z-index:0; opacity:0.3;
   }
 
-  /* AMBIENT GLOWS */
-  .glow-container { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-  .glow { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.6; }
-  .glow-1 { top: -10%; left: 10%; width: 600px; height: 600px; background: radial-gradient(circle, var(--glow-blue) 0%, transparent 70%); }
-  .glow-2 { bottom: 10%; right: -10%; width: 800px; height: 800px; background: radial-gradient(circle, var(--glow-green) 0%, transparent 70%); }
-  .glow-3 { top: 40%; left: -20%; width: 700px; height: 700px; background: radial-gradient(circle, var(--glow-blue) 0%, transparent 70%); }
-  .glow-4 { bottom: -10%; left: 30%; width: 500px; height: 500px; background: radial-gradient(circle, var(--glow-blue) 0%, transparent 70%); }
+  .glow-container { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+  .glow { position:absolute; border-radius:50%; filter:blur(120px); opacity:0.6; }
+  .glow-1 { top:-10%; left:10%; width:600px; height:600px; background:radial-gradient(circle, var(--glow-blue) 0%, transparent 70%); }
+  .glow-2 { bottom:10%; right:-10%; width:800px; height:800px; background:radial-gradient(circle, var(--glow-green) 0%, transparent 70%); }
+  .glow-3 { top:40%; left:-20%; width:700px; height:700px; background:radial-gradient(circle, var(--glow-blue) 0%, transparent 70%); }
+  .glow-4 { bottom:-10%; left:30%; width:500px; height:500px; background:radial-gradient(circle, var(--glow-blue) 0%, transparent 70%); }
 
   /* HEADER */
   header {
     position:sticky; top:0; z-index:100;
-    background:rgba(5,5,5,0.85);
-    backdrop-filter:blur(24px);
-    border-bottom:1px solid var(--border);
-    padding:0 24px;
+    background:rgba(5,5,5,0.85); backdrop-filter:blur(24px);
+    border-bottom:1px solid var(--border); padding:0 24px;
   }
-  .header-inner {
-    max-width:1440px; margin:0 auto;
-    display:flex; align-items:center; height:72px;
-    gap:24px;
-  }
+  .header-inner { max-width:1440px; margin:0 auto; display:flex; align-items:center; height:72px; gap:24px; }
   .logo {
     font-size:1.6rem; font-weight:800; letter-spacing:-1px;
     background:linear-gradient(135deg, var(--green), var(--blue));
@@ -78,95 +69,165 @@
   .back-btn {
     display:flex; align-items:center; gap:6px; color:var(--muted);
     font-size:0.9rem; font-weight:600; text-decoration:none;
-    padding:8px 16px; border-radius:12px; border:1px solid var(--border);
-    transition:all 0.2s;
+    padding:8px 16px; border-radius:12px; border:1px solid var(--border); transition:all 0.2s;
   }
   .back-btn:hover { color:var(--text); border-color:rgba(255,255,255,0.15); background:rgba(255,255,255,0.04); }
 
-  /* PAGE CONTENT */
-  .page {
-    max-width:800px; margin:0 auto;
-    padding:64px 24px 100px;
-    position:relative; z-index:1;
-  }
-  .page-title {
-    font-size:2.8rem; font-weight:800; letter-spacing:-1.5px;
-    margin-bottom:12px; line-height:1.1;
-  }
-  .page-title span { color:var(--blue); }
-  .updated { font-size:0.85rem; color:var(--muted); margin-bottom:48px; }
+  /* LAYOUT */
+  .page { max-width:900px; margin:0 auto; padding:72px 24px 120px; position:relative; z-index:1; }
 
-  .section { margin-bottom:40px; }
-  .section h2 {
-    font-size:1rem; font-weight:800; margin-bottom:16px;
-    color:var(--green); text-transform:uppercase; letter-spacing:1.5px;
+  /* HERO */
+  .page-tag {
+    display:inline-flex; align-items:center; gap:8px;
+    padding:8px 20px; background:rgba(255,255,255,0.05); border:1px solid var(--border);
+    border-radius:100px; font-size:0.85rem; color:var(--green); font-weight:700; margin-bottom:28px;
   }
-  .section p, .section li {
-    font-size:0.95rem; color:var(--muted); line-height:1.8; margin-bottom:10px;
+  .page-title { font-size:3.2rem; font-weight:800; letter-spacing:-2px; line-height:1.05; margin-bottom:20px; }
+  .page-title span { color:var(--blue); }
+  .page-lead { font-size:1.05rem; color:var(--muted); line-height:1.75; max-width:680px; margin-bottom:16px; }
+  .updated {
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:0.82rem; color:var(--muted); margin-bottom:56px;
+    background:var(--surface2); border:1px solid var(--border);
+    padding:6px 14px; border-radius:100px;
   }
-  .section ul { padding-left:20px; }
-  .section li { margin-bottom:8px; }
+
+  /* TABLE OF CONTENTS */
+  .toc {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:20px; padding:28px 32px; margin-bottom:56px;
+  }
+  .toc-title { font-size:0.8rem; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:2px; margin-bottom:20px; }
+  .toc-cols { display:grid; grid-template-columns:1fr 1fr; gap:8px 32px; }
+  .toc-link {
+    display:flex; align-items:center; gap:10px;
+    color:var(--muted); text-decoration:none; font-size:0.9rem; font-weight:500;
+    padding:8px 0; border-bottom:1px solid var(--border); transition:color 0.2s;
+  }
+  .toc-link:hover { color:var(--text); }
+  .toc-num { font-family:'DM Mono'; font-size:0.78rem; color:var(--green); font-weight:600; min-width:24px; }
+
+  /* BLOCK LABEL */
+  .block-label {
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:2px;
+    margin-bottom:12px; padding:4px 12px; border-radius:100px;
+  }
+  .block-label.green { color:var(--green); background:var(--green-dim); border:1px solid rgba(16,185,129,0.2); }
+  .block-label.blue  { color:var(--blue);  background:var(--blue-dim);  border:1px solid rgba(59,130,246,0.2); }
+  .block-label.red   { color:var(--red);   background:var(--red-dim);   border:1px solid rgba(244,63,94,0.2); }
+
+  /* SECTION HEADING */
+  .section { margin-bottom:56px; scroll-margin-top:100px; }
+  .section-num { font-family:'DM Mono'; font-size:0.82rem; color:var(--green); font-weight:600; margin-bottom:10px; display:block; }
+  .section h2 { font-size:1.6rem; font-weight:800; letter-spacing:-0.5px; margin-bottom:20px; line-height:1.2; }
+  .section p { font-size:0.97rem; color:var(--muted); line-height:1.85; margin-bottom:16px; }
   .section strong { color:var(--text); }
 
-  .divider {
-    border:none; border-top:1px solid var(--border); margin:48px 0;
+  /* ITEM LIST */
+  .item-list { display:flex; flex-direction:column; gap:12px; margin-top:20px; }
+  .item {
+    display:flex; gap:16px; align-items:flex-start;
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:16px; padding:20px 24px; transition:all 0.2s;
   }
+  .item:hover { border-color:rgba(255,255,255,0.1); }
+  .item-icon { font-size:1.2rem; flex-shrink:0; margin-top:2px; }
+  .item-body h4 { font-size:0.95rem; font-weight:700; margin-bottom:6px; }
+  .item-body p { font-size:0.88rem; color:var(--muted); line-height:1.65; margin:0; }
+
+  /* HIGHLIGHT BOX */
+  .highlight {
+    border-radius:18px; padding:24px 28px; margin:24px 0;
+    display:flex; gap:16px; align-items:flex-start;
+  }
+  .highlight.green { background:var(--green-dim); border:1px solid rgba(16,185,129,0.2); }
+  .highlight.blue  { background:var(--blue-dim);  border:1px solid rgba(59,130,246,0.2); }
+  .highlight.red   { background:var(--red-dim);   border:1px solid rgba(244,63,94,0.2); }
+  .highlight.gold  { background:rgba(245,158,11,0.07); border:1px solid rgba(245,158,11,0.2); }
+  .highlight-icon { font-size:1.4rem; flex-shrink:0; }
+  .highlight-body h4 { font-size:0.95rem; font-weight:700; margin-bottom:8px; }
+  .highlight-body p { font-size:0.88rem; color:var(--muted); line-height:1.65; margin:0; }
+
+  /* DEFINITION TABLE */
+  .def-table { margin-top:20px; border-radius:16px; overflow:hidden; border:1px solid var(--border); }
+  .def-row { display:grid; grid-template-columns:200px 1fr; border-bottom:1px solid var(--border); }
+  .def-row:last-child { border-bottom:none; }
+  .def-term { padding:16px 20px; background:var(--surface2); font-size:0.88rem; font-weight:700; color:var(--text); }
+  .def-desc { padding:16px 20px; font-size:0.88rem; color:var(--muted); line-height:1.65; }
+
+  /* INFO GRID */
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:20px; }
+  .info-card {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:16px; padding:20px 24px; transition:all 0.2s;
+  }
+  .info-card:hover { border-color:rgba(255,255,255,0.1); }
+  .info-card .val { font-size:1.6rem; font-weight:800; font-family:'Space Grotesk'; letter-spacing:-0.5px; margin-bottom:4px; }
+  .info-card .val.green { color:var(--green); }
+  .info-card .val.blue  { color:var(--blue); }
+  .info-card .lbl { font-size:0.82rem; color:var(--muted); font-weight:600; }
+
+  /* DIVIDER */
+  .chapter-divider {
+    display:flex; align-items:center; gap:20px; margin:64px 0;
+  }
+  .chapter-divider::before, .chapter-divider::after {
+    content:''; flex:1; height:1px; background:var(--border);
+  }
+  .chapter-label {
+    font-size:0.8rem; font-weight:800; text-transform:uppercase; letter-spacing:2px;
+    padding:8px 20px; border-radius:100px; white-space:nowrap;
+  }
+  .chapter-label.blue { color:var(--blue); background:var(--blue-dim); border:1px solid rgba(59,130,246,0.2); }
+  .chapter-label.green { color:var(--green); background:var(--green-dim); border:1px solid rgba(16,185,129,0.2); }
+
+  /* RIGHTS LIST */
+  .rights-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:20px; }
+  .right-item {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:14px; padding:18px 20px; transition:all 0.2s;
+  }
+  .right-item:hover { border-color:rgba(255,255,255,0.1); }
+  .right-item .right-icon { font-size:1.3rem; margin-bottom:10px; display:block; }
+  .right-item h4 { font-size:0.9rem; font-weight:700; margin-bottom:6px; }
+  .right-item p { font-size:0.82rem; color:var(--muted); line-height:1.6; margin:0; }
+
+  /* CONTACT CARD */
+  .contact-card {
+    background:linear-gradient(135deg, rgba(59,130,246,0.05), rgba(16,185,129,0.05));
+    border:1px solid var(--border); border-radius:24px; padding:40px;
+    text-align:center; margin-top:56px;
+  }
+  .contact-card h2 { font-size:1.8rem; font-weight:800; letter-spacing:-1px; margin-bottom:12px; }
+  .contact-card p { color:var(--muted); font-size:0.97rem; line-height:1.7; margin-bottom:28px; max-width:500px; margin-left:auto; margin-right:auto; }
+  .btn-email {
+    display:inline-flex; align-items:center; gap:10px;
+    background:var(--green); color:#080c10; font-weight:800;
+    padding:14px 32px; border-radius:14px; text-decoration:none; font-size:0.95rem;
+    box-shadow:0 4px 12px rgba(16,185,129,0.2); transition:all 0.3s;
+  }
+  .btn-email:hover { opacity:0.9; transform:translateY(-2px); box-shadow:0 8px 24px rgba(16,185,129,0.3); }
 
   /* FOOTER */
-  footer {
-    background: rgba(5,5,5,0.5);
-    border-top: 1px solid var(--border);
-    padding: 80px 24px 40px;
-    margin-top: 80px;
-    position: relative;
-    z-index: 1;
-  }
-  .footer-inner {
-    max-width: 1440px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
-    gap: 48px;
-  }
-  .footer-col h4 {
-    color: var(--text);
-    margin-bottom: 24px;
-    font-size: 0.95rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-  .footer-col ul { list-style: none; }
-  .footer-col li { margin-bottom: 12px; }
-  .footer-col a {
-    color: var(--muted);
-    text-decoration: none;
-    font-size: 0.95rem;
-    transition: all 0.2s;
-    cursor: pointer;
-    font-weight: 500;
-  }
-  .footer-col a:hover { color: var(--blue); }
-  .footer-legal {
-    max-width: 1440px;
-    margin: 48px auto 0;
-    padding-top: 32px;
-    border-top: 1px solid var(--border);
-    color: var(--muted);
-    font-size: 0.85rem;
-    line-height: 1.8;
-  }
-  .footer-disclaimer {
-    background: rgba(255,255,255,0.02);
-    border: 1px solid var(--border);
-    padding: 20px;
-    border-radius: 12px;
-    margin-top: 24px;
-  }
+  footer { background:rgba(5,5,5,0.5); border-top:1px solid var(--border); padding:80px 24px 40px; position:relative; z-index:1; }
+  .footer-inner { max-width:1440px; margin:0 auto; display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:48px; }
+  .footer-col h4 { color:var(--text); margin-bottom:24px; font-size:0.95rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; }
+  .footer-col ul { list-style:none; }
+  .footer-col li { margin-bottom:12px; }
+  .footer-col a { color:var(--muted); text-decoration:none; font-size:0.95rem; transition:all 0.2s; font-weight:500; }
+  .footer-col a:hover { color:var(--blue); }
+  .footer-legal { max-width:1440px; margin:48px auto 0; padding-top:32px; border-top:1px solid var(--border); color:var(--muted); font-size:0.85rem; line-height:1.8; }
+  .footer-disclaimer { background:rgba(255,255,255,0.02); border:1px solid var(--border); padding:20px; border-radius:12px; margin-top:24px; }
 
   @media (max-width: 768px) {
-    .footer-inner { grid-template-columns: 1fr; gap: 40px; }
-    .page-title { font-size: 2rem; }
+    .page-title { font-size:2.2rem; }
+    .toc-cols { grid-template-columns:1fr; }
+    .info-grid { grid-template-columns:1fr; }
+    .rights-grid { grid-template-columns:1fr; }
+    .def-row { grid-template-columns:1fr; }
+    .def-term { border-bottom:1px solid var(--border); }
+    .footer-inner { grid-template-columns:1fr; gap:40px; }
   }
 </style>
 </head>
@@ -179,7 +240,6 @@
   <div class="glow glow-4"></div>
 </div>
 
-<!-- HEADER -->
 <header>
   <div class="header-inner">
     <a class="logo" href="/">Bubuya.</a>
@@ -188,112 +248,595 @@
 </header>
 
 <div class="page">
-  <h1 class="page-title">Termos de Uso e<br><span>Política de Privacidade</span></h1>
-  <p class="updated">Última atualização: março de 2026</p>
 
-  <!-- TERMOS DE USO -->
-  <div class="section">
-    <h2>1. Sobre a plataforma</h2>
-    <p>A <strong>Bubuya</strong> é uma plataforma brasileira de mercados de previsão. Usuários podem apostar créditos em resultados de eventos futuros — como eventos políticos, econômicos, esportivos e tecnológicos — e obter retornos com base na probabilidade implícita no mercado.</p>
-    <p>A plataforma opera com créditos em reais (BRL), que podem ser depositados via PIX e sacados mediante solicitação.</p>
+  <!-- HERO -->
+  <div class="page-tag">📄 Documentos legais</div>
+  <h1 class="page-title">Termos de Uso &<br><span>Política de Privacidade</span></h1>
+  <p class="page-lead">Este documento regula o uso da plataforma Bubuya e define como tratamos os dados dos nossos usuários. Leia com atenção antes de criar sua conta.</p>
+  <div class="updated">📅 Última atualização: março de 2026 — versão 2.1</div>
+
+  <!-- ÍNDICE -->
+  <div class="toc">
+    <div class="toc-title">Índice do documento</div>
+    <div class="toc-cols">
+      <a href="#s1" class="toc-link"><span class="toc-num">01</span> Definições e glossário</a>
+      <a href="#s7" class="toc-link"><span class="toc-num">07</span> Dados coletados</a>
+      <a href="#s2" class="toc-link"><span class="toc-num">02</span> Elegibilidade e cadastro</a>
+      <a href="#s8" class="toc-link"><span class="toc-num">08</span> Como usamos seus dados</a>
+      <a href="#s3" class="toc-link"><span class="toc-num">03</span> Funcionamento dos mercados</a>
+      <a href="#s9" class="toc-link"><span class="toc-num">09</span> Compartilhamento de dados</a>
+      <a href="#s4" class="toc-link"><span class="toc-num">04</span> Depósitos e saques</a>
+      <a href="#s10" class="toc-link"><span class="toc-num">10</span> Segurança e armazenamento</a>
+      <a href="#s5" class="toc-link"><span class="toc-num">05</span> Conduta e uso proibido</a>
+      <a href="#s11" class="toc-link"><span class="toc-num">11</span> Seus direitos (LGPD)</a>
+      <a href="#s6" class="toc-link"><span class="toc-num">06</span> Responsabilidade e riscos</a>
+      <a href="#s12" class="toc-link"><span class="toc-num">12</span> Contato e DPO</a>
+    </div>
   </div>
 
-  <div class="section">
-    <h2>2. Elegibilidade</h2>
-    <ul>
-      <li>Você deve ter ao menos <strong>18 anos</strong> para criar uma conta.</li>
-      <li>O cadastro é individual e intransferível.</li>
-      <li>É vedado criar múltiplas contas para burlar regras ou limites da plataforma.</li>
-    </ul>
+  <!-- ════════════════════════════════
+       PARTE I — TERMOS DE USO
+  ════════════════════════════════ -->
+  <div class="chapter-divider">
+    <span class="chapter-label green">Parte I — Termos de Uso</span>
   </div>
 
-  <div class="section">
-    <h2>3. Funcionamento dos mercados</h2>
-    <p>Cada mercado tem uma pergunta com resposta binária (SIM ou NÃO). As probabilidades refletem as apostas acumuladas dos usuários via modelo de precificação proporcional.</p>
-    <ul>
-      <li><strong>Taxa da casa:</strong> 2% sobre cada operação (compra ou venda).</li>
-      <li><strong>Resolução:</strong> realizada pelo time operacional da Bubuya com base em fontes primárias confiáveis descritas nas regras de cada mercado.</li>
-      <li><strong>Pagamento:</strong> usuários vencedores recebem o retorno diretamente no saldo da plataforma.</li>
-    </ul>
+  <!-- 1. DEFINIÇÕES -->
+  <div class="section" id="s1">
+    <span class="section-num">01</span>
+    <h2>Definições e glossário</h2>
+    <p>Para garantir clareza neste documento, os termos abaixo têm os seguintes significados dentro do contexto da Bubuya:</p>
+    <div class="def-table">
+      <div class="def-row">
+        <div class="def-term">Plataforma</div>
+        <div class="def-desc">O site e serviços da Bubuya, disponíveis em bubuya.com.br e seus subdomínios.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Usuário / Trader</div>
+        <div class="def-desc">Pessoa física maior de 18 anos registrada na plataforma com uma conta ativa.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Mercado</div>
+        <div class="def-desc">Uma pergunta de resposta binária (SIM/NÃO) sobre um evento futuro verificável, com prazo e regras de resolução definidos.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Posição</div>
+        <div class="def-desc">A quantidade de cotas SIM ou NÃO que um usuário detém em um determinado mercado.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Saldo</div>
+        <div class="def-desc">Créditos em reais (BRL) mantidos na conta do usuário dentro da plataforma, sem vínculo com conta bancária.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Resolução</div>
+        <div class="def-desc">O ato de encerrar um mercado com base no resultado verificado do evento, redistribuindo os valores aos vencedores.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Taxa da casa</div>
+        <div class="def-desc">Percentual cobrado pela Bubuya sobre cada operação, atualmente fixado em 2%.</div>
+      </div>
+    </div>
   </div>
 
-  <div class="section">
-    <h2>4. Depósitos e saques</h2>
-    <ul>
-      <li>Depósito mínimo: <strong>R$10</strong>.</li>
-      <li>Saque mínimo: <strong>R$20</strong>.</li>
-      <li>Saques são processados manualmente em até 2 dias úteis.</li>
-      <li>Bônus de indicação possuem restrições de saque descritas no programa de referral.</li>
-    </ul>
+  <!-- 2. ELEGIBILIDADE -->
+  <div class="section" id="s2">
+    <span class="section-num">02</span>
+    <h2>Elegibilidade e cadastro</h2>
+    <p>Para usar a Bubuya, você precisa atender aos seguintes requisitos e concordar com as condições abaixo:</p>
+
+    <div class="item-list">
+      <div class="item">
+        <div class="item-icon">🔞</div>
+        <div class="item-body">
+          <h4>Idade mínima de 18 anos</h4>
+          <p>A plataforma é exclusiva para adultos. Ao se cadastrar, você declara ter ao menos 18 anos. Contas de menores detectadas serão encerradas imediatamente e os saldos devolvidos mediante análise.</p>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">🇧🇷</div>
+        <div class="item-body">
+          <h4>Residência no Brasil</h4>
+          <p>A plataforma é voltada ao público brasileiro. O uso por residentes de outros países é permitido, mas o usuário é responsável por verificar a legalidade em sua jurisdição local.</p>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">👤</div>
+        <div class="item-body">
+          <h4>Conta individual e intransferível</h4>
+          <p>Cada pessoa física pode ter apenas uma conta ativa. O cadastro não pode ser cedido, vendido ou transferido a terceiros. A Bubuya pode exigir verificação de identidade a qualquer momento.</p>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">✅</div>
+        <div class="item-body">
+          <h4>Informações verídicas</h4>
+          <p>Você se compromete a fornecer nome, e-mail e demais dados verdadeiros durante o cadastro e a mantê-los atualizados. Dados falsos implicam suspensão imediata da conta.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight blue" style="margin-top:24px">
+      <div class="highlight-icon">ℹ️</div>
+      <div class="highlight-body">
+        <h4>Verificação de identidade (KYC)</h4>
+        <p>Para saques acima de R$500 ou em caso de suspeita de fraude, podemos solicitar documentos de identificação. Isso garante a segurança de todos os usuários e o cumprimento da legislação vigente.</p>
+      </div>
+    </div>
   </div>
 
-  <div class="section">
-    <h2>5. Conduta do usuário</h2>
-    <p>É proibido usar a plataforma para:</p>
-    <ul>
-      <li>Lavagem de dinheiro ou atividades ilícitas.</li>
-      <li>Manipulação de mercados via múltiplas contas ou automações não autorizadas.</li>
-      <li>Qualquer uso que viole a legislação brasileira vigente.</li>
-    </ul>
-    <p>A Bubuya reserva o direito de suspender contas que violem estas regras, com ou sem aviso prévio.</p>
+  <!-- 3. FUNCIONAMENTO DOS MERCADOS -->
+  <div class="section" id="s3">
+    <span class="section-num">03</span>
+    <h2>Funcionamento dos mercados</h2>
+    <p>Os mercados da Bubuya funcionam como bolsas de previsão: as probabilidades são definidas pelo mercado (pelos próprios usuários), não pela plataforma. Entenda as regras:</p>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="val green">2%</div>
+        <div class="lbl">Taxa por operação (compra ou venda)</div>
+      </div>
+      <div class="info-card">
+        <div class="val blue">R$1,00</div>
+        <div class="lbl">Valor de cada cota ao ser resolvida como vencedora</div>
+      </div>
+      <div class="info-card">
+        <div class="val green">R$0,00</div>
+        <div class="lbl">Valor de cada cota ao ser resolvida como perdedora</div>
+      </div>
+      <div class="info-card">
+        <div class="val blue">1+</div>
+        <div class="lbl">Confirmações de blockchain exigidas para depósitos cripto</div>
+      </div>
+    </div>
+
+    <div class="item-list" style="margin-top:28px">
+      <div class="item">
+        <div class="item-icon">📊</div>
+        <div class="item-body">
+          <h4>Precificação por oferta e demanda</h4>
+          <p>O preço de uma cota SIM sobe quando mais usuários apostam nela e cai quando apostam em NÃO. A plataforma não define odds — o mercado define. Isso garante que as probabilidades reflitam o consenso coletivo.</p>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">🔍</div>
+        <div class="item-body">
+          <h4>Resolução por fonte primária</h4>
+          <p>Cada mercado especifica previamente a fonte de resolução (ex: portal do governo, CBF, Banco Central). O time da Bubuya consulta essa fonte e resolve o mercado quando o resultado se torna inequívoco. Não há resolução por interpretação subjetiva.</p>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">⚡</div>
+        <div class="item-body">
+          <h4>Trading antes da resolução</h4>
+          <p>Você pode comprar e vender posições a qualquer momento enquanto o mercado está aberto, independente do resultado final. Isso permite realizar lucros antecipados ou limitar perdas conforme as probabilidades mudam.</p>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">🔄</div>
+        <div class="item-body">
+          <h4>Cancelamento de mercados</h4>
+          <p>Em casos excepcionais — como evento não ocorrendo, fonte primária inacessível ou ambiguidade irresolúvel — o mercado pode ser cancelado. Neste caso, todos os usuários recebem integralmente o valor investido, sem desconto de taxa.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight gold">
+      <div class="highlight-icon">⚖️</div>
+      <div class="highlight-body">
+        <h4>Contestação de resolução</h4>
+        <p>Se você discordar de uma resolução, pode abrir uma contestação por e-mail em até 72 horas após a resolução. A Bubuya se reserva o direito de revisar o caso com base na fonte primária definida nas regras do mercado. Decisões finais são comunicadas em até 5 dias úteis.</p>
+      </div>
+    </div>
   </div>
 
-  <div class="section">
-    <h2>6. Limitação de responsabilidade</h2>
-    <p>A Bubuya não garante lucros. Apostar em mercados de previsão envolve risco de perda total do valor investido. A plataforma é fornecida "como está", sem garantias de disponibilidade contínua.</p>
+  <!-- 4. DEPÓSITOS E SAQUES -->
+  <div class="section" id="s4">
+    <span class="section-num">04</span>
+    <h2>Depósitos e saques</h2>
+    <p>A Bubuya aceita três formas de depósito: <strong>PIX Direto</strong>, <strong>Gateway InfinitePay</strong> (cartão/débito/PIX) e <strong>criptomoedas via MetaMask</strong>. Saques são processados exclusivamente via PIX.</p>
+
+    <div class="def-table" style="margin-top:20px">
+      <div class="def-row">
+        <div class="def-term">Depósito mínimo</div>
+        <div class="def-desc"><strong style="color:var(--text)">R$10</strong> — válido para todas as formas de pagamento.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Saque mínimo</div>
+        <div class="def-desc"><strong style="color:var(--text)">R$20</strong> — processado em até 2 dias úteis após a solicitação.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Taxa de depósito</div>
+        <div class="def-desc"><strong style="color:var(--green)">Gratuito</strong> — a Bubuya não cobra taxas sobre entradas.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Taxa de saque</div>
+        <div class="def-desc"><strong style="color:var(--green)">Gratuito</strong> — sem cobrança para retiradas via PIX.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">PIX Direto</div>
+        <div class="def-desc">Transferência manual para a chave PIX da plataforma. Crédito após confirmação pelo suporte (até 24h úteis).</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Gateway InfinitePay</div>
+        <div class="def-desc">Checkout seguro com cartão de crédito, débito ou PIX. Crédito instantâneo após confirmação do gateway.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Cripto (MetaMask)</div>
+        <div class="def-desc">Envio de ETH ou MATIC para a carteira da plataforma. Crédito após 1 confirmação na rede blockchain.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Bônus de boas-vindas</div>
+        <div class="def-desc">R$100 de crédito para novos usuários. Sujeito a volume mínimo de apostas antes de ser sacável. Não cumulativo com outras promoções.</div>
+      </div>
+    </div>
+
+    <div class="highlight red" style="margin-top:24px">
+      <div class="highlight-icon">🚨</div>
+      <div class="highlight-body">
+        <h4>Chargebacks e estornos indevidos</h4>
+        <p>Contestações de pagamento (chargebacks) feitas de má-fé após o uso dos créditos na plataforma resultam em banimento imediato e possível ação judicial por fraude. Entre em contato com o suporte antes de contestar qualquer cobrança.</p>
+      </div>
+    </div>
   </div>
 
-  <hr class="divider">
+  <!-- 5. CONDUTA -->
+  <div class="section" id="s5">
+    <span class="section-num">05</span>
+    <h2>Conduta e uso proibido</h2>
+    <p>A Bubuya é uma plataforma de análise preditiva e entretenimento. O uso deve ser lícito, ético e individual. São expressamente proibidas as seguintes condutas:</p>
 
-  <!-- POLÍTICA DE PRIVACIDADE -->
-  <div class="section">
-    <h2>7. Dados coletados</h2>
-    <p>Para operar sua conta, coletamos:</p>
-    <ul>
-      <li><strong>Nome de usuário</strong> e <strong>endereço de email</strong> (obrigatórios para cadastro).</li>
-      <li><strong>Histórico de apostas, depósitos e saques</strong> vinculados à sua conta.</li>
-      <li><strong>Chave PIX</strong> para processamento de saques (não armazenada permanentemente após o pagamento).</li>
-    </ul>
+    <div class="item-list">
+      <div class="item">
+        <div class="item-icon">🚫</div>
+        <div class="item-body">
+          <h4>Múltiplas contas</h4>
+          <p>Criar mais de uma conta por pessoa, seja com dados próprios ou de terceiros, para burlar limites, coletar múltiplos bônus ou manipular mercados. Todas as contas vinculadas serão encerradas.</p>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">🤖</div>
+        <div class="item-body">
+          <h4>Automações e bots</h4>
+          <p>Uso de scripts, bots ou qualquer automação não autorizada para interagir com a plataforma, manipular preços ou explorar vulnerabilidades. Inclui arbitragem sistemática via software.</p>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">💰</div>
+        <div class="item-body">
+          <h4>Lavagem de dinheiro</h4>
+          <p>Utilizar a plataforma para movimentar valores de origem ilícita, simular operações fictícias ou qualquer outro método que configure lavagem de ativos. Casos suspeitos são reportados às autoridades.</p>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">📰</div>
+        <div class="item-body">
+          <h4>Uso de informação privilegiada</h4>
+          <p>Apostar com base em informações não públicas e relevantes para o resultado do mercado. Isso inclui insider trading em mercados econômicos e acesso antecipado a resultados esportivos.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight green" style="margin-top:24px">
+      <div class="highlight-icon">🛡️</div>
+      <div class="highlight-body">
+        <h4>Penalidades aplicáveis</h4>
+        <p>Violações podem resultar em: suspensão temporária, encerramento definitivo da conta, confisco do saldo, banimento de IP e, quando aplicável, comunicação às autoridades policiais e ao COAF (Conselho de Controle de Atividades Financeiras).</p>
+      </div>
+    </div>
   </div>
 
-  <div class="section">
-    <h2>8. Uso dos dados</h2>
-    <ul>
-      <li>Operar e manter sua conta.</li>
-      <li>Enviar emails transacionais (verificação de cadastro, códigos de saque, resultados de mercados).</li>
-      <li>Detectar e prevenir fraudes.</li>
-    </ul>
-    <p>Não vendemos seus dados a terceiros.</p>
+  <!-- 6. RESPONSABILIDADE -->
+  <div class="section" id="s6">
+    <span class="section-num">06</span>
+    <h2>Responsabilidade e riscos</h2>
+    <p>Participar de mercados de previsão envolve riscos reais. Leia com atenção antes de investir qualquer valor.</p>
+
+    <div class="item-list">
+      <div class="item">
+        <div class="item-icon">📉</div>
+        <div class="item-body">
+          <h4>Risco de perda total</h4>
+          <p>Em cada posição, você pode perder até 100% do valor investido. A Bubuya não garante lucros nem retornos mínimos. O desempenho passado de um trader não garante resultados futuros.</p>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">🔧</div>
+        <div class="item-body">
+          <h4>Disponibilidade da plataforma</h4>
+          <p>A Bubuya é fornecida "como está". Não garantimos disponibilidade ininterrupta. Manutenções programadas e emergenciais podem ocorrer. Posições abertas durante instabilidades não são canceladas automaticamente.</p>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">🌐</div>
+        <div class="item-body">
+          <h4>Eventos externos</h4>
+          <p>Atrasos ou mudanças em eventos do mundo real (cancelamentos, remarcações, decisões judiciais) podem afetar a resolução dos mercados. Nesses casos, as regras do mercado prevalecem sobre qualquer expectativa individual.</p>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">⚖️</div>
+        <div class="item-body">
+          <h4>Limitação de indenização</h4>
+          <p>A Bubuya não se responsabiliza por lucros cessantes, danos indiretos ou consequenciais decorrentes do uso da plataforma. A responsabilidade máxima é limitada ao saldo disponível na conta do usuário no momento do evento.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight red">
+      <div class="highlight-icon">❤️</div>
+      <div class="highlight-body">
+        <h4>Jogo responsável</h4>
+        <p>Se você sentir que está perdendo o controle sobre quanto aposta, recomendamos pausar sua conta. Entre em contato com o suporte para ativar limites de depósito, limites de apostas ou bloqueio temporário da conta. O Jogo Responsável é uma prioridade para nós.</p>
+      </div>
+    </div>
   </div>
 
-  <div class="section">
-    <h2>9. Retenção de dados</h2>
-    <p>Seus dados são mantidos enquanto sua conta estiver ativa. Você pode solicitar a exclusão da conta e dos dados associados por email para o suporte.</p>
+  <!-- ════════════════════════════════
+       PARTE II — POLÍTICA DE PRIVACIDADE
+  ════════════════════════════════ -->
+  <div class="chapter-divider">
+    <span class="chapter-label blue">Parte II — Política de Privacidade (LGPD)</span>
   </div>
 
-  <div class="section">
-    <h2>10. Contato</h2>
-    <p>Dúvidas sobre estes termos ou sobre seus dados? Entre em contato pelo email de suporte disponível na plataforma.</p>
+  <!-- 7. DADOS COLETADOS -->
+  <div class="section" id="s7">
+    <span class="section-num">07</span>
+    <h2>Quais dados coletamos</h2>
+    <p>Coletamos apenas os dados estritamente necessários para operar a plataforma, garantir segurança e cumprir obrigações legais. Nenhum dado é coletado sem propósito definido.</p>
+
+    <div class="item-list">
+      <div class="item">
+        <div class="item-icon">👤</div>
+        <div class="item-body">
+          <h4>Dados de cadastro</h4>
+          <p><strong>Nome completo</strong> e <strong>endereço de e-mail</strong> — fornecidos no momento do registro. Usados para identificação, comunicação e recuperação de conta.</p>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">💳</div>
+        <div class="item-body">
+          <h4>Dados financeiros</h4>
+          <p><strong>Histórico de depósitos, saques e apostas</strong> vinculados à sua conta. A <strong>chave PIX</strong> para saques é armazenada temporariamente durante o processamento e não é mantida permanentemente após o pagamento.</p>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">🦊</div>
+        <div class="item-body">
+          <h4>Endereço de carteira cripto</h4>
+          <p>Quando você conecta sua MetaMask, armazenamos o endereço público da carteira (<strong>nunca a chave privada</strong>, que permanece exclusivamente no seu dispositivo). Usado para vincular transações à sua conta.</p>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">🌐</div>
+        <div class="item-body">
+          <h4>Dados técnicos de acesso</h4>
+          <p><strong>Endereço IP</strong>, tipo de navegador e timestamps de acesso — coletados automaticamente para fins de segurança, detecção de fraudes e diagnóstico de problemas técnicos. Não usados para marketing.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight blue" style="margin-top:24px">
+      <div class="highlight-icon">🚫</div>
+      <div class="highlight-body">
+        <h4>O que NÃO coletamos</h4>
+        <p>Não coletamos CPF, RG, data de nascimento, endereço físico, dados biométricos ou documentos de identidade como parte do cadastro padrão. Essas informações podem ser solicitadas pontualmente em processos de verificação KYC, mas não são armazenadas na plataforma principal.</p>
+      </div>
+    </div>
   </div>
+
+  <!-- 8. USO DOS DADOS -->
+  <div class="section" id="s8">
+    <span class="section-num">08</span>
+    <h2>Como usamos seus dados</h2>
+    <p>Cada dado coletado tem uma finalidade específica e legal, conforme a Lei Geral de Proteção de Dados (Lei nº 13.709/2018). Abaixo estão todas as finalidades aplicadas:</p>
+
+    <div class="def-table" style="margin-top:20px">
+      <div class="def-row">
+        <div class="def-term">Operação da conta</div>
+        <div class="def-desc">Criar, autenticar e manter sua conta ativa. Base legal: <strong>execução de contrato</strong>.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Transações financeiras</div>
+        <div class="def-desc">Processar depósitos, saques e apostas com precisão e segurança. Base legal: <strong>execução de contrato</strong>.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Comunicações transacionais</div>
+        <div class="def-desc">Enviar e-mails de confirmação de cadastro, resultado de mercados e notificações de saque. Base legal: <strong>execução de contrato</strong>.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Prevenção de fraudes</div>
+        <div class="def-desc">Detectar múltiplas contas, bots e comportamentos suspeitos. Base legal: <strong>legítimo interesse</strong>.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Obrigações legais</div>
+        <div class="def-desc">Cumprir requisições de autoridades competentes quando exigido por lei. Base legal: <strong>cumprimento de obrigação legal</strong>.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Melhoria do produto</div>
+        <div class="def-desc">Análise agregada e anonimizada de uso para melhorar a experiência. Base legal: <strong>legítimo interesse</strong>. Você pode optar por não participar.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. COMPARTILHAMENTO -->
+  <div class="section" id="s9">
+    <span class="section-num">09</span>
+    <h2>Compartilhamento de dados</h2>
+    <p><strong>Não vendemos, alugamos nem comercializamos seus dados pessoais</strong> com terceiros para fins publicitários ou de marketing. Os dados são compartilhados apenas nas situações abaixo:</p>
+
+    <div class="item-list">
+      <div class="item">
+        <div class="item-icon">💳</div>
+        <div class="item-body">
+          <h4>Processadores de pagamento</h4>
+          <p>Compartilhamos dados mínimos necessários com a <strong>InfinitePay</strong> (gateway de pagamento) para processar transações. Esses parceiros operam sob seus próprios termos e políticas de privacidade, e são contratualmente proibidos de usar seus dados para qualquer outra finalidade.</p>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">🏛️</div>
+        <div class="item-body">
+          <h4>Autoridades legais</h4>
+          <p>Dados podem ser fornecidos a autoridades policiais, judiciais ou regulatórias quando exigido por ordem judicial, investigação criminal ou obrigação legal. Sempre que possível e permitido por lei, notificaremos o usuário afetado.</p>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">☁️</div>
+        <div class="item-body">
+          <h4>Infraestrutura de tecnologia</h4>
+          <p>Utilizamos servidores da <strong>Railway</strong> (backend) e <strong>Supabase</strong> (banco de dados) para hospedar a plataforma. Esses provedores têm acesso técnico aos dados, mas são contratualmente obrigados a mantê-los confidenciais.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. SEGURANÇA -->
+  <div class="section" id="s10">
+    <span class="section-num">10</span>
+    <h2>Segurança e armazenamento</h2>
+    <p>Adotamos medidas técnicas e organizacionais para proteger seus dados contra acesso não autorizado, perda ou alteração:</p>
+
+    <div class="item-list">
+      <div class="item">
+        <div class="item-icon">🔐</div>
+        <div class="item-body">
+          <h4>Criptografia de senhas</h4>
+          <p>Senhas são armazenadas usando hashing com sal (bcrypt). <strong>Nenhum funcionário da Bubuya tem acesso à sua senha</strong> — nem em texto claro nem em formato reversível.</p>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">🛡️</div>
+        <div class="item-body">
+          <h4>Autenticação por token JWT</h4>
+          <p>Sessões são gerenciadas por tokens JWT com validade limitada. Tokens expirados ou inválidos são rejeitados automaticamente. Recomendamos não compartilhar sessões ativas em dispositivos públicos.</p>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">🌐</div>
+        <div class="item-body">
+          <h4>HTTPS em todas as conexões</h4>
+          <p>Todo tráfego entre seu navegador e nossos servidores é criptografado via TLS 1.3. Certificados SSL são renovados automaticamente e monitorados continuamente.</p>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-icon">🗃️</div>
+        <div class="item-body">
+          <h4>Retenção de dados</h4>
+          <p>Seus dados são mantidos enquanto sua conta estiver ativa. Após exclusão da conta, dados transacionais são anonimizados e retidos por até 5 anos para fins de auditoria e conformidade fiscal, conforme exigido por lei.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight green" style="margin-top:24px">
+      <div class="highlight-icon">🔔</div>
+      <div class="highlight-body">
+        <h4>Notificação de incidentes</h4>
+        <p>Em caso de violação de dados que possa afetar seus direitos, notificaremos você e a Autoridade Nacional de Proteção de Dados (ANPD) dentro de 72 horas após a confirmação do incidente, conforme exigido pela LGPD.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. SEUS DIREITOS (LGPD) -->
+  <div class="section" id="s11">
+    <span class="section-num">11</span>
+    <h2>Seus direitos pela LGPD</h2>
+    <p>A Lei Geral de Proteção de Dados (Lei nº 13.709/2018) garante a você os seguintes direitos em relação aos seus dados pessoais. Todos podem ser exercidos através do nosso e-mail de suporte:</p>
+
+    <div class="rights-grid">
+      <div class="right-item">
+        <span class="right-icon">📋</span>
+        <h4>Acesso</h4>
+        <p>Solicitar a qualquer momento uma cópia completa de todos os dados pessoais que mantemos sobre você.</p>
+      </div>
+      <div class="right-item">
+        <span class="right-icon">✏️</span>
+        <h4>Correção</h4>
+        <p>Corrigir dados incompletos, desatualizados ou incorretos vinculados à sua conta.</p>
+      </div>
+      <div class="right-item">
+        <span class="right-icon">🗑️</span>
+        <h4>Exclusão</h4>
+        <p>Solicitar a exclusão dos seus dados pessoais, exceto quando a retenção for exigida por lei ou obrigação contratual.</p>
+      </div>
+      <div class="right-item">
+        <span class="right-icon">🚫</span>
+        <h4>Oposição</h4>
+        <p>Opor-se ao tratamento de dados baseado em legítimo interesse, como análise de uso para melhoria do produto.</p>
+      </div>
+      <div class="right-item">
+        <span class="right-icon">📦</span>
+        <h4>Portabilidade</h4>
+        <p>Receber seus dados em formato estruturado e legível por máquina para transferência a outro serviço.</p>
+      </div>
+      <div class="right-item">
+        <span class="right-icon">⏸️</span>
+        <h4>Restrição</h4>
+        <p>Solicitar a suspensão temporária do tratamento dos seus dados enquanto uma contestação está em análise.</p>
+      </div>
+    </div>
+
+    <div class="highlight blue" style="margin-top:24px">
+      <div class="highlight-icon">⏱️</div>
+      <div class="highlight-body">
+        <h4>Prazo de resposta</h4>
+        <p>Respondemos todas as solicitações relacionadas à LGPD em até <strong>15 dias úteis</strong> a partir do recebimento. Em casos complexos, esse prazo pode ser estendido por igual período, com comunicação prévia ao solicitante.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 12. CONTATO -->
+  <div class="section" id="s12">
+    <span class="section-num">12</span>
+    <h2>Contato e encarregado de dados</h2>
+    <p>Para exercer qualquer direito previsto neste documento, reportar violações ou tirar dúvidas sobre o tratamento dos seus dados, entre em contato com nossa equipe:</p>
+
+    <div class="def-table" style="margin-top:20px">
+      <div class="def-row">
+        <div class="def-term">E-mail de suporte</div>
+        <div class="def-desc"><a href="mailto:suporte@bubuya.com.br" style="color:var(--blue); text-decoration:none; font-weight:600">suporte@bubuya.com.br</a> — atendimento geral e dúvidas sobre a plataforma.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">DPO / Encarregado</div>
+        <div class="def-desc"><a href="mailto:privacidade@bubuya.com.br" style="color:var(--blue); text-decoration:none; font-weight:600">privacidade@bubuya.com.br</a> — exclusivo para solicitações relacionadas à LGPD e proteção de dados.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">ANPD</div>
+        <div class="def-desc">Você também pode protocolar reclamações diretamente na <strong>Autoridade Nacional de Proteção de Dados</strong> em gov.br/anpd.</div>
+      </div>
+      <div class="def-row">
+        <div class="def-term">Alterações neste documento</div>
+        <div class="def-desc">Alterações relevantes serão comunicadas por e-mail com pelo menos 10 dias de antecedência. O uso contínuo da plataforma após a entrada em vigor constitui aceite das novas condições.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA CONTATO -->
+  <div class="contact-card">
+    <h2>Ficou com alguma dúvida?</h2>
+    <p>Nossa equipe está disponível para esclarecer qualquer ponto sobre os termos, sua privacidade ou como seus dados são tratados.</p>
+    <a class="btn-email" href="mailto:suporte@bubuya.com.br">
+      ✉️ Falar com o Suporte
+    </a>
+  </div>
+
 </div>
 
 <footer>
   <div class="footer-inner">
-    <div class="footer-col" style="padding-right: 40px">
-      <div class="logo" style="margin-bottom: 20px; font-size: 1.8rem; display: block">Bubuya.</div>
-      <p style="color: var(--muted); font-size: 0.95rem; line-height: 1.6">A principal plataforma brasileira de mercados de previsão.</p>
+    <div class="footer-col" style="padding-right:40px">
+      <a class="logo" href="/" style="display:block; margin-bottom:20px; font-size:1.8rem">Bubuya.</a>
+      <p style="color:var(--muted); font-size:0.95rem; line-height:1.6">A principal plataforma brasileira de mercados de previsão.</p>
     </div>
     <div class="footer-col">
       <h4>Plataforma</h4>
       <ul>
-        <li><a href="/">Quem Somos</a></li>
+        <li><a href="/about.html">Quem Somos</a></li>
         <li><a href="/terms.html">Termos de Uso</a></li>
       </ul>
     </div>
     <div class="footer-col">
       <h4>Suporte</h4>
       <ul>
-        <li><a href="/">Como Funciona</a></li>
+        <li><a href="/how-it-works.html">Como Funciona</a></li>
         <li><a href="mailto:suporte@bubuya.com.br">Suporte</a></li>
       </ul>
     </div>
@@ -307,10 +850,10 @@
   </div>
   <div class="footer-legal">
     <div class="footer-disclaimer">
-      <strong>Aviso Legal Importante:</strong> A Bubuya é uma plataforma de tecnologia de mercados de previsão. Não constitui recomendação financeira.
+      <strong>Aviso Legal Importante:</strong> A Bubuya é uma plataforma de tecnologia de mercados de previsão. Não constitui recomendação financeira. Apostar envolve risco de perda. Jogue com responsabilidade.
     </div>
-    <div style="margin-top: 32px">
-      <p>© 2026 Bubuya — Todos os direitos reservados.</p>
+    <div style="margin-top:32px">
+      <p>© 2026 Bubuya — Todos os direitos reservados. CNPJ em processo de registro.</p>
     </div>
   </div>
 </footer>

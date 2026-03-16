@@ -401,15 +401,11 @@ function loadAll() {
 }
 
 function loadStats() {
+  // Só busca contagem de usuários — /admin/deposits já é atualizado por loadDeposits()
+  // evitando chamada duplicada para o mesmo endpoint
   fetch(API + '/admin/users', { headers: adminHeaders() }).then(function(r){ return r.json(); }).then(function(data){
     if (!Array.isArray(data)) return;
     document.getElementById('statUsers').textContent = data.length || 0;
-  }).catch(function(){});
-  fetch(API + '/admin/deposits', { headers: adminHeaders() }).then(function(r){ return r.json(); }).then(function(data){
-    if (!Array.isArray(data)) return;
-    var pending = data.filter(function(d){ return d.status === 'pending'; }).length;
-    document.getElementById('statDep').textContent = pending;
-    document.getElementById('pendingCount').textContent = pending;
   }).catch(function(){});
 }
 

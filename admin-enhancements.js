@@ -274,12 +274,19 @@ function enhanceReceitaRenderer() {
   };
 }
 
+var botPanelInitialized = false;
+
 function enhanceBotStatsLoader() {
   var original = window.loadBotStats;
   window.loadBotStats = function() {
-    if (typeof original === 'function') original();
-    loadBotConfig();
-    loadRealPanel();
+    if (typeof original === 'function') original(); // GET /admin/bots/stats
+    // config e realPanel: apenas na primeira abertura do painel de bots
+    // evita triplicar requests a cada refresh de stats
+    if (!botPanelInitialized) {
+      botPanelInitialized = true;
+      loadBotConfig();   // GET /admin/bots/config
+      loadRealPanel();   // GET /admin/real/stats
+    }
   };
 }
 

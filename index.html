@@ -544,10 +544,10 @@
     <!-- PAINEL: PIX DIRETO -->
     <div class="deposit-panel active" id="panel-pix">
       <div class="method-info">
-        Gera um QR Code e chave PIX <strong>diretamente</strong>. Saldo creditado em até 5 minutos após o pagamento.
+        Transfira o valor diretamente para a chave PIX da plataforma. <strong>Envie o comprovante</strong> para nosso suporte após o pagamento.
       </div>
       <input class="modal-input" type="number" id="pixDirectAmount" placeholder="Valor (R$) — mínimo R$10" min="10">
-      <button class="btn-primary" style="width:100%;font-size:1rem" onclick="window.depositPIXDireto()">Gerar QR Code PIX</button>
+      <button class="btn-primary" style="width:100%;font-size:1rem" onclick="window.depositPIXDireto()">Ver Chave PIX</button>
       <div id="pixDirectOutput" style="display:none; margin-top:20px;">
         <div class="pix-qr-box">
           <img id="pixDirectQR" src="" alt="QR Code PIX" style="width:160px;height:160px;border-radius:8px;">
@@ -557,7 +557,9 @@
           <span class="pix-key-val" id="pixDirectKey">—</span>
           <button class="btn-copy" onclick="window.copyPixKey()">Copiar</button>
         </div>
-        <p style="text-align:center; color:var(--muted); font-size:0.85rem">Após o pagamento o saldo é creditado automaticamente.</p>
+        <p id="pixDirectInstr" style="text-align:center; color:var(--muted); font-size:0.85rem; margin-top:8px; line-height:1.6">
+          Após transferir, envie o comprovante para nosso suporte.
+        </p>
       </div>
     </div>
 
@@ -809,46 +811,39 @@ window.switchDepositTab = (tab, btn) => {
   if (tab === 'eth') window.refreshEthPanel();
 };
 
-/* ===== DEPOSIT: PIX DIRETO ===== */
-window.depositPIXDireto = async () => {
+/* ===== DEPOSIT: PIX DIRETO (chave estática do config.js) ===== */
+window.depositPIXDireto = () => {
   const amt = document.getElementById('pixDirectAmount').value;
   if (!amt || parseFloat(amt) < 10) return window.showToast('⚠️', 'Atenção', 'Valor mínimo é R$10.');
-  const token = localStorage.getItem('preditivo_token');
-  if (!token) { window.closeModal('depositModal'); return window.openModal('loginModal'); }
-
-  const btn = document.querySelector('#panel-pix .btn-primary');
-  btn.textContent = 'Gerando...'; btn.disabled = true;
-
-  try {
-    const res = await fetch(window.API + '/deposits/pix', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-      body: JSON.stringify({ amount: parseFloat(amt) })
-    });
-    const data = await res.json();
-    if (data.error) { window.showToast('❌', 'Erro', data.error); return; }
-
-    const output = document.getElementById('pixDirectOutput');
-    const qrImg  = document.getElementById('pixDirectQR');
-    const keyEl  = document.getElementById('pixDirectKey');
-
-    // Suporte a resposta com QR code em base64 ou URL
-    if (data.qr_code_base64) {
-      qrImg.src = 'data:image/png;base64,' + data.qr_code_base64;
-    } else if (data.qr_code_url) {
-      qrImg.src = data.qr_code_url;
-    } else if (data.pix_key) {
-      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(data.pix_key)}`;
-    }
-    keyEl.textContent = data.pix_key || data.copy_paste || '—';
-    window._pixKey = keyEl.textContent;
-    output.style.display = 'block';
-    window.showToast('✅', 'QR Code gerado!', 'Escaneie ou copie a chave PIX.');
-  } catch(e) {
-    window.showToast('❌', 'Erro', 'Falha ao gerar PIX. Tente o Gateway.');
-  } finally {
-    btn.textContent = 'Gerar QR Code PIX'; btn.disabled = false;
+  if (!localStorage.getItem('preditivo_token')) {
+    window.closeModal('depositModal');
+    return window.openModal('loginModal');
   }
+
+  const cfg     = window.PREDITIVO_CONFIG;
+  const pixKey  = cfg.PIX_KEY;
+  const name    = cfg.PIX_RECEIVER_NAME || 'Bubuya';
+  const amtFmt  = parseFloat(amt).toFixed(2);
+
+  if (!pixKey || pixKey === 'COLE_A_CHAVE_PIX_AQUI') {
+    return window.showToast('⚠️', 'PIX indisponível', 'Use o Gateway para depositar. PIX direto ainda não configurado.');
+  }
+
+  const output = document.getElementById('pixDirectOutput');
+  const qrImg  = document.getElementById('pixDirectQR');
+  const keyEl  = document.getElementById('pixDirectKey');
+
+  // Gera QR code com a chave PIX da plataforma
+  qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(pixKey)}&bgcolor=ffffff&color=000000&margin=10`;
+  keyEl.textContent = pixKey;
+  window._pixKey = pixKey;
+  output.style.display = 'block';
+
+  // Atualiza texto de instrução com valor
+  const instrEl = document.getElementById('pixDirectInstr');
+  if (instrEl) instrEl.textContent = `Transfira exatamente R$${amtFmt} para ${name}. Envie o comprovante para ${cfg.SUPPORT_EMAIL}.`;
+
+  window.showToast('✅', 'Chave PIX exibida!', `Transfira R$${amtFmt} para a chave abaixo.`);
 };
 
 window.copyPixKey = () => {

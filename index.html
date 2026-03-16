@@ -319,6 +319,60 @@
   }
   .modal-input:focus { border-color:var(--blue); background:rgba(255,255,255,0.04); box-shadow: 0 0 0 4px rgba(59,130,246,0.1); }
 
+  /* ---- DEPOSIT TABS ---- */
+  .deposit-tabs {
+    display: flex; gap: 8px; margin-bottom: 28px;
+    background: var(--surface2); border-radius: 16px; padding: 6px;
+    border: 1px solid var(--border);
+  }
+  .deposit-tab {
+    flex: 1; padding: 10px 8px; border-radius: 12px; border: none;
+    background: transparent; color: var(--muted); font-family: inherit;
+    font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .deposit-tab:hover { color: var(--text); }
+  .deposit-tab.active { background: var(--surface); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+  .deposit-tab.active.pix  { color: var(--green); }
+  .deposit-tab.active.gw   { color: var(--blue); }
+  .deposit-tab.active.eth  { color: #f97316; }
+
+  .deposit-panel { display: none; }
+  .deposit-panel.active { display: block; animation: fadeIn 0.25s ease-out; }
+
+  .pix-qr-box {
+    background: #ffffff; border-radius: 20px; padding: 20px;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    margin: 20px 0;
+  }
+  .pix-key-box {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px 20px; margin: 16px 0;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  }
+  .pix-key-val { font-family: 'DM Mono', monospace; font-size: 0.85rem; color: var(--text); word-break: break-all; }
+  .btn-copy {
+    background: var(--green-dim); color: var(--green); border: 1px solid rgba(16,185,129,0.2);
+    border-radius: 10px; padding: 8px 16px; font-size: 0.82rem; font-weight: 700;
+    cursor: pointer; white-space: nowrap; transition: all 0.2s; font-family: inherit;
+  }
+  .btn-copy:hover { background: var(--green); color: #000; }
+
+  .wallet-chip {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px 18px; margin-bottom: 20px;
+  }
+  .wallet-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); }
+  .wallet-addr { font-family: 'DM Mono', monospace; font-size: 0.85rem; color: var(--muted); }
+
+  .method-info {
+    background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px 18px; margin-bottom: 20px;
+    font-size: 0.88rem; color: var(--muted); line-height: 1.6;
+  }
+  .method-info strong { color: var(--text); }
+
   /* ---- TOAST ---- */
   .toast {
     position:fixed; bottom:32px; right:32px; z-index:2000;
@@ -469,18 +523,83 @@
 </div>
 
 <div class="modal-overlay" id="depositModal">
-  <div class="modal">
+  <div class="modal" style="max-width:560px">
     <button class="modal-close" onclick="window.closeModal('depositModal')">&times;</button>
-    <h2 class="modal-title">Depositar via PIX</h2>
-    <p class="modal-sub">O saldo é creditado instantaneamente.</p>
-    <input class="modal-input" type="number" id="depositAmount" placeholder="Valor (R$)">
-    <button class="btn-primary" style="width:100%" onclick="window.generatePix()">Gerar QR Code</button>
-    <div id="pixOutput" style="text-align:center; margin-top:20px; display:none">
-      <div style="background:#fff; padding:20px; border-radius:16px; margin:0 auto 20px; width:200px; height:200px">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=PROD-PIX-STUB" alt="QR Code">
-      </div>
-      <p style="color:var(--muted); font-size:0.9rem">Copiado para o clipboard!</p>
+    <h2 class="modal-title">Depositar</h2>
+    <p class="modal-sub">Escolha como prefere adicionar saldo.</p>
+
+    <!-- TABS -->
+    <div class="deposit-tabs">
+      <button class="deposit-tab pix active" onclick="window.switchDepositTab('pix',this)">
+        <span>💚</span> PIX Direto
+      </button>
+      <button class="deposit-tab gw" onclick="window.switchDepositTab('gw',this)">
+        <span>⚡</span> Gateway
+      </button>
+      <button class="deposit-tab eth" onclick="window.switchDepositTab('eth',this)">
+        <span>🦊</span> Cripto
+      </button>
     </div>
+
+    <!-- PAINEL: PIX DIRETO -->
+    <div class="deposit-panel active" id="panel-pix">
+      <div class="method-info">
+        Gera um QR Code e chave PIX <strong>diretamente</strong>. Saldo creditado em até 5 minutos após o pagamento.
+      </div>
+      <input class="modal-input" type="number" id="pixDirectAmount" placeholder="Valor (R$) — mínimo R$10" min="10">
+      <button class="btn-primary" style="width:100%;font-size:1rem" onclick="window.depositPIXDireto()">Gerar QR Code PIX</button>
+      <div id="pixDirectOutput" style="display:none; margin-top:20px;">
+        <div class="pix-qr-box">
+          <img id="pixDirectQR" src="" alt="QR Code PIX" style="width:160px;height:160px;border-radius:8px;">
+          <p style="font-size:0.85rem; color:#333; font-weight:700">Escaneie com qualquer app bancário</p>
+        </div>
+        <div class="pix-key-box">
+          <span class="pix-key-val" id="pixDirectKey">—</span>
+          <button class="btn-copy" onclick="window.copyPixKey()">Copiar</button>
+        </div>
+        <p style="text-align:center; color:var(--muted); font-size:0.85rem">Após o pagamento o saldo é creditado automaticamente.</p>
+      </div>
+    </div>
+
+    <!-- PAINEL: GATEWAY INFINITEPAY -->
+    <div class="deposit-panel" id="panel-gw">
+      <div class="method-info">
+        Redireciona para o checkout seguro da <strong>InfinitePay</strong>. Aceita cartão de crédito, débito e PIX com confirmação instantânea.
+      </div>
+      <input class="modal-input" type="number" id="gatewayAmount" placeholder="Valor (R$) — mínimo R$10" min="10">
+      <button class="btn-primary" style="width:100%;font-size:1rem;background:var(--blue);box-shadow:0 4px 12px rgba(59,130,246,0.25)" onclick="window.depositGateway()">
+        Ir para o Checkout InfinitePay →
+      </button>
+    </div>
+
+    <!-- PAINEL: CRIPTO / METAMASK -->
+    <div class="deposit-panel" id="panel-eth">
+      <div id="ethNoWallet" style="display:none">
+        <div class="method-info" style="border-color:rgba(249,115,22,0.2)">
+          Você precisa conectar sua carteira MetaMask para usar essa opção.
+        </div>
+        <button class="btn-primary" style="width:100%;background:#f97316;box-shadow:0 4px 12px rgba(249,115,22,0.25)" onclick="window.connectWalletAndDeposit()">
+          🦊 Conectar MetaMask
+        </button>
+      </div>
+      <div id="ethWalletReady">
+        <div class="wallet-chip">
+          <div class="wallet-dot"></div>
+          <span class="wallet-addr" id="ethWalletAddr">—</span>
+        </div>
+        <div class="method-info">
+          Envie <strong>ETH ou MATIC</strong> para a carteira da plataforma. O equivalente em reais é creditado após 1 confirmação na rede.
+        </div>
+        <input class="modal-input" type="number" id="ethAmount" placeholder="Valor em ETH" step="0.001" min="0.001">
+        <div style="font-size:0.82rem; color:var(--muted); margin:-8px 0 16px; padding:0 4px">
+          Taxa de rede (gas) cobrada pela MetaMask, não pela Bubuya.
+        </div>
+        <button class="btn-primary" style="width:100%;font-size:1rem;background:#f97316;box-shadow:0 4px 12px rgba(249,115,22,0.25)" onclick="window.depositCripto()">
+          🦊 Enviar via MetaMask
+        </button>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -519,7 +638,20 @@ window.showToast = (icon, title, msg) => {
   setTimeout(() => t.classList.remove('show'), 3500);
 };
 
-window.openModal = (id) => { document.getElementById(id).classList.add('active'); };
+window.openModal = (id) => {
+  document.getElementById(id).classList.add('active');
+  if (id === 'depositModal') {
+    // Reset para aba PIX e atualiza painel ETH
+    document.querySelectorAll('.deposit-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.deposit-panel').forEach(p => p.classList.remove('active'));
+    const firstTab = document.querySelector('.deposit-tab.pix');
+    if (firstTab) firstTab.classList.add('active');
+    const firstPanel = document.getElementById('panel-pix');
+    if (firstPanel) firstPanel.classList.add('active');
+    document.getElementById('pixDirectOutput').style.display = 'none';
+    window.refreshEthPanel();
+  }
+};
 window.closeModal = (id) => { document.getElementById(id).classList.remove('active'); };
 
 window.showSection = (name) => {
@@ -666,12 +798,74 @@ window.loadPortfolio = async () => {
   }
 };
 
-window.generatePix = async () => {
-  const amt = document.getElementById('depositAmount').value;
-  if(!amt || amt <= 0) return window.showToast('⚠️', 'Atenção', 'Digite um valor válido.');
-  
+/* ===== DEPOSIT: TAB SWITCHER ===== */
+window.switchDepositTab = (tab, btn) => {
+  document.querySelectorAll('.deposit-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.deposit-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+  if (tab === 'eth') window.refreshEthPanel();
+};
+
+/* ===== DEPOSIT: PIX DIRETO ===== */
+window.depositPIXDireto = async () => {
+  const amt = document.getElementById('pixDirectAmount').value;
+  if (!amt || parseFloat(amt) < 10) return window.showToast('⚠️', 'Atenção', 'Valor mínimo é R$10.');
   const token = localStorage.getItem('preditivo_token');
-  if(!token) return window.openModal('loginModal');
+  if (!token) { window.closeModal('depositModal'); return window.openModal('loginModal'); }
+
+  const btn = document.querySelector('#panel-pix .btn-primary');
+  btn.textContent = 'Gerando...'; btn.disabled = true;
+
+  try {
+    const res = await fetch(window.API + '/deposits/pix', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ amount: parseFloat(amt) })
+    });
+    const data = await res.json();
+    if (data.error) { window.showToast('❌', 'Erro', data.error); return; }
+
+    const output = document.getElementById('pixDirectOutput');
+    const qrImg  = document.getElementById('pixDirectQR');
+    const keyEl  = document.getElementById('pixDirectKey');
+
+    // Suporte a resposta com QR code em base64 ou URL
+    if (data.qr_code_base64) {
+      qrImg.src = 'data:image/png;base64,' + data.qr_code_base64;
+    } else if (data.qr_code_url) {
+      qrImg.src = data.qr_code_url;
+    } else if (data.pix_key) {
+      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(data.pix_key)}`;
+    }
+    keyEl.textContent = data.pix_key || data.copy_paste || '—';
+    window._pixKey = keyEl.textContent;
+    output.style.display = 'block';
+    window.showToast('✅', 'QR Code gerado!', 'Escaneie ou copie a chave PIX.');
+  } catch(e) {
+    window.showToast('❌', 'Erro', 'Falha ao gerar PIX. Tente o Gateway.');
+  } finally {
+    btn.textContent = 'Gerar QR Code PIX'; btn.disabled = false;
+  }
+};
+
+window.copyPixKey = () => {
+  const key = window._pixKey || document.getElementById('pixDirectKey').textContent;
+  if (!key || key === '—') return;
+  navigator.clipboard.writeText(key).then(() => {
+    window.showToast('📋', 'Copiado!', 'Chave PIX copiada para a área de transferência.');
+  });
+};
+
+/* ===== DEPOSIT: GATEWAY INFINITEPAY ===== */
+window.depositGateway = async () => {
+  const amt = document.getElementById('gatewayAmount').value;
+  if (!amt || parseFloat(amt) < 10) return window.showToast('⚠️', 'Atenção', 'Valor mínimo é R$10.');
+  const token = localStorage.getItem('preditivo_token');
+  if (!token) { window.closeModal('depositModal'); return window.openModal('loginModal'); }
+
+  const btn = document.querySelector('#panel-gw .btn-primary');
+  btn.textContent = 'Conectando...'; btn.disabled = true;
 
   try {
     const res = await fetch(window.API + '/deposits/infinitepay/checkout', {
@@ -680,33 +874,120 @@ window.generatePix = async () => {
       body: JSON.stringify({ amount: parseFloat(amt) })
     });
     const data = await res.json();
-    if(data.error) return window.showToast('❌', 'Erro', data.error);
-    
-    if(data.url) {
-      window.showToast('🚀', 'Redirecionando', 'Você será levado ao checkout do InfinitePay.');
-      setTimeout(() => window.location.href = data.url, 1500);
+    if (data.error) return window.showToast('❌', 'Erro', data.error);
+    if (data.url) {
+      window.showToast('🚀', 'Redirecionando', 'Levando você ao checkout InfinitePay...');
+      setTimeout(() => window.location.href = data.url, 1200);
     } else {
       window.showToast('❌', 'Erro', 'URL de checkout não recebida.');
     }
   } catch(e) {
     window.showToast('❌', 'Erro', 'Falha ao conectar com InfinitePay.');
+  } finally {
+    btn.textContent = 'Ir para o Checkout InfinitePay →'; btn.disabled = false;
   }
 };
 
+/* ===== WALLET: CONNECT ===== */
 window.connectWallet = async () => {
   if (typeof window.ethereum === 'undefined') {
-    return window.showToast('🦊', 'MetaMask', 'Por favor, instale a MetaMask!');
+    return window.showToast('🦊', 'MetaMask', 'Por favor, instale a extensão MetaMask!');
   }
   try {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const accounts = await provider.send("eth_requestAccounts", []);
+    const accounts = await provider.send('eth_requestAccounts', []);
     window.state.walletAddress = accounts[0];
     const btn = document.getElementById('btnConnectWallet');
-    if(btn) btn.style.display = 'none';
+    if (btn) btn.style.display = 'none';
     window.updateAuthUI();
-    window.showToast('🔗', 'Conectado', 'Carteira vinculada com sucesso.');
+    window.showToast('🔗', 'Carteira conectada', window.state.walletAddress.slice(0,6) + '...' + window.state.walletAddress.slice(-4));
+    return true;
   } catch(e) {
-    window.showToast('❌', 'Erro', 'Falha ao conectar carteira.');
+    window.showToast('❌', 'Erro', 'Conexão recusada ou MetaMask não disponível.');
+    return false;
+  }
+};
+
+window.connectWalletAndDeposit = async () => {
+  const ok = await window.connectWallet();
+  if (ok) window.refreshEthPanel();
+};
+
+window.refreshEthPanel = () => {
+  const noWallet = document.getElementById('ethNoWallet');
+  const ready    = document.getElementById('ethWalletReady');
+  const addrEl   = document.getElementById('ethWalletAddr');
+  if (!noWallet || !ready) return;
+  if (window.state.walletAddress) {
+    noWallet.style.display = 'none';
+    ready.style.display = 'block';
+    addrEl.textContent = window.state.walletAddress.slice(0,8) + '...' + window.state.walletAddress.slice(-6);
+  } else {
+    noWallet.style.display = 'block';
+    ready.style.display = 'none';
+  }
+};
+
+/* ===== DEPOSIT: CRIPTO (METAMASK) ===== */
+window.depositCripto = async () => {
+  if (!window.state.walletAddress) {
+    const ok = await window.connectWallet();
+    if (!ok) return;
+  }
+  const ethAmt = document.getElementById('ethAmount').value;
+  if (!ethAmt || parseFloat(ethAmt) <= 0) return window.showToast('⚠️', 'Atenção', 'Informe o valor em ETH.');
+
+  const token = localStorage.getItem('preditivo_token');
+  if (!token) { window.closeModal('depositModal'); return window.openModal('loginModal'); }
+
+  const btn = document.querySelector('#panel-eth #ethWalletReady .btn-primary');
+  btn.textContent = 'Aguardando MetaMask...'; btn.disabled = true;
+
+  try {
+    // Busca endereço da carteira da plataforma
+    let platformWallet;
+    try {
+      const addrRes = await fetch(window.API + '/deposits/crypto/address', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const addrData = await addrRes.json();
+      platformWallet = addrData.address;
+    } catch(_) { /* endpoint pode não existir ainda */ }
+
+    if (!platformWallet) {
+      window.showToast('⚠️', 'Indisponível', 'Depósito via cripto temporariamente indisponível. Use PIX ou Gateway.');
+      return;
+    }
+
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer   = provider.getSigner();
+    const valueWei = ethers.utils.parseEther(ethAmt);
+
+    btn.textContent = 'Confirme na MetaMask...';
+    const tx = await signer.sendTransaction({ to: platformWallet, value: valueWei });
+
+    window.showToast('⏳', 'Transação enviada', 'Aguardando confirmação na rede...');
+    btn.textContent = 'Confirmando na rede...';
+
+    await tx.wait(1); // 1 confirmação
+
+    // Notifica o backend
+    await fetch(window.API + '/deposits/crypto/confirm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ tx_hash: tx.hash, amount_eth: parseFloat(ethAmt) })
+    });
+
+    window.showToast('✅', 'Depósito confirmado!', `Tx: ${tx.hash.slice(0,10)}... — saldo atualizado em breve.`);
+    window.closeModal('depositModal');
+  } catch(e) {
+    if (e.code === 4001) {
+      window.showToast('⚠️', 'Cancelado', 'Você recusou a transação na MetaMask.');
+    } else {
+      window.showToast('❌', 'Erro', e.message || 'Falha na transação.');
+    }
+  } finally {
+    btn.textContent = '🦊 Enviar via MetaMask'; btn.disabled = false;
   }
 };
 

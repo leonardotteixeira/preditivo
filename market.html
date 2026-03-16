@@ -12,6 +12,8 @@
 <meta name="twitter:card" content="summary">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 :root {
@@ -249,6 +251,7 @@ header {
     <a class="logo" href="/">Bubuya.</a>
     <a class="back-btn" href="/">← Mercados</a>
     <div class="header-right" id="authArea">
+      <button class="back-btn" onclick="connectWallet()" id="btnConnectWallet" style="border-color:var(--blue);color:var(--blue)">Conectar Carteira</button>
       <button class="login-btn" onclick="openModal('loginModal')">Entrar</button>
     </div>
   </div>
@@ -740,9 +743,27 @@ function updateAuthUI() {
       '<div class="user-avatar">' + state.user.name.slice(0,2).toUpperCase() + '</div>' +
       '<span>' + state.user.name + '</span>' +
       '<span style="color:var(--green);font-family:DM Mono,monospace;font-size:0.8rem;margin-left:4px">R$' + state.balance.toFixed(0) + '</span>' +
+      (state.walletAddress ? '<span style="font-size:0.7rem;color:var(--muted);background:var(--surface2);padding:2px 6px;border-radius:4px;border:1px solid var(--border);margin-left:8px">'+state.walletAddress.slice(0,6)+'...'+state.walletAddress.slice(-4)+'</span>' : '') +
       '</div>';
     var balEl = document.getElementById('balDisplay');
     if (balEl) balEl.textContent = 'R$' + state.balance.toFixed(2);
+  }
+}
+
+async function connectWallet() {
+  if (typeof window.ethereum === 'undefined') {
+    return showToast('Instale a MetaMask!');
+  }
+  try {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const accounts = await provider.send("eth_requestAccounts", []);
+    state.walletAddress = accounts[0];
+    const btn = document.getElementById('btnConnectWallet');
+    if(btn) btn.style.display = 'none';
+    updateAuthUI();
+    showToast('Carteira conectada!');
+  } catch(e) {
+    showToast('Erro ao conectar carteira');
   }
 }
 

@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 
 <style>
   :root {
@@ -308,6 +309,7 @@
         <a onclick="window.showSection('ranking')" id="nav-ranking">Ranking</a>
       </nav>
       <div id="authArea">
+        <button class="btn-outline" onclick="window.connectWallet()" id="btnConnectWallet">Conectar Carteira</button>
         <button class="btn-primary" onclick="window.openModal('loginModal')">Entrar</button>
       </div>
     </div>
@@ -438,7 +440,7 @@
 
 <script src="./config.js"></script>
 <script>
-window.state = { markets: [], user: null, balance: 0, catFilter: 'all', searchQuery: '' };
+window.state = { markets: [], user: null, balance: 0, catFilter: 'all', searchQuery: '', walletAddress: null };
 window.API = window.PREDITIVO_CONFIG.API_BASE;
 
 const CAT_COLORS = {
@@ -546,6 +548,7 @@ window.updateAuthUI = () => {
           <div style="font-weight:800; font-size:1rem">${window.state.user.name}</div>
           <div style="color:var(--green); font-family:'DM Mono'; font-weight:800">R$${window.state.balance.toFixed(2)}</div>
         </div>
+        ${window.state.walletAddress ? `<div style="font-size:0.75rem;color:var(--muted);background:var(--surface2);padding:4px 8px;border-radius:8px;border:1px solid var(--border)">${window.state.walletAddress.slice(0,6)}...${window.state.walletAddress.slice(-4)}</div>` : ''}
         <button class="btn-outline" style="padding:8px 16px; border-radius:12px" onclick="localStorage.removeItem('preditivo_token');location.reload()">Sair</button>
       </div>`;
     const h1 = document.getElementById('heroH1');
@@ -606,11 +609,48 @@ window.loadPortfolio = async () => {
   }
 };
 
-window.generatePix = () => {
+window.generatePix = async () => {
   const amt = document.getElementById('depositAmount').value;
   if(!amt || amt <= 0) return window.showToast('⚠️', 'Atenção', 'Digite um valor válido.');
-  document.getElementById('pixOutput').style.display = 'block';
-  window.showToast('✅', 'PIX Gerado', 'Copie o código abaixo para pagar.');
+  
+  const token = localStorage.getItem('preditivo_token');
+  if(!token) return window.openModal('loginModal');
+
+  try {
+    const res = await fetch(window.API + '/deposits/infinitepay/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ amount: parseFloat(amt) })
+    });
+    const data = await res.json();
+    if(data.error) return window.showToast('❌', 'Erro', data.error);
+    
+    if(data.url) {
+      window.showToast('🚀', 'Redirecionando', 'Você será levado ao checkout do InfinitePay.');
+      setTimeout(() => window.location.href = data.url, 1500);
+    } else {
+      window.showToast('❌', 'Erro', 'URL de checkout não recebida.');
+    }
+  } catch(e) {
+    window.showToast('❌', 'Erro', 'Falha ao conectar com InfinitePay.');
+  }
+};
+
+window.connectWallet = async () => {
+  if (typeof window.ethereum === 'undefined') {
+    return window.showToast('🦊', 'MetaMask', 'Por favor, instale a MetaMask!');
+  }
+  try {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const accounts = await provider.send("eth_requestAccounts", []);
+    window.state.walletAddress = accounts[0];
+    const btn = document.getElementById('btnConnectWallet');
+    if(btn) btn.style.display = 'none';
+    window.updateAuthUI();
+    window.showToast('🔗', 'Conectado', 'Carteira vinculada com sucesso.');
+  } catch(e) {
+    window.showToast('❌', 'Erro', 'Falha ao conectar carteira.');
+  }
 };
 
 window.doWithdraw = () => {

@@ -291,6 +291,7 @@ function enhanceBotStatsLoader() {
 }
 
 function enhanceBotControls() {
+  // Atualiza config após ativar/desativar bot automático
   var originalEnable = window.enableBot;
   window.enableBot = function() {
     if (typeof originalEnable === 'function') originalEnable();
@@ -302,46 +303,8 @@ function enhanceBotControls() {
     if (typeof originalDisable === 'function') originalDisable();
     setTimeout(loadBotConfig, 400);
   };
-
-  var originalReload = window.reloadAllBotBalances;
-  window.reloadAllBotBalances = function() {
-    fetch(API + '/admin/users', { headers: adminHeaders() })
-      .then(function(r) { return r.json(); })
-      .then(function(users) {
-        var amount = parseFloat(document.getElementById('botReloadAmount').value);
-        if (!amount || amount < 0) { showToast('Digite um valor valido'); return; }
-
-        var btn = document.getElementById('botReloadBtn');
-        var statusEl = document.getElementById('botReloadStatus');
-        btn.disabled = true;
-        btn.textContent = 'Carregando...';
-        statusEl.textContent = 'Buscando usuarios...';
-
-        var botUsers = users.filter(function(u) { return !!u.is_bot; });
-        statusEl.textContent = 'Encontrados ' + botUsers.length + ' bots. Atualizando saldos...';
-
-        return Promise.all(botUsers.map(function(u) {
-          return fetch(API + '/admin/balance', {
-            method: 'POST',
-            headers: adminHeaders(),
-            body: JSON.stringify({ user_id: u.id, amount: amount })
-          }).then(function(r) { return r.json(); });
-        })).then(function(results) {
-          var ok = results.filter(function(x) { return !x.error; }).length;
-          statusEl.textContent = ok + '/' + botUsers.length + ' bots atualizados para ' + fmtMoney(amount);
-          statusEl.style.color = '#00e676';
-          showToast('Saldo de ' + ok + ' bots atualizado!');
-          if (typeof loadBotStats === 'function') loadBotStats();
-        }).finally(function() {
-          btn.disabled = false;
-          btn.textContent = 'Recarregar Saldo de Todos os Bots';
-        });
-      })
-      .catch(function(err) {
-        console.error(err);
-        if (typeof originalReload === 'function') originalReload();
-      });
-  };
+  // reloadAllBotBalances: definido em admin.html, usa /admin/bots/reload-balances (batch SQL)
+  // Não sobrescrever — a versão de admin.html já é correta e usa endpoint dedicado
 }
 
 document.addEventListener('DOMContentLoaded', function() {

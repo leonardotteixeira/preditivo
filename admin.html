@@ -606,7 +606,7 @@ function openBalance(userId, name, balance) {
   openModal('balanceModal');
 }
 
-// FIX: passa "amount" (valor a adicionar/remover) em vez de "balance"
+// Ajuste individual de saldo: valor positivo adiciona, negativo subtrai (mode delta)
 function saveBalance() {
   if (!balanceUserId) return;
   var val = parseFloat(document.getElementById('balanceVal').value);
@@ -614,7 +614,7 @@ function saveBalance() {
   fetch(API + '/admin/balance', {
     method: 'POST',
     headers: adminHeaders(),
-    body: JSON.stringify({ user_id: balanceUserId, amount: val })
+    body: JSON.stringify({ user_id: balanceUserId, amount: val, mode: 'delta' })
   })
   .then(function(r){ return r.json(); })
   .then(function(d){
@@ -910,6 +910,7 @@ function runSimulation() {
 }
 
 // ── GESTÃO DE BOTS - RECARREGAR SALDO ────────────────────────────────────────
+// Usa endpoint batch: 1 request SQL → atualiza todos os bots de uma vez
 function reloadAllBotBalances() {
   var amount = parseFloat(document.getElementById('botReloadAmount').value);
   if (!amount || amount < 0) { showToast('Digite um valor válido'); return; }
@@ -917,32 +918,27 @@ function reloadAllBotBalances() {
   var btn = document.getElementById('botReloadBtn');
   var statusEl = document.getElementById('botReloadStatus');
   btn.disabled = true;
-  btn.textContent = 'Carregando...';
-  statusEl.textContent = 'Buscando usuários...';
+  btn.textContent = 'Atualizando...';
+  statusEl.textContent = 'Atualizando saldos...';
+  statusEl.style.color = '#5a6878';
 
-  fetch(API + '/admin/users', { headers: adminHeaders() })
+  fetch(API + '/admin/bots/reload-balances', {
+    method: 'POST',
+    headers: adminHeaders(),
+    body: JSON.stringify({ amount: amount })
+  })
   .then(function(r){ return r.json(); })
-  .then(function(users) {
-    // Filtra por is_bot=true (bots usam @botprev.internal, não @bot.com)
-    var botUsers = users.filter(function(u) { return u.is_bot === true; });
-
-    statusEl.textContent = 'Encontrados ' + botUsers.length + ' bots. Atualizando saldos...';
-
-    var promises = botUsers.map(function(u) {
-      return fetch(API + '/admin/balance', {
-        method: 'POST',
-        headers: adminHeaders(),
-        // mode "set" → define o saldo para o valor exato informado
-        body: JSON.stringify({ user_id: u.id, amount: amount, mode: 'set' })
-      }).then(function(r){ return r.json(); });
-    });
-
-    return Promise.all(promises).then(function(results) {
-      var ok = results.filter(function(r){ return r.ok; }).length;
-      statusEl.textContent = '✅ ' + ok + '/' + botUsers.length + ' bots atualizados para R$' + amount.toLocaleString('pt-BR');
-      statusEl.style.color = '#00e676';
-      showToast('Saldo de ' + ok + ' bots atualizado!');
-    });
+  .then(function(d) {
+    if (d.error) {
+      statusEl.textContent = 'Erro: ' + d.error;
+      statusEl.style.color = '#ff4757';
+      showToast('Erro: ' + d.error);
+      return;
+    }
+    statusEl.textContent = '✅ ' + d.updated + ' bots atualizados para R$' + amount.toLocaleString('pt-BR', {minimumFractionDigits:2});
+    statusEl.style.color = '#00e676';
+    showToast('Saldo de ' + d.updated + ' bots atualizado!');
+    loadBotStats();
   })
   .catch(function(err) {
     statusEl.textContent = 'Erro: ' + (err.message || 'Falha ao atualizar');

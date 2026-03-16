@@ -41,16 +41,24 @@ body {
   min-height: 100vh;
 }
 
-/* Noise texture */
+/* Noise texture — igual ao index.html */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
   pointer-events: none;
   z-index: 0;
-  opacity: 0.25;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.3;
 }
+
+/* Ambient glows — igual ao index.html */
+.glow-container { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.glow { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.6; }
+.glow-1 { top: -10%; left: 10%; width: 600px; height: 600px; background: radial-gradient(circle, var(--glow-blue) 0%, transparent 70%); }
+.glow-2 { bottom: 10%; right: -10%; width: 800px; height: 800px; background: radial-gradient(circle, var(--glow-green) 0%, transparent 70%); }
+.glow-3 { top: 40%; left: -20%; width: 700px; height: 700px; background: radial-gradient(circle, var(--glow-blue) 0%, transparent 70%); }
+.glow-4 { bottom: -10%; left: 30%; width: 500px; height: 500px; background: radial-gradient(circle, var(--glow-blue) 0%, transparent 70%); }
 
 /* HEADER */
 header {
@@ -763,10 +771,11 @@ footer {
 </head>
 <body>
 
-<!-- Ambient glows -->
-<div style="position:fixed;pointer-events:none;inset:0;overflow:hidden;z-index:0" aria-hidden="true">
-  <div style="position:absolute;top:-300px;left:-200px;width:600px;height:600px;background:radial-gradient(circle,var(--glow-blue),transparent 70%);filter:blur(120px)"></div>
-  <div style="position:absolute;bottom:-400px;right:-300px;width:800px;height:800px;background:radial-gradient(circle,var(--glow-green),transparent 70%);filter:blur(120px)"></div>
+<div class="glow-container" aria-hidden="true">
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+  <div class="glow glow-3"></div>
+  <div class="glow glow-4"></div>
 </div>
 
 <header>

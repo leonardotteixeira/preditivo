@@ -641,14 +641,16 @@ window.showToast = (icon, title, msg) => {
 window.openModal = (id) => {
   document.getElementById(id).classList.add('active');
   if (id === 'depositModal') {
-    // Reset para aba PIX e atualiza painel ETH
-    document.querySelectorAll('.deposit-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.deposit-panel').forEach(p => p.classList.remove('active'));
-    const firstTab = document.querySelector('.deposit-tab.pix');
-    if (firstTab) firstTab.classList.add('active');
-    const firstPanel = document.getElementById('panel-pix');
-    if (firstPanel) firstPanel.classList.add('active');
-    document.getElementById('pixDirectOutput').style.display = 'none';
+    // Seleciona elementos DENTRO do modal de depósito especificamente
+    const modal = document.getElementById('depositModal');
+    modal.querySelectorAll('.deposit-tab').forEach(t => t.classList.remove('active'));
+    modal.querySelectorAll('.deposit-panel').forEach(p => p.classList.remove('active'));
+    const pixTab   = modal.querySelector('.deposit-tab.pix');
+    const pixPanel = modal.querySelector('#panel-pix');
+    if (pixTab)   pixTab.classList.add('active');
+    if (pixPanel) pixPanel.classList.add('active');
+    const pixOut = document.getElementById('pixDirectOutput');
+    if (pixOut) pixOut.style.display = 'none';
     window.refreshEthPanel();
   }
 };
@@ -873,16 +875,35 @@ window.depositGateway = async () => {
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({ amount: parseFloat(amt) })
     });
-    const data = await res.json();
-    if (data.error) return window.showToast('❌', 'Erro', data.error);
-    if (data.url) {
-      window.showToast('🚀', 'Redirecionando', 'Levando você ao checkout InfinitePay...');
-      setTimeout(() => window.location.href = data.url, 1200);
+
+    // Tenta parsear como JSON; se falhar, lê como texto para diagnóstico
+    let data;
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      data = await res.json();
     } else {
-      window.showToast('❌', 'Erro', 'URL de checkout não recebida.');
+      const text = await res.text();
+      console.error('InfinitePay resposta não-JSON:', text);
+      window.showToast('❌', 'Erro', 'Resposta inválida do gateway. Verifique o console.');
+      return;
+    }
+
+    if (!res.ok || data.error || data.message?.toLowerCase().includes('erro')) {
+      return window.showToast('❌', 'Erro Gateway', data.error || data.message || `Status ${res.status}`);
+    }
+
+    // Aceita qualquer campo de URL que o backend possa retornar
+    const redirectUrl = data.url || data.checkout_url || data.redirect_url || data.payment_url || data.link;
+    if (redirectUrl) {
+      window.showToast('🚀', 'Redirecionando', 'Levando você ao checkout InfinitePay...');
+      setTimeout(() => window.location.href = redirectUrl, 1200);
+    } else {
+      console.error('InfinitePay resposta sem URL:', data);
+      window.showToast('❌', 'Erro', 'Gateway não retornou URL. Tente o PIX Direto.');
     }
   } catch(e) {
-    window.showToast('❌', 'Erro', 'Falha ao conectar com InfinitePay.');
+    console.error('InfinitePay fetch error:', e);
+    window.showToast('❌', 'Erro', 'Falha de conexão com o gateway. Tente o PIX Direto.');
   } finally {
     btn.textContent = 'Ir para o Checkout InfinitePay →'; btn.disabled = false;
   }

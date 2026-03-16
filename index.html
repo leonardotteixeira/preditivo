@@ -507,6 +507,51 @@
     <input class="modal-input" type="email" id="loginEmail" placeholder="Email">
     <input class="modal-input" type="password" id="loginPass" placeholder="Senha">
     <button class="btn-primary" style="width:100%" onclick="window.doLogin()">Acessar Conta</button>
+    <p style="text-align:center;margin-top:16px;font-size:0.9rem">
+      <a href="#" style="color:var(--muted);text-decoration:underline;cursor:pointer"
+         onclick="event.preventDefault();window.closeModal('loginModal');window.openModal('forgotModal')">
+        Esqueceu a senha?
+      </a>
+    </p>
+  </div>
+</div>
+
+<!-- MODAL: Recuperação de Senha -->
+<div class="modal-overlay" id="forgotModal">
+  <div class="modal">
+    <button class="modal-close" onclick="window.closeModal('forgotModal')">&times;</button>
+
+    <!-- Step 1: Email -->
+    <div id="forgotStep1">
+      <h2 class="modal-title">Recuperar Senha</h2>
+      <p class="modal-sub">Informe seu email e enviaremos um código de verificação.</p>
+      <input class="modal-input" type="email" id="forgotEmail" placeholder="Seu email">
+      <div id="forgotMsg1" style="display:none;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:0.9rem"></div>
+      <button class="btn-primary" style="width:100%" onclick="window.doForgotPassword()">Enviar Código</button>
+      <p style="text-align:center;margin-top:16px;font-size:0.9rem">
+        <a href="#" style="color:var(--muted);text-decoration:underline;cursor:pointer"
+           onclick="event.preventDefault();window.closeModal('forgotModal');window.openModal('loginModal')">
+          Voltar ao login
+        </a>
+      </p>
+    </div>
+
+    <!-- Step 2: Código + Nova Senha -->
+    <div id="forgotStep2" style="display:none">
+      <h2 class="modal-title">Nova Senha</h2>
+      <p class="modal-sub">Insira o código recebido no email e escolha sua nova senha.</p>
+      <input class="modal-input" id="forgotCode" placeholder="Código de verificação" maxlength="10">
+      <input class="modal-input" type="password" id="forgotNewPass" placeholder="Nova senha (mín. 6 caracteres)">
+      <input class="modal-input" type="password" id="forgotConfirmPass" placeholder="Confirmar nova senha">
+      <div id="forgotMsg2" style="display:none;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:0.9rem"></div>
+      <button class="btn-primary" style="width:100%" onclick="window.doResetPassword()">Redefinir Senha</button>
+      <p style="text-align:center;margin-top:16px;font-size:0.9rem">
+        <a href="#" style="color:var(--muted);text-decoration:underline;cursor:pointer"
+           onclick="event.preventDefault();document.getElementById('forgotStep2').style.display='none';document.getElementById('forgotStep1').style.display='block'">
+          Reenviar código
+        </a>
+      </p>
+    </div>
   </div>
 </div>
 
@@ -726,6 +771,90 @@ window.doLogin = async () => {
     window.updateAuthUI();
     window.showToast('👋', 'Olá!', 'Bem-vindo de volta, ' + d.user.name);
   } catch(e) { window.showToast('❌', 'Erro', 'Falha na conexão com o servidor.'); }
+};
+
+// ---- RECUPERAÇÃO DE SENHA ----
+window.doForgotPassword = async () => {
+  const email = document.getElementById('forgotEmail').value.trim();
+  const msgEl = document.getElementById('forgotMsg1');
+
+  const showMsg = (text, isError) => {
+    msgEl.textContent = text;
+    msgEl.style.display = 'block';
+    msgEl.style.background = isError ? 'rgba(244,63,94,0.12)' : 'rgba(16,185,129,0.12)';
+    msgEl.style.color = isError ? 'var(--red)' : 'var(--green)';
+    msgEl.style.border = `1px solid ${isError ? 'rgba(244,63,94,0.3)' : 'rgba(16,185,129,0.3)'}`;
+  };
+
+  if (!email) return showMsg('Informe seu email.', true);
+
+  try {
+    const res = await fetch(window.API + '/auth/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const d = await res.json();
+    if (!res.ok) return showMsg(d.error || 'Erro ao enviar código.', true);
+
+    // Independente de o email existir ou não, exibe step 2
+    showMsg(d.message || 'Se o email existir, enviaremos um código.', false);
+    setTimeout(() => {
+      document.getElementById('forgotStep1').style.display = 'none';
+      document.getElementById('forgotStep2').style.display = 'block';
+      document.getElementById('forgotMsg2').style.display = 'none';
+    }, 1200);
+  } catch(e) {
+    showMsg('Falha na conexão com o servidor.', true);
+  }
+};
+
+window.doResetPassword = async () => {
+  const email = document.getElementById('forgotEmail').value.trim();
+  const code = document.getElementById('forgotCode').value.trim();
+  const password = document.getElementById('forgotNewPass').value;
+  const confirm = document.getElementById('forgotConfirmPass').value;
+  const msgEl = document.getElementById('forgotMsg2');
+
+  const showMsg = (text, isError) => {
+    msgEl.textContent = text;
+    msgEl.style.display = 'block';
+    msgEl.style.background = isError ? 'rgba(244,63,94,0.12)' : 'rgba(16,185,129,0.12)';
+    msgEl.style.color = isError ? 'var(--red)' : 'var(--green)';
+    msgEl.style.border = `1px solid ${isError ? 'rgba(244,63,94,0.3)' : 'rgba(16,185,129,0.3)'}`;
+  };
+
+  if (!code) return showMsg('Informe o código recebido no email.', true);
+  if (password.length < 6) return showMsg('A senha deve ter no mínimo 6 caracteres.', true);
+  if (password !== confirm) return showMsg('As senhas não coincidem.', true);
+
+  try {
+    const res = await fetch(window.API + '/auth/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, code, password })
+    });
+    const d = await res.json();
+    if (!res.ok) return showMsg(d.error || 'Erro ao redefinir senha.', true);
+
+    showMsg('Senha redefinida com sucesso!', false);
+    setTimeout(() => {
+      // Reseta o modal e abre o login
+      window.closeModal('forgotModal');
+      document.getElementById('forgotStep1').style.display = 'block';
+      document.getElementById('forgotStep2').style.display = 'none';
+      document.getElementById('forgotEmail').value = '';
+      document.getElementById('forgotCode').value = '';
+      document.getElementById('forgotNewPass').value = '';
+      document.getElementById('forgotConfirmPass').value = '';
+      document.getElementById('forgotMsg1').style.display = 'none';
+      document.getElementById('forgotMsg2').style.display = 'none';
+      window.openModal('loginModal');
+      window.showToast('✅', 'Senha redefinida', 'Faça login com sua nova senha.');
+    }, 1500);
+  } catch(e) {
+    showMsg('Falha na conexão com o servidor.', true);
+  }
 };
 
 window.updateAuthUI = () => {

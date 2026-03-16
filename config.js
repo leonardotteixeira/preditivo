@@ -6,7 +6,7 @@ window.PREDITIVO_CONFIG = {
   APP_DOMAIN: 'bubuya.com.br',
   SUPPORT_EMAIL: 'suporte@bubuya.com.br',
   // Chave PIX da plataforma para depósitos manuais (PIX Direto)
-  PIX_KEY: 'COLE_A_CHAVE_PIX_AQUI',
-  PIX_KEY_TYPE: 'aleatoria', // cpf | cnpj | email | telefone | aleatoria
+  PIX_KEY: '9bf0d836-a584-4436-8f45-61c650167cf3',
+  PIX_KEY_TYPE: 'aleatoria',
   PIX_RECEIVER_NAME: 'Bubuya Plataforma'
 };

@@ -504,8 +504,8 @@
     <button class="modal-close" onclick="window.closeModal('loginModal')">&times;</button>
     <h2 class="modal-title">Entrar</h2>
     <p class="modal-sub">Bem-vindo de volta à Bubuya.</p>
-    <input class="modal-input" type="email" id="loginEmail" placeholder="Email">
-    <input class="modal-input" type="password" id="loginPass" placeholder="Senha">
+    <input class="modal-input" type="email" id="loginEmail" placeholder="Email" onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()">
+    <input class="modal-input" type="password" id="loginPass" placeholder="Senha" onkeydown="if(event.key==='Enter')window.doLogin()">
     <button class="btn-primary" style="width:100%" onclick="window.doLogin()">Acessar Conta</button>
     <p style="text-align:center;margin-top:16px;font-size:0.9rem">
       <a href="#" style="color:var(--muted);text-decoration:underline;cursor:pointer"

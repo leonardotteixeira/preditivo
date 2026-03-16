@@ -206,7 +206,7 @@ tr:hover td { background:rgba(255,255,255,0.02); }
       <!-- GESTÃO DE BOTS -->
       <div class="section-title" style="font-size:0.95rem;margin-top:32px;margin-bottom:12px">💰 Gestão de Bots</div>
       <div style="background:#0e1419;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px;max-width:480px">
-        <p style="color:#5a6878;font-size:0.85rem;margin-bottom:16px">Define o saldo de todos os usuários bots (emails que terminam em @bot.com), exceto txotta.</p>
+        <p style="color:#5a6878;font-size:0.85rem;margin-bottom:16px">Define o saldo de todos os usuários marcados como bots (<code style="background:rgba(255,255,255,0.05);padding:1px 5px;border-radius:4px">is_bot = true</code>), exceto txotta.</p>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
           <label style="font-size:0.9rem;color:#5a6878;flex-shrink:0">Saldo (R$):</label>
           <input id="botReloadAmount" type="number" value="999999" min="0" step="1000"
@@ -759,6 +759,8 @@ function loadBotStats() {
   fetch(API + '/admin/bots/stats', { headers: adminHeaders() })
   .then(function(r){ return r.json(); })
   .then(function(d){
+    if (d.error) { showToast('Erro nos stats dos bots: ' + d.error); return; }
+
     // Status badge
     var badge = d.bot_enabled
       ? '<span class="bot-status-on">● ATIVO</span>'

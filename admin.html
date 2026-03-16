@@ -402,9 +402,11 @@ function loadAll() {
 
 function loadStats() {
   fetch(API + '/admin/users', { headers: adminHeaders() }).then(function(r){ return r.json(); }).then(function(data){
+    if (!Array.isArray(data)) return;
     document.getElementById('statUsers').textContent = data.length || 0;
   }).catch(function(){});
   fetch(API + '/admin/deposits', { headers: adminHeaders() }).then(function(r){ return r.json(); }).then(function(data){
+    if (!Array.isArray(data)) return;
     var pending = data.filter(function(d){ return d.status === 'pending'; }).length;
     document.getElementById('statDep').textContent = pending;
     document.getElementById('pendingCount').textContent = pending;
@@ -415,6 +417,7 @@ function loadDeposits() {
   fetch(API + '/admin/deposits', { headers: adminHeaders() })
     .then(function(r){ return r.json(); })
     .then(function(data) {
+      if (!Array.isArray(data)) { console.warn('loadDeposits: resposta inválida', data); return; }
       allDeposits = data;
       var pending = data.filter(function(d){ return d.status === 'pending'; });
       document.getElementById('pendingCount').textContent = pending.length;
@@ -506,6 +509,7 @@ function loadUsers() {
   fetch(API + '/admin/users', { headers: adminHeaders() })
     .then(function(r){ return r.json(); })
     .then(function(data) {
+      if (!Array.isArray(data)) { console.warn('loadUsers: resposta inválida', data); return; }
       var tbody = document.getElementById('usersTbody');
       tbody.innerHTML = data.map(function(u) {
         var dt = new Date(u.created_at).toLocaleDateString('pt-BR');
@@ -655,6 +659,7 @@ function loadSaques() {
   fetch(API + '/admin/withdrawals', { headers: adminHeaders() })
     .then(function(r){ return r.json(); })
     .then(function(data) {
+      if (!Array.isArray(data)) { console.warn('loadSaques: resposta inválida', data); return; }
       var pending = data.filter(function(s){ return s.status === 'pending'; }).length;
       document.getElementById('saquesCount').textContent = pending;
       var tbody = document.getElementById('saquesTbody');

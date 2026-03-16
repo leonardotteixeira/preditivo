@@ -351,8 +351,7 @@ document.addEventListener('DOMContentLoaded', function() {
 window.addEventListener('load', function() {
   ensureEnhancementPanels();
   enhanceReceitaRenderer();
-  enhanceBotStatsLoader();
+  enhanceBotStatsLoader(); // já inclui loadBotConfig + loadRealPanel ao chamar loadBotStats
   enhanceBotControls();
-  loadBotConfig();
-  loadRealPanel();
+  // Não chamar loadBotConfig/loadRealPanel separadamente — serão chamados via loadBotStats()
 });

@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<title>Bubuya — Como Funciona</title>
+<meta name="description" content="Entenda como funcionam os mercados de previsão da Bubuya: como apostar, ganhar, depositar e sacar.">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #030303;
+    --surface: #0a0a0a;
+    --surface2: #121212;
+    --border: rgba(255,255,255,0.06);
+    --green: #10b981;
+    --green-dim: rgba(16,185,129,0.1);
+    --red: #f43f5e;
+    --red-dim: rgba(244,63,94,0.1);
+    --blue: #3b82f6;
+    --blue-dim: rgba(59,130,246,0.1);
+    --gold: #f59e0b;
+    --text: #ffffff;
+    --muted: #888888;
+    --glow-blue: rgba(59,130,246,0.12);
+    --glow-green: rgba(16,185,129,0.08);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events:none; z-index:0; opacity:0.3;
+  }
+
+  .glow-container { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .glow { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.6; }
+  .glow-1 { top: -10%; left: 10%; width: 600px; height: 600px; background: radial-gradient(circle, var(--glow-blue) 0%, transparent 70%); }
+  .glow-2 { bottom: 10%; right: -10%; width: 800px; height: 800px; background: radial-gradient(circle, var(--glow-green) 0%, transparent 70%); }
+  .glow-3 { top: 40%; left: -20%; width: 700px; height: 700px; background: radial-gradient(circle, var(--glow-blue) 0%, transparent 70%); }
+  .glow-4 { bottom: -10%; left: 30%; width: 500px; height: 500px; background: radial-gradient(circle, var(--glow-blue) 0%, transparent 70%); }
+
+  header {
+    position:sticky; top:0; z-index:100;
+    background:rgba(5,5,5,0.85);
+    backdrop-filter:blur(24px);
+    border-bottom:1px solid var(--border);
+    padding:0 24px;
+  }
+  .header-inner {
+    max-width:1440px; margin:0 auto;
+    display:flex; align-items:center; height:72px; gap:24px;
+  }
+  .logo {
+    font-size:1.6rem; font-weight:800; letter-spacing:-1px;
+    background:linear-gradient(135deg, var(--green), var(--blue));
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    text-decoration:none;
+  }
+  .back-btn {
+    display:flex; align-items:center; gap:6px; color:var(--muted);
+    font-size:0.9rem; font-weight:600; text-decoration:none;
+    padding:8px 16px; border-radius:12px; border:1px solid var(--border);
+    transition:all 0.2s;
+  }
+  .back-btn:hover { color:var(--text); border-color:rgba(255,255,255,0.15); background:rgba(255,255,255,0.04); }
+
+  /* PAGE */
+  .page { max-width:900px; margin:0 auto; padding:72px 24px 120px; position:relative; z-index:1; }
+
+  .page-tag {
+    display:inline-flex; align-items:center; gap:8px;
+    padding:8px 20px; background:rgba(255,255,255,0.05); border:1px solid var(--border);
+    border-radius:100px; font-size:0.85rem; color:var(--green); font-weight:700;
+    margin-bottom:28px;
+  }
+  .page-title { font-size:3.5rem; font-weight:800; letter-spacing:-2px; line-height:1.05; margin-bottom:24px; }
+  .page-title span { color:var(--green); }
+  .page-lead { font-size:1.15rem; color:var(--muted); line-height:1.75; max-width:680px; margin-bottom:72px; }
+
+  .section-label { font-size:0.8rem; font-weight:800; color:var(--green); text-transform:uppercase; letter-spacing:2px; margin-bottom:16px; }
+  .section { margin-bottom:64px; }
+  .section h2 { font-size:1.8rem; font-weight:800; letter-spacing:-0.5px; margin-bottom:20px; line-height:1.2; }
+  .section p { font-size:0.98rem; color:var(--muted); line-height:1.85; margin-bottom:16px; }
+  .section strong { color:var(--text); }
+  .divider { border:none; border-top:1px solid var(--border); margin:64px 0; }
+
+  /* STEPS */
+  .steps { display:flex; flex-direction:column; gap:0; margin-top:32px; position:relative; }
+  .steps::before {
+    content:''; position:absolute; left:23px; top:48px; bottom:48px; width:2px;
+    background: linear-gradient(to bottom, var(--green), var(--blue));
+    opacity: 0.3;
+  }
+  .step { display:flex; gap:24px; align-items:flex-start; padding:28px 0; }
+  .step-num {
+    width:48px; height:48px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1rem; font-weight:800; font-family:'Space Grotesk';
+    background:var(--surface2); border:2px solid var(--border);
+    position:relative; z-index:1;
+  }
+  .step-num.green { background:var(--green-dim); border-color:rgba(16,185,129,0.3); color:var(--green); }
+  .step-num.blue  { background:var(--blue-dim); border-color:rgba(59,130,246,0.3); color:var(--blue); }
+  .step-num.gold  { background:rgba(245,158,11,0.1); border-color:rgba(245,158,11,0.3); color:var(--gold); }
+  .step-body h3 { font-size:1.05rem; font-weight:700; margin-bottom:8px; }
+  .step-body p { font-size:0.92rem; color:var(--muted); line-height:1.7; }
+
+  /* MARKET DEMO */
+  .market-demo {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:24px; padding:32px; margin-top:32px;
+  }
+  .demo-title { font-size:1rem; font-weight:700; margin-bottom:8px; }
+  .demo-q { font-size:0.85rem; color:var(--muted); margin-bottom:24px; }
+  .demo-bar { height:12px; background:var(--surface2); border-radius:12px; overflow:hidden; display:flex; border:1px solid rgba(255,255,255,0.03); margin-bottom:12px; }
+  .demo-yes { background:var(--green); height:100%; width:63%; filter:drop-shadow(0 0 8px var(--green)); }
+  .demo-no  { background:var(--red);   height:100%; width:37%; filter:drop-shadow(0 0 8px var(--red)); }
+  .demo-labels { display:flex; justify-content:space-between; font-size:0.85rem; font-family:'DM Mono'; margin-bottom:24px; }
+  .demo-yes-lbl { color:var(--green); font-weight:700; }
+  .demo-no-lbl  { color:var(--red);   font-weight:700; }
+  .demo-odds { display:flex; gap:12px; }
+  .demo-odd {
+    flex:1; padding:14px; border-radius:14px; text-align:center;
+    font-weight:800; font-size:1.1rem; cursor:pointer;
+    transition:all 0.2s;
+  }
+  .demo-odd.yes { background:var(--green-dim); color:var(--green); border:1px solid rgba(16,185,129,0.2); }
+  .demo-odd.no  { background:var(--red-dim);   color:var(--red);   border:1px solid rgba(244,63,94,0.2); }
+  .demo-odd:hover { transform:translateY(-2px); }
+  .demo-meta { font-size:0.8rem; color:var(--muted); margin-top:16px; text-align:center; }
+
+  /* FAQ */
+  .faq { display:flex; flex-direction:column; gap:16px; margin-top:32px; }
+  .faq-item {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:16px; overflow:hidden;
+  }
+  .faq-q {
+    padding:20px 24px; font-weight:700; font-size:0.95rem; cursor:pointer;
+    display:flex; justify-content:space-between; align-items:center;
+    user-select:none; transition:background 0.2s;
+  }
+  .faq-q:hover { background:rgba(255,255,255,0.03); }
+  .faq-q .arrow { color:var(--muted); transition:transform 0.3s; font-size:0.85rem; }
+  .faq-item.open .faq-q .arrow { transform:rotate(180deg); }
+  .faq-a {
+    max-height:0; overflow:hidden;
+    transition:max-height 0.4s cubic-bezier(0.2,0,0,1), padding 0.3s;
+    font-size:0.92rem; color:var(--muted); line-height:1.75;
+    padding:0 24px;
+  }
+  .faq-item.open .faq-a { max-height:300px; padding:0 24px 24px; }
+
+  /* EXAMPLE CALC */
+  .calc-box {
+    background: linear-gradient(135deg, rgba(16,185,129,0.05), rgba(59,130,246,0.05));
+    border:1px solid rgba(16,185,129,0.15); border-radius:20px; padding:32px; margin-top:28px;
+  }
+  .calc-box h3 { font-size:1rem; font-weight:700; margin-bottom:20px; }
+  .calc-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border); font-size:0.92rem; }
+  .calc-row:last-child { border-bottom:none; font-weight:800; font-size:1rem; color:var(--green); padding-top:16px; }
+  .calc-label { color:var(--muted); }
+  .calc-val { font-family:'DM Mono'; font-weight:600; }
+
+  /* CTA */
+  .cta-block {
+    background: linear-gradient(135deg, rgba(59,130,246,0.05), rgba(16,185,129,0.05));
+    border:1px solid var(--border); border-radius:28px; padding:48px; text-align:center; margin-top:64px;
+  }
+  .cta-block h2 { font-size:2rem; font-weight:800; letter-spacing:-1px; margin-bottom:16px; }
+  .cta-block p { color:var(--muted); font-size:1rem; line-height:1.7; margin-bottom:32px; max-width:500px; margin-left:auto; margin-right:auto; }
+  .btn-primary {
+    display:inline-block; background:var(--green); color:#080c10; font-weight:800;
+    padding:16px 40px; border-radius:14px; border:none; cursor:pointer;
+    font-family:inherit; font-size:1rem; text-decoration:none;
+    box-shadow:0 4px 12px rgba(16,185,129,0.2); transition:all 0.3s;
+  }
+  .btn-primary:hover { opacity:0.9; transform:translateY(-2px); box-shadow:0 8px 24px rgba(16,185,129,0.3); }
+
+  /* FOOTER */
+  footer { background:rgba(5,5,5,0.5); border-top:1px solid var(--border); padding:80px 24px 40px; position:relative; z-index:1; }
+  .footer-inner { max-width:1440px; margin:0 auto; display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:48px; }
+  .footer-col h4 { color:var(--text); margin-bottom:24px; font-size:0.95rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; }
+  .footer-col ul { list-style:none; }
+  .footer-col li { margin-bottom:12px; }
+  .footer-col a { color:var(--muted); text-decoration:none; font-size:0.95rem; transition:all 0.2s; font-weight:500; }
+  .footer-col a:hover { color:var(--blue); }
+  .footer-legal { max-width:1440px; margin:48px auto 0; padding-top:32px; border-top:1px solid var(--border); color:var(--muted); font-size:0.85rem; line-height:1.8; }
+  .footer-disclaimer { background:rgba(255,255,255,0.02); border:1px solid var(--border); padding:20px; border-radius:12px; margin-top:24px; }
+
+  @media (max-width: 768px) {
+    .page-title { font-size:2.2rem; }
+    .footer-inner { grid-template-columns:1fr; gap:40px; }
+    .steps::before { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="glow-container">
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+  <div class="glow glow-3"></div>
+  <div class="glow glow-4"></div>
+</div>
+
+<header>
+  <div class="header-inner">
+    <a class="logo" href="/">Bubuya.</a>
+    <a class="back-btn" href="/">← Voltar</a>
+  </div>
+</header>
+
+<div class="page">
+
+  <div class="page-tag">📖 Guia completo</div>
+  <h1 class="page-title">Como a<br><span>Bubuya funciona</span></h1>
+  <p class="page-lead">Em menos de 5 minutos você entende tudo o que precisa para começar a operar nos mercados de previsão e transformar seu conhecimento em lucro real.</p>
+
+  <!-- O QUE É -->
+  <div class="section">
+    <div class="section-label">O conceito</div>
+    <h2>O que é um mercado de previsão?</h2>
+    <p>Um mercado de previsão é um ambiente onde pessoas compram e vendem <strong>posições sobre o resultado de eventos futuros</strong>. Em vez de apostar em odds fixas definidas por uma casa, aqui as probabilidades são formadas pela própria oferta e demanda dos usuários.</p>
+    <p>Se você acredita que algo <strong>vai acontecer</strong>, você compra uma posição SIM. Se acredita que <strong>não vai acontecer</strong>, compra NÃO. Quando o evento se resolve, quem estava certo recebe o retorno — e quem estava errado perde o que investiu.</p>
+    <p>A inteligência coletiva de milhares de traders tende a produzir probabilidades <strong>mais precisas do que qualquer especialista individualmente</strong>. É isso que torna os mercados de previsão fascinantes — e lucrativos para quem estuda.</p>
+  </div>
+
+  <!-- PASSO A PASSO -->
+  <div class="section">
+    <div class="section-label">Passo a passo</div>
+    <h2>Da conta ao lucro em 4 passos</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num green">1</div>
+        <div class="step-body">
+          <h3>Crie sua conta gratuitamente</h3>
+          <p>Cadastro em menos de 60 segundos. Basta nome, email e senha. Nenhum documento é exigido para começar — e você já recebe <strong>R$100 de bônus</strong> para explorar os mercados sem precisar depositar nada.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num blue">2</div>
+        <div class="step-body">
+          <h3>Deposite via PIX (opcional)</h3>
+          <p>Quando quiser operar com dinheiro real, basta depositar via PIX a partir de <strong>R$10</strong>. O saldo é creditado instantaneamente na sua conta, sem taxa de entrada.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num green">3</div>
+        <div class="step-body">
+          <h3>Escolha um mercado e tome sua posição</h3>
+          <p>Navegue pelos mercados disponíveis, analise as probabilidades atuais e decida quanto apostar em SIM ou NÃO. Você pode <strong>comprar e vender posições a qualquer momento</strong> enquanto o mercado está aberto — não precisa esperar o resultado.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num gold">4</div>
+        <div class="step-body">
+          <h3>Receba o resultado e saque quando quiser</h3>
+          <p>Quando o evento acontece, o time da Bubuya resolve o mercado com base nas regras publicadas. Vencedores recebem o retorno automaticamente no saldo. Para sacar, basta solicitar via PIX — processamos em até 2 dias úteis.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- EXEMPLO VISUAL -->
+  <div class="section">
+    <div class="section-label">Exemplo prático</div>
+    <h2>Veja como um mercado funciona na prática</h2>
+    <p>Imagine o seguinte mercado aberto na Bubuya:</p>
+
+    <div class="market-demo">
+      <div class="demo-title">🏛️ Lula termina 2026 ainda na presidência?</div>
+      <div class="demo-q">Resolução em: 31/12/2026 · Fonte: Portal do Planalto</div>
+      <div class="demo-bar">
+        <div class="demo-yes"></div>
+        <div class="demo-no"></div>
+      </div>
+      <div class="demo-labels">
+        <span class="demo-yes-lbl">SIM — 63%</span>
+        <span class="demo-no-lbl">NÃO — 37%</span>
+      </div>
+      <div class="demo-odds">
+        <div class="demo-odd yes">Comprar SIM · R$0,63</div>
+        <div class="demo-odd no">Comprar NÃO · R$0,37</div>
+      </div>
+      <div class="demo-meta">Volume total negociado: R$84.200 · 1.247 traders · Fecha em 290 dias</div>
+    </div>
+
+    <div class="calc-box" style="margin-top:28px">
+      <h3>📊 Simulação: você aposta R$100 em SIM (a R$0,63)</h3>
+      <div class="calc-row">
+        <span class="calc-label">Valor investido</span>
+        <span class="calc-val">R$100,00</span>
+      </div>
+      <div class="calc-row">
+        <span class="calc-label">Taxa da casa (2%)</span>
+        <span class="calc-val">− R$2,00</span>
+      </div>
+      <div class="calc-row">
+        <span class="calc-label">Posições SIM adquiridas</span>
+        <span class="calc-val">~156 cotas</span>
+      </div>
+      <div class="calc-row">
+        <span class="calc-label">Retorno se SIM vencer</span>
+        <span class="calc-val">R$156,00</span>
+      </div>
+      <div class="calc-row">
+        <span class="calc-label">Lucro líquido</span>
+        <span class="calc-val" style="color:var(--green)">+ R$56,00 (+56%)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIPOS DE MERCADO -->
+  <div class="section">
+    <div class="section-label">Categorias</div>
+    <h2>Que tipos de mercado existem?</h2>
+    <p>A Bubuya cobre os assuntos que mais movimentam o Brasil:</p>
+    <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-top:24px">
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:20px 24px">
+        <div style="font-size:1.5rem; margin-bottom:10px">🏛️</div>
+        <strong>Política</strong>
+        <p style="font-size:0.88rem; color:var(--muted); margin-top:6px; line-height:1.6">Eleições, aprovações de lei, movimentos no Congresso, escândalos e decisões do STF.</p>
+      </div>
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:20px 24px">
+        <div style="font-size:1.5rem; margin-bottom:10px">📈</div>
+        <strong>Economia</strong>
+        <p style="font-size:0.88rem; color:var(--muted); margin-top:6px; line-height:1.6">Dólar, Selic, inflação, resultados de empresas e indicadores do Banco Central.</p>
+      </div>
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:20px 24px">
+        <div style="font-size:1.5rem; margin-bottom:10px">⚽</div>
+        <strong>Esportes</strong>
+        <p style="font-size:0.88rem; color:var(--muted); margin-top:6px; line-height:1.6">Brasileirão, Copa do Brasil, Copa do Mundo, Fórmula 1 e grandes competições nacionais.</p>
+      </div>
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:20px 24px">
+        <div style="font-size:1.5rem; margin-bottom:10px">💻</div>
+        <strong>Tecnologia</strong>
+        <p style="font-size:0.88rem; color:var(--muted); margin-top:6px; line-height:1.6">Lançamentos de produtos, IPOs de techs brasileiras, regulamentação de IA e criptomoedas.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- COMO GANHAR DINHEIRO -->
+  <div class="section">
+    <div class="section-label">Estratégia</div>
+    <h2>Como traders lucram de verdade?</h2>
+    <p>Existem <strong>duas formas principais</strong> de lucrar na Bubuya:</p>
+    <p><strong>1. Esperar a resolução:</strong> você acredita que algo vai acontecer, compra a posição a um preço baixo e aguarda o evento. Se você estiver certo, recebe R$1,00 por cota comprada — independente de quanto pagou por ela.</p>
+    <p><strong>2. Trading ativo:</strong> você compra posições quando acha que o mercado está subestimando uma probabilidade, e vende antes da resolução quando o preço subiu. Assim como na bolsa de valores, é possível lucrar sem esperar o resultado final.</p>
+    <p>Os traders mais bem-sucedidos combinam as duas estratégias: estudam os eventos com profundidade, entram cedo quando as odds ainda são favoráveis, e saem com lucro antes mesmo do mercado fechar.</p>
+  </div>
+
+  <!-- RESOLUÇÃO -->
+  <div class="section">
+    <div class="section-label">Resolução</div>
+    <h2>Como os mercados são resolvidos?</h2>
+    <p>Cada mercado publicado na Bubuya traz, em suas regras, a <strong>fonte primária de resolução</strong> que será utilizada. Exemplos comuns:</p>
+    <div style="display:flex; flex-direction:column; gap:12px; margin-top:20px">
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px 20px; display:flex; gap:16px; align-items:center">
+        <span style="font-size:1.2rem">🏛️</span>
+        <span style="font-size:0.92rem; color:var(--muted)">Mercados políticos → <strong style="color:var(--text)">Portal oficial do governo federal, TSE ou Diário Oficial</strong></span>
+      </div>
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px 20px; display:flex; gap:16px; align-items:center">
+        <span style="font-size:1.2rem">📊</span>
+        <span style="font-size:0.92rem; color:var(--muted)">Mercados econômicos → <strong style="color:var(--text)">Banco Central do Brasil, IBGE ou B3</strong></span>
+      </div>
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px 20px; display:flex; gap:16px; align-items:center">
+        <span style="font-size:1.2rem">⚽</span>
+        <span style="font-size:0.92rem; color:var(--muted)">Mercados esportivos → <strong style="color:var(--text)">CBF, site oficial da competição ou ESPN Brasil</strong></span>
+      </div>
+    </div>
+    <p style="margin-top:20px">O time operacional da Bubuya resolve os mercados assim que a fonte oficial publica o resultado. Em caso de ambiguidade, as regras do mercado prevalecem sobre qualquer interpretação externa.</p>
+  </div>
+
+  <hr class="divider">
+
+  <!-- DEPÓSITO E SAQUE -->
+  <div class="section">
+    <div class="section-label">Financeiro</div>
+    <h2>Depósito e saque: tudo via PIX</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num green">D</div>
+        <div class="step-body">
+          <h3>Depositar</h3>
+          <p>Clique em <strong>"Depositar"</strong> no header após fazer login. Informe o valor (mínimo R$10) e você receberá um QR Code ou chave PIX para pagamento. O saldo é creditado <strong>instantaneamente</strong> após a confirmação do banco.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num blue">S</div>
+        <div class="step-body">
+          <h3>Sacar</h3>
+          <p>Clique em <strong>"Sacar"</strong>, informe o valor (mínimo R$20) e sua chave PIX. O processamento é manual e ocorre em até <strong>2 dias úteis</strong>. Saques de bônus estão sujeitos às regras do programa de indicação.</p>
+        </div>
+      </div>
+    </div>
+    <div class="calc-box">
+      <h3>💰 Resumo das taxas e limites</h3>
+      <div class="calc-row">
+        <span class="calc-label">Taxa por operação (compra/venda)</span>
+        <span class="calc-val">2%</span>
+      </div>
+      <div class="calc-row">
+        <span class="calc-label">Depósito mínimo</span>
+        <span class="calc-val">R$10</span>
+      </div>
+      <div class="calc-row">
+        <span class="calc-label">Saque mínimo</span>
+        <span class="calc-val">R$20</span>
+      </div>
+      <div class="calc-row">
+        <span class="calc-label">Prazo para saque</span>
+        <span class="calc-val">até 2 dias úteis</span>
+      </div>
+      <div class="calc-row">
+        <span class="calc-label">Taxa de depósito ou saque</span>
+        <span class="calc-val" style="color:var(--green)">Gratuito</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="section">
+    <div class="section-label">Dúvidas frequentes</div>
+    <h2>Perguntas que todo mundo faz</h2>
+    <div class="faq">
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Preciso entender de finanças para usar a Bubuya?
+          <span class="arrow">▾</span>
+        </div>
+        <div class="faq-a">Não. Qualquer pessoa com opinião sobre eventos do dia a dia pode participar. Não é preciso saber de bolsa de valores, finanças ou matemática avançada. A interface é intuitiva e as regras de cada mercado são explicadas em linguagem simples.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Posso perder mais do que investi?
+          <span class="arrow">▾</span>
+        </div>
+        <div class="faq-a">Não. Na Bubuya você só perde o que apostou naquela posição específica. Não existe alavancagem, margem ou risco de perda superior ao capital investido. No pior cenário, você perde 100% do valor colocado em uma posição — nunca mais do que isso.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Posso vender minha posição antes do resultado?
+          <span class="arrow">▾</span>
+        </div>
+        <div class="faq-a">Sim! Enquanto o mercado estiver aberto, você pode vender sua posição a qualquer momento pelo preço atual do mercado. Isso permite travar lucros quando as odds subirem a seu favor, ou limitar perdas se mudar de opinião.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          O que acontece se o mercado for cancelado?
+          <span class="arrow">▾</span>
+        </div>
+        <div class="faq-a">Em casos excepcionais (como o evento não ocorrer ou a fonte de resolução não publicar resultado conclusivo), o mercado pode ser cancelado. Nesse caso, todos os usuários recebem de volta o valor investido integralmente, sem desconto da taxa de operação.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          O bônus de R$100 pode ser sacado diretamente?
+          <span class="arrow">▾</span>
+        </div>
+        <div class="faq-a">O bônus de boas-vindas é destinado à exploração dos mercados. Para sacar lucros gerados com o bônus, é necessário atingir um volume mínimo de apostas (descrito no programa de referral). O objetivo é garantir que o bônus seja usado para jogar, não para saque imediato.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          A Bubuya é legal no Brasil?
+          <span class="arrow">▾</span>
+        </div>
+        <div class="faq-a">A Bubuya opera como plataforma de entretenimento e informação preditiva. Nosso modelo é diferente das apostas esportivas regulamentadas. Recomendamos consultar um advogado para questões específicas sobre sua situação fiscal ou legal individual.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-block">
+    <h2>Tudo certo. Vamos começar?</h2>
+    <p>Crie sua conta agora e receba R$100 de bônus para testar os mercados sem precisar depositar nada.</p>
+    <a class="btn-primary" href="/">Criar Conta Grátis — R$100 de Bônus</a>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-col" style="padding-right: 40px">
+      <a class="logo" href="/" style="display:block; margin-bottom:20px; font-size:1.8rem">Bubuya.</a>
+      <p style="color: var(--muted); font-size: 0.95rem; line-height: 1.6">A principal plataforma brasileira de mercados de previsão.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Plataforma</h4>
+      <ul>
+        <li><a href="/about.html">Quem Somos</a></li>
+        <li><a href="/terms.html">Termos de Uso</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Suporte</h4>
+      <ul>
+        <li><a href="/how-it-works.html">Como Funciona</a></li>
+        <li><a href="mailto:suporte@bubuya.com.br">Suporte</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Categorias</h4>
+      <ul>
+        <li><a href="/">Política</a></li>
+        <li><a href="/">Economia</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-legal">
+    <div class="footer-disclaimer">
+      <strong>Aviso Legal Importante:</strong> A Bubuya é uma plataforma de tecnologia de mercados de previsão. Não constitui recomendação financeira.
+    </div>
+    <div style="margin-top: 32px">
+      <p>© 2026 Bubuya — Todos os direitos reservados.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+function toggleFaq(el) {
+  const item = el.parentElement;
+  item.classList.toggle('open');
+}
+</script>
+
+</body>
+</html>

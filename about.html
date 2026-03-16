@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<title>Bubuya — Quem Somos</title>
+<meta name="description" content="Conheça a Bubuya, a principal plataforma brasileira de mercados de previsão. Nossa missão, time e valores.">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #030303;
+    --surface: #0a0a0a;
+    --surface2: #121212;
+    --border: rgba(255,255,255,0.06);
+    --green: #10b981;
+    --green-dim: rgba(16,185,129,0.1);
+    --blue: #3b82f6;
+    --blue-dim: rgba(59,130,246,0.1);
+    --gold: #f59e0b;
+    --text: #ffffff;
+    --muted: #888888;
+    --glow-blue: rgba(59,130,246,0.12);
+    --glow-green: rgba(16,185,129,0.08);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events:none; z-index:0; opacity:0.3;
+  }
+
+  .glow-container { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .glow { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.6; }
+  .glow-1 { top: -10%; left: 10%; width: 600px; height: 600px; background: radial-gradient(circle, var(--glow-blue) 0%, transparent 70%); }
+  .glow-2 { bottom: 10%; right: -10%; width: 800px; height: 800px; background: radial-gradient(circle, var(--glow-green) 0%, transparent 70%); }
+  .glow-3 { top: 40%; left: -20%; width: 700px; height: 700px; background: radial-gradient(circle, var(--glow-blue) 0%, transparent 70%); }
+  .glow-4 { bottom: -10%; left: 30%; width: 500px; height: 500px; background: radial-gradient(circle, var(--glow-blue) 0%, transparent 70%); }
+
+  header {
+    position:sticky; top:0; z-index:100;
+    background:rgba(5,5,5,0.85);
+    backdrop-filter:blur(24px);
+    border-bottom:1px solid var(--border);
+    padding:0 24px;
+  }
+  .header-inner {
+    max-width:1440px; margin:0 auto;
+    display:flex; align-items:center; height:72px; gap:24px;
+  }
+  .logo {
+    font-size:1.6rem; font-weight:800; letter-spacing:-1px;
+    background:linear-gradient(135deg, var(--green), var(--blue));
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    text-decoration:none;
+  }
+  .back-btn {
+    display:flex; align-items:center; gap:6px; color:var(--muted);
+    font-size:0.9rem; font-weight:600; text-decoration:none;
+    padding:8px 16px; border-radius:12px; border:1px solid var(--border);
+    transition:all 0.2s;
+  }
+  .back-btn:hover { color:var(--text); border-color:rgba(255,255,255,0.15); background:rgba(255,255,255,0.04); }
+
+  /* PAGE */
+  .page { max-width:900px; margin:0 auto; padding:72px 24px 120px; position:relative; z-index:1; }
+
+  /* HERO */
+  .page-hero { margin-bottom:80px; }
+  .page-tag {
+    display:inline-flex; align-items:center; gap:8px;
+    padding:8px 20px; background:rgba(255,255,255,0.05); border:1px solid var(--border);
+    border-radius:100px; font-size:0.85rem; color:var(--green); font-weight:700;
+    margin-bottom:28px;
+  }
+  .page-title {
+    font-size:3.5rem; font-weight:800; letter-spacing:-2px;
+    line-height:1.05; margin-bottom:24px;
+  }
+  .page-title span { color:var(--blue); }
+  .page-lead { font-size:1.2rem; color:var(--muted); line-height:1.7; max-width:680px; }
+
+  /* STATS ROW */
+  .stats-row {
+    display:grid; grid-template-columns: repeat(3, 1fr); gap:24px;
+    margin:64px 0;
+  }
+  .stat-card {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:24px; padding:32px;
+    transition: all 0.3s;
+  }
+  .stat-card:hover { border-color: rgba(255,255,255,0.12); transform: translateY(-4px); }
+  .stat-val {
+    font-size:2.8rem; font-weight:800; font-family:'Space Grotesk', sans-serif;
+    letter-spacing:-1.5px; margin-bottom:8px;
+  }
+  .stat-val.green { color: var(--green); }
+  .stat-val.blue  { color: var(--blue); }
+  .stat-val.gold  { color: var(--gold); }
+  .stat-lbl { font-size:0.85rem; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:1.5px; }
+
+  /* SECTIONS */
+  .section { margin-bottom:56px; }
+  .section-label {
+    font-size:0.8rem; font-weight:800; color:var(--green);
+    text-transform:uppercase; letter-spacing:2px; margin-bottom:16px;
+  }
+  .section h2 {
+    font-size:1.8rem; font-weight:800; letter-spacing:-0.5px;
+    margin-bottom:20px; line-height:1.2;
+  }
+  .section p { font-size:0.98rem; color:var(--muted); line-height:1.85; margin-bottom:16px; }
+  .section strong { color:var(--text); }
+
+  /* CARD GRID */
+  .card-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:20px; margin-top:32px; }
+  .card {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:20px; padding:28px;
+    transition: all 0.3s;
+  }
+  .card:hover { border-color: rgba(255,255,255,0.12); transform: translateY(-3px); }
+  .card-icon { font-size:2rem; margin-bottom:16px; }
+  .card h3 { font-size:1.05rem; font-weight:700; margin-bottom:10px; }
+  .card p { font-size:0.9rem; color:var(--muted); line-height:1.7; }
+
+  /* VALUES LIST */
+  .values-list { display:flex; flex-direction:column; gap:20px; margin-top:32px; }
+  .value-item {
+    display:flex; gap:20px; align-items:flex-start;
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:20px; padding:28px;
+    transition: all 0.3s;
+  }
+  .value-item:hover { border-color: rgba(255,255,255,0.12); }
+  .value-icon {
+    width:48px; height:48px; border-radius:14px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.4rem; flex-shrink:0;
+    background: var(--green-dim); border:1px solid rgba(16,185,129,0.2);
+  }
+  .value-icon.blue { background:var(--blue-dim); border-color:rgba(59,130,246,0.2); }
+  .value-icon.gold { background:rgba(245,158,11,0.1); border-color:rgba(245,158,11,0.2); }
+  .value-body h3 { font-size:1rem; font-weight:700; margin-bottom:8px; }
+  .value-body p { font-size:0.9rem; color:var(--muted); line-height:1.7; }
+
+  .divider { border:none; border-top:1px solid var(--border); margin:56px 0; }
+
+  /* CTA */
+  .cta-block {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:28px; padding:48px; text-align:center;
+    margin-top:64px;
+    background: linear-gradient(135deg, rgba(59,130,246,0.05), rgba(16,185,129,0.05));
+  }
+  .cta-block h2 { font-size:2rem; font-weight:800; letter-spacing:-1px; margin-bottom:16px; }
+  .cta-block p { color:var(--muted); font-size:1rem; line-height:1.7; margin-bottom:32px; max-width:500px; margin-left:auto; margin-right:auto; }
+  .btn-primary {
+    display:inline-block;
+    background:var(--green); color:#080c10; font-weight:800;
+    padding:16px 40px; border-radius:14px; border:none; cursor:pointer;
+    font-family:inherit; font-size:1rem; text-decoration:none;
+    box-shadow: 0 4px 12px rgba(16,185,129,0.2);
+    transition:all 0.3s;
+  }
+  .btn-primary:hover { opacity:0.9; transform:translateY(-2px); box-shadow:0 8px 24px rgba(16,185,129,0.3); }
+
+  /* FOOTER */
+  footer {
+    background: rgba(5,5,5,0.5); border-top: 1px solid var(--border);
+    padding: 80px 24px 40px; position: relative; z-index: 1;
+  }
+  .footer-inner {
+    max-width: 1440px; margin: 0 auto;
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px;
+  }
+  .footer-col h4 { color: var(--text); margin-bottom: 24px; font-size: 0.95rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .footer-col ul { list-style: none; }
+  .footer-col li { margin-bottom: 12px; }
+  .footer-col a { color: var(--muted); text-decoration: none; font-size: 0.95rem; transition: all 0.2s; font-weight: 500; }
+  .footer-col a:hover { color: var(--blue); }
+  .footer-legal { max-width: 1440px; margin: 48px auto 0; padding-top: 32px; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; line-height: 1.8; }
+  .footer-disclaimer { background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 20px; border-radius: 12px; margin-top: 24px; }
+
+  @media (max-width: 768px) {
+    .page-title { font-size: 2.2rem; }
+    .stats-row { grid-template-columns: 1fr; }
+    .card-grid { grid-template-columns: 1fr; }
+    .footer-inner { grid-template-columns: 1fr; gap: 40px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="glow-container">
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+  <div class="glow glow-3"></div>
+  <div class="glow glow-4"></div>
+</div>
+
+<header>
+  <div class="header-inner">
+    <a class="logo" href="/">Bubuya.</a>
+    <a class="back-btn" href="/">← Voltar</a>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="page-hero">
+    <div class="page-tag">🇧🇷 Feito no Brasil</div>
+    <h1 class="page-title">Somos a Bubuya.<br><span>O futuro começa aqui.</span></h1>
+    <p class="page-lead">Nascemos com um propósito simples: dar a qualquer brasileiro a chance de transformar conhecimento em lucro — usando a sabedoria coletiva dos mercados de previsão.</p>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-val green">R$15M+</div>
+      <div class="stat-lbl">Volume transacionado</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val blue">37+</div>
+      <div class="stat-lbl">Mercados ativos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val gold">2.9K+</div>
+      <div class="stat-lbl">Traders ativos</div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- MISSÃO -->
+  <div class="section">
+    <div class="section-label">Nossa missão</div>
+    <h2>Democratizar o acesso à informação preditiva</h2>
+    <p>Acreditamos que as pessoas comuns, quando têm as ferramentas certas, são capazes de prever o futuro melhor do que qualquer analista isolado. A Bubuya existe para provar isso.</p>
+    <p>Somos inspirados por plataformas como <strong>Polymarket</strong> e <strong>Kalshi</strong> — líderes globais em mercados de previsão — mas construídos para a realidade brasileira: PIX como meio de pagamento, português como idioma, e eventos que realmente importam para o nosso dia a dia.</p>
+    <p>Cada apostador na Bubuya não é apenas um jogador — é um <strong>analista de mercado</strong> que contribui com sua visão de mundo para a formação de probabilidades mais precisas.</p>
+  </div>
+
+  <!-- O QUE NOS DIFERENCIA -->
+  <div class="section">
+    <div class="section-label">Diferenciais</div>
+    <h2>Por que escolher a Bubuya?</h2>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">⚡</div>
+        <h3>PIX Instantâneo</h3>
+        <p>Depósitos e saques via PIX. Seu dinheiro entra e sai em minutos, sem burocracia bancária ou taxas abusivas.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🇧🇷</div>
+        <h3>100% Brasileiro</h3>
+        <p>Mercados sobre política, economia, esportes e entretenimento nacionais. Conteúdo que você conhece e sobre o qual tem opinião formada.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <h3>Probabilidades Reais</h3>
+        <p>As odds são definidas pelos próprios usuários, não pela casa. Quanto mais o mercado negocia, mais precisa fica a probabilidade.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔒</div>
+        <h3>Transparência Total</h3>
+        <p>Todas as regras de resolução de cada mercado são publicadas antes da abertura. Você sabe exatamente o que esperar.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎁</div>
+        <h3>R$100 de Bônus</h3>
+        <p>Novos usuários recebem R$100 em créditos para começar a explorar os mercados sem risco financeiro inicial.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📱</div>
+        <h3>Experiência Fluida</h3>
+        <p>Interface moderna, responsiva e intuitiva. Funciona perfeitamente no celular ou no computador, sem necessidade de app.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- VALORES -->
+  <div class="section">
+    <div class="section-label">Nossos valores</div>
+    <h2>O que guia cada decisão que tomamos</h2>
+    <div class="values-list">
+      <div class="value-item">
+        <div class="value-icon">🎯</div>
+        <div class="value-body">
+          <h3>Integridade acima de tudo</h3>
+          <p>Jamais manipulamos mercados, alteramos odds retroativamente ou resolvemos apostas de forma tendenciosa. A confiança dos nossos usuários é nosso ativo mais valioso — e tratamos isso com total seriedade.</p>
+        </div>
+      </div>
+      <div class="value-item">
+        <div class="value-icon blue">💡</div>
+        <div class="value-body">
+          <h3>Conhecimento é poder</h3>
+          <p>Incentivamos pesquisa, análise e debate. Na Bubuya, quem estuda e se mantém informado tem vantagem real — não existe "sorte do iniciante" aqui. Os melhores traders são os mais preparados.</p>
+        </div>
+      </div>
+      <div class="value-item">
+        <div class="value-icon gold">🤝</div>
+        <div class="value-body">
+          <h3>Comunidade como pilar</h3>
+          <p>Construímos uma plataforma onde os usuários se ajudam, compartilham análises e crescem juntos. O ranking público e as discussões abertas fazem parte de uma cultura saudável de competição.</p>
+        </div>
+      </div>
+      <div class="value-item">
+        <div class="value-icon">⚖️</div>
+        <div class="value-body">
+          <h3>Jogo responsável</h3>
+          <p>Somos uma plataforma de previsões — não de apostas esportivas tradicionais. Promovemos o uso consciente, com limites definidos pelo próprio usuário e comunicação clara sobre os riscos envolvidos.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- COMO OPERAMOS -->
+  <div class="section">
+    <div class="section-label">Operação</div>
+    <h2>Como mantemos a plataforma funcionando</h2>
+    <p>A Bubuya cobra uma <strong>taxa de 2%</strong> sobre cada operação realizada — seja compra ou venda de posição em qualquer mercado. Essa taxa é nossa única fonte de receita direta.</p>
+    <p>Não cobramos mensalidades, não vendemos dados de usuários e não tomamos posições próprias nos mercados. Nosso interesse é exclusivamente que a plataforma seja justa, ativa e confiável.</p>
+    <p>Os mercados são criados e resolvidos por nosso time operacional com base em <strong>fontes primárias públicas</strong>: jornais de referência, portais governamentais, resultados oficiais de competições e declarações verificáveis de autoridades competentes. Cada mercado especifica antecipadamente qual será a fonte de resolução.</p>
+  </div>
+
+  <!-- COMPLIANCE -->
+  <div class="section">
+    <div class="section-label">Legalidade e compliance</div>
+    <h2>Operamos dentro da lei brasileira</h2>
+    <p>A Bubuya opera como plataforma de <strong>entretenimento e informação preditiva</strong>. Nosso modelo de negócio é baseado em mercados de previsão — um segmento diferente das apostas esportivas regulamentadas.</p>
+    <p>Seguimos as diretrizes da <strong>Lei Geral de Proteção de Dados (LGPD)</strong> no tratamento de todas as informações dos usuários. Suas informações nunca são vendidas, compartilhadas indevidamente ou usadas fora do escopo descrito em nossa Política de Privacidade.</p>
+    <p>Em caso de dúvidas sobre a legalidade da sua participação ou sobre questões fiscais, recomendamos consultar um advogado ou contador de sua confiança.</p>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-block">
+    <h2>Pronto para fazer parte?</h2>
+    <p>Junte-se a milhares de traders que já estão transformando opiniões em lucro na maior plataforma de mercados preditivos do Brasil.</p>
+    <a class="btn-primary" href="/">Começar Agora — R$100 Grátis</a>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-col" style="padding-right: 40px">
+      <a class="logo" href="/" style="display:block; margin-bottom:20px; font-size:1.8rem">Bubuya.</a>
+      <p style="color: var(--muted); font-size: 0.95rem; line-height: 1.6">A principal plataforma brasileira de mercados de previsão.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Plataforma</h4>
+      <ul>
+        <li><a href="/about.html">Quem Somos</a></li>
+        <li><a href="/terms.html">Termos de Uso</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Suporte</h4>
+      <ul>
+        <li><a href="/how-it-works.html">Como Funciona</a></li>
+        <li><a href="mailto:suporte@bubuya.com.br">Suporte</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Categorias</h4>
+      <ul>
+        <li><a href="/">Política</a></li>
+        <li><a href="/">Economia</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-legal">
+    <div class="footer-disclaimer">
+      <strong>Aviso Legal Importante:</strong> A Bubuya é uma plataforma de tecnologia de mercados de previsão. Não constitui recomendação financeira.
+    </div>
+    <div style="margin-top: 32px">
+      <p>© 2026 Bubuya — Todos os direitos reservados.</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

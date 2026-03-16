@@ -920,9 +920,8 @@ function reloadAllBotBalances() {
   fetch(API + '/admin/users', { headers: adminHeaders() })
   .then(function(r){ return r.json(); })
   .then(function(users) {
-    var botUsers = users.filter(function(u) {
-      return u.username !== 'txotta' && u.email && u.email.indexOf('@bot.com') !== -1;
-    });
+    // Filtra por is_bot=true (bots usam @botprev.internal, não @bot.com)
+    var botUsers = users.filter(function(u) { return u.is_bot === true; });
 
     statusEl.textContent = 'Encontrados ' + botUsers.length + ' bots. Atualizando saldos...';
 
@@ -930,7 +929,8 @@ function reloadAllBotBalances() {
       return fetch(API + '/admin/balance', {
         method: 'POST',
         headers: adminHeaders(),
-        body: JSON.stringify({ user_id: u.id, amount: amount })
+        // mode "set" → define o saldo para o valor exato informado
+        body: JSON.stringify({ user_id: u.id, amount: amount, mode: 'set' })
       }).then(function(r){ return r.json(); });
     });
 

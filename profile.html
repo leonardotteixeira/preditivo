@@ -9,6 +9,63 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 <style>
+  /* FOOTER STYLES */
+  footer {
+    background: rgba(5,5,5,0.5);
+    border-top: 1px solid var(--border);
+    padding: 80px 24px 40px;
+    margin-top: 80px;
+    position: relative;
+    z-index: 1;
+  }
+  .footer-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 48px;
+  }
+  .footer-col h4 {
+    color: var(--text);
+    margin-bottom: 24px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .footer-col ul { list-style: none; }
+  .footer-col li { margin-bottom: 12px; }
+  .footer-col a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  .footer-col a:hover { color: var(--blue); }
+  
+  .footer-legal {
+    max-width: 1100px;
+    margin: 48px auto 0;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.85rem;
+    line-height: 1.8;
+  }
+  .footer-disclaimer {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 24px;
+  }
+  
+  @media (max-width: 768px) {
+    .footer-inner { grid-template-columns: 1fr; gap: 40px; }
+  }
+
 * { margin:0; padding:0; box-sizing:border-box; }
 :root {
   --bg:#080c10; --surface:#0e1419; --surface2:#141c24;
@@ -664,6 +721,78 @@ async function disable2fa() {
   } catch(e) { fb.style.color='var(--red)'; fb.textContent='Erro de conexão.'; }
 }
 
+</script>
+<!-- ABOUT MODAL -->
+<div id="aboutModal" class="modal-overlay">
+  <div class="modal" style="max-width: 600px">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px">
+      <h2 style="font-size:1.5rem">Quem Somos</h2>
+      <button class="modal-close" onclick="closeModal('aboutModal')">×</button>
+    </div>
+    <div style="line-height:1.7; color:var(--muted)">
+      <p style="margin-bottom:16px">A <strong>Bubuya.</strong> é a primeira plataforma brasileira dedicada exclusivamente a mercados de previsão (Prediction Markets).</p>
+      <p>Nossa missão é democratizar o acesso à inteligência coletiva, permitindo que qualquer pessoa transforme seu conhecimento e intuição em retornos financeiros.</p>
+    </div>
+  </div>
+</div>
+
+<!-- HOW TO BET MODAL -->
+<div id="howToBetModal" class="modal-overlay">
+  <div class="modal" style="max-width: 600px">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px">
+      <h2 style="font-size:1.5rem">Como Apostar</h2>
+      <button class="modal-close" onclick="closeModal('howToBetModal')">×</button>
+    </div>
+    <div style="line-height:1.7; color:var(--muted)">
+      <p>Escolha um mercado, selecione "SIM" ou "NÃO" e receba seu lucro se estiver certo.</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-col" style="padding-right: 40px">
+      <div class="logo" style="margin-bottom: 20px; font-size: 1.8rem">Bubuya.</div>
+      <p style="color: var(--muted); font-size: 0.95rem; line-height: 1.6">
+        Onde o conhecimento se torna valor.
+      </p>
+    </div>
+    <div class="footer-col">
+      <h4>Plataforma</h4>
+      <ul>
+        <li><a onclick="openModal('aboutModal')">Quem Somos</a></li>
+        <li><a href="/terms.html">Termos de Uso</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Suporte</h4>
+      <ul>
+        <li><a onclick="openModal('howToBetModal')">Como Apostar</a></li>
+        <li><a href="mailto:suporte@bubuya.com.br">Suporte por Email</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Redes</h4>
+      <ul>
+        <li><a href="/">Início</a></li>
+        <li><a href="#">Twitter</a></li>
+      </ul>
+    </div>
+  </div>
+  
+  <div class="footer-legal">
+    <div class="footer-disclaimer">
+      <strong>⚠️ Aviso Legal:</strong> Não é recomendação financeira.
+    </div>
+    <div style="margin-top: 32px">
+      <p>© 2026 Bubuya.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 </script>
 </body>
 </html>

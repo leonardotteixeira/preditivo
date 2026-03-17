@@ -761,7 +761,7 @@
   </div>
 </div>
 
-<script src="./config.js?v=20260318"></script>
+<script src="./config.js?v=20260319"></script>
 <script>
 window.state = { markets: [], user: null, balance: 0, catFilter: 'all', searchQuery: '', walletAddress: null };
 window.API = window.PREDITIVO_CONFIG.API_BASE;
@@ -1057,18 +1057,36 @@ window.loadPortfolio = async () => {
         </div>
       </div>`).join('');
   };
+  // Helper: mostra summary imediatamente com dados disponíveis + chama loadPnl async
+  function showSummaryNow(positions) {
+    const fmt = v => parseFloat(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2});
+    const bal = window.state && window.state.balance || 0;
+    const invested = positions.reduce((acc, p) => acc + parseFloat(p.amount||0), 0);
+    const pvEl = document.getElementById('pnlPortfolioValue');
+    if (pvEl) pvEl.textContent = 'R$ ' + fmt(bal + invested);
+    const avEl = document.getElementById('pnlAvailable');
+    if (avEl) avEl.textContent = 'R$ ' + fmt(bal);
+    const inEl = document.getElementById('pnlInvested');
+    if (inEl) inEl.textContent = 'R$ ' + fmt(invested);
+    const sumEl = document.getElementById('portfolioSummary');
+    if (sumEl) sumEl.style.display = 'grid';
+    // P&L: carrega async
+    window.loadPnl('all');
+  }
+
   try {
     // Tenta endpoint enriquecido; se não disponível ainda, usa /bets/my como fallback
     const r = await fetch(apiBase + '/bets/portfolio', { headers });
     const res = await r.json();
     if(r.ok && Array.isArray(res)) {
       renderCards(res);
+      showSummaryNow(res);
       return;
     }
     // Fallback: /bets/my (sempre disponível) — filtra abertas e agrupa
     const r2 = await fetch(apiBase + '/bets/my', { headers });
     const bets = await r2.json();
-    if(!Array.isArray(bets)) { renderCards([]); return; }
+    if(!Array.isArray(bets)) { renderCards([]); showSummaryNow([]); return; }
     const open = bets.filter(b => b.status === 'open');
     // Agrupa por market_id+side
     const map = {};
@@ -1085,11 +1103,10 @@ window.loadPortfolio = async () => {
       potential: ((p.potential_payout / p.amount - 1) * 100).toFixed(2)
     }));
     renderCards(positions);
+    showSummaryNow(positions);
   } catch(e) {
     grid.innerHTML = '<div style="grid-column:1/-1; padding:60px; text-align:center; color:var(--muted)">Erro ao carregar portfólio. Tente novamente.</div>';
   }
-  // Carregar resumo Carteira + P&L
-  window.loadPnl('all');
 };
 
 /* ===== CARTEIRA + LUCRO/PREJUÍZO ===== */
@@ -1139,29 +1156,28 @@ window.loadPnl = async function(period) {
     const r = await fetch(apiBase + '/bets/pnl?period=' + period,
       { headers: { 'Authorization': 'Bearer ' + token } });
     const d = await r.json();
-    if (!r.ok || d.error) return;
+    if (!r.ok || d.error) { console.warn('PnL endpoint:', d.error || r.status); return; }
     const fmt = v => parseFloat(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2});
     const pnl = parseFloat(d.total_pnl);
     const pnlEl = document.getElementById('pnlTotal');
     if (pnlEl) { pnlEl.textContent = (pnl >= 0 ? '+' : '') + 'R$ ' + fmt(d.total_pnl); pnlEl.style.color = pnl >= 0 ? 'var(--green)' : '#ef4444'; }
     const metaEl = document.getElementById('pnlMeta');
     if (metaEl) metaEl.textContent = d.win_count + ' vitórias · ' + d.loss_count + ' derrotas · ' + d.win_rate + '% de acerto';
-    const bal = window.state.balance || 0;
-    const invested = parseFloat(d.open_invested);
-    const pvEl = document.getElementById('pnlPortfolioValue');
-    if (pvEl) pvEl.textContent = 'R$ ' + fmt(bal + invested);
-    const avEl = document.getElementById('pnlAvailable');
-    if (avEl) avEl.textContent = 'R$ ' + fmt(bal);
-    const inEl = document.getElementById('pnlInvested');
-    if (inEl) inEl.textContent = 'R$ ' + fmt(invested);
+    // Atualiza carteira com dados precisos do endpoint PnL
+    const bal2 = window.state && window.state.balance || 0;
+    const invested2 = parseFloat(d.open_invested);
+    const pvEl2 = document.getElementById('pnlPortfolioValue');
+    if (pvEl2) pvEl2.textContent = 'R$ ' + fmt(bal2 + invested2);
+    const avEl2 = document.getElementById('pnlAvailable');
+    if (avEl2) avEl2.textContent = 'R$ ' + fmt(bal2);
+    const inEl2 = document.getElementById('pnlInvested');
+    if (inEl2) inEl2.textContent = 'R$ ' + fmt(invested2);
     const chEl = document.getElementById('pnlPortfolioChange');
-    if (chEl && invested > 0) {
-      const unrealized = parseFloat(d.open_value) - invested;
+    if (chEl && invested2 > 0) {
+      const unrealized = parseFloat(d.open_value) - invested2;
       chEl.textContent = (unrealized >= 0 ? '+' : '') + 'R$ ' + fmt(unrealized) + ' não realizado';
       chEl.style.color = unrealized >= 0 ? 'var(--green)' : '#ef4444';
     }
-    const sumEl = document.getElementById('portfolioSummary');
-    if (sumEl) sumEl.style.display = 'grid';
     drawSparkline(d.history);
   } catch(e) { console.error('PnL error:', e); }
 };

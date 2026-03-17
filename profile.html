@@ -9,16 +9,27 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --bg:#080c10;--surface:#0e1419;--surface2:#141c24;
-  --border:rgba(255,255,255,0.07);--green:#00e676;--red:#ff4757;
-  --blue:#00b4ff;--gold:#ffc107;--text:#e8edf2;--muted:#5a6878;
+  --bg:#060a0e;--surface:#0d1117;--surface2:#131b22;
+  --border:rgba(255,255,255,0.06);--green:#10b981;--red:#ef4444;
+  --blue:#3b82f6;--gold:#f59e0b;--text:#e2e8f0;--muted:#4b5563;
+  --green-dim:rgba(16,185,129,0.1);
+  --glow-blue:rgba(59,130,246,0.12);--glow-green:rgba(16,185,129,0.08);
 }
-body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+body{
+  font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+}
+/* Grade sutil igual à home */
 body::after{
   content:'';position:fixed;inset:0;
-  background-image:linear-gradient(rgba(0,230,118,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,230,118,0.03) 1px,transparent 1px);
+  background-image:linear-gradient(rgba(16,185,129,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(16,185,129,0.025) 1px,transparent 1px);
   background-size:40px 40px;pointer-events:none;z-index:0;
 }
+/* Orbs de glow — cópia exata da home */
+.glow-container{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.glow{position:absolute;border-radius:50%;filter:blur(120px);opacity:0.6}
+.glow-1{top:-10%;left:10%;width:600px;height:600px;background:radial-gradient(circle,var(--glow-blue) 0%,transparent 70%)}
+.glow-2{bottom:10%;right:-10%;width:800px;height:800px;background:radial-gradient(circle,var(--glow-green) 0%,transparent 70%)}
 
 /* ── HEADER ── */
 header{position:sticky;top:0;z-index:100;background:rgba(8,12,16,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 24px}
@@ -41,6 +52,16 @@ nav a.active{color:var(--green);background:rgba(0,230,118,0.08)}
 
 /* ── PAGE ── */
 .page{max-width:1100px;margin:0 auto;padding:40px 24px 80px;position:relative;z-index:1}
+
+/* ── AVATAR COM FOTO ── */
+.avatar-wrap{position:relative;flex-shrink:0;cursor:pointer}
+.avatar-wrap:hover .avatar-overlay{opacity:1}
+.avatar-overlay{
+  position:absolute;inset:0;border-radius:50%;
+  background:rgba(0,0,0,0.55);display:flex;align-items:center;
+  justify-content:center;opacity:0;transition:opacity .2s;font-size:1.3rem
+}
+#avatarFileInput{display:none}
 
 /* ── PROFILE HEADER ── */
 .profile-hero{
@@ -188,6 +209,12 @@ footer{background:rgba(5,5,5,0.5);border-top:1px solid var(--border);padding:60p
 </style>
 </head>
 <body>
+
+<!-- Fundo glow igual à home -->
+<div class="glow-container">
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+</div>
 
 <header>
   <div class="header-inner">
@@ -387,8 +414,15 @@ function renderPage() {
   /* HTML montado */
   var html =
     /* Profile hero */
+    '<input type="file" id="avatarFileInput" accept="image/*" onchange="handleAvatarUpload(event)">' +
     '<div class="profile-hero">' +
-      '<div class="profile-avatar">'+u.name.slice(0,2).toUpperCase()+'</div>' +
+      '<div class="avatar-wrap" onclick="document.getElementById(\'avatarFileInput\').click()" title="Clique para mudar a foto">' +
+        (u.avatar_url
+          ? '<img src="'+u.avatar_url+'" style="width:88px;height:88px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 3px rgba(16,185,129,0.3);display:block">'
+          : '<div class="profile-avatar">'+u.name.slice(0,2).toUpperCase()+'</div>'
+        ) +
+        '<div class="avatar-overlay">📷</div>' +
+      '</div>' +
       '<div class="profile-info">' +
         '<div class="profile-name">'+u.name+'</div>' +
         '<div class="profile-email">'+u.email+'</div>' +
@@ -488,6 +522,56 @@ function renderPage() {
 
   document.getElementById('pageContent').innerHTML = html;
   updateAuthUI();
+}
+
+/* ── AVATAR UPLOAD ── */
+function handleAvatarUpload(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { showToast('❌ Arquivo muito grande. Use uma imagem menor que 5MB.'); return; }
+
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      // Resize para máx 300x300 mantendo proporção
+      var maxSize = 300;
+      var w = img.width, h = img.height;
+      if (w > h) { if (w > maxSize) { h = Math.round(h * maxSize / w); w = maxSize; } }
+      else { if (h > maxSize) { w = Math.round(w * maxSize / h); h = maxSize; } }
+
+      var canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      var ctx = canvas.getContext('2d');
+      // Círculo recortado
+      ctx.beginPath();
+      ctx.arc(w/2, h/2, Math.min(w,h)/2, 0, Math.PI*2);
+      ctx.clip();
+      ctx.drawImage(img, 0, 0, w, h);
+
+      var base64 = canvas.toDataURL('image/jpeg', 0.82);
+      uploadAvatar(base64);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function uploadAvatar(base64) {
+  showToast('⏳ Salvando foto...');
+  try {
+    var data = await apiPatch('/auth/profile', { name: state.user.name, avatar_url: base64 }, state.token);
+    if (data.error) { showToast('❌ Erro: ' + data.error); return; }
+    state.user.avatar_url = base64;
+    showToast('✅ Foto atualizada!');
+    // Atualiza o avatar sem re-renderizar a página toda
+    var wrap = document.querySelector('.avatar-wrap');
+    if (wrap) {
+      wrap.innerHTML =
+        '<img src="'+base64+'" style="width:88px;height:88px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 3px rgba(16,185,129,0.3);display:block">' +
+        '<div class="avatar-overlay">📷</div>';
+    }
+  } catch(e) { showToast('❌ Erro de conexão.'); }
 }
 
 /* ── SAVE PROFILE ── */

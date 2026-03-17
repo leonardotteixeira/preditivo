@@ -654,10 +654,72 @@
   <div class="modal">
     <button class="modal-close" onclick="window.closeModal('withdrawModal')">&times;</button>
     <h2 class="modal-title">Sacar Lucros</h2>
-    <p class="modal-sub">Transferência imediata para sua chave PIX.</p>
-    <input class="modal-input" type="number" id="withdrawAmount" placeholder="Valor (R$)">
-    <input class="modal-input" id="pixKey" placeholder="Sua Chave PIX">
-    <button class="btn-primary" style="width:100%" onclick="window.doWithdraw()">Confirmar Saque</button>
+
+    <!-- PASSO 1: escolha do método -->
+    <div id="withdrawStep1">
+      <div class="deposit-tabs" style="margin-bottom:20px">
+        <button class="deposit-tab pix active" id="wtab-pix" onclick="window.switchWithdrawTab('pix',this)">
+          <span>💸</span> PIX
+        </button>
+        <button class="deposit-tab eth" id="wtab-eth" onclick="window.switchWithdrawTab('eth',this)">
+          <span>🦊</span> Cripto
+        </button>
+      </div>
+
+      <!-- PIX -->
+      <div id="wpanel-pix" class="deposit-panel active">
+        <div class="method-info">
+          Solicite o saque via PIX. Um <strong>código de confirmação</strong> será enviado ao seu e-mail.
+        </div>
+        <input class="modal-input" type="number" id="wAmountPix" placeholder="Valor (R$) — mínimo R$20" min="20">
+        <select class="modal-input" id="wPixType" style="background:var(--surface2);color:var(--text);cursor:pointer">
+          <option value="">Tipo de chave PIX</option>
+          <option value="cpf">CPF</option>
+          <option value="email">E-mail</option>
+          <option value="telefone">Telefone</option>
+          <option value="aleatoria">Chave aleatória</option>
+        </select>
+        <input class="modal-input" id="wPixKey" placeholder="Sua chave PIX">
+        <button class="btn-primary" style="width:100%" onclick="window.requestWithdraw('pix')">Solicitar Saque via PIX</button>
+      </div>
+
+      <!-- CRIPTO / METAMASK -->
+      <div id="wpanel-eth" class="deposit-panel">
+        <!-- sem wallet conectada -->
+        <div id="wEthNoWallet">
+          <div class="method-info" style="border-color:rgba(249,115,22,0.2)">
+            Conecte sua carteira MetaMask. O valor em <strong>ETH</strong> será enviado ao seu endereço após aprovação.
+          </div>
+          <button class="btn-primary" style="width:100%;background:#f97316;box-shadow:0 4px 12px rgba(249,115,22,0.25)" onclick="window.connectWalletAndWithdraw()">
+            🦊 Conectar MetaMask
+          </button>
+        </div>
+        <!-- com wallet conectada -->
+        <div id="wEthReady" style="display:none">
+          <div class="wallet-chip" style="margin-bottom:16px">
+            <div class="wallet-dot"></div>
+            <span class="wallet-addr" id="wEthAddr">—</span>
+          </div>
+          <div class="method-info" style="border-color:rgba(249,115,22,0.2)">
+            O saque será processado manualmente em até <strong>24h</strong>. Um código de confirmação será enviado ao seu e-mail.
+          </div>
+          <input class="modal-input" type="number" id="wAmountEth" placeholder="Valor (R$) — mínimo R$20" min="20">
+          <button class="btn-primary" style="width:100%;background:#f97316;box-shadow:0 4px 12px rgba(249,115,22,0.25)" onclick="window.requestWithdraw('eth')">
+            🦊 Solicitar Saque em Cripto
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASSO 2: confirmação por e-mail -->
+    <div id="withdrawStep2" style="display:none">
+      <div class="method-info" style="text-align:center">
+        Enviamos um código para o seu e-mail. <br>Digite abaixo para confirmar o saque.
+      </div>
+      <input class="modal-input" id="wVerifyCode" placeholder="Código de verificação" maxlength="6" style="text-align:center;letter-spacing:6px;font-size:1.4rem;font-weight:800">
+      <button class="btn-primary" style="width:100%" onclick="window.confirmWithdraw()">Confirmar Saque</button>
+      <button class="btn-outline" style="width:100%;margin-top:8px" onclick="window.withdrawBackToStep1()">Voltar</button>
+    </div>
   </div>
 </div>
 
@@ -688,7 +750,6 @@ window.showToast = (icon, title, msg) => {
 window.openModal = (id) => {
   document.getElementById(id).classList.add('active');
   if (id === 'depositModal') {
-    // Seleciona elementos DENTRO do modal de depósito especificamente
     const modal = document.getElementById('depositModal');
     modal.querySelectorAll('.deposit-tab').forEach(t => t.classList.remove('active'));
     modal.querySelectorAll('.deposit-panel').forEach(p => p.classList.remove('active'));
@@ -699,6 +760,17 @@ window.openModal = (id) => {
     const pixOut = document.getElementById('pixDirectOutput');
     if (pixOut) pixOut.style.display = 'none';
     window.refreshEthPanel();
+  }
+  if (id === 'withdrawModal') {
+    // Reset para o passo 1, aba PIX
+    document.getElementById('withdrawStep1').style.display = 'block';
+    document.getElementById('withdrawStep2').style.display = 'none';
+    document.getElementById('wVerifyCode').value = '';
+    const wmodal = document.getElementById('withdrawModal');
+    wmodal.querySelectorAll('.deposit-tab').forEach(t => t.classList.remove('active'));
+    wmodal.querySelectorAll('.deposit-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('wtab-pix').classList.add('active');
+    document.getElementById('wpanel-pix').classList.add('active');
   }
 };
 window.closeModal = (id) => { document.getElementById(id).classList.remove('active'); };
@@ -1182,11 +1254,106 @@ window.depositCripto = async () => {
   }
 };
 
-window.doWithdraw = () => {
-  const amt = document.getElementById('withdrawAmount').value;
-  if(!amt || amt <= 1) return window.showToast('⚠️', 'Atenção', 'Valor mínimo de R$1.');
-  window.showToast('⏳', 'Processando', 'Seu saque está sendo enviado via PIX.');
-  setTimeout(() => window.closeModal('withdrawModal'), 2000);
+/* ===== WITHDRAW: TAB SWITCHER ===== */
+window.switchWithdrawTab = (tab, btn) => {
+  document.querySelectorAll('#withdrawModal .deposit-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#withdrawModal .deposit-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('wpanel-' + tab).classList.add('active');
+  if (tab === 'eth') window.refreshWithdrawEthPanel();
+};
+
+window.refreshWithdrawEthPanel = () => {
+  const noW  = document.getElementById('wEthNoWallet');
+  const ready = document.getElementById('wEthReady');
+  const addr  = document.getElementById('wEthAddr');
+  if (!noW || !ready) return;
+  if (window.state.walletAddress) {
+    noW.style.display   = 'none';
+    ready.style.display = 'block';
+    addr.textContent = window.state.walletAddress.slice(0,8) + '...' + window.state.walletAddress.slice(-6);
+  } else {
+    noW.style.display   = 'block';
+    ready.style.display = 'none';
+  }
+};
+
+window.connectWalletAndWithdraw = async () => {
+  const ok = await window.connectWallet();
+  if (ok) window.refreshWithdrawEthPanel();
+};
+
+window.withdrawBackToStep1 = () => {
+  document.getElementById('withdrawStep1').style.display = 'block';
+  document.getElementById('withdrawStep2').style.display = 'none';
+  document.getElementById('wVerifyCode').value = '';
+};
+
+/* ===== WITHDRAW: SOLICITAR (PIX ou ETH) ===== */
+window.requestWithdraw = async (method) => {
+  const token = localStorage.getItem('preditivo_token');
+  if (!token) return window.openModal('loginModal');
+
+  let amount, pixKey, pixKeyType;
+
+  if (method === 'pix') {
+    amount     = parseFloat(document.getElementById('wAmountPix').value);
+    pixKey     = document.getElementById('wPixKey').value.trim();
+    pixKeyType = document.getElementById('wPixType').value;
+    if (!amount || amount < 20) return window.showToast('⚠️', 'Atenção', 'Valor mínimo de R$20.');
+    if (!pixKeyType)            return window.showToast('⚠️', 'Atenção', 'Selecione o tipo de chave PIX.');
+    if (!pixKey)                return window.showToast('⚠️', 'Atenção', 'Informe sua chave PIX.');
+  } else {
+    amount     = parseFloat(document.getElementById('wAmountEth').value);
+    pixKey     = window.state.walletAddress;
+    pixKeyType = 'eth';
+    if (!amount || amount < 20) return window.showToast('⚠️', 'Atenção', 'Valor mínimo de R$20.');
+    if (!pixKey)                return window.showToast('⚠️', 'Atenção', 'Conecte sua carteira MetaMask.');
+  }
+
+  try {
+    const r = await fetch(window.API + '/withdrawals', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ amount, pix_key: pixKey, pix_key_type: pixKeyType })
+    });
+    const d = await r.json();
+    if (d.error) return window.showToast('❌', 'Erro', d.error);
+    // vai para step 2 (verificação por e-mail)
+    document.getElementById('withdrawStep1').style.display = 'none';
+    document.getElementById('withdrawStep2').style.display = 'block';
+    document.getElementById('wVerifyCode').focus();
+    window.showToast('📧', 'Código enviado', 'Verifique seu e-mail para confirmar o saque.');
+  } catch(e) {
+    window.showToast('❌', 'Erro', 'Falha na conexão. Tente novamente.');
+  }
+};
+
+/* ===== WITHDRAW: CONFIRMAR CÓDIGO ===== */
+window.confirmWithdraw = async () => {
+  const token = localStorage.getItem('preditivo_token');
+  const code  = document.getElementById('wVerifyCode').value.trim();
+  if (!code) return window.showToast('⚠️', 'Atenção', 'Digite o código recebido por e-mail.');
+
+  try {
+    const r = await fetch(window.API + '/withdrawals/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ code })
+    });
+    const d = await r.json();
+    if (d.error) return window.showToast('❌', 'Erro', d.error);
+    // Atualiza saldo local
+    if (d.new_balance != null) {
+      window.state.balance = parseFloat(d.new_balance);
+      window.updateAuthUI();
+    }
+    window.closeModal('withdrawModal');
+    window.withdrawBackToStep1();
+    window.showToast('✅', 'Saque solicitado', 'Seu saque foi registrado e está sendo processado.');
+  } catch(e) {
+    window.showToast('❌', 'Erro', 'Falha na conexão. Tente novamente.');
+  }
 };
 
 window.setCatFilter = (cat, el) => {

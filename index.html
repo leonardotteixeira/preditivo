@@ -552,17 +552,35 @@
 <div class="modal-overlay" id="loginModal">
   <div class="modal">
     <button class="modal-close" onclick="window.closeModal('loginModal')">&times;</button>
-    <h2 class="modal-title">Entrar</h2>
-    <p class="modal-sub">Bem-vindo de volta à Bubuya.</p>
-    <input class="modal-input" type="email" id="loginEmail" placeholder="Email" onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()">
-    <input class="modal-input" type="password" id="loginPass" placeholder="Senha" onkeydown="if(event.key==='Enter')window.doLogin()">
-    <button class="btn-primary" style="width:100%" onclick="window.doLogin()">Acessar Conta</button>
-    <p style="text-align:center;margin-top:16px;font-size:0.9rem">
-      <a href="#" style="color:var(--muted);text-decoration:underline;cursor:pointer"
-         onclick="event.preventDefault();window.closeModal('loginModal');window.openModal('forgotModal')">
-        Esqueceu a senha?
-      </a>
-    </p>
+
+    <!-- Step 1: Email + Senha -->
+    <div id="loginStep1">
+      <h2 class="modal-title">Entrar</h2>
+      <p class="modal-sub">Bem-vindo de volta à Bubuya.</p>
+      <input class="modal-input" type="email" id="loginEmail" placeholder="Email" onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()">
+      <input class="modal-input" type="password" id="loginPass" placeholder="Senha" onkeydown="if(event.key==='Enter')window.doLogin()">
+      <button class="btn-primary" style="width:100%" onclick="window.doLogin()">Acessar Conta</button>
+      <p style="text-align:center;margin-top:16px;font-size:0.9rem">
+        <a href="#" style="color:var(--muted);text-decoration:underline;cursor:pointer"
+           onclick="event.preventDefault();window.closeModal('loginModal');window.openModal('forgotModal')">
+          Esqueceu a senha?
+        </a>
+      </p>
+    </div>
+
+    <!-- Step 2: Código 2FA (oculto por padrão) -->
+    <div id="loginStep2" style="display:none">
+      <h2 class="modal-title">Verificação em 2 Etapas</h2>
+      <p class="modal-sub" style="text-align:center">Código de verificação enviado para seu email.</p>
+      <input class="modal-input" id="login2faCode" type="text" inputmode="numeric"
+        placeholder="Código de 6 dígitos" maxlength="6"
+        onkeydown="if(event.key==='Enter')window.doLogin2fa()">
+      <button class="btn-primary" style="width:100%;margin-top:4px" onclick="window.doLogin2fa()">Verificar</button>
+      <button onclick="window.backToLoginStep1()"
+        style="width:100%;margin-top:10px;background:none;border:none;color:var(--muted);font-size:0.85rem;cursor:pointer;padding:8px">
+        ← Voltar
+      </button>
+    </div>
   </div>
 </div>
 
@@ -799,6 +817,7 @@ window.showToast = (icon, title, msg) => {
 
 window.openModal = (id) => {
   document.getElementById(id).classList.add('active');
+  if (id === 'loginModal' && window.backToLoginStep1) window.backToLoginStep1();
   if (id === 'depositModal') {
     const modal = document.getElementById('depositModal');
     modal.querySelectorAll('.deposit-tab').forEach(t => t.classList.remove('active'));
@@ -874,8 +893,10 @@ window.renderMarkets = () => {
   }).join('');
 };
 
+let _login2faEmail = null;
+
 window.doLogin = async () => {
-  const email = document.getElementById('loginEmail').value;
+  const email    = document.getElementById('loginEmail').value;
   const password = document.getElementById('loginPass').value;
   try {
     const res = await fetch(window.API + '/auth/login', {
@@ -885,14 +906,52 @@ window.doLogin = async () => {
     });
     const d = await res.json();
     if (d.error) return window.showToast('❌', 'Erro', d.error);
-    
-    localStorage.setItem('preditivo_token', d.token);
-    window.state.user = d.user;
-    window.state.balance = parseFloat(d.user.balance);
-    window.closeModal('loginModal');
-    window.updateAuthUI();
-    window.showToast('👋', 'Olá!', 'Bem-vindo de volta, ' + d.user.name);
+
+    // 2FA requerido: mostrar step 2
+    if (d.requires_2fa) {
+      _login2faEmail = d.email;
+      document.getElementById('loginStep1').style.display = 'none';
+      document.getElementById('loginStep2').style.display = 'block';
+      document.getElementById('login2faCode').value = '';
+      document.getElementById('login2faCode').focus();
+      return;
+    }
+
+    window._finalizeLogin(d);
   } catch(e) { window.showToast('❌', 'Erro', 'Falha na conexão com o servidor.'); }
+};
+
+window.doLogin2fa = async () => {
+  const code = (document.getElementById('login2faCode').value || '').trim();
+  if (!code) return window.showToast('❌', 'Erro', 'Digite o código de 6 dígitos.');
+  try {
+    const res = await fetch(window.API + '/auth/login/2fa', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: _login2faEmail, code })
+    });
+    const d = await res.json();
+    if (d.error) return window.showToast('❌', 'Erro', d.error);
+    window._finalizeLogin(d);
+  } catch(e) { window.showToast('❌', 'Erro', 'Falha na conexão com o servidor.'); }
+};
+
+window._finalizeLogin = function(d) {
+  localStorage.setItem('preditivo_token', d.token);
+  window.state.user = d.user;
+  window.state.balance = parseFloat(d.user.balance);
+  window.closeModal('loginModal');
+  window.updateAuthUI();
+  window.showToast('👋', 'Olá!', 'Bem-vindo de volta, ' + d.user.name);
+  window.backToLoginStep1(); // reset modal para próxima abertura
+};
+
+window.backToLoginStep1 = function() {
+  _login2faEmail = null;
+  const s1 = document.getElementById('loginStep1');
+  const s2 = document.getElementById('loginStep2');
+  if (s1) s1.style.display = 'block';
+  if (s2) s2.style.display = 'none';
 };
 
 // ---- RECUPERAÇÃO DE SENHA ----

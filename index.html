@@ -723,7 +723,7 @@
   </div>
 </div>
 
-<script src="./config.js"></script>
+<script src="./config.js?v=20260316"></script>
 <script>
 window.state = { markets: [], user: null, balance: 0, catFilter: 'all', searchQuery: '', walletAddress: null };
 window.API = window.PREDITIVO_CONFIG.API_BASE;
@@ -987,6 +987,9 @@ window.loadPortfolio = async () => {
     grid.innerHTML = '<div style="grid-column:1/-1; padding:60px; text-align:center; color:var(--muted)">Conecte-se para visualizar suas previsões.</div>';
     return;
   }
+  const apiBase = (window.PREDITIVO_CONFIG && window.PREDITIVO_CONFIG.API_BASE)
+    || window.API
+    || 'https://preditivo-backend-production.up.railway.app';
   const headers = { 'Authorization': 'Bearer ' + token };
   const renderCards = (positions) => {
     if(!positions.length) {
@@ -1018,14 +1021,14 @@ window.loadPortfolio = async () => {
   };
   try {
     // Tenta endpoint enriquecido; se não disponível ainda, usa /bets/my como fallback
-    const r = await fetch(window.API + '/bets/portfolio', { headers });
+    const r = await fetch(apiBase + '/bets/portfolio', { headers });
     const res = await r.json();
     if(r.ok && Array.isArray(res)) {
       renderCards(res);
       return;
     }
     // Fallback: /bets/my (sempre disponível) — filtra abertas e agrupa
-    const r2 = await fetch(window.API + '/bets/my', { headers });
+    const r2 = await fetch(apiBase + '/bets/my', { headers });
     const bets = await r2.json();
     if(!Array.isArray(bets)) { renderCards([]); return; }
     const open = bets.filter(b => b.status === 'open');

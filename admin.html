@@ -384,8 +384,8 @@ tr:hover td { background:rgba(255,255,255,0.015); }
 
 <div id="toast" class="toast"></div>
 
-<script src="./config.js"></script>
-<script src="./admin-enhancements.js"></script>
+<script src="./config.js?v=20260316"></script>
+<script src="./admin-enhancements.js?v=20260316"></script>
 <script>
 var API = window.PREDITIVO_CONFIG.API_BASE;
 var ADMIN_SECRET = '';
@@ -1013,7 +1013,7 @@ function criarMercado() {
 
   fb.style.color = '#5a6878'; fb.textContent = 'Criando...';
 
-  fetch(API + '/admin/markets', {
+  fetch(API + '/markets', {
     method: 'POST',
     headers: adminHeaders(),
     body: JSON.stringify({ title: title, category: cat, ends_at: date, description: desc, image_url: img })

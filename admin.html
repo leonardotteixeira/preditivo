@@ -384,8 +384,8 @@ tr:hover td { background:rgba(255,255,255,0.015); }
 
 <div id="toast" class="toast"></div>
 
-<script src="./config.js?v=20260316"></script>
-<script src="./admin-enhancements.js?v=20260316"></script>
+<script src="./config.js?v=20260317"></script>
+<script src="./admin-enhancements.js?v=20260317"></script>
 <script>
 var API = window.PREDITIVO_CONFIG.API_BASE;
 var ADMIN_SECRET = '';
@@ -608,22 +608,36 @@ function openResolve(marketId, title) {
   openModal('resolveModal');
 }
 
-// FIX: agora chama /admin/markets/:id/resolve
 function confirmResolve(outcome) {
   if (!resolveMarketId) return;
+  var btns = document.querySelectorAll('#resolveModal .btn-yes, #resolveModal .btn-no');
+  btns.forEach(function(b){ b.disabled = true; b.style.opacity = '0.5'; });
+  var label = outcome === 'yes' ? 'SIM' : 'NAO';
+
   fetch(API + '/admin/markets/' + resolveMarketId + '/resolve', {
     method: 'POST',
     headers: adminHeaders(),
     body: JSON.stringify({ outcome: outcome })
   })
-  .then(function(r){ return r.json(); })
-  .then(function(data) {
-    if (data.error) { showToast('Erro: ' + data.error); return; }
+  .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, status: r.status, data: d }; }); })
+  .then(function(res) {
+    if (!res.ok || res.data.error) {
+      showToast('Erro ' + res.status + ': ' + (res.data.error || 'falha'));
+      btns.forEach(function(b){ b.disabled = false; b.style.opacity = ''; });
+      return;
+    }
     closeModal('resolveModal');
-    showToast('Resolvido! ' + (data.resolved || ''));
+    var d = res.data;
+    var w = d.winners !== undefined ? d.winners : d.winners_paid;
+    var l = d.losers !== undefined ? d.losers : 0;
+    var paid = d.total_paid !== undefined ? parseFloat(d.total_paid).toLocaleString('pt-BR',{minimumFractionDigits:2}) : '—';
+    showToast('✅ Resolvido como ' + label + ' | ' + w + ' vencedores (R$' + paid + ' pagos) | ' + l + ' perdedores');
     loadMarkets();
   })
-  .catch(function(){ showToast('Erro ao resolver'); });
+  .catch(function(e){
+    showToast('Erro de rede: ' + e.message);
+    btns.forEach(function(b){ b.disabled = false; b.style.opacity = ''; });
+  });
 }
 
 function openDesc(marketId) {

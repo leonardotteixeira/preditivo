@@ -259,7 +259,7 @@ footer{background:rgba(5,5,5,0.5);border-top:1px solid var(--border);padding:60p
 <script src="./config.js?v=20260321"></script>
 <script>
 var API = window.PREDITIVO_CONFIG.API_BASE;
-var state = { user: null, token: null, bets: [], deposits: [] };
+var state = { user: null, token: null, bets: [], deposits: [], withdrawals: [] };
 
 /* ── UTILS ── */
 function showToast(msg) {
@@ -295,6 +295,7 @@ function switchTab(name) {
   if (btn) btn.classList.add('active');
   if (content) content.classList.add('active');
   if (name === 'indicacoes') loadIndicacoes();
+  if (name === 'extrato') renderExtrato(_extratoPeriod);
 }
 
 /* ── AUTH UI ── */
@@ -396,19 +397,6 @@ function renderPage() {
         '</div>';
       }).join('');
 
-  /* Depósitos */
-  var depRows = deps.length===0
-    ? '<div class="empty"><div class="empty-icon">💰</div>Nenhum depósito ainda.</div>'
-    : deps.map(function(d){
-        return '<div class="dep-row">' +
-          '<div>' +
-            '<div class="dep-code">'+(d.code||d.id||'-')+'</div>' +
-            '<div style="font-size:0.77rem;color:var(--muted);margin-top:3px">'+fmtDate(d.created_at)+'</div>' +
-          '</div>' +
-          '<span class="dep-status dep-'+d.status+'">'+d.status.toUpperCase()+'</span>' +
-          '<div class="dep-amount">R$'+fmtR(d.amount)+'</div>' +
-        '</div>';
-      }).join('');
 
   /* HTML montado */
   var html =
@@ -447,7 +435,7 @@ function renderPage() {
     '<div class="tab-row">' +
       '<button class="tab-btn active" id="tab-btn-apostas"   onclick="switchTab(\'apostas\')">Apostas</button>' +
       '<button class="tab-btn"        id="tab-btn-pnl"       onclick="switchTab(\'pnl\')">P&L por Mercado</button>' +
-      '<button class="tab-btn"        id="tab-btn-depositos" onclick="switchTab(\'depositos\')">Depósitos</button>' +
+      '<button class="tab-btn"        id="tab-btn-extrato"   onclick="switchTab(\'extrato\')">Extrato</button>' +
       '<button class="tab-btn"        id="tab-btn-editar"    onclick="switchTab(\'editar\')">Editar Perfil</button>' +
       '<button class="tab-btn"        id="tab-btn-seguranca" onclick="switchTab(\'seguranca\')">🔒 Segurança</button>' +
       '<button class="tab-btn"        id="tab-btn-indicacoes" onclick="switchTab(\'indicacoes\')">🎁 Indicações</button>' +
@@ -459,8 +447,19 @@ function renderPage() {
     /* PnL */
     '<div class="tab-content" id="tab-pnl">'+pnlCards+'</div>' +
 
-    /* Depósitos */
-    '<div class="tab-content" id="tab-depositos"><div class="dep-list">'+depRows+'</div></div>' +
+    /* Extrato unificado */
+    '<div class="tab-content" id="tab-extrato">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px">' +
+        '<div style="display:flex;gap:6px;flex-wrap:wrap">' +
+          '<button id="extPeriod-7d"  class="period-filter" onclick="setExtratoPeriod(7)"   style="padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);cursor:pointer;font-family:inherit;font-size:0.82rem;font-weight:600;transition:all .2s">7d</button>' +
+          '<button id="extPeriod-30d" class="period-filter" onclick="setExtratoPeriod(30)"  style="padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);cursor:pointer;font-family:inherit;font-size:0.82rem;font-weight:600;transition:all .2s">30d</button>' +
+          '<button id="extPeriod-90d" class="period-filter" onclick="setExtratoPeriod(90)"  style="padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);cursor:pointer;font-family:inherit;font-size:0.82rem;font-weight:600;transition:all .2s">90d</button>' +
+          '<button id="extPeriod-0"   class="period-filter active-filter" onclick="setExtratoPeriod(0)"   style="padding:7px 14px;border-radius:8px;border:1px solid var(--green);background:rgba(16,185,129,0.1);color:var(--green);cursor:pointer;font-family:inherit;font-size:0.82rem;font-weight:600;transition:all .2s">Todos</button>' +
+        '</div>' +
+        '<button onclick="exportCSV()" style="padding:8px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);cursor:pointer;font-family:inherit;font-size:0.82rem;font-weight:600;transition:border-color .2s" onmouseover="this.style.borderColor=\'rgba(255,255,255,0.2)\'" onmouseout="this.style.borderColor=\'var(--border)\'">⬇ CSV</button>' +
+      '</div>' +
+      '<div id="extrato-list"></div>' +
+    '</div>' +
 
     /* Editar */
     '<div class="tab-content" id="tab-editar">' +
@@ -521,6 +520,7 @@ function renderPage() {
 
   document.getElementById('pageContent').innerHTML = html;
   updateAuthUI();
+  renderExtrato(0);
 }
 
 /* ── AVATAR UPLOAD ── */
@@ -701,6 +701,113 @@ function shareRef(link) {
   else { window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank'); }
 }
 
+/* ── EXTRATO ── */
+var _extratoPeriod = 0; // 0 = todos
+
+function buildExtratoRows(days) {
+  var cutoff = days > 0 ? new Date(Date.now() - days * 86400000) : null;
+  var rows = [];
+
+  // Depósitos
+  (state.deposits || []).forEach(function(d) {
+    var dt = new Date(d.created_at);
+    if (cutoff && dt < cutoff) return;
+    var statusLabel = d.status === 'confirmed' ? '✅ Confirmado' : d.status === 'pending' ? '⏳ Pendente' : '❌ Rejeitado';
+    rows.push({ ts: dt, type: '⬇️ Depósito', date: fmtDate(d.created_at), amount: parseFloat(d.amount||0), sign: 1, label: statusLabel, color: d.status==='confirmed' ? 'var(--green)' : d.status==='pending' ? 'var(--gold)' : 'var(--red)' });
+  });
+
+  // Saques
+  (state.withdrawals || []).forEach(function(w) {
+    var dt = new Date(w.created_at);
+    if (cutoff && dt < cutoff) return;
+    var statusLabel = w.status === 'paid' ? '✅ Pago' : w.status === 'pending' ? '⏳ Pendente' : '❌ Cancelado';
+    rows.push({ ts: dt, type: '⬆️ Saque', date: fmtDate(w.created_at), amount: parseFloat(w.amount||0), sign: -1, label: statusLabel, color: w.status==='paid' ? 'var(--muted)' : w.status==='pending' ? 'var(--gold)' : 'var(--red)' });
+  });
+
+  // Apostas ganhas
+  (state.bets || []).filter(function(b){ return b.status==='won'; }).forEach(function(b) {
+    var dt = new Date(b.created_at);
+    if (cutoff && dt < cutoff) return;
+    rows.push({ ts: dt, type: '🎉 Ganho', date: fmtDate(b.created_at), amount: parseFloat(b.payout||b.potential_payout||0), sign: 1, label: b.market_title||b.market_id||'-', color: 'var(--green)' });
+  });
+
+  // Apostas perdidas
+  (state.bets || []).filter(function(b){ return b.status==='lost'; }).forEach(function(b) {
+    var dt = new Date(b.created_at);
+    if (cutoff && dt < cutoff) return;
+    rows.push({ ts: dt, type: '📊 Aposta', date: fmtDate(b.created_at), amount: parseFloat(b.amount||0), sign: -1, label: b.market_title||b.market_id||'-', color: '#ef4444' });
+  });
+
+  rows.sort(function(a,b){ return b.ts - a.ts; });
+  return rows;
+}
+
+function renderExtrato(days) {
+  _extratoPeriod = days;
+  var list = document.getElementById('extrato-list');
+  if (!list) return;
+
+  // Atualizar botões de período
+  [7,30,90,0].forEach(function(d){
+    var btn = document.getElementById('extPeriod-' + (d===0?'0':d+'d'));
+    if (!btn) return;
+    if (d === days) {
+      btn.style.borderColor='var(--green)';
+      btn.style.background='rgba(16,185,129,0.1)';
+      btn.style.color='var(--green)';
+    } else {
+      btn.style.borderColor='var(--border)';
+      btn.style.background='var(--surface2)';
+      btn.style.color='var(--muted)';
+    }
+  });
+
+  var rows = buildExtratoRows(days);
+  if (rows.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">📋</div>Nenhuma transação neste período.</div>';
+    return;
+  }
+
+  list.innerHTML = rows.map(function(r) {
+    var sign = r.sign >= 0 ? '+' : '-';
+    var amtColor = r.sign >= 0 ? 'var(--green)' : '#ef4444';
+    return '<div class="dep-row">' +
+      '<div style="font-size:1.1rem;flex-shrink:0">' + r.type.split(' ')[0] + '</div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-size:0.88rem;font-weight:600">' + r.type.replace(/^\S+\s/,'') + '</div>' +
+        '<div style="font-size:0.75rem;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + r.label + '</div>' +
+        '<div style="font-size:0.72rem;color:var(--muted);margin-top:1px">' + r.date + '</div>' +
+      '</div>' +
+      '<div style="text-align:right;flex-shrink:0">' +
+        '<div class="dep-amount" style="color:' + amtColor + '">' + sign + 'R$' + fmtR(r.amount) + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function setExtratoPeriod(days) {
+  renderExtrato(days);
+}
+
+function exportCSV() {
+  var rows = buildExtratoRows(_extratoPeriod);
+  if (rows.length === 0) { showToast('Nenhuma transação para exportar.'); return; }
+  var lines = ['Tipo,Data,Valor,Status/Mercado'];
+  rows.forEach(function(r) {
+    var sign = r.sign >= 0 ? '+' : '-';
+    var label = '"' + r.label.replace(/"/g,'""') + '"';
+    lines.push(r.type + ',' + r.date + ',' + sign + r.amount.toFixed(2) + ',' + label);
+  });
+  var blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'extrato-bubuya.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  showToast('📥 CSV exportado!');
+}
+
 /* ── LOGIN / 2FA ── */
 var _login2faEmail=null;
 async function doLogin() {
@@ -746,10 +853,14 @@ async function loadProfile() {
     var me=await apiGet('/auth/me',state.token);
     if(!me||!me.id){ openModal('loginModal'); return; }
     state.user=me;
-    var bets=await apiGet('/bets/my',state.token);
+    var [bets, deps, wits] = await Promise.all([
+      apiGet('/bets/my', state.token),
+      apiGet('/deposits/my', state.token),
+      apiGet('/withdrawals/my', state.token)
+    ]);
     state.bets=Array.isArray(bets)?bets:[];
-    var deps=await apiGet('/deposits/my',state.token);
     state.deposits=Array.isArray(deps)?deps:[];
+    state.withdrawals=Array.isArray(wits)?wits:[];
     renderPage();
   } catch(e){
     document.getElementById('pageContent').innerHTML='<div class="empty"><div class="empty-icon">⚠️</div>Erro ao carregar perfil.</div>';

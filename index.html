@@ -1171,37 +1171,79 @@ window.doResetPassword = async () => {
 window.updateAuthUI = () => {
   const area = document.getElementById('authArea');
   if (window.state.user && area) {
+    const firstName = window.state.user.name.split(' ')[0];
+    const avatarEl  = window.state.user.avatar_url
+      ? `<img src="${window.state.user.avatar_url}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0">`
+      : `<div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--blue));display:flex;align-items:center;justify-content:center;font-weight:800;color:#030303;font-size:0.85rem;flex-shrink:0">${window.state.user.name[0].toUpperCase()}</div>`;
     area.innerHTML = `
-      <div style="display:flex; align-items:center; gap:12px">
-        <div style="display:flex; gap:8px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="display:flex;gap:8px">
           <button class="btn-finance btn-deposit" onclick="window.openModal('depositModal')">Depositar</button>
           <button class="btn-finance btn-withdraw" onclick="window.openModal('withdrawModal')">Sacar</button>
         </div>
-        <!-- Sino de notificações -->
+
+        <!-- ── Sino de notificações ── -->
         <div style="position:relative">
           <button id="bellBtn" onclick="window.toggleNotifPanel()" title="Notificações"
-            style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;position:relative">
-            🔔
-            <span id="notifBadge" style="display:none;position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;border-radius:50%;min-width:18px;height:18px;font-size:0.65rem;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 4px;line-height:1">0</span>
+            style="position:relative;background:transparent;border:none;cursor:pointer;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:10px;color:var(--muted);transition:background .2s,color .2s"
+            onmouseenter="this.style.background='var(--surface2)';this.style.color='var(--text)'" onmouseleave="this.style.background='transparent';this.style.color='var(--muted)'">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+            <span id="notifBadge" style="display:none;position:absolute;top:3px;right:3px;background:#ef4444;color:#fff;border-radius:50%;min-width:16px;height:16px;font-size:0.6rem;font-weight:800;align-items:center;justify-content:center;padding:0 3px;line-height:1;border:2px solid var(--bg)">0</span>
           </button>
           <!-- Painel de notificações -->
-          <div id="notifPanel" style="display:none;position:absolute;top:50px;right:0;width:320px;max-height:420px;overflow-y:auto;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.4);z-index:1000">
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border)">
-              <span style="font-weight:700;font-size:0.9rem">Notificações</span>
-              <button onclick="window.markAllRead()" style="background:none;border:none;color:var(--muted);font-size:0.78rem;cursor:pointer">Marcar todas como lidas</button>
+          <div id="notifPanel" style="display:none;position:absolute;top:46px;right:-8px;width:340px;max-height:460px;overflow-y:auto;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,0.5);z-index:1000">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1;border-radius:16px 16px 0 0">
+              <span style="font-weight:700;font-size:0.92rem">Notificações</span>
+              <button onclick="window.markAllRead()" style="background:none;border:none;color:var(--muted);font-size:0.75rem;cursor:pointer;font-family:inherit;transition:color .2s" onmouseenter="this.style.color='var(--text)'" onmouseleave="this.style.color='var(--muted)'">Marcar lidas</button>
             </div>
-            <div id="notifList" style="padding:8px 0">
-              <div style="padding:24px;text-align:center;color:var(--muted);font-size:0.85rem">Carregando...</div>
+            <div id="notifList">
+              <div style="padding:28px;text-align:center;color:var(--muted);font-size:0.85rem">Carregando...</div>
             </div>
           </div>
         </div>
-        <div style="text-align:right">
-          <a href="./profile.html" style="font-weight:800;font-size:1rem;color:inherit;text-decoration:none;cursor:pointer"
-            title="Ver perfil">${window.state.user.name}</a>
-          <div style="color:var(--green); font-family:'DM Mono'; font-weight:800">R$${window.state.balance.toFixed(2)}</div>
+
+        <!-- ── Perfil (dropdown) ── -->
+        <div style="position:relative">
+          <button id="profileBtn" onclick="window.toggleProfileMenu()" title="Minha conta"
+            style="display:flex;align-items:center;gap:9px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:6px 10px 6px 7px;cursor:pointer;font-family:inherit;transition:border-color .2s"
+            onmouseenter="this.style.borderColor='rgba(255,255,255,0.18)'" onmouseleave="this.style.borderColor='var(--border)'">
+            ${avatarEl}
+            <div style="text-align:left;line-height:1.15">
+              <div style="font-weight:700;font-size:0.87rem;color:var(--text)">${firstName}</div>
+              <div style="color:var(--green);font-family:'DM Mono',monospace;font-weight:800;font-size:0.78rem">R$${window.state.balance.toFixed(2)}</div>
+            </div>
+            <svg id="profileChevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted);transition:transform .25s;flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <!-- Menu dropdown do perfil -->
+          <div id="profileMenu" style="display:none;position:absolute;top:calc(100% + 8px);right:0;width:210px;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,0.45);z-index:1001;overflow:hidden">
+            <div style="padding:14px 16px;border-bottom:1px solid var(--border)">
+              <div style="font-weight:700;font-size:0.88rem">${window.state.user.name}</div>
+              <div style="color:var(--muted);font-size:0.75rem;margin-top:2px">${window.state.user.email || ''}</div>
+            </div>
+            <a href="./profile.html" style="display:flex;align-items:center;gap:10px;padding:11px 16px;color:var(--text);text-decoration:none;font-size:0.86rem;font-weight:600;transition:background .15s" onmouseenter="this.style.background='rgba(255,255,255,0.05)'" onmouseleave="this.style.background='transparent'">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Meu Perfil
+            </a>
+            <a href="./profile.html" onclick="sessionStorage.setItem('profileTab','security')" style="display:flex;align-items:center;gap:10px;padding:11px 16px;color:var(--text);text-decoration:none;font-size:0.86rem;font-weight:600;transition:background .15s" onmouseenter="this.style.background='rgba(255,255,255,0.05)'" onmouseleave="this.style.background='transparent'">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Segurança
+            </a>
+            <a href="./profile.html" onclick="sessionStorage.setItem('profileTab','referrals')" style="display:flex;align-items:center;gap:10px;padding:11px 16px;color:var(--text);text-decoration:none;font-size:0.86rem;font-weight:600;transition:background .15s" onmouseenter="this.style.background='rgba(255,255,255,0.05)'" onmouseleave="this.style.background='transparent'">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              Indicações
+            </a>
+            <div style="border-top:1px solid var(--border);margin:4px 0"></div>
+            <button onclick="localStorage.removeItem('preditivo_token');location.reload()" style="display:flex;align-items:center;gap:10px;padding:11px 16px;color:#f43f5e;background:none;border:none;font-size:0.86rem;font-weight:600;cursor:pointer;width:100%;font-family:inherit;transition:background .15s" onmouseenter="this.style.background='rgba(244,63,94,0.08)'" onmouseleave="this.style.background='transparent'">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              Sair
+            </button>
+          </div>
         </div>
-        ${window.state.walletAddress ? `<div style="font-size:0.75rem;color:var(--muted);background:var(--surface2);padding:4px 8px;border-radius:8px;border:1px solid var(--border)">${window.state.walletAddress.slice(0,6)}...${window.state.walletAddress.slice(-4)}</div>` : ''}
-        <button class="btn-outline" style="padding:8px 16px; border-radius:12px" onclick="localStorage.removeItem('preditivo_token');location.reload()">Sair</button>
+
+        ${window.state.walletAddress ? `<div style="font-size:0.72rem;color:var(--muted);background:var(--surface2);padding:4px 8px;border-radius:8px;border:1px solid var(--border)">${window.state.walletAddress.slice(0,6)}...${window.state.walletAddress.slice(-4)}</div>` : ''}
       </div>`;
     const h1 = document.getElementById('heroH1');
     if(h1) h1.innerHTML = `Olá, <span>${window.state.user.name.split(' ')[0]}</span>.`;
@@ -1835,7 +1877,8 @@ async function init() {
 }
 
 /* ===== NOTIFICAÇÕES ===== */
-let _notifPanelOpen = false;
+let _notifPanelOpen   = false;
+let _profileMenuOpen  = false;
 
 window.loadNotifications = async function() {
   const token = localStorage.getItem('preditivo_token');
@@ -1844,11 +1887,10 @@ window.loadNotifications = async function() {
     const r = await fetch(window.API + '/notifications/my', { headers: { 'Authorization': 'Bearer ' + token } });
     if (!r.ok) return;
     const data = await r.json();
-    const badge  = document.getElementById('notifBadge');
-    const list   = document.getElementById('notifList');
+    const badge = document.getElementById('notifBadge');
+    const list  = document.getElementById('notifList');
     if (!badge || !list) return;
 
-    // Badge
     if (data.unread_count > 0) {
       badge.style.display = 'flex';
       badge.textContent = data.unread_count > 99 ? '99+' : data.unread_count;
@@ -1856,25 +1898,64 @@ window.loadNotifications = async function() {
       badge.style.display = 'none';
     }
 
-    // Lista
     if (!data.notifications || !data.notifications.length) {
-      list.innerHTML = '<div style="padding:32px;text-align:center;color:var(--muted);font-size:0.85rem">Nenhuma notificação ainda.</div>';
+      list.innerHTML = '<div style="padding:36px;text-align:center;color:var(--muted);font-size:0.85rem">Nenhuma notificação ainda.</div>';
       return;
     }
-    const fmt = dt => new Date(dt).toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
-    list.innerHTML = data.notifications.map(n => `
-      <div style="padding:12px 16px;border-bottom:1px solid var(--border);background:${n.is_read ? 'transparent' : 'rgba(16,185,129,0.05)'}">
-        <div style="display:flex;align-items:flex-start;gap:10px">
-          <div style="font-size:1.2rem;line-height:1;margin-top:2px">${n.type==='market_won' ? '🎉' : n.type==='market_lost' ? '📊' : '🔔'}</div>
-          <div style="flex:1">
-            <div style="font-weight:700;font-size:0.85rem;margin-bottom:2px">${n.title}</div>
-            <div style="color:var(--muted);font-size:0.78rem;line-height:1.4">${n.body}</div>
-            <div style="color:var(--muted);font-size:0.7rem;margin-top:4px">${fmt(n.created_at)}</div>
+
+    const fmt = dt => new Date(dt).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+    const iconBg = { market_won:'rgba(16,185,129,0.12)', market_lost:'rgba(244,63,94,0.09)' };
+    const chevronSvg = (id) => `<svg id="nChev${id}" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted);flex-shrink:0;transition:transform .22s"><polyline points="6 9 12 15 18 9"/></svg>`;
+
+    list.innerHTML = data.notifications.map((n, i) => {
+      const meta   = (typeof n.meta === 'object' && n.meta) ? n.meta : {};
+      const icon   = n.type === 'market_won' ? '🎉' : n.type === 'market_lost' ? '📊' : '🔔';
+      const bg     = iconBg[n.type] || 'rgba(59,130,246,0.1)';
+      const unread = !n.is_read;
+
+      const detailHtml = (meta.market_title || n.type === 'market_won' || n.type === 'market_lost') ? `
+        <div id="nDetail${i}" style="display:none;padding:0 16px 14px 60px">
+          <div style="background:var(--surface2);border-radius:10px;padding:12px 14px;font-size:0.78rem;border:1px solid var(--border)">
+            ${meta.market_title ? `
+              <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:5px">Mercado</div>
+              <div style="font-weight:600;line-height:1.4;margin-bottom:10px">${meta.market_title}</div>` : ''}
+            ${n.type === 'market_won' ? `
+              <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border)">
+                <span style="color:var(--muted);font-size:0.76rem">Prêmio recebido</span>
+                <span style="color:var(--green);font-weight:800;font-family:'DM Mono',monospace">+R$${(parseFloat(meta.payout)||0).toFixed(2)}</span>
+              </div>` : ''}
+            ${n.type === 'market_lost' ? `
+              <div style="color:var(--muted);font-size:0.76rem;padding-top:8px;border-top:1px solid var(--border)">Resultado: ${meta.market_title ? 'mercado encerrado sem prêmio' : 'sem prêmio'}</div>` : ''}
           </div>
-          ${!n.is_read ? '<div style="width:8px;height:8px;background:var(--green);border-radius:50%;margin-top:4px;flex-shrink:0"></div>' : ''}
-        </div>
-      </div>`).join('');
+        </div>` : '';
+
+      return `
+        <div style="border-bottom:1px solid var(--border);background:${unread ? 'rgba(16,185,129,0.03)' : 'transparent'}">
+          <div onclick="window.toggleNotifItem(${i})" style="padding:13px 16px;cursor:pointer;display:flex;align-items:flex-start;gap:12px;transition:background .15s" onmouseenter="this.style.background='rgba(255,255,255,0.025)'" onmouseleave="this.style.background='transparent'">
+            <div style="width:34px;height:34px;border-radius:10px;background:${bg};display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;margin-top:1px">${icon}</div>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+                <span style="font-weight:700;font-size:0.84rem">${n.title}</span>
+                ${unread ? '<span style="width:6px;height:6px;background:var(--green);border-radius:50%;display:inline-block;flex-shrink:0"></span>' : ''}
+              </div>
+              <div style="color:var(--muted);font-size:0.77rem;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px">${n.body}</div>
+              <div style="color:var(--muted);font-size:0.67rem;margin-top:4px;opacity:.65">${fmt(n.created_at)}</div>
+            </div>
+            ${detailHtml ? chevronSvg(i) : ''}
+          </div>
+          ${detailHtml}
+        </div>`;
+    }).join('');
   } catch(e) {}
+};
+
+window.toggleNotifItem = function(i) {
+  const detail  = document.getElementById('nDetail' + i);
+  const chevron = document.getElementById('nChev' + i);
+  if (!detail) return;
+  const open = detail.style.display !== 'none';
+  detail.style.display = open ? 'none' : 'block';
+  if (chevron) chevron.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
 };
 
 window.toggleNotifPanel = function() {
@@ -1889,21 +1970,35 @@ window.markAllRead = async function() {
   const token = localStorage.getItem('preditivo_token');
   if (!token) return;
   try {
-    await fetch(window.API + '/notifications/read-all', {
-      method: 'PATCH',
-      headers: { 'Authorization': 'Bearer ' + token }
-    });
+    await fetch(window.API + '/notifications/read-all', { method:'PATCH', headers:{ 'Authorization':'Bearer ' + token } });
     await window.loadNotifications();
   } catch(e) {}
 };
 
-// Fechar painel ao clicar fora
+window.toggleProfileMenu = function() {
+  const menu    = document.getElementById('profileMenu');
+  const chevron = document.getElementById('profileChevron');
+  if (!menu) return;
+  _profileMenuOpen = !_profileMenuOpen;
+  menu.style.display = _profileMenuOpen ? 'block' : 'none';
+  if (chevron) chevron.style.transform = _profileMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+};
+
+// Fechar painéis ao clicar fora
 document.addEventListener('click', function(e) {
   const panel = document.getElementById('notifPanel');
   const bell  = document.getElementById('bellBtn');
   if (panel && bell && !bell.contains(e.target) && !panel.contains(e.target)) {
     panel.style.display = 'none';
     _notifPanelOpen = false;
+  }
+  const pmenu  = document.getElementById('profileMenu');
+  const pbtn   = document.getElementById('profileBtn');
+  const pchev  = document.getElementById('profileChevron');
+  if (pmenu && pbtn && !pbtn.contains(e.target) && !pmenu.contains(e.target)) {
+    pmenu.style.display = 'none';
+    _profileMenuOpen = false;
+    if (pchev) pchev.style.transform = 'rotate(0deg)';
   }
 });
 

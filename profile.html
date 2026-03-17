@@ -761,6 +761,13 @@ async function init() {
   if(!savedToken){ openModal('loginModal'); return; }
   state.token=savedToken;
   await loadProfile();
+  // Abrir tab via sessionStorage (vindo do dropdown do header)
+  var pendingTab = sessionStorage.getItem('profileTab');
+  if (pendingTab) {
+    sessionStorage.removeItem('profileTab');
+    var tabMap = { security:'seguranca', referrals:'indicacoes', edit:'editar' };
+    switchTab(tabMap[pendingTab] || pendingTab);
+  }
 }
 
 init();

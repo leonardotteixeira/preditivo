@@ -5,245 +5,186 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <title>Bubuya — Meu Perfil</title>
-<meta name="description" content="Gerencie seu perfil, apostas, depósitos e saque na Bubuya.">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 <style>
-  /* FOOTER STYLES */
-  footer {
-    background: rgba(5,5,5,0.5);
-    border-top: 1px solid var(--border);
-    padding: 80px 24px 40px;
-    margin-top: 80px;
-    position: relative;
-    z-index: 1;
-  }
-  .footer-inner {
-    max-width: 1100px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
-    gap: 48px;
-  }
-  .footer-col h4 {
-    color: var(--text);
-    margin-bottom: 24px;
-    font-size: 0.95rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-  .footer-col ul { list-style: none; }
-  .footer-col li { margin-bottom: 12px; }
-  .footer-col a {
-    color: var(--muted);
-    text-decoration: none;
-    font-size: 0.95rem;
-    transition: all 0.2s;
-    cursor: pointer;
-    font-weight: 500;
-  }
-  .footer-col a:hover { color: var(--blue); }
-  
-  .footer-legal {
-    max-width: 1100px;
-    margin: 48px auto 0;
-    padding-top: 32px;
-    border-top: 1px solid var(--border);
-    color: var(--muted);
-    font-size: 0.85rem;
-    line-height: 1.8;
-  }
-  .footer-disclaimer {
-    background: rgba(255,255,255,0.02);
-    border: 1px solid var(--border);
-    padding: 20px;
-    border-radius: 12px;
-    margin-top: 24px;
-  }
-  
-  @media (max-width: 768px) {
-    .footer-inner { grid-template-columns: 1fr; gap: 40px; }
-  }
-
-* { margin:0; padding:0; box-sizing:border-box; }
-:root {
-  --bg:#080c10; --surface:#0e1419; --surface2:#141c24;
-  --border:rgba(255,255,255,0.07); --green:#00e676; --red:#ff4757;
-  --blue:#00b4ff; --gold:#ffc107; --text:#e8edf2; --muted:#5a6878;
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#080c10;--surface:#0e1419;--surface2:#141c24;
+  --border:rgba(255,255,255,0.07);--green:#00e676;--red:#ff4757;
+  --blue:#00b4ff;--gold:#ffc107;--text:#e8edf2;--muted:#5a6878;
 }
-body { font-family:'Space Grotesk',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
-body::after {
-  content:''; position:fixed; inset:0;
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+body::after{
+  content:'';position:fixed;inset:0;
   background-image:linear-gradient(rgba(0,230,118,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,230,118,0.03) 1px,transparent 1px);
-  background-size:40px 40px; pointer-events:none; z-index:0;
+  background-size:40px 40px;pointer-events:none;z-index:0;
 }
-header {
-  position:sticky; top:0; z-index:100;
-  background:rgba(8,12,16,0.9); backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--border); padding:0 24px;
+
+/* ── HEADER ── */
+header{position:sticky;top:0;z-index:100;background:rgba(8,12,16,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 24px}
+.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:16px;height:64px}
+.logo{font-size:1.3rem;font-weight:700;letter-spacing:-0.5px;background:linear-gradient(135deg,var(--green),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none}
+nav{display:flex;gap:4px;margin-left:12px}
+nav a{color:var(--muted);font-size:0.9rem;font-weight:500;padding:6px 14px;border-radius:10px;cursor:pointer;text-decoration:none;transition:all .2s}
+nav a:hover{color:var(--text);background:var(--surface2)}
+nav a.active{color:var(--green);background:rgba(0,230,118,0.08)}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.btn-outline{padding:8px 16px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--text);cursor:pointer;font-family:inherit;font-size:0.85rem;font-weight:600;transition:all .2s}
+.btn-outline:hover{border-color:rgba(255,255,255,0.2);color:#fff}
+.btn-primary{padding:10px 20px;background:var(--green);color:#080c10;font-weight:700;font-size:0.9rem;border:none;border-radius:10px;cursor:pointer;font-family:inherit;transition:opacity .2s}
+.btn-primary:hover{opacity:.88}
+.btn-finance{padding:8px 14px;border-radius:10px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;border:none;transition:all .2s}
+.btn-deposit{background:rgba(0,230,118,0.12);color:var(--green)}
+.btn-deposit:hover{background:rgba(0,230,118,0.2)}
+.btn-withdraw{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+.btn-withdraw:hover{color:var(--text)}
+
+/* ── PAGE ── */
+.page{max-width:1100px;margin:0 auto;padding:40px 24px 80px;position:relative;z-index:1}
+
+/* ── PROFILE HEADER ── */
+.profile-hero{
+  background:var(--surface);border:1px solid var(--border);border-radius:24px;
+  padding:36px;margin-bottom:24px;display:flex;align-items:center;gap:28px;
+  position:relative;overflow:hidden;isolation:isolate
 }
-.header-inner { max-width:1100px; margin:0 auto; display:flex; align-items:center; gap:16px; height:64px; }
-.logo {
-  font-size:1.3rem; font-weight:700; letter-spacing:-0.5px;
+.profile-hero::before{
+  content:'';position:absolute;top:-60px;right:-60px;width:280px;height:280px;
+  border-radius:50%;background:radial-gradient(circle,rgba(0,230,118,0.08) 0%,transparent 70%)
+}
+.profile-avatar{
+  width:88px;height:88px;border-radius:50%;
   background:linear-gradient(135deg,var(--green),var(--blue));
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-  cursor:pointer; text-decoration:none;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2rem;font-weight:700;color:#080c10;flex-shrink:0;
+  box-shadow:0 0 0 3px rgba(0,230,118,0.2)
 }
-.back-btn {
-  display:flex; align-items:center; gap:6px; color:var(--muted);
-  font-size:0.85rem; cursor:pointer; text-decoration:none;
-  padding:6px 12px; border-radius:8px; border:1px solid var(--border); transition:all 0.2s;
-}
-.back-btn:hover { color:var(--text); border-color:rgba(255,255,255,0.15); }
-.header-right { margin-left:auto; display:flex; align-items:center; gap:12px; }
-.user-chip {
-  display:flex; align-items:center; gap:8px; padding:6px 12px;
-  background:var(--surface); border:1px solid var(--border); border-radius:10px; font-size:0.85rem;
-}
-.user-avatar {
-  width:28px; height:28px; border-radius:50%;
-  background:linear-gradient(135deg,var(--green),var(--blue));
-  display:flex; align-items:center; justify-content:center;
-  font-size:0.75rem; font-weight:700; color:#080c10;
-}
+.profile-info{flex:1}
+.profile-name{font-size:1.8rem;font-weight:700;margin-bottom:4px}
+.profile-email{font-size:0.85rem;color:var(--muted);margin-bottom:14px}
+.profile-badges{display:flex;gap:8px;flex-wrap:wrap}
+.badge{padding:4px 12px;border-radius:100px;font-size:0.73rem;font-weight:700;background:rgba(0,230,118,0.1);color:var(--green);border:1px solid rgba(0,230,118,0.2)}
+.badge-gold{background:rgba(255,193,7,0.1);color:var(--gold);border-color:rgba(255,193,7,0.2)}
+.badge-blue{background:rgba(0,180,255,0.1);color:var(--blue);border-color:rgba(0,180,255,0.2)}
 
-.page { max-width:1100px; margin:0 auto; padding:32px 24px 80px; position:relative; z-index:1; }
+/* ── STATS GRID ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+@media(max-width:700px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
+.stat-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px
+}
+.stat-label{font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.stat-value{font-size:1.5rem;font-weight:700;font-family:'DM Mono',monospace}
 
-/* PROFILE HEADER */
-.profile-header {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:20px; padding:32px; margin-bottom:24px;
-  display:flex; align-items:center; gap:24px;
-  position:relative; overflow:hidden; isolation:isolate;
+/* ── TABS ── */
+.tab-row{display:flex;gap:4px;margin-bottom:28px;overflow-x:auto;scrollbar-width:none;padding:4px;background:var(--surface);border:1px solid var(--border);border-radius:14px}
+.tab-btn{
+  padding:9px 18px;background:transparent;border:none;color:var(--muted);
+  cursor:pointer;font-family:inherit;font-size:0.88rem;font-weight:600;
+  border-radius:10px;white-space:nowrap;transition:all .2s
 }
-.profile-header::before {
-  content:''; position:absolute; top:-40px; right:-40px;
-  width:200px; height:200px; border-radius:50%;
-  background:radial-gradient(circle,rgba(0,230,118,0.1) 0%,transparent 70%);
-}
-.profile-avatar-lg {
-  width:80px; height:80px; border-radius:50%;
-  background:linear-gradient(135deg,var(--green),var(--blue));
-  display:flex; align-items:center; justify-content:center;
-  font-size:1.8rem; font-weight:700; color:#080c10; flex-shrink:0;
-}
-.profile-info { flex:1; }
-.profile-name { font-size:1.6rem; font-weight:700; margin-bottom:4px; }
-.profile-email { font-size:0.85rem; color:var(--muted); margin-bottom:12px; }
-.profile-badges { display:flex; gap:8px; flex-wrap:wrap; }
-.badge-chip {
-  padding:4px 12px; border-radius:100px; font-size:0.75rem; font-weight:600;
-  background:rgba(0,230,118,0.1); color:var(--green); border:1px solid rgba(0,230,118,0.2);
-}
-.btn-edit {
-  padding:10px 20px; background:var(--surface2); border:1px solid var(--border);
-  border-radius:8px; color:var(--text); cursor:pointer; font-family:inherit;
-  font-size:0.85rem; font-weight:600; transition:all 0.2s; position:relative; z-index:2;
-}
-.btn-edit:hover { border-color:var(--green); color:var(--green); }
+.tab-btn.active{background:var(--surface2);color:var(--green)}
+.tab-btn:hover:not(.active){color:var(--text)}
+.tab-content{display:none}
+.tab-content.active{display:block}
 
-/* STATS GRID */
-.stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
-@media(max-width:700px) { .stats-grid { grid-template-columns:repeat(2,1fr); } }
-.stat-card {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:14px; padding:20px;
+/* ── BET CARDS (mesma aparência que portfolio-card) ── */
+.bets-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.bet-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:20px;
+  padding:22px;transition:border-color .2s
 }
-.stat-label { font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
-.stat-value { font-size:1.5rem; font-weight:700; font-family:'DM Mono',monospace; }
+.bet-card:hover{border-color:rgba(255,255,255,0.14)}
+.bet-market{font-size:0.78rem;color:var(--muted);text-transform:uppercase;margin-bottom:10px;line-height:1.4}
+.bet-pnl{font-size:1.5rem;font-weight:800;margin-bottom:12px}
+.bet-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bet-field-label{font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.bet-field-val{font-size:0.9rem;font-weight:700}
+.pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.72rem;font-weight:800}
+.pill-yes{background:rgba(0,230,118,0.15);color:var(--green)}
+.pill-no{background:rgba(255,71,87,0.15);color:var(--red)}
+.pill-won{background:rgba(0,230,118,0.15);color:#10b981}
+.pill-lost{background:rgba(239,68,68,0.12);color:#ef4444}
+.pill-open{background:rgba(0,180,255,0.12);color:var(--blue)}
 
-/* TABS */
-.tabs { display:flex; gap:4px; border-bottom:1px solid var(--border); margin-bottom:24px; }
-.tab-btn {
-  padding:10px 20px; background:transparent; border:none;
-  color:var(--muted); cursor:pointer; font-family:inherit;
-  font-size:0.9rem; font-weight:500; border-bottom:2px solid transparent;
-  margin-bottom:-1px; transition:all 0.2s;
+/* ── PNL CARDS ── */
+.pnl-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:20px;margin-bottom:12px;display:flex;align-items:center;gap:16px
 }
-.tab-btn.active { color:var(--green); border-bottom-color:var(--green); }
-.tab-btn:hover:not(.active) { color:var(--text); }
-.tab-content { display:none; }
-.tab-content.active { display:block; }
+.pnl-market{flex:1;font-size:0.9rem;font-weight:600}
+.pnl-meta{font-size:0.78rem;color:var(--muted);margin-top:4px}
+.pnl-value{font-family:'DM Mono',monospace;font-size:1.05rem;font-weight:700;text-align:right;white-space:nowrap}
 
-/* BETS TABLE */
-.bets-table { width:100%; border-collapse:collapse; }
-.bets-table th {
-  text-align:left; padding:10px 12px; font-size:0.72rem;
-  text-transform:uppercase; letter-spacing:1px; color:var(--muted);
-  border-bottom:1px solid var(--border);
+/* ── DEPOSITS ── */
+.dep-list{}
+.dep-row{display:flex;align-items:center;gap:16px;padding:16px;margin-bottom:8px;background:var(--surface);border:1px solid var(--border);border-radius:14px}
+.dep-code{font-family:'DM Mono',monospace;font-size:0.82rem;color:var(--blue)}
+.dep-amount{font-family:'DM Mono',monospace;font-size:1rem;font-weight:700;color:var(--green);margin-left:auto}
+.dep-status{padding:3px 10px;border-radius:100px;font-size:0.72rem;font-weight:700;white-space:nowrap}
+.dep-pending{background:rgba(255,193,7,0.12);color:var(--gold)}
+.dep-confirmed{background:rgba(0,230,118,0.12);color:var(--green)}
+.dep-rejected{background:rgba(255,71,87,0.12);color:var(--red)}
+
+/* ── EDIT / SECURITY CARDS ── */
+.edit-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:520px}
+.form-label{display:block;font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;margin-top:16px}
+.form-input{
+  width:100%;background:var(--surface2);border:1px solid var(--border);
+  border-radius:10px;padding:12px 16px;color:var(--text);font-family:inherit;font-size:0.95rem;outline:none;transition:border-color .2s
 }
-.bets-table td { padding:14px 12px; font-size:0.9rem; border-bottom:1px solid rgba(255,255,255,0.03); }
-.bets-table tr:hover td { background:rgba(255,255,255,0.02); }
-.status-badge {
-  padding:3px 10px; border-radius:100px; font-size:0.75rem; font-weight:600;
+.form-input:focus{border-color:var(--green)}
+.form-input:disabled{opacity:.4}
+.btn-save{padding:12px 28px;background:var(--green);color:#080c10;font-weight:700;font-size:0.95rem;border:none;border-radius:10px;cursor:pointer;font-family:inherit;transition:opacity .2s;margin-top:16px}
+.btn-save:hover{opacity:.85}
+.btn-danger{background:#ef4444;color:#fff}
+.form-feedback{margin-top:10px;font-size:0.85rem}
+
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:64px;color:var(--muted)}
+.empty-icon{font-size:3rem;margin-bottom:16px}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.active{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px;width:90%;max-width:420px}
+.modal h3{margin-bottom:8px;font-size:1.2rem}
+.modal p{color:var(--muted);font-size:0.9rem;margin-bottom:20px}
+.modal-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--text);font-size:1rem;font-family:inherit;outline:none;margin-bottom:12px;transition:border-color .2s}
+.modal-input:focus{border-color:var(--green)}
+.modal-btn{width:100%;padding:14px;font-weight:700;font-size:1rem;border:none;border-radius:10px;cursor:pointer;font-family:inherit;transition:opacity .2s}
+.modal-btn-primary{background:var(--green);color:#080c10}
+.modal-btn-secondary{background:transparent;color:var(--muted);border:1px solid var(--border);margin-top:8px}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:14px 20px;font-size:0.9rem;z-index:9999;transform:translateY(100px);opacity:0;transition:all .3s;max-width:320px}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* ── FOOTER ── */
+footer{background:rgba(5,5,5,0.5);border-top:1px solid var(--border);padding:60px 24px 32px;margin-top:80px;position:relative;z-index:1}
+.footer-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px}
+.footer-col h4{color:var(--text);margin-bottom:20px;font-size:0.85rem;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.footer-col ul{list-style:none}
+.footer-col li{margin-bottom:10px}
+.footer-col a{color:var(--muted);text-decoration:none;font-size:0.9rem;cursor:pointer;transition:color .2s}
+.footer-col a:hover{color:var(--text)}
+.footer-legal{max-width:1100px;margin:40px auto 0;padding-top:28px;border-top:1px solid var(--border);color:var(--muted);font-size:0.82rem}
+@media(max-width:768px){.footer-inner{grid-template-columns:1fr;gap:32px}}
+
+/* ── REFERRAL CARD ── */
+.ref-hero{background:linear-gradient(135deg,rgba(0,153,116,0.12),rgba(0,200,110,0.04));border:1px solid rgba(0,230,118,0.2);border-radius:20px;padding:28px;margin-bottom:20px}
+.ref-link-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0}
+.ref-link-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-size:0.83rem;font-family:monospace;outline:none;min-width:0}
+.ref-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.ref-stat-card{background:var(--surface2);border-radius:14px;padding:20px;text-align:center}
+
+@media(max-width:600px){
+  .profile-hero{flex-direction:column;text-align:center}
+  .bets-grid{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .tab-row{flex-wrap:nowrap}
+  .ref-stats{grid-template-columns:1fr}
 }
-.status-open { background:rgba(0,180,255,0.12); color:var(--blue); }
-.status-won { background:rgba(0,230,118,0.12); color:var(--green); }
-.status-lost { background:rgba(255,71,87,0.12); color:var(--red); }
-.side-yes { background:rgba(0,230,118,0.12); color:var(--green); padding:3px 10px; border-radius:6px; font-size:0.8rem; font-weight:700; }
-.side-no { background:rgba(255,71,87,0.12); color:var(--red); padding:3px 10px; border-radius:6px; font-size:0.8rem; font-weight:700; }
-
-/* PNL TABLE */
-.pnl-card {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:14px; padding:20px; margin-bottom:12px;
-  display:flex; align-items:center; gap:16px;
-}
-.pnl-market { flex:1; font-size:0.9rem; font-weight:500; }
-.pnl-meta { font-size:0.78rem; color:var(--muted); margin-top:4px; }
-.pnl-value { font-family:'DM Mono',monospace; font-size:1rem; font-weight:700; text-align:right; }
-.pnl-pos { color:var(--green); }
-.pnl-neg { color:var(--red); }
-.pnl-neutral { color:var(--muted); }
-
-/* DEPOSITS TABLE */
-.deposit-row { display:flex; align-items:center; gap:16px; padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.03); }
-.deposit-code { font-family:'DM Mono',monospace; font-size:0.85rem; color:var(--blue); }
-.deposit-amount { font-family:'DM Mono',monospace; font-size:1rem; font-weight:700; color:var(--green); margin-left:auto; }
-.deposit-status { padding:3px 10px; border-radius:100px; font-size:0.75rem; font-weight:600; }
-.dep-pending { background:rgba(255,193,7,0.12); color:var(--gold); }
-.dep-confirmed { background:rgba(0,230,118,0.12); color:var(--green); }
-.dep-rejected { background:rgba(255,71,87,0.12); color:var(--red); }
-
-/* EDIT FORM */
-.edit-card {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:14px; padding:28px; max-width:500px;
-}
-.form-group { margin-bottom:16px; }
-.form-label { display:block; font-size:0.8rem; color:var(--muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:1px; }
-.form-input {
-  width:100%; background:var(--surface2); border:1px solid var(--border);
-  border-radius:8px; padding:12px 16px; color:var(--text);
-  font-family:inherit; font-size:0.95rem; outline:none; transition:border-color 0.2s;
-}
-.form-input:focus { border-color:var(--green); }
-.btn-save {
-  padding:12px 28px; background:var(--green); color:#080c10;
-  font-weight:700; font-size:0.95rem; border:none; border-radius:8px;
-  cursor:pointer; font-family:inherit; transition:opacity 0.2s;
-}
-.btn-save:hover { opacity:0.85; }
-.form-feedback { margin-top:12px; font-size:0.85rem; }
-
-/* EMPTY STATE */
-.empty { text-align:center; padding:60px; color:var(--muted); }
-.empty-icon { font-size:3rem; margin-bottom:16px; }
-
-/* MODAL */
-.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(8px); z-index:1000; align-items:center; justify-content:center; }
-.modal-overlay.active { display:flex; }
-.modal { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:32px; width:90%; max-width:420px; }
-.modal h3 { margin-bottom:8px; }
-.modal p { color:var(--muted); font-size:0.9rem; margin-bottom:20px; }
-.modal-input { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:12px 16px; color:var(--text); font-size:1rem; font-family:inherit; outline:none; margin-bottom:12px; }
-.modal-input:focus { border-color:var(--green); }
-.btn-primary { width:100%; padding:14px; background:var(--green); color:#080c10; font-weight:700; font-size:1rem; border:none; border-radius:8px; cursor:pointer; font-family:inherit; }
-.btn-secondary { width:100%; padding:12px; background:transparent; color:var(--text); font-weight:600; border:1px solid var(--border); border-radius:8px; cursor:pointer; font-family:inherit; margin-top:8px; }
-
-.toast { position:fixed; bottom:24px; right:24px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 20px; font-size:0.9rem; z-index:2000; transform:translateY(100px); opacity:0; transition:all 0.3s; }
-.toast.show { transform:translateY(0); opacity:1; }
 </style>
 </head>
 <body>
@@ -251,223 +192,281 @@ header {
 <header>
   <div class="header-inner">
     <a class="logo" href="/">Bubuya.</a>
-    <a class="back-btn" href="/">← Mercados</a>
+    <nav>
+      <a href="/" >Explorar</a>
+      <a href="/#portfolio">Portfólio</a>
+      <a class="active">Perfil</a>
+    </nav>
     <div class="header-right" id="authArea">
-      <button class="back-btn" onclick="connectWallet()" id="btnConnectWallet" style="border-color:var(--blue);color:var(--blue)">Conectar Carteira</button>
+      <!-- preenchido por updateAuthUI() -->
     </div>
   </div>
 </header>
 
 <div class="page" id="pageContent">
-  <div style="text-align:center;padding:80px;color:var(--muted)">Carregando perfil...</div>
+  <div class="empty"><div class="empty-icon">⏳</div>Carregando perfil...</div>
 </div>
 
 <!-- LOGIN MODAL -->
 <div class="modal-overlay" id="loginModal">
   <div class="modal">
     <div id="loginStep1">
-      <h3>Entrar</h3>
+      <h3>Entrar na Bubuya</h3>
       <p>Acesse sua conta para ver o perfil</p>
       <input class="modal-input" type="email" placeholder="Email" id="loginEmail">
       <input class="modal-input" type="password" placeholder="Senha" id="loginPass" onkeydown="if(event.key==='Enter')doLogin()">
-      <button class="btn-primary" onclick="doLogin()">Entrar</button>
-      <button class="btn-secondary" onclick="window.location.href='/'">Voltar</button>
+      <button class="modal-btn modal-btn-primary" onclick="doLogin()">Entrar</button>
+      <button class="modal-btn modal-btn-secondary" onclick="window.location.href='/'">Voltar ao início</button>
     </div>
     <div id="loginStep2" style="display:none">
-      <h3>Verificação em duas etapas</h3>
-      <p>Enviamos um código de 6 dígitos para o seu email.</p>
-      <input class="modal-input" type="text" placeholder="Código de 6 dígitos" id="login2faCode" maxlength="6" inputmode="numeric" autocomplete="one-time-code">
-      <button class="btn-primary" onclick="doLogin2fa()">Verificar</button>
-      <button class="btn-secondary" onclick="document.getElementById('loginStep1').style.display='';document.getElementById('loginStep2').style.display='none'">Voltar</button>
+      <h3>Verificação em 2 etapas</h3>
+      <p>Código enviado para seu email.</p>
+      <input class="modal-input" type="text" placeholder="Código de 6 dígitos" id="login2faCode" maxlength="6" inputmode="numeric" autocomplete="one-time-code" onkeydown="if(event.key==='Enter')doLogin2fa()">
+      <button class="modal-btn modal-btn-primary" onclick="doLogin2fa()">Verificar</button>
+      <button class="modal-btn modal-btn-secondary" onclick="document.getElementById('loginStep1').style.display='';document.getElementById('loginStep2').style.display='none'">← Voltar</button>
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<script src="./config.js"></script>
+<script src="./config.js?v=20260321"></script>
 <script>
 var API = window.PREDITIVO_CONFIG.API_BASE;
 var state = { user: null, token: null, bets: [], deposits: [] };
 
+/* ── UTILS ── */
 function showToast(msg) {
   var t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(function(){ t.classList.remove('show'); }, 3000);
+  setTimeout(function(){ t.classList.remove('show'); }, 3200);
 }
-
-function openModal(id) { document.getElementById(id).classList.add('active'); }
+function openModal(id)  { document.getElementById(id).classList.add('active'); }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function fmtDate(d) { return d ? new Date(d).toLocaleDateString('pt-BR', {day:'2-digit',month:'2-digit',year:'numeric'}) : '-'; }
+function fmtR(v)    { return parseFloat(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2}); }
 
 async function apiGet(path, token) {
-  var res = await fetch(API + path, { headers: token ? { Authorization: 'Bearer ' + token } : {} });
-  return res.json();
+  var r = await fetch(API+path, {headers: token ? {Authorization:'Bearer '+token} : {}});
+  return r.json();
 }
 async function apiPost(path, body, token) {
-  var res = await fetch(API + path, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
-    body: JSON.stringify(body)
-  });
-  return res.json();
+  var r = await fetch(API+path, {method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify(body)});
+  return r.json();
 }
 async function apiPatch(path, body, token) {
-  var res = await fetch(API + path, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
-    body: JSON.stringify(body)
-  });
-  return res.json();
+  var r = await fetch(API+path, {method:'PATCH',headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify(body)});
+  return r.json();
 }
 
-function formatDate(d) {
-  if (!d) return '-';
-  return new Date(d).toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric' });
-}
-
+/* ── TABS ── */
 function switchTab(name) {
   document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
   document.querySelectorAll('.tab-content').forEach(function(c){ c.classList.remove('active'); });
-  document.getElementById('tab-btn-' + name).classList.add('active');
-  document.getElementById('tab-' + name).classList.add('active');
+  var btn = document.getElementById('tab-btn-'+name);
+  var content = document.getElementById('tab-'+name);
+  if (btn) btn.classList.add('active');
+  if (content) content.classList.add('active');
   if (name === 'indicacoes') loadIndicacoes();
-  // seguranca tab is rendered by renderPage, no async load needed
 }
 
+/* ── AUTH UI ── */
+function updateAuthUI() {
+  var area = document.getElementById('authArea');
+  if (!area) return;
+  if (state.user) {
+    area.innerHTML =
+      '<div style="display:flex;align-items:center;gap:10px">' +
+        '<button class="btn-finance btn-deposit" onclick="window.location.href=\'/\'">Depositar</button>' +
+        '<div style="text-align:right">' +
+          '<div style="font-weight:800;font-size:0.95rem">' + state.user.name + '</div>' +
+          '<div style="color:var(--green);font-family:DM Mono,monospace;font-size:0.85rem;font-weight:700">R$' + fmtR(state.user.balance) + '</div>' +
+        '</div>' +
+        '<button class="btn-outline" onclick="doLogout()">Sair</button>' +
+      '</div>';
+  } else {
+    area.innerHTML = '<button class="btn-primary" onclick="openModal(\'loginModal\')">Entrar</button>';
+  }
+}
+
+function doLogout() {
+  localStorage.removeItem('preditivo_token');
+  window.location.href = '/';
+}
+
+/* ── RENDER PAGE ── */
 function renderPage() {
   var u = state.user;
   var bets = state.bets;
-  var deposits = state.deposits;
+  var deps = state.deposits;
 
-  // Stats
+  /* Stats */
   var totalBets = bets.length;
-  var won = bets.filter(function(b){ return b.status === 'won'; }).length;
-  var totalInvested = bets.reduce(function(s,b){ return s + parseFloat(b.amount); }, 0);
-  var totalPayout = bets.filter(function(b){ return b.status === 'won'; }).reduce(function(s,b){ return s + parseFloat(b.payout || b.potential_payout || 0); }, 0);
-  var totalLost = bets.filter(function(b){ return b.status === 'lost'; }).reduce(function(s,b){ return s + parseFloat(b.amount); }, 0);
-  var pnl = totalPayout - totalLost;
-  var winRate = totalBets > 0 ? Math.round((won / totalBets) * 100) : 0;
+  var won = bets.filter(function(b){ return b.status==='won'; }).length;
+  var totalInvested = bets.reduce(function(s,b){ return s+parseFloat(b.amount||0); }, 0);
+  var totalReturn = bets.filter(function(b){ return b.status==='won'; })
+                        .reduce(function(s,b){ return s+parseFloat(b.payout||b.potential_payout||0); }, 0);
+  var totalLost = bets.filter(function(b){ return b.status==='lost'; })
+                      .reduce(function(s,b){ return s+parseFloat(b.amount||0); }, 0);
+  var pnl = totalReturn - totalLost;
+  var winRate = totalBets > 0 ? Math.round((won/totalBets)*100) : 0;
 
-  // Bets rows
-  var betsRows = bets.length === 0
-    ? '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--muted)">Nenhuma aposta ainda</td></tr>'
-    : bets.map(function(b) {
-        var pnlVal = b.status === 'won' ? parseFloat(b.payout || b.potential_payout || 0) - parseFloat(b.amount)
-                   : b.status === 'lost' ? -parseFloat(b.amount) : null;
-        var pnlStr = pnlVal === null ? '-' : (pnlVal >= 0 ? '<span style="color:var(--green)">+R$'+pnlVal.toFixed(2)+'</span>' : '<span style="color:var(--red)">-R$'+Math.abs(pnlVal).toFixed(2)+'</span>');
-        return '<tr>' +
-          '<td style="max-width:260px;font-size:0.85rem">' + (b.market_title || b.market_id) + '</td>' +
-          '<td><span class="side-' + b.side + '">' + (b.side === 'yes' ? 'SIM' : 'NAO') + '</span></td>' +
-          '<td style="font-family:DM Mono,monospace">R$' + parseFloat(b.amount).toFixed(2) + '</td>' +
-          '<td><span class="status-badge status-' + b.status + '">' + b.status.toUpperCase() + '</span></td>' +
-          '<td>' + pnlStr + '</td>' +
-          '</tr>';
-      }).join('');
-
-  // PnL by market
-  var marketMap = {};
-  bets.forEach(function(b) {
-    var key = b.market_title || b.market_id;
-    if (!marketMap[key]) marketMap[key] = { title: key, invested: 0, returned: 0, count: 0 };
-    marketMap[key].invested += parseFloat(b.amount);
-    marketMap[key].count++;
-    if (b.status === 'won') marketMap[key].returned += parseFloat(b.payout || b.potential_payout || 0);
-    if (b.status === 'lost') marketMap[key].returned += 0;
-  });
-  var pnlCards = Object.values(marketMap).length === 0
-    ? '<div class="empty"><div class="empty-icon">📊</div>Nenhuma aposta ainda</div>'
-    : Object.values(marketMap).map(function(m) {
-        var mp = m.returned - m.invested;
-        var mpClass = mp > 0 ? 'pnl-pos' : mp < 0 ? 'pnl-neg' : 'pnl-neutral';
-        var mpStr = mp > 0 ? '+R$'+mp.toFixed(2) : 'R$'+mp.toFixed(2);
-        return '<div class="pnl-card">' +
-          '<div><div class="pnl-market">' + m.title + '</div><div class="pnl-meta">' + m.count + ' aposta(s) · investido R$' + m.invested.toFixed(2) + '</div></div>' +
-          '<div class="pnl-value ' + mpClass + '">' + mpStr + '</div>' +
-          '</div>';
-      }).join('');
-
-  // Deposits rows
-  var depRows = deposits.length === 0
-    ? '<div class="empty"><div class="empty-icon">💰</div>Nenhum depósito ainda</div>'
-    : deposits.map(function(d) {
-        return '<div class="deposit-row">' +
-          '<div>' +
-            '<div class="deposit-code">' + d.code + '</div>' +
-            '<div style="font-size:0.78rem;color:var(--muted);margin-top:3px">' + formatDate(d.created_at) + '</div>' +
+  /* Bet cards */
+  var betCards = bets.length === 0
+    ? '<div class="empty"><div class="empty-icon">🎯</div>Nenhuma aposta ainda.<br><a href="/" style="color:var(--green);font-size:0.9rem;margin-top:8px;display:inline-block">Ver mercados →</a></div>'
+    : '<div class="bets-grid">' + bets.map(function(b){
+        var won_ = b.status==='won', lost_=b.status==='lost', open_=b.status==='open';
+        var pnlVal = won_ ? parseFloat(b.payout||b.potential_payout||0)-parseFloat(b.amount||0)
+                   : lost_ ? -parseFloat(b.amount||0) : null;
+        var pnlStr = pnlVal===null
+          ? '<span style="color:var(--muted)">Em aberto</span>'
+          : pnlVal>=0
+            ? '<span style="color:var(--green)">+R$'+fmtR(Math.abs(pnlVal))+'</span>'
+            : '<span style="color:#ef4444">-R$'+fmtR(Math.abs(pnlVal))+'</span>';
+        var statusClass = won_?'pill-won':lost_?'pill-lost':'pill-open';
+        var statusLabel = won_?'✓ GANHOU':lost_?'✗ PERDEU':'EM ABERTO';
+        return '<div class="bet-card">' +
+          '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">' +
+            '<div class="bet-market" style="flex:1;padding-right:8px">'+(b.market_title||b.market_id)+'</div>' +
+            '<span class="pill '+(b.side==='yes'?'pill-yes':'pill-no')+'">'+(b.side==='yes'?'SIM':'NÃO')+'</span>' +
           '</div>' +
-          '<span class="deposit-status dep-' + d.status + '">' + d.status.toUpperCase() + '</span>' +
-          '<div class="deposit-amount">R$' + parseFloat(d.amount).toFixed(2) + '</div>' +
+          '<span class="pill '+statusClass+'" style="margin-bottom:10px;display:inline-block">'+statusLabel+'</span>' +
+          '<div class="bet-pnl">'+pnlStr+'</div>' +
+          '<div class="bet-grid">' +
+            '<div><div class="bet-field-label">Investido</div><div class="bet-field-val">R$'+fmtR(b.amount)+'</div></div>' +
+            (won_
+              ? '<div><div class="bet-field-label">Recebido</div><div class="bet-field-val" style="color:var(--green)">R$'+fmtR(b.payout||0)+'</div></div>'
+              : open_
+                ? '<div><div class="bet-field-label">Payout pot.</div><div class="bet-field-val" style="color:var(--blue)">R$'+fmtR(b.potential_payout||0)+'</div></div>'
+                : '<div><div class="bet-field-label">Recebido</div><div class="bet-field-val" style="color:var(--muted)">R$0,00</div></div>'
+            ) +
+          '</div>' +
+          '<div style="margin-top:10px;font-size:0.7rem;color:var(--muted)">'+fmtDate(b.created_at)+'</div>' +
+        '</div>';
+      }).join('') + '</div>';
+
+  /* PnL por mercado */
+  var mMap = {};
+  bets.forEach(function(b){
+    var k = b.market_title||b.market_id;
+    if(!mMap[k]) mMap[k]={title:k,invested:0,returned:0,count:0};
+    mMap[k].invested+=parseFloat(b.amount||0);
+    mMap[k].count++;
+    if(b.status==='won') mMap[k].returned+=parseFloat(b.payout||b.potential_payout||0);
+  });
+  var pnlCards = Object.values(mMap).length===0
+    ? '<div class="empty"><div class="empty-icon">📊</div>Nenhuma aposta ainda.</div>'
+    : Object.values(mMap).map(function(m){
+        var mp=m.returned-m.invested;
+        var color=mp>0?'var(--green)':mp<0?'#ef4444':'var(--muted)';
+        var sign=mp>=0?'+':'';
+        return '<div class="pnl-card">' +
+          '<div style="flex:1">' +
+            '<div class="pnl-market">'+m.title+'</div>' +
+            '<div class="pnl-meta">'+m.count+' aposta(s) · investido R$'+fmtR(m.invested)+'</div>' +
+          '</div>' +
+          '<div class="pnl-value" style="color:'+color+'">'+sign+'R$'+fmtR(mp)+'</div>' +
         '</div>';
       }).join('');
 
+  /* Depósitos */
+  var depRows = deps.length===0
+    ? '<div class="empty"><div class="empty-icon">💰</div>Nenhum depósito ainda.</div>'
+    : deps.map(function(d){
+        return '<div class="dep-row">' +
+          '<div>' +
+            '<div class="dep-code">'+(d.code||d.id||'-')+'</div>' +
+            '<div style="font-size:0.77rem;color:var(--muted);margin-top:3px">'+fmtDate(d.created_at)+'</div>' +
+          '</div>' +
+          '<span class="dep-status dep-'+d.status+'">'+d.status.toUpperCase()+'</span>' +
+          '<div class="dep-amount">R$'+fmtR(d.amount)+'</div>' +
+        '</div>';
+      }).join('');
+
+  /* HTML montado */
   var html =
-    '<div class="profile-header">' +
-      '<div class="profile-avatar-lg">' + u.name.slice(0,2).toUpperCase() + '</div>' +
+    /* Profile hero */
+    '<div class="profile-hero">' +
+      '<div class="profile-avatar">'+u.name.slice(0,2).toUpperCase()+'</div>' +
       '<div class="profile-info">' +
-        '<div class="profile-name">' + u.name + '</div>' +
-        '<div class="profile-email">' + u.email + '</div>' +
+        '<div class="profile-name">'+u.name+'</div>' +
+        '<div class="profile-email">'+u.email+'</div>' +
         '<div class="profile-badges">' +
-          '<span class="badge-chip">Trader</span>' +
-          (winRate >= 60 ? '<span class="badge-chip" style="background:rgba(255,193,7,0.1);color:var(--gold);border-color:rgba(255,193,7,0.2)">Preciso</span>' : '') +
-          (totalBets >= 10 ? '<span class="badge-chip" style="background:rgba(0,180,255,0.1);color:var(--blue);border-color:rgba(0,180,255,0.2)">Veterano</span>' : '') +
+          '<span class="badge">Trader</span>' +
+          (winRate>=60?'<span class="badge badge-gold">🎯 Preciso</span>':'') +
+          (totalBets>=10?'<span class="badge badge-blue">⚡ Veterano</span>':'') +
+          (u.two_fa_enabled?'<span class="badge badge-blue">🔒 2FA Ativo</span>':'') +
         '</div>' +
       '</div>' +
-      '<button class="btn-edit" onclick="switchTab(\'editar\')">Editar perfil</button>' +
+      '<button class="btn-outline" onclick="switchTab(\'editar\')" style="align-self:flex-start">Editar perfil</button>' +
     '</div>' +
 
+    /* Stats */
     '<div class="stats-grid">' +
-      '<div class="stat-card"><div class="stat-label">Saldo</div><div class="stat-value" style="color:var(--green)">R$' + parseFloat(u.balance || 0).toFixed(2) + '</div></div>' +
-      '<div class="stat-card"><div class="stat-label">Apostas</div><div class="stat-value">' + totalBets + '</div></div>' +
-      '<div class="stat-card"><div class="stat-label">Taxa de acerto</div><div class="stat-value" style="color:' + (winRate >= 50 ? 'var(--green)' : 'var(--red)') + '">' + winRate + '%</div></div>' +
-      '<div class="stat-card"><div class="stat-label">P&L Total</div><div class="stat-value ' + (pnl >= 0 ? 'pnl-pos' : 'pnl-neg') + '">' + (pnl >= 0 ? '+' : '') + 'R$' + pnl.toFixed(2) + '</div></div>' +
+      '<div class="stat-card"><div class="stat-label">Saldo</div><div class="stat-value" style="color:var(--green)">R$'+fmtR(u.balance)+'</div></div>' +
+      '<div class="stat-card"><div class="stat-label">Apostas</div><div class="stat-value">'+totalBets+'</div></div>' +
+      '<div class="stat-card"><div class="stat-label">Taxa de acerto</div><div class="stat-value" style="color:'+(winRate>=50?'var(--green)':'#ef4444')+'">'+winRate+'%</div></div>' +
+      '<div class="stat-card"><div class="stat-label">P&L Total</div><div class="stat-value" style="color:'+(pnl>=0?'var(--green)':'#ef4444')+'">'+(pnl>=0?'+':'')+'R$'+fmtR(pnl)+'</div></div>' +
     '</div>' +
 
-    '<div class="tabs">' +
-      '<button class="tab-btn active" id="tab-btn-apostas" onclick="switchTab(\'apostas\')">Apostas</button>' +
-      '<button class="tab-btn" id="tab-btn-pnl" onclick="switchTab(\'pnl\')">P&L por Mercado</button>' +
-      '<button class="tab-btn" id="tab-btn-depositos" onclick="switchTab(\'depositos\')">Depósitos</button>' +
-      '<button class="tab-btn" id="tab-btn-editar" onclick="switchTab(\'editar\')">Editar Perfil</button>' +
-      '<button class="tab-btn" id="tab-btn-seguranca" onclick="switchTab(\'seguranca\')">🔒 Segurança</button>' +
-      '<button class="tab-btn" id="tab-btn-indicacoes" onclick="switchTab(\'indicacoes\')">🎁 Indicações</button>' +
+    /* Tabs */
+    '<div class="tab-row">' +
+      '<button class="tab-btn active" id="tab-btn-apostas"   onclick="switchTab(\'apostas\')">Apostas</button>' +
+      '<button class="tab-btn"        id="tab-btn-pnl"       onclick="switchTab(\'pnl\')">P&L por Mercado</button>' +
+      '<button class="tab-btn"        id="tab-btn-depositos" onclick="switchTab(\'depositos\')">Depósitos</button>' +
+      '<button class="tab-btn"        id="tab-btn-editar"    onclick="switchTab(\'editar\')">Editar Perfil</button>' +
+      '<button class="tab-btn"        id="tab-btn-seguranca" onclick="switchTab(\'seguranca\')">🔒 Segurança</button>' +
+      '<button class="tab-btn"        id="tab-btn-indicacoes" onclick="switchTab(\'indicacoes\')">🎁 Indicações</button>' +
     '</div>' +
 
-    '<div class="tab-content active" id="tab-apostas">' +
-      '<table class="bets-table">' +
-        '<thead><tr><th>Mercado</th><th>Lado</th><th>Valor</th><th>Status</th><th>P&L</th></tr></thead>' +
-        '<tbody>' + betsRows + '</tbody>' +
-      '</table>' +
-    '</div>' +
+    /* Apostas */
+    '<div class="tab-content active" id="tab-apostas">'+betCards+'</div>' +
 
-    '<div class="tab-content" id="tab-pnl">' + pnlCards + '</div>' +
+    /* PnL */
+    '<div class="tab-content" id="tab-pnl">'+pnlCards+'</div>' +
 
-    '<div class="tab-content" id="tab-depositos">' + depRows + '</div>' +
+    /* Depósitos */
+    '<div class="tab-content" id="tab-depositos"><div class="dep-list">'+depRows+'</div></div>' +
 
+    /* Editar */
     '<div class="tab-content" id="tab-editar">' +
       '<div class="edit-card">' +
-        '<div class="form-group"><label class="form-label">Nome de usuário</label><input class="form-input" id="editName" value="' + u.name + '"></div>' +
-        '<div class="form-group"><label class="form-label">Email</label><input class="form-input" value="' + u.email + '" disabled style="opacity:0.5"></div>' +
-        '<div style="border-top:1px solid var(--border);padding-top:20px;margin-top:4px">' +
-          '<div class="form-group"><label class="form-label">Nova senha</label><input class="form-input" type="password" id="editPass" placeholder="Deixe em branco para manter"></div>' +
-          '<div class="form-group"><label class="form-label">Confirmar nova senha</label><input class="form-input" type="password" id="editPassConfirm" placeholder="Repita a nova senha"></div>' +
+        '<div style="font-weight:700;font-size:1.05rem;margin-bottom:4px">Dados da conta</div>' +
+        '<div style="color:var(--muted);font-size:0.85rem;margin-bottom:4px">Atualize suas informações pessoais.</div>' +
+        '<label class="form-label">Nome de usuário</label>' +
+        '<input class="form-input" id="editName" value="'+u.name+'">' +
+        '<label class="form-label">Email</label>' +
+        '<input class="form-input" value="'+u.email+'" disabled>' +
+        '<div style="border-top:1px solid var(--border);margin-top:20px;padding-top:20px">' +
+          '<div style="font-weight:600;margin-bottom:4px">Alterar senha</div>' +
+          '<div style="font-size:0.82rem;color:var(--muted);margin-bottom:12px">Deixe em branco para manter a senha atual.</div>' +
+          '<label class="form-label">Nova senha</label>' +
+          '<input class="form-input" type="password" id="editPass" placeholder="Mínimo 6 caracteres">' +
+          '<label class="form-label">Confirmar senha</label>' +
+          '<input class="form-input" type="password" id="editPassConfirm" placeholder="Repita a nova senha">' +
         '</div>' +
         '<button class="btn-save" onclick="saveProfile()">Salvar alterações</button>' +
         '<div class="form-feedback" id="editFeedback"></div>' +
       '</div>' +
     '</div>' +
 
+    /* Segurança */
     '<div class="tab-content" id="tab-seguranca">' +
       '<div class="edit-card">' +
-        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">' +
-          '<div>' +
-            '<div style="font-weight:600;margin-bottom:4px">Verificação em duas etapas</div>' +
-            '<div style="font-size:0.85rem;color:var(--muted)">Receba um código no email a cada login.</div>' +
+        '<div style="font-weight:700;font-size:1.05rem;margin-bottom:4px">Verificação em duas etapas</div>' +
+        '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:20px">Receba um código no email a cada novo login para maior segurança.</div>' +
+        '<div style="display:flex;align-items:center;gap:12px;padding:16px;background:var(--surface2);border-radius:12px;margin-bottom:16px">' +
+          '<div style="font-size:1.5rem">'+(u.two_fa_enabled?'🟢':'⚪')+'</div>' +
+          '<div style="flex:1">' +
+            '<div style="font-weight:600">2FA por email</div>' +
+            '<div style="font-size:0.82rem;color:var(--muted)">'+(u.two_fa_enabled?'Ativado — cada login exige verificação por email':'Desativado — ative para mais segurança')+'</div>' +
           '</div>' +
-          '<span style="margin-left:16px;padding:4px 12px;border-radius:100px;font-size:0.75rem;font-weight:600;background:' + (u.two_fa_enabled ? 'rgba(0,230,118,0.12);color:var(--green)' : 'rgba(90,104,120,0.2);color:var(--muted)') + '">' + (u.two_fa_enabled ? 'Ativado' : 'Desativado') + '</span>' +
+          '<span style="padding:4px 12px;border-radius:100px;font-size:0.73rem;font-weight:700;background:'+(u.two_fa_enabled?'rgba(0,230,118,0.12);color:var(--green)':'rgba(90,104,120,0.2);color:var(--muted)')+'">'+(u.two_fa_enabled?'Ativo':'Inativo')+'</span>' +
         '</div>' +
         (u.two_fa_enabled
-          ? '<button class="btn-save" style="background:var(--red);color:#fff;margin-top:16px" onclick="disable2faPrompt()">Desativar 2FA</button>'
-          : '<button class="btn-save" style="margin-top:16px" onclick="enable2fa()">Ativar 2FA</button>') +
+          ? '<button class="btn-save btn-danger" onclick="disable2faPrompt()">Desativar 2FA</button>'
+          : '<button class="btn-save" onclick="enable2fa()">Ativar 2FA</button>') +
         '<div id="twoFaStep2" style="display:none;margin-top:16px">' +
           '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:8px">Digite o código enviado para o seu email:</div>' +
           '<input class="form-input" type="text" id="twoFaCode" placeholder="Código de 6 dígitos" maxlength="6" inputmode="numeric">' +
@@ -476,323 +475,246 @@ function renderPage() {
         '<div id="twoFaDisableStep" style="display:none;margin-top:16px">' +
           '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:8px">Confirme sua senha para desativar:</div>' +
           '<input class="form-input" type="password" id="twoFaDisablePass" placeholder="Sua senha atual">' +
-          '<button class="btn-save" style="background:var(--red);color:#fff;margin-top:10px" onclick="disable2fa()">Confirmar desativação</button>' +
+          '<button class="btn-save btn-danger" style="margin-top:10px" onclick="disable2fa()">Confirmar desativação</button>' +
         '</div>' +
-        '<div id="twoFaFeedback" style="margin-top:10px;font-size:0.85rem"></div>' +
+        '<div id="twoFaFeedback" style="margin-top:12px;font-size:0.85rem"></div>' +
       '</div>' +
     '</div>' +
 
-    // BUG FIX 1: tab-indicacoes agora existe no HTML com sec-indicacoes dentro
+    /* Indicações */
     '<div class="tab-content" id="tab-indicacoes">' +
-      '<div id="sec-indicacoes"><div style="text-align:center;padding:40px;color:var(--muted)">Clique na aba para carregar...</div></div>' +
+      '<div id="sec-indicacoes"><div class="empty"><div class="empty-icon">🎁</div>Clique na aba para carregar seu link de indicação.</div></div>' +
     '</div>';
 
   document.getElementById('pageContent').innerHTML = html;
   updateAuthUI();
 }
 
+/* ── SAVE PROFILE ── */
 async function saveProfile() {
   var name = document.getElementById('editName').value.trim();
   var pass = document.getElementById('editPass').value;
   var passConfirm = document.getElementById('editPassConfirm').value;
   var fb = document.getElementById('editFeedback');
-
-  if (!name) { fb.style.color = 'var(--red)'; fb.textContent = 'Nome não pode ser vazio.'; return; }
-  if (pass && pass !== passConfirm) { fb.style.color = 'var(--red)'; fb.textContent = 'Senhas não coincidem.'; return; }
-
-  fb.style.color = 'var(--muted)'; fb.textContent = 'Salvando...';
-
+  if (!name) { fb.style.color='#ef4444'; fb.textContent='Nome não pode ser vazio.'; return; }
+  if (pass && pass!==passConfirm) { fb.style.color='#ef4444'; fb.textContent='Senhas não coincidem.'; return; }
+  fb.style.color='var(--muted)'; fb.textContent='Salvando...';
   try {
-    var body = { name: name };
-    if (pass) body.password = pass;
-    var data = await apiPatch('/auth/profile', body, state.token);
-    if (data.error) { fb.style.color = 'var(--red)'; fb.textContent = 'Erro: ' + data.error; return; }
-    state.user.name = name;
-    fb.style.color = 'var(--green)'; fb.textContent = 'Perfil atualizado!';
-    showToast('Perfil atualizado!');
+    var body={name};
+    if(pass) body.password=pass;
+    var data=await apiPatch('/auth/profile',body,state.token);
+    if(data.error){ fb.style.color='#ef4444'; fb.textContent='Erro: '+data.error; return; }
+    state.user.name=name;
+    fb.style.color='var(--green)'; fb.textContent='Perfil atualizado com sucesso!';
+    showToast('✅ Perfil atualizado!');
     updateAuthUI();
-  } catch(e) {
-    fb.style.color = 'var(--red)'; fb.textContent = 'Erro de conexão.';
-  }
+  } catch(e){ fb.style.color='#ef4444'; fb.textContent='Erro de conexão.'; }
 }
 
-function updateAuthUI() {
-  var area = document.getElementById('authArea');
-  if (state.user) {
-    area.innerHTML = '<div class="user-chip">' +
-      '<div class="user-avatar">' + state.user.name.slice(0,2).toUpperCase() + '</div>' +
-      '<span>' + state.user.name + '</span>' +
-      '<span style="color:var(--green);font-family:DM Mono,monospace;font-size:0.8rem;margin-left:4px">R$' + parseFloat(state.user.balance || 0).toFixed(0) + '</span>' +
-      (state.walletAddress ? '<span style="font-size:0.7rem;color:var(--muted);background:var(--surface2);padding:2px 6px;border-radius:4px;border:1px solid var(--border);margin-left:8px">'+state.walletAddress.slice(0,6)+'...'+state.walletAddress.slice(-4)+'</span>' : '') +
-      '</div>';
-  }
-}
-
-async function connectWallet() {
-  if (typeof window.ethereum === 'undefined') {
-    return showToast('Instale a MetaMask!');
-  }
+/* ── 2FA ── */
+async function enable2fa() {
+  var fb=document.getElementById('twoFaFeedback');
+  fb.textContent='Enviando código...'; fb.style.color='var(--muted)';
   try {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const accounts = await provider.send("eth_requestAccounts", []);
-    state.walletAddress = accounts[0];
-    const btn = document.getElementById('btnConnectWallet');
-    if(btn) btn.style.display = 'none';
-    updateAuthUI();
-    showToast('Carteira conectada!');
-  } catch(e) {
-    showToast('Erro ao conectar carteira');
-  }
+    var d=await apiPost('/auth/2fa/enable',{},state.token);
+    if(d.error){ fb.style.color='#ef4444'; fb.textContent='Erro: '+d.error; return; }
+    fb.textContent='Código enviado! Verifique seu email.'; fb.style.color='var(--green)';
+    document.getElementById('twoFaStep2').style.display='';
+    document.getElementById('twoFaCode').focus();
+  } catch(e){ fb.style.color='#ef4444'; fb.textContent='Erro de conexão.'; }
+}
+async function verify2faEnable() {
+  var code=document.getElementById('twoFaCode').value.trim();
+  var fb=document.getElementById('twoFaFeedback');
+  if(!code){ fb.style.color='#ef4444'; fb.textContent='Informe o código.'; return; }
+  try {
+    var d=await apiPost('/auth/2fa/enable/verify',{code},state.token);
+    if(d.error){ fb.style.color='#ef4444'; fb.textContent='Erro: '+d.error; return; }
+    state.user.two_fa_enabled=true;
+    showToast('🔒 2FA ativado!');
+    renderPage(); switchTab('seguranca');
+  } catch(e){ fb.style.color='#ef4444'; fb.textContent='Erro de conexão.'; }
+}
+function disable2faPrompt(){
+  document.getElementById('twoFaDisableStep').style.display='';
+  document.getElementById('twoFaDisablePass').focus();
+}
+async function disable2fa(){
+  var password=document.getElementById('twoFaDisablePass').value;
+  var fb=document.getElementById('twoFaFeedback');
+  if(!password){ fb.style.color='#ef4444'; fb.textContent='Informe a senha.'; return; }
+  try {
+    var d=await apiPost('/auth/2fa/disable',{password},state.token);
+    if(d.error){ fb.style.color='#ef4444'; fb.textContent='Erro: '+d.error; return; }
+    state.user.two_fa_enabled=false;
+    showToast('2FA desativado.');
+    renderPage(); switchTab('seguranca');
+  } catch(e){ fb.style.color='#ef4444'; fb.textContent='Erro de conexão.'; }
 }
 
-var _login2faEmail = null;
+/* ── INDICAÇÕES ── */
+function loadIndicacoes() {
+  var section=document.getElementById('sec-indicacoes');
+  if(!section) return;
+  section.innerHTML='<div class="empty"><div class="empty-icon">⏳</div>Carregando...</div>';
+  fetch(API+'/referrals/me',{headers:{Authorization:'Bearer '+state.token}})
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(data.error){ section.innerHTML='<div class="empty" style="color:#ef4444">Erro: '+data.error+'</div>'; return; }
+      var link=window.location.origin+'?ref='+data.referral_code;
+      section.innerHTML=
+        '<div class="ref-hero">' +
+          '<div style="font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">🎁 Seu link de indicação</div>' +
+          '<div style="font-weight:700;font-size:1.05rem;margin-bottom:4px">Convide amigos e ganhe <span style="color:var(--green)">R$50</span></div>' +
+          '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:12px">Quando seu indicado depositar R$100+, você ganha R$50 e ele ganha R$20.</div>' +
+          '<div class="ref-link-row">' +
+            '<input id="refLink" class="ref-link-input" value="'+link+'" readonly>' +
+            '<button onclick="copyRefLink()" style="padding:10px 20px;background:var(--green);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit">Copiar</button>' +
+            '<button onclick="shareRef(\''+link+'\')" style="padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--text)">📤 Share</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="ref-stats">' +
+          '<div class="ref-stat-card">' +
+            '<div style="font-size:1.8rem;font-weight:800;color:var(--green)">R$'+fmtR(data.total_earned)+'</div>' +
+            '<div style="font-size:0.78rem;color:var(--muted);margin-top:4px">Total ganho em bônus</div>' +
+          '</div>' +
+          '<div class="ref-stat-card">' +
+            '<div style="font-size:1.8rem;font-weight:800;color:var(--gold)">R$'+fmtR(data.bonus_balance)+'</div>' +
+            '<div style="font-size:0.78rem;color:var(--muted);margin-top:4px">Saldo bônus disponível</div>' +
+          '</div>' +
+        '</div>' +
+        '<div style="font-weight:700;margin-bottom:12px">Histórico de indicações</div>' +
+        (data.referrals.length===0
+          ? '<div class="empty" style="padding:32px"><div class="empty-icon">🔗</div>Nenhuma indicação ainda. Compartilhe seu link!</div>'
+          : '<table style="width:100%;border-collapse:collapse">' +
+              '<thead><tr>' +
+                '<th style="text-align:left;padding:10px 8px;color:var(--muted);font-size:0.72rem;font-weight:600;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.5px">Usuário</th>' +
+                '<th style="text-align:left;padding:10px 8px;color:var(--muted);font-size:0.72rem;font-weight:600;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.5px">Tipo</th>' +
+                '<th style="text-align:right;padding:10px 8px;color:var(--muted);font-size:0.72rem;font-weight:600;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.5px">Bônus</th>' +
+                '<th style="text-align:right;padding:10px 8px;color:var(--muted);font-size:0.72rem;font-weight:600;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.5px">Data</th>' +
+              '</tr></thead><tbody>' +
+              data.referrals.map(function(r){
+                return '<tr style="border-bottom:1px solid rgba(255,255,255,0.03)">' +
+                  '<td style="padding:12px 8px;font-size:0.88rem;font-weight:600">'+(r.referred_username||'-')+'</td>' +
+                  '<td style="padding:12px 8px;font-size:0.82rem;color:var(--muted)">'+(r.type==='deposit'?'✅ Depósito confirmado':'📝 Cadastro')+'</td>' +
+                  '<td style="padding:12px 8px;text-align:right;color:var(--green);font-weight:700">+R$'+fmtR(r.referrer_amount)+'</td>' +
+                  '<td style="padding:12px 8px;text-align:right;color:var(--muted);font-size:0.8rem">'+fmtDate(r.created_at)+'</td>' +
+                  '</tr>';
+              }).join('')+'</tbody></table>'
+        );
+    })
+    .catch(function(){ section.innerHTML='<div class="empty" style="color:#ef4444">Erro de conexão.</div>'; });
+}
+
+function copyRefLink() {
+  var input=document.getElementById('refLink');
+  navigator.clipboard ? navigator.clipboard.writeText(input.value).then(function(){ showToast('🔗 Link copiado!'); })
+                      : (input.select(), document.execCommand('copy'), showToast('🔗 Link copiado!'));
+}
+
+function shareRef(link) {
+  var text='Aposte comigo na Bubuya — plataforma de mercados preditivos do Brasil! Use meu link e ganhe R$20 de bônus: '+link;
+  if(navigator.share) { navigator.share({title:'Bubuya',text:text,url:link}); }
+  else { window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank'); }
+}
+
+/* ── LOGIN / 2FA ── */
+var _login2faEmail=null;
 async function doLogin() {
-  var email = document.getElementById('loginEmail').value;
-  var pass = document.getElementById('loginPass').value;
+  var email=document.getElementById('loginEmail').value;
+  var pass=document.getElementById('loginPass').value;
   try {
-    var data = await apiPost('/auth/login', { email, password: pass });
-    if (data.error) { showToast('Erro: ' + data.error); return; }
-    if (data.requires_2fa) {
-      _login2faEmail = data.email;
-      document.getElementById('loginStep1').style.display = 'none';
-      document.getElementById('loginStep2').style.display = '';
-      document.getElementById('login2faCode').value = '';
+    var data=await apiPost('/auth/login',{email,password:pass});
+    if(data.error){ showToast('❌ '+data.error); return; }
+    if(data.requires_2fa){
+      _login2faEmail=data.email;
+      document.getElementById('loginStep1').style.display='none';
+      document.getElementById('loginStep2').style.display='';
+      document.getElementById('login2faCode').value='';
       document.getElementById('login2faCode').focus();
       showToast('Código enviado para o email');
       return;
     }
     _finishLogin(data);
-  } catch(e) { showToast('Erro de conexão'); }
+  } catch(e){ showToast('❌ Erro de conexão'); }
 }
-
 async function doLogin2fa() {
-  var code = document.getElementById('login2faCode').value.trim();
-  if (!code) { showToast('Informe o código'); return; }
+  var code=document.getElementById('login2faCode').value.trim();
+  if(!code){ showToast('Informe o código'); return; }
   try {
-    var data = await apiPost('/auth/login/2fa', { email: _login2faEmail, code });
-    if (data.error) { showToast('Código inválido: ' + data.error); return; }
+    var data=await apiPost('/auth/login/2fa',{email:_login2faEmail,code});
+    if(data.error){ showToast('❌ Código inválido: '+data.error); return; }
     _finishLogin(data);
-  } catch(e) { showToast('Erro de conexão'); }
+  } catch(e){ showToast('❌ Erro de conexão'); }
 }
-
-function _finishLogin(data) {
-  state.user = data.user;
-  state.token = data.token;
-  localStorage.setItem('preditivo_token', data.token);
+function _finishLogin(data){
+  state.user=data.user; state.token=data.token;
+  localStorage.setItem('preditivo_token',data.token);
   closeModal('loginModal');
-  document.getElementById('loginStep1').style.display = '';
-  document.getElementById('loginStep2').style.display = 'none';
-  _login2faEmail = null;
+  document.getElementById('loginStep1').style.display='';
+  document.getElementById('loginStep2').style.display='none';
+  _login2faEmail=null;
   loadProfile();
 }
 
+/* ── LOAD PROFILE ── */
 async function loadProfile() {
   try {
-    var me = await apiGet('/auth/me', state.token);
-    if (!me || !me.id) { openModal('loginModal'); return; }
-    state.user = me;
-
-    var bets = await apiGet('/bets/my', state.token);
-    state.bets = Array.isArray(bets) ? bets : [];
-
-    var deps = await apiGet('/deposits/my', state.token);
-    state.deposits = Array.isArray(deps) ? deps : [];
-
+    var me=await apiGet('/auth/me',state.token);
+    if(!me||!me.id){ openModal('loginModal'); return; }
+    state.user=me;
+    var bets=await apiGet('/bets/my',state.token);
+    state.bets=Array.isArray(bets)?bets:[];
+    var deps=await apiGet('/deposits/my',state.token);
+    state.deposits=Array.isArray(deps)?deps:[];
     renderPage();
-  } catch(e) {
-    document.getElementById('pageContent').innerHTML = '<div style="text-align:center;padding:80px;color:var(--muted)">Erro ao carregar perfil.</div>';
+  } catch(e){
+    document.getElementById('pageContent').innerHTML='<div class="empty"><div class="empty-icon">⚠️</div>Erro ao carregar perfil.</div>';
   }
 }
 
 async function init() {
-  var savedToken = localStorage.getItem('preditivo_token');
-  if (!savedToken) { openModal('loginModal'); return; }
-  state.token = savedToken;
+  var savedToken=localStorage.getItem('preditivo_token');
+  if(!savedToken){ openModal('loginModal'); return; }
+  state.token=savedToken;
   await loadProfile();
 }
 
 init();
-
-function loadIndicacoes() {
-  var section = document.getElementById('sec-indicacoes');
-  if (!section) return;
-  section.innerHTML = '<div style="text-align:center;padding:40px;color:#5a6878">Carregando...</div>';
-
-  // BUG FIX 2: era "token" (undefined), agora é "state.token"
-  fetch(API + '/referrals/me', { headers: { 'Authorization': 'Bearer ' + state.token } })
-    .then(function(r){ return r.json(); })
-    .then(function(data) {
-      if (data.error) { section.innerHTML = '<p style="color:#ff4757">Erro: ' + data.error + '</p>'; return; }
-      var link = window.location.origin + '?ref=' + data.referral_code;
-      section.innerHTML =
-        '<div style="background:linear-gradient(135deg,rgba(0,153,116,0.15),rgba(0,200,110,0.05));border:1px solid var(--green);border-radius:16px;padding:24px;margin-bottom:24px">' +
-          '<div style="font-size:0.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Seu link de indicação</div>' +
-          '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">' +
-            '<input id="refLink" value="'+link+'" readonly style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:0.85rem;font-family:monospace;min-width:0">' +
-            '<button onclick="copyRefLink()" style="padding:10px 18px;background:var(--green);color:#000;border:none;border-radius:8px;font-weight:700;cursor:pointer;white-space:nowrap">Copiar</button>' +
-          '</div>' +
-          '<div style="margin-top:12px;font-size:0.82rem;color:var(--muted)">Compartilhe e ganhe <strong style="color:var(--green)">R$50</strong> quando seu amigo depositar R$100+. Seu amigo ganha <strong style="color:var(--green)">R$20</strong>.</div>' +
-        '</div>' +
-        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px">' +
-          '<div style="background:var(--surface2);border-radius:12px;padding:16px;text-align:center">' +
-            '<div style="font-size:1.6rem;font-weight:700;color:var(--green)">R$' + parseFloat(data.total_earned).toFixed(0) + '</div>' +
-            '<div style="font-size:0.78rem;color:var(--muted);margin-top:4px">Total ganho em bônus</div>' +
-          '</div>' +
-          '<div style="background:var(--surface2);border-radius:12px;padding:16px;text-align:center">' +
-            '<div style="font-size:1.6rem;font-weight:700;color:#ffc107">R$' + parseFloat(data.bonus_balance).toFixed(0) + '</div>' +
-            '<div style="font-size:0.78rem;color:var(--muted);margin-top:4px">Saldo bônus disponível</div>' +
-          '</div>' +
-        '</div>' +
-        '<div style="font-size:0.9rem;font-weight:600;margin-bottom:12px">Histórico de indicações</div>' +
-        (data.referrals.length === 0
-          ? '<div style="text-align:center;padding:32px;color:#5a6878;font-size:0.88rem">Nenhuma indicação ainda. Compartilhe seu link!</div>'
-          : '<table style="width:100%;border-collapse:collapse">' +
-              '<thead><tr>' +
-                '<th style="text-align:left;padding:8px;color:var(--muted);font-size:0.78rem;font-weight:500;border-bottom:1px solid var(--border)">Usuário</th>' +
-                '<th style="text-align:left;padding:8px;color:var(--muted);font-size:0.78rem;font-weight:500;border-bottom:1px solid var(--border)">Tipo</th>' +
-                '<th style="text-align:right;padding:8px;color:var(--muted);font-size:0.78rem;font-weight:500;border-bottom:1px solid var(--border)">Bônus</th>' +
-                '<th style="text-align:right;padding:8px;color:var(--muted);font-size:0.78rem;font-weight:500;border-bottom:1px solid var(--border)">Data</th>' +
-              '</tr></thead>' +
-              '<tbody>' +
-              data.referrals.map(function(r) {
-                return '<tr>' +
-                  '<td style="padding:10px 8px;font-size:0.85rem">' + (r.referred_username || '-') + '</td>' +
-                  '<td style="padding:10px 8px;font-size:0.82rem;color:var(--muted)">' + (r.type === 'deposit' ? '✅ Depósito confirmado' : '📝 Cadastro') + '</td>' +
-                  '<td style="padding:10px 8px;text-align:right;color:var(--green);font-weight:600">+R$' + parseFloat(r.referrer_amount).toFixed(0) + '</td>' +
-                  '<td style="padding:10px 8px;text-align:right;color:var(--muted);font-size:0.8rem">' + new Date(r.created_at).toLocaleDateString('pt-BR') + '</td>' +
-                  '</tr>';
-              }).join('') +
-              '</tbody></table>'
-        );
-    })
-    .catch(function(e){ section.innerHTML = '<p style="color:#ff4757">Erro de conexão</p>'; });
-}
-
-function copyRefLink() {
-  var input = document.getElementById('refLink');
-  input.select();
-  document.execCommand('copy');
-  showToast('Link copiado!');
-}
-
-// ---- 2FA ----
-async function enable2fa() {
-  var fb = document.getElementById('twoFaFeedback');
-  fb.textContent = 'Enviando código...'; fb.style.color = 'var(--muted)';
-  try {
-    var data = await apiPost('/auth/2fa/enable', {}, state.token);
-    if (data.error) { fb.style.color='var(--red)'; fb.textContent='Erro: '+data.error; return; }
-    fb.textContent = 'Código enviado! Verifique seu email.'; fb.style.color='var(--green)';
-    document.getElementById('twoFaStep2').style.display = '';
-    document.getElementById('twoFaCode').focus();
-  } catch(e) { fb.style.color='var(--red)'; fb.textContent='Erro de conexão.'; }
-}
-
-async function verify2faEnable() {
-  var code = document.getElementById('twoFaCode').value.trim();
-  var fb = document.getElementById('twoFaFeedback');
-  if (!code) { fb.style.color='var(--red)'; fb.textContent='Informe o código.'; return; }
-  try {
-    var data = await apiPost('/auth/2fa/enable/verify', { code }, state.token);
-    if (data.error) { fb.style.color='var(--red)'; fb.textContent='Erro: '+data.error; return; }
-    state.user.two_fa_enabled = true;
-    showToast('2FA ativado com sucesso!');
-    renderPage();
-    switchTab('seguranca');
-  } catch(e) { fb.style.color='var(--red)'; fb.textContent='Erro de conexão.'; }
-}
-
-function disable2faPrompt() {
-  document.getElementById('twoFaDisableStep').style.display = '';
-  document.getElementById('twoFaDisablePass').focus();
-}
-
-async function disable2fa() {
-  var password = document.getElementById('twoFaDisablePass').value;
-  var fb = document.getElementById('twoFaFeedback');
-  if (!password) { fb.style.color='var(--red)'; fb.textContent='Informe a senha.'; return; }
-  try {
-    var data = await apiPost('/auth/2fa/disable', { password }, state.token);
-    if (data.error) { fb.style.color='var(--red)'; fb.textContent='Erro: '+data.error; return; }
-    state.user.two_fa_enabled = false;
-    showToast('2FA desativado.');
-    renderPage();
-    switchTab('seguranca');
-  } catch(e) { fb.style.color='var(--red)'; fb.textContent='Erro de conexão.'; }
-}
-
 </script>
-<!-- ABOUT MODAL -->
-<div id="aboutModal" class="modal-overlay">
-  <div class="modal" style="max-width: 600px">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px">
-      <h2 style="font-size:1.5rem">Quem Somos</h2>
-      <button class="modal-close" onclick="closeModal('aboutModal')">×</button>
-    </div>
-    <div style="line-height:1.7; color:var(--muted)">
-      <p style="margin-bottom:16px">A <strong>Bubuya.</strong> é a primeira plataforma brasileira dedicada exclusivamente a mercados de previsão (Prediction Markets).</p>
-      <p>Nossa missão é democratizar o acesso à inteligência coletiva, permitindo que qualquer pessoa transforme seu conhecimento e intuição em retornos financeiros.</p>
-    </div>
-  </div>
-</div>
-
-<!-- HOW TO BET MODAL -->
-<div id="howToBetModal" class="modal-overlay">
-  <div class="modal" style="max-width: 600px">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px">
-      <h2 style="font-size:1.5rem">Como Funciona</h2>
-      <button class="modal-close" onclick="closeModal('howToBetModal')">×</button>
-    </div>
-    <div style="line-height:1.7; color:var(--muted)">
-      <p>Escolha um mercado, selecione "SIM" ou "NÃO" e receba seu lucro se estiver certo.</p>
-    </div>
-  </div>
-</div>
 
 <footer>
   <div class="footer-inner">
-    <div class="footer-col" style="padding-right: 40px">
-      <div class="logo" style="margin-bottom: 20px; font-size: 1.8rem">Bubuya.</div>
-      <p style="color: var(--muted); font-size: 0.95rem; line-height: 1.6">
-        Onde o conhecimento se torna valor.
-      </p>
+    <div class="footer-col">
+      <div class="logo" style="margin-bottom:16px;font-size:1.6rem">Bubuya.</div>
+      <p style="color:var(--muted);font-size:0.9rem;line-height:1.6">Onde o conhecimento se torna valor.</p>
     </div>
     <div class="footer-col">
       <h4>Plataforma</h4>
       <ul>
-        <li><a onclick="openModal('aboutModal')">Quem Somos</a></li>
+        <li><a href="/about.html">Quem Somos</a></li>
         <li><a href="/terms.html">Termos de Uso</a></li>
       </ul>
     </div>
     <div class="footer-col">
       <h4>Suporte</h4>
       <ul>
-        <li><a onclick="openModal('howToBetModal')">Como Funciona</a></li>
-        <li><a href="mailto:suporte@bubuya.com.br">Suporte por Email</a></li>
+        <li><a href="/how-it-works.html">Como Funciona</a></li>
+        <li><a href="mailto:suporte@bubuya.com.br">Email</a></li>
       </ul>
     </div>
     <div class="footer-col">
-      <h4>Redes</h4>
+      <h4>Navegar</h4>
       <ul>
-        <li><a href="/">Início</a></li>
-        <li><a href="#">Twitter</a></li>
+        <li><a href="/">Explorar Mercados</a></li>
+        <li><a href="/#portfolio">Portfólio</a></li>
       </ul>
     </div>
   </div>
-  
   <div class="footer-legal">
-    <div class="footer-disclaimer">
-      <strong>⚠️ Aviso Legal:</strong> Não é recomendação financeira.
-    </div>
-    <div style="margin-top: 32px">
-      <p>© 2026 Bubuya.</p>
-    </div>
+    <div style="margin-top:20px"><p>© 2026 Bubuya. · Todos os direitos reservados.</p></div>
   </div>
 </footer>
 
-<script>
-function openModal(id) { document.getElementById(id).classList.add('active'); }
-function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-</script>
 </body>
 </html>

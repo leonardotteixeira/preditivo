@@ -334,7 +334,8 @@ tr:hover td { background:rgba(255,255,255,0.015); }
 <!-- MODAL RESOLVER -->
 <div id="resolveModal" class="modal-overlay">
   <div class="modal">
-    <h3>Resolver Mercado</h3>
+    <div id="resolveSuccess" style="display:none;text-align:center;padding:8px 0"></div>
+    <h3 id="resolveModalHeading">Resolver Mercado</h3>
     <p id="resolveMarketTitle" style="color:#5a6878;margin-bottom:16px;font-size:0.9rem"></p>
     <button class="btn-yes" onclick="confirmResolve('yes')">SIM — Aconteceu</button>
     <button class="btn-no" onclick="confirmResolve('no')">NAO — Nao aconteceu</button>
@@ -403,16 +404,22 @@ function adminHeaders() {
 function adminLogin() {
   var pass = document.getElementById('adminPass').value;
   if (!pass) { showToast('Digite a senha'); return; }
-  // Testa o secret no backend antes de liberar o painel
+  var btn = document.querySelector('#loginScreen button');
+  if (btn) { btn.disabled = true; btn.textContent = 'Verificando...'; }
   fetch(API + '/admin/deposits', { headers: { 'x-admin-secret': pass } })
     .then(function(r) {
-      if (r.status === 403) { showToast('Senha incorreta'); return; }
+      if (btn) { btn.disabled = false; btn.textContent = 'Entrar'; }
+      if (r.status === 403) { showToast('Senha incorreta (403)'); return; }
+      if (!r.ok) { showToast('Erro ' + r.status + ' ao autenticar'); return; }
       ADMIN_SECRET = pass;
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('dashboard').style.display = 'block';
       loadAll();
     })
-    .catch(function() { showToast('Erro de conexão'); });
+    .catch(function(e) {
+      if (btn) { btn.disabled = false; btn.textContent = 'Entrar'; }
+      showToast('Erro de conexão: ' + e.message);
+    });
 }
 
 function logout() {
@@ -610,9 +617,9 @@ function openResolve(marketId, title) {
 
 function confirmResolve(outcome) {
   if (!resolveMarketId) return;
-  var btns = document.querySelectorAll('#resolveModal .btn-yes, #resolveModal .btn-no');
-  btns.forEach(function(b){ b.disabled = true; b.style.opacity = '0.5'; });
-  var label = outcome === 'yes' ? 'SIM' : 'NAO';
+  var btns = document.querySelectorAll('#resolveModal .btn-yes, #resolveModal .btn-no, #resolveModal .btn-cancel');
+  btns.forEach(function(b){ b.disabled = true; b.style.opacity = '0.4'; });
+  var label = outcome === 'yes' ? 'SIM ✅' : 'NÃO ❌';
 
   fetch(API + '/admin/markets/' + resolveMarketId + '/resolve', {
     method: 'POST',
@@ -622,19 +629,40 @@ function confirmResolve(outcome) {
   .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, status: r.status, data: d }; }); })
   .then(function(res) {
     if (!res.ok || res.data.error) {
-      showToast('Erro ' + res.status + ': ' + (res.data.error || 'falha'));
       btns.forEach(function(b){ b.disabled = false; b.style.opacity = ''; });
+      showToast('Erro ' + res.status + ': ' + (res.data.error || 'falha ao resolver'));
       return;
     }
-    closeModal('resolveModal');
+    // Mostrar resultado DENTRO do modal antes de fechar
     var d = res.data;
-    var w = d.winners !== undefined ? d.winners : d.winners_paid;
-    var l = d.losers !== undefined ? d.losers : 0;
-    var paid = d.total_paid !== undefined ? parseFloat(d.total_paid).toLocaleString('pt-BR',{minimumFractionDigits:2}) : '—';
-    showToast('✅ Resolvido como ' + label + ' | ' + w + ' vencedores (R$' + paid + ' pagos) | ' + l + ' perdedores');
-    loadMarkets();
+    var paid = parseFloat(d.total_paid || 0).toLocaleString('pt-BR', {minimumFractionDigits:2});
+    var successEl = document.getElementById('resolveSuccess');
+    var heading = document.getElementById('resolveModalHeading');
+    if (successEl) {
+      successEl.style.display = 'block';
+      successEl.innerHTML =
+        '<div style="font-size:2.5rem;margin-bottom:8px">' + (outcome === 'yes' ? '✅' : '❌') + '</div>' +
+        '<div style="font-size:1.1rem;font-weight:700;color:#10b981;margin-bottom:6px">Resolvido como ' + label + '</div>' +
+        '<div style="font-size:0.85rem;color:#8899aa">' + d.winners + ' vencedores · R$' + paid + ' distribuídos · ' + d.losers + ' perdedores</div>';
+    }
+    if (heading) heading.style.display = 'none';
+    var titleEl = document.getElementById('resolveMarketTitle');
+    if (titleEl) titleEl.style.display = 'none';
+    // Fechar modal após 1800ms para o usuário ver o resultado
+    setTimeout(function() {
+      closeModal('resolveModal');
+      setTimeout(function() {
+        if (successEl) { successEl.style.display = 'none'; successEl.innerHTML = ''; }
+        if (heading) heading.style.display = '';
+        if (titleEl) titleEl.style.display = '';
+        btns.forEach(function(b){ b.disabled = false; b.style.opacity = ''; });
+      }, 400);
+      showToast('✅ Resolvido | ' + d.winners + ' vencedores (R$' + paid + ') | ' + d.losers + ' perdedores');
+      loadMarkets();
+    }, 1800);
   })
   .catch(function(e){
+    btns.forEach(function(b){ b.disabled = false; b.style.opacity = ''; });
     showToast('Erro de rede: ' + e.message);
     btns.forEach(function(b){ b.disabled = false; b.style.opacity = ''; });
   });

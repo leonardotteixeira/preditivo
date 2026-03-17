@@ -723,7 +723,7 @@
   </div>
 </div>
 
-<script src="./config.js?v=20260316"></script>
+<script src="./config.js?v=20260317"></script>
 <script>
 window.state = { markets: [], user: null, balance: 0, catFilter: 'all', searchQuery: '', walletAddress: null };
 window.API = window.PREDITIVO_CONFIG.API_BASE;
@@ -1386,6 +1386,9 @@ async function init() {
     if(Array.isArray(mkts)) {
       window.state.markets = mkts.filter(m => !m.resolved_at);
       window.renderMarkets();
+    } else {
+      const grid = document.getElementById('marketsGrid');
+      if (grid) grid.innerHTML = '<div style="text-align:center;grid-column:1/-1;padding:80px;color:var(--muted)">⚠️ Erro ao carregar mercados. <button onclick="init()" style="padding:8px 20px;border-radius:10px;background:var(--green);color:#000;border:none;cursor:pointer;font-weight:600;margin-left:8px">Recarregar</button></div>';
     }
 
     const token = localStorage.getItem('preditivo_token');
@@ -1403,7 +1406,11 @@ async function init() {
         }
       }
     }
-  } catch(e) { console.error('Init failure:', e); }
+  } catch(e) {
+    console.error('Init failure:', e);
+    const grid = document.getElementById('marketsGrid');
+    if (grid) grid.innerHTML = '<div style="text-align:center;grid-column:1/-1;padding:80px;color:var(--muted)">⚠️ Não foi possível carregar os mercados.<br><span style="font-size:0.85rem;opacity:0.6">' + e.message + '</span><br><br><button onclick="init()" style="padding:10px 24px;border-radius:12px;background:var(--green);color:#000;border:none;cursor:pointer;font-weight:600">Tentar novamente</button></div>';
+  }
 }
 
 window.changeHeroImage = () => {

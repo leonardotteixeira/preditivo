@@ -293,6 +293,9 @@
   .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
   .portfolio-card { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 24px; }
   .port-profit { font-size: 1.6rem; font-weight: 800; margin: 10px 0; }
+  .pnl-tab { padding:3px 10px; border-radius:8px; border:none; font-size:0.72rem; font-weight:600; cursor:pointer; background:transparent; color:var(--muted); transition:all .2s; }
+  .pnl-tab.active, .pnl-tab:hover { background:var(--green); color:#000; }
+  @media (max-width:600px) { #portfolioSummary { grid-template-columns:1fr !important; } }
 
   /* ---- MODALS ---- */
   .modal-overlay {
@@ -479,6 +482,41 @@
   <div style="max-width: 1000px; margin: 0 auto;">
     <h2 class="modal-title">Portfólio Ativo</h2>
     <p class="modal-sub">Gerencie seus ativos e posições em tempo real.</p>
+    <!-- RESUMO: CARTEIRA + P&L -->
+    <div id="portfolioSummary" style="display:none;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px">
+      <!-- CARTEIRA -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px">
+        <div style="margin-bottom:4px"><span style="font-size:0.78rem;font-weight:600;color:var(--muted);letter-spacing:.06em">CARTEIRA</span></div>
+        <div id="pnlPortfolioValue" style="font-size:2rem;font-weight:800;color:var(--text);margin-bottom:2px">R$ —</div>
+        <div id="pnlPortfolioChange" style="font-size:0.82rem;color:var(--muted);margin-bottom:16px"></div>
+        <div style="display:flex;gap:12px">
+          <div style="flex:1;background:var(--bg);border-radius:12px;padding:12px">
+            <div style="font-size:0.7rem;color:var(--muted);margin-bottom:4px">DISPONÍVEL</div>
+            <div id="pnlAvailable" style="font-size:1rem;font-weight:700;color:var(--green)">R$ —</div>
+          </div>
+          <div style="flex:1;background:var(--bg);border-radius:12px;padding:12px">
+            <div style="font-size:0.7rem;color:var(--muted);margin-bottom:4px">EM POSIÇÕES</div>
+            <div id="pnlInvested" style="font-size:1rem;font-weight:700;color:var(--text)">R$ —</div>
+          </div>
+        </div>
+      </div>
+      <!-- LUCRO / PREJUÍZO -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-size:0.78rem;font-weight:600;color:var(--muted);letter-spacing:.06em">LUCRO / PREJUÍZO</span>
+          <div style="display:flex;gap:4px">
+            <button onclick="window.loadPnl('day')"   class="pnl-tab" data-p="day">1D</button>
+            <button onclick="window.loadPnl('week')"  class="pnl-tab" data-p="week">1S</button>
+            <button onclick="window.loadPnl('month')" class="pnl-tab" data-p="month">1M</button>
+            <button onclick="window.loadPnl('all')"   class="pnl-tab active" data-p="all">ALL</button>
+          </div>
+        </div>
+        <div id="pnlTotal" style="font-size:2rem;font-weight:800;margin-bottom:2px;color:var(--text)">R$ —</div>
+        <div id="pnlMeta" style="font-size:0.82rem;color:var(--muted);margin-bottom:12px"></div>
+        <canvas id="pnlChart" height="60" style="width:100%;display:block"></canvas>
+      </div>
+    </div>
+
     <div id="portfolioContent" class="portfolio-grid">
       <div style="grid-column: 1/-1; padding:100px; text-align:center; background: var(--surface2); border: 1px solid var(--border); border-radius: 32px; color:var(--muted);">
         Conecte-se para visualizar suas previsões e lucros acumulados.
@@ -723,7 +761,7 @@
   </div>
 </div>
 
-<script src="./config.js?v=20260317"></script>
+<script src="./config.js?v=20260318"></script>
 <script>
 window.state = { markets: [], user: null, balance: 0, catFilter: 'all', searchQuery: '', walletAddress: null };
 window.API = window.PREDITIVO_CONFIG.API_BASE;
@@ -1050,6 +1088,82 @@ window.loadPortfolio = async () => {
   } catch(e) {
     grid.innerHTML = '<div style="grid-column:1/-1; padding:60px; text-align:center; color:var(--muted)">Erro ao carregar portfólio. Tente novamente.</div>';
   }
+  // Carregar resumo Carteira + P&L
+  window.loadPnl('all');
+};
+
+/* ===== CARTEIRA + LUCRO/PREJUÍZO ===== */
+function drawSparkline(history) {
+  const canvas = document.getElementById('pnlChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth || 300;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (!history || history.length < 2) {
+    ctx.fillStyle = '#5a6878';
+    ctx.font = '12px Inter, sans-serif';
+    ctx.fillText('Sem dados suficientes', 8, canvas.height / 2 + 4);
+    return;
+  }
+  let cum = 0;
+  const points = history.map(h => { cum += parseFloat(h.pnl); return cum; });
+  const minVal = Math.min(...points), maxVal = Math.max(...points);
+  const range = maxVal - minVal || 1;
+  const W = canvas.width, H = canvas.height, pad = 4;
+  const xs = points.map((_, i) => pad + (i / (points.length - 1)) * (W - pad * 2));
+  const ys = points.map(v => H - pad - ((v - minVal) / range) * (H - pad * 2));
+  const positive = points[points.length - 1] >= 0;
+  const color = positive ? '#10b981' : '#ef4444';
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, positive ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.25)');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.beginPath();
+  ctx.moveTo(xs[0], ys[0]);
+  xs.forEach((x, i) => { if (i > 0) ctx.lineTo(x, ys[i]); });
+  ctx.lineTo(xs[xs.length-1], H); ctx.lineTo(xs[0], H); ctx.closePath();
+  ctx.fillStyle = grad; ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(xs[0], ys[0]);
+  xs.forEach((x, i) => { if (i > 0) ctx.lineTo(x, ys[i]); });
+  ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.stroke();
+}
+
+window.loadPnl = async function(period) {
+  period = period || 'all';
+  document.querySelectorAll('.pnl-tab').forEach(t => t.classList.toggle('active', t.dataset.p === period));
+  const token = localStorage.getItem('preditivo_token');
+  if (!token) return;
+  const apiBase = (window.PREDITIVO_CONFIG && window.PREDITIVO_CONFIG.API_BASE)
+    || window.API || 'https://preditivo-backend-production.up.railway.app';
+  try {
+    const r = await fetch(apiBase + '/bets/pnl?period=' + period,
+      { headers: { 'Authorization': 'Bearer ' + token } });
+    const d = await r.json();
+    if (!r.ok || d.error) return;
+    const fmt = v => parseFloat(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2});
+    const pnl = parseFloat(d.total_pnl);
+    const pnlEl = document.getElementById('pnlTotal');
+    if (pnlEl) { pnlEl.textContent = (pnl >= 0 ? '+' : '') + 'R$ ' + fmt(d.total_pnl); pnlEl.style.color = pnl >= 0 ? 'var(--green)' : '#ef4444'; }
+    const metaEl = document.getElementById('pnlMeta');
+    if (metaEl) metaEl.textContent = d.win_count + ' vitórias · ' + d.loss_count + ' derrotas · ' + d.win_rate + '% de acerto';
+    const bal = window.state.balance || 0;
+    const invested = parseFloat(d.open_invested);
+    const pvEl = document.getElementById('pnlPortfolioValue');
+    if (pvEl) pvEl.textContent = 'R$ ' + fmt(bal + invested);
+    const avEl = document.getElementById('pnlAvailable');
+    if (avEl) avEl.textContent = 'R$ ' + fmt(bal);
+    const inEl = document.getElementById('pnlInvested');
+    if (inEl) inEl.textContent = 'R$ ' + fmt(invested);
+    const chEl = document.getElementById('pnlPortfolioChange');
+    if (chEl && invested > 0) {
+      const unrealized = parseFloat(d.open_value) - invested;
+      chEl.textContent = (unrealized >= 0 ? '+' : '') + 'R$ ' + fmt(unrealized) + ' não realizado';
+      chEl.style.color = unrealized >= 0 ? 'var(--green)' : '#ef4444';
+    }
+    const sumEl = document.getElementById('portfolioSummary');
+    if (sumEl) sumEl.style.display = 'grid';
+    drawSparkline(d.history);
+  } catch(e) { console.error('PnL error:', e); }
 };
 
 /* ===== DEPOSIT: TAB SWITCHER ===== */

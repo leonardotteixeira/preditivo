@@ -92,7 +92,7 @@ tr:hover td { background:rgba(255,255,255,0.015); }
 .receita-card, .bot-card { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:22px; transition:border-color 0.2s; }
 .receita-card:hover, .bot-card:hover { border-color:rgba(255,255,255,0.12); }
 .receita-label, .bot-label { font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:1.2px; margin-bottom:10px; }
-.receita-val, .bot-val { font-size:1.5rem; font-weight:800; font-family:'DM Mono',monospace; }
+.receita-val, .bot-val { font-size:clamp(0.85rem,2.5vw,1.4rem); font-weight:800; font-family:'DM Mono',monospace; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
 /* ── STATUS BOTS ── */
 .bot-status-on  { display:inline-block; background:var(--green-dim); color:var(--green); border:1px solid rgba(16,185,129,0.3); border-radius:8px; padding:4px 12px; font-size:0.8rem; font-weight:700; }
@@ -665,14 +665,14 @@ function saveBalance() {
     headers: adminHeaders(),
     body: JSON.stringify({ user_id: balanceUserId, amount: val, mode: 'delta' })
   })
-  .then(function(r){ return r.json(); })
-  .then(function(d){
-    if (d.error) { showToast('Erro: ' + d.error); return; }
+  .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, status: r.status, data: d }; }); })
+  .then(function(res){
+    if (!res.ok || res.data.error) { showToast('Erro ' + res.status + ': ' + (res.data.error || 'falha')); return; }
     closeModal('balanceModal');
-    showToast('Saldo atualizado!');
+    showToast('Saldo atualizado! Novo saldo: R$' + parseFloat(res.data.new_balance).toLocaleString('pt-BR',{minimumFractionDigits:2}));
     loadUsers();
   })
-  .catch(function(){ showToast('Erro ao atualizar'); });
+  .catch(function(e){ showToast('Erro de rede: ' + e.message); });
 }
 
 var imageMarketId = null;

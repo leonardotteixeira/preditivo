@@ -877,6 +877,9 @@ window.updateAuthUI = () => {
     if(h1) h1.innerHTML = `Olá, <span>${window.state.user.name.split(' ')[0]}</span>.`;
     const sub = document.getElementById('heroSub');
     if(sub) sub.textContent = "Seu portfólio está esperando. Vamos lucrar hoje?";
+    // Se o portfólio já estava aberto quando o auth completou, recarregar
+    const portSection = document.getElementById('section-portfolio');
+    if(portSection && portSection.classList.contains('active')) window.loadPortfolio();
   }
 };
 
@@ -907,12 +910,12 @@ window.loadRanking = async () => {
 
 window.loadPortfolio = async () => {
   const grid = document.getElementById('portfolioContent');
-  if(!window.state.user) {
+  const token = localStorage.getItem('preditivo_token');
+  if(!token) {
     grid.innerHTML = '<div style="grid-column:1/-1; padding:60px; text-align:center; color:var(--muted)">Conecte-se para visualizar suas previsões.</div>';
     return;
   }
   try {
-    const token = localStorage.getItem('preditivo_token');
     const res = await fetch(window.API + '/bets/portfolio', { headers: { 'Authorization': 'Bearer ' + token } }).then(r => r.json());
     if(!Array.isArray(res) || res.length === 0) {
       grid.innerHTML = '<div style="grid-column:1/-1; padding:60px; text-align:center; color:var(--muted)">Você ainda não possui investimentos ativos.</div>';

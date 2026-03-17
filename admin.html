@@ -343,6 +343,16 @@ tr:hover td { background:rgba(255,255,255,0.015); }
   </div>
 </div>
 
+<!-- MODAL RELATÓRIO DE RESOLUÇÃO -->
+<div id="resolutionReportModal" class="modal-overlay">
+  <div class="modal" style="max-width:480px;width:90%">
+    <h3 id="reportTitle" style="margin-bottom:4px">Relatório de Resolução</h3>
+    <p id="reportMarketName" style="color:#5a6878;font-size:0.85rem;margin-bottom:20px"></p>
+    <div id="reportContent"></div>
+    <button class="btn-cancel" style="margin-top:16px;width:100%" onclick="closeModal('resolutionReportModal')">Fechar</button>
+  </div>
+</div>
+
 <!-- MODAL EDITAR FOTO -->
 <div id="imageModal" class="modal-overlay">
   <div class="modal">
@@ -633,8 +643,8 @@ function confirmResolve(outcome) {
       showToast('Erro ' + res.status + ': ' + (res.data.error || 'falha ao resolver'));
       return;
     }
-    // Mostrar resultado DENTRO do modal antes de fechar
     var d = res.data;
+    // Mostrar estado de sucesso no modal antes de fechar
     var paid = parseFloat(d.total_paid || 0).toLocaleString('pt-BR', {minimumFractionDigits:2});
     var successEl = document.getElementById('resolveSuccess');
     var heading = document.getElementById('resolveModalHeading');
@@ -648,7 +658,6 @@ function confirmResolve(outcome) {
     if (heading) heading.style.display = 'none';
     var titleEl = document.getElementById('resolveMarketTitle');
     if (titleEl) titleEl.style.display = 'none';
-    // Fechar modal após 1800ms para o usuário ver o resultado
     setTimeout(function() {
       closeModal('resolveModal');
       setTimeout(function() {
@@ -657,15 +666,66 @@ function confirmResolve(outcome) {
         if (titleEl) titleEl.style.display = '';
         btns.forEach(function(b){ b.disabled = false; b.style.opacity = ''; });
       }, 400);
-      showToast('✅ Resolvido | ' + d.winners + ' vencedores (R$' + paid + ') | ' + d.losers + ' perdedores');
+      // Abrir relatório detalhado
+      showResolutionReport(d);
       loadMarkets();
     }, 1800);
   })
   .catch(function(e){
     btns.forEach(function(b){ b.disabled = false; b.style.opacity = ''; });
     showToast('Erro de rede: ' + e.message);
-    btns.forEach(function(b){ b.disabled = false; b.style.opacity = ''; });
   });
+}
+
+function showResolutionReport(d) {
+  var fmt = function(v) { return parseFloat(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2}); };
+  var outcome = d.outcome === 'yes' ? 'SIM ✅' : 'NÃO ❌';
+  var houseRetained = parseFloat(d.house_retained || 0);
+  var houseColor = houseRetained >= 0 ? '#10b981' : '#ef4444';
+
+  document.getElementById('reportTitle').textContent = 'Relatório de Resolução';
+  document.getElementById('reportMarketName').textContent = d.title || '';
+
+  document.getElementById('reportContent').innerHTML = [
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">',
+      '<div style="background:#0d1117;border-radius:12px;padding:14px;text-align:center">',
+        '<div style="font-size:1.8rem;font-weight:800;color:#10b981">' + d.winners + '</div>',
+        '<div style="font-size:0.75rem;color:#5a6878;margin-top:2px">VENCEDORES</div>',
+      '</div>',
+      '<div style="background:#0d1117;border-radius:12px;padding:14px;text-align:center">',
+        '<div style="font-size:1.8rem;font-weight:800;color:#ef4444">' + d.losers + '</div>',
+        '<div style="font-size:0.75rem;color:#5a6878;margin-top:2px">PERDEDORES</div>',
+      '</div>',
+    '</div>',
+    '<div style="background:#0d1117;border-radius:12px;padding:14px;margin-bottom:10px">',
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">',
+        '<span style="color:#8899aa;font-size:0.82rem">Resultado</span>',
+        '<span style="font-weight:700;color:#e8eaed">' + outcome + '</span>',
+      '</div>',
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">',
+        '<span style="color:#8899aa;font-size:0.82rem">Total apostado</span>',
+        '<span style="font-weight:700;color:#e8eaed">R$ ' + fmt(d.total_wagered) + '</span>',
+      '</div>',
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">',
+        '<span style="color:#8899aa;font-size:0.82rem">Pago aos vencedores</span>',
+        '<span style="font-weight:700;color:#10b981">R$ ' + fmt(d.total_paid) + '</span>',
+      '</div>',
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">',
+        '<span style="color:#8899aa;font-size:0.82rem">Taxa (2%) arrecadada</span>',
+        '<span style="font-weight:700;color:#f59e0b">R$ ' + fmt(d.total_taxa) + '</span>',
+      '</div>',
+      '<div style="border-top:1px solid #1e2d3d;margin:10px 0"></div>',
+      '<div style="display:flex;justify-content:space-between;align-items:center">',
+        '<span style="color:#8899aa;font-size:0.82rem;font-weight:600">Retido pela casa</span>',
+        '<span style="font-weight:800;font-size:1.05rem;color:' + houseColor + '">R$ ' + fmt(d.house_retained) + '</span>',
+      '</div>',
+    '</div>',
+    '<div style="text-align:center;font-size:0.75rem;color:#5a6878">',
+      d.total_bets + ' apostas processadas no total',
+    '</div>'
+  ].join('');
+
+  openModal('resolutionReportModal');
 }
 
 function openDesc(marketId) {

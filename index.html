@@ -1003,7 +1003,41 @@ window._finalizeLogin = function(d) {
   window.updateAuthUI();
   window.showToast('👋', 'Olá!', 'Bem-vindo de volta, ' + d.user.name);
   window.backToLoginStep1(); // reset modal para próxima abertura
+  // Registrar push notifications (sem bloquear o fluxo)
+  setTimeout(function(){ window.registerPush(d.token); }, 2000);
 };
+
+// ---- PUSH NOTIFICATIONS ----
+window.registerPush = async function(token) {
+  try {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+    var VAPID_PUBLIC_KEY = 'BF_5OhLx4KcJl9IA8bkRJzDcLdfX_9EZhVaxHtgMkv-6PnWi05ZXWkLH_yT8UR-vdjOtRzaCH-wDt04k4h2nnCM';
+    var reg = await navigator.serviceWorker.register('/sw.js');
+    await navigator.serviceWorker.ready;
+    var existing = await reg.pushManager.getSubscription();
+    if (existing) return; // já inscrito
+    var permission = await Notification.requestPermission();
+    if (permission !== 'granted') return;
+    var sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: _urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+    });
+    await fetch(window.API + '/notifications/push-subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: JSON.stringify({ subscription: sub })
+    });
+  } catch(e) { /* push opcional — silencioso */ }
+};
+
+function _urlBase64ToUint8Array(base64String) {
+  var padding = '='.repeat((4 - base64String.length % 4) % 4);
+  var base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  var rawData = atob(base64);
+  var arr = new Uint8Array(rawData.length);
+  for (var i = 0; i < rawData.length; i++) { arr[i] = rawData.charCodeAt(i); }
+  return arr;
+}
 
 window.backToLoginStep1 = function() {
   _login2faEmail = null;
@@ -1866,6 +1900,8 @@ async function init() {
     if(Array.isArray(mkts)) {
       window.state.markets = mkts.filter(m => !m.resolved_at);
       window.renderMarkets();
+      // Onboarding tour — só para novos usuários
+      setTimeout(tourStart, 800);
     } else {
       const grid = document.getElementById('marketsGrid');
       if (grid) grid.innerHTML = '<div style="text-align:center;grid-column:1/-1;padding:80px;color:var(--muted)">⚠️ Erro ao carregar mercados. <button onclick="init()" style="padding:8px 20px;border-radius:10px;background:var(--green);color:#000;border:none;cursor:pointer;font-weight:600;margin-left:8px">Recarregar</button></div>';
@@ -1884,6 +1920,8 @@ async function init() {
           const tag = document.querySelector('.hero-tag');
           if(tag) tag.innerHTML += ' <span style="color:var(--blue); cursor:pointer; margin-left:10px" onclick="window.changeHeroImage()">[Trocar Foto]</span>';
         }
+        // Tentar registrar push se ainda não estiver inscrito
+        setTimeout(function(){ window.registerPush(token); }, 3000);
       }
     }
   } catch(e) {
@@ -2066,6 +2104,95 @@ if(savedHero && savedHero.startsWith('http')) {
 })();
 
 init();
+
+/* ===== ONBOARDING TOUR ===== */
+var _tourStep = 0;
+var _tourSteps = [
+  { target: '#marketsGrid',    title: 'Mercados preditivos',  text: 'Cada card é uma pergunta sobre o futuro. Você aposta SIM ou NÃO e ganha se estiver certo.' },
+  { target: '.market-card',   title: 'Probabilidade ao vivo', text: 'A barra mostra o que o mercado acha: quanto mais pessoas apostam SIM, maior fica a chance.' },
+  { target: '#searchInput',    title: 'Busca inteligente',    text: 'Encontre mercados por assunto: "Copa", "eleição", "Bitcoin", "Selic"...' },
+  { target: '#topicTags',      title: 'Filtros por categoria', text: 'Filtre por Política, Economia, Esportes ou Tecnologia para ver só o que te interessa.' },
+  { target: '#section-ranking',title: 'Ranking de traders',   text: 'Acerte previsões e suba no ranking! Os melhores traders ganham destaque na plataforma.' }
+];
+
+function tourStart() {
+  if (localStorage.getItem('bubuya_tour_done')) return;
+  _tourStep = 0;
+  document.getElementById('tourOverlay').style.display = 'block';
+  document.getElementById('tourSpotlight').style.display = 'block';
+  document.getElementById('tourTooltip').style.display = 'block';
+  tourRender(_tourStep);
+}
+function tourNext() {
+  _tourStep++;
+  if (_tourStep >= _tourSteps.length) { tourFinish(); return; }
+  tourRender(_tourStep);
+}
+function tourSkip()   { tourFinish(); }
+function tourFinish() {
+  localStorage.setItem('bubuya_tour_done', '1');
+  document.getElementById('tourOverlay').style.display = 'none';
+  document.getElementById('tourSpotlight').style.display = 'none';
+  document.getElementById('tourTooltip').style.display = 'none';
+}
+
+function tourRender(i) {
+  var step = _tourSteps[i];
+  var el = document.querySelector(step.target);
+  if (!el) { tourNext(); return; }
+
+  // Scroll element into view
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  setTimeout(function() {
+    var rect = el.getBoundingClientRect();
+    var pad  = 8;
+    var spot = document.getElementById('tourSpotlight');
+    spot.style.top    = (rect.top    - pad) + 'px';
+    spot.style.left   = (rect.left   - pad) + 'px';
+    spot.style.width  = (rect.width  + pad*2) + 'px';
+    spot.style.height = (rect.height + pad*2) + 'px';
+
+    // Posicionar tooltip — abaixo do spotlight, ou acima se perto do rodapé
+    var tip   = document.getElementById('tourTooltip');
+    var tipH  = 160;
+    var tipW  = 300;
+    var vp    = window.innerHeight;
+    var tipTop = rect.bottom + pad + 12;
+    if (tipTop + tipH > vp - 20) tipTop = rect.top - tipH - pad - 12;
+    var tipLeft = Math.min(Math.max(rect.left, 16), window.innerWidth - tipW - 16);
+    tip.style.top  = Math.max(10, tipTop) + 'px';
+    tip.style.left = tipLeft + 'px';
+
+    // Conteúdo
+    document.getElementById('tourTitle').textContent = step.title;
+    document.getElementById('tourText').textContent  = step.text;
+    document.getElementById('tourBtn').textContent   = i === _tourSteps.length - 1 ? 'Entendi! 🎉' : 'Próximo →';
+
+    // Dots
+    var dots = '';
+    for (var d = 0; d < _tourSteps.length; d++) {
+      dots += '<div style="width:6px;height:6px;border-radius:50%;background:' + (d === i ? 'var(--green)' : 'rgba(255,255,255,0.2)') + '"></div>';
+    }
+    document.getElementById('tourDots').innerHTML = dots;
+  }, 350);
+}
 </script>
+<!-- ── ONBOARDING TOUR ─────────────────────────────────────────────────────── -->
+<div id="tourOverlay" style="display:none;position:fixed;inset:0;z-index:9997;pointer-events:none"></div>
+<div id="tourSpotlight" style="display:none;position:fixed;border-radius:14px;box-shadow:0 0 0 9999px rgba(0,0,0,0.72);z-index:9998;pointer-events:none;transition:top .3s,left .3s,width .3s,height .3s"></div>
+<div id="tourTooltip" style="display:none;position:fixed;z-index:9999;background:#0f1923;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:20px 22px;max-width:300px;width:300px;box-shadow:0 8px 32px rgba(0,0,0,0.6)">
+  <div style="font-size:0.7rem;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:700">Guia Rápido</div>
+  <div id="tourTitle" style="font-weight:800;font-size:1rem;margin-bottom:8px;color:#fff"></div>
+  <div id="tourText" style="font-size:0.85rem;color:#aaa;line-height:1.5;margin-bottom:16px"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between">
+    <div id="tourDots" style="display:flex;gap:5px;align-items:center"></div>
+    <div style="display:flex;gap:8px">
+      <button onclick="tourSkip()" style="padding:7px 14px;background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#888;cursor:pointer;font-size:0.8rem;font-family:inherit;transition:border-color .2s" onmouseover="this.style.borderColor='rgba(255,255,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'">Pular</button>
+      <button id="tourBtn" onclick="tourNext()" style="padding:7px 16px;background:var(--green);color:#080c10;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:700;font-family:inherit;transition:opacity .2s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Próximo →</button>
+    </div>
+  </div>
+</div>
+
 <footer><div class="footer-inner"><div class="footer-col" style="padding-right: 40px"><div class="logo" style="margin-bottom: 20px; font-size: 1.8rem">Bubuya.</div><p style="color: var(--muted); font-size: 0.95rem; line-height: 1.6">A principal plataforma brasileira de mercados de previsao.</p></div><div class="footer-col"><h4>Plataforma</h4><ul><li><a href="/about.html">Quem Somos</a></li><li><a href="/terms.html">Termos de Uso</a></li></ul></div><div class="footer-col"><h4>Suporte</h4><ul><li><a href="/how-it-works.html">Como Funciona</a></li><li><a href="mailto:suporte@bubuya.com.br">Suporte</a></li></ul></div><div class="footer-col"><h4>Categorias</h4><ul><li><a onclick="window.setCatFilter('politica', event.target)">Politica</a></li><li><a onclick="window.setCatFilter('economia', event.target)">Economia</a></li></ul></div></div><div class="footer-legal"><div class="footer-disclaimer"><strong>Aviso Legal Importante:</strong> A Bubuya e uma plataforma de tecnologia de mercados de previsao. Nao constitui recomendacao financeira.</div><div style="margin-top: 32px"><p>� 2026 Bubuya � Todos os direitos reservados.</p></div></div></footer><div id="aboutModal" class="modal-overlay"><div class="modal" style="max-width: 600px"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px"><h2 style="font-size:1.5rem">Quem Somos</h2><button class="modal-close" onclick="window.closeModal('aboutModal')">x</button></div><div style="line-height:1.7; color:var(--muted)"><p>A Bubuya e a principal plataforma brasileira de mercados de previsao.</p></div></div></div><div id="howToBetModal" class="modal-overlay"><div class="modal" style="max-width: 600px"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px"><h2 style="font-size:1.5rem">Como Funciona</h2><button class="modal-close" onclick="window.closeModal('howToBetModal')">x</button></div><div style="line-height:1.7; color:var(--muted)"><p>Escolha um mercado, compre SIM ou NAO e lucre se estiver certo.</p></div></div></div></body>
 </html>

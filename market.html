@@ -818,6 +818,7 @@ var state = { user: null, token: null, balance: 0, betSide: 'yes', betAction: 'b
 var market = null;
 var chart = null;
 var allHistory = [];
+var chartMode = 'lines';
 
 var marketId = new URLSearchParams(window.location.search).get('id') || window.location.pathname.split('/').pop();
 
@@ -877,6 +878,7 @@ function copyLink() {
 }
 
 function renderPage() {
+  chartMode = 'lines';
   var m = market;
   var total = parseFloat(m.q_yes) + parseFloat(m.q_no);
   var probYes = Math.round(parseFloat(m.q_yes) / total * 100);
@@ -980,11 +982,14 @@ function renderPage() {
       '<div class="chart-card">' +
         '<div class="chart-header">' +
           '<div class="chart-title">Histórico de chance</div>' +
-          '<div class="chart-periods">' +
-            '<button class="period-btn active" onclick="filterChart(\'all\',this)">ALL</button>' +
-            '<button class="period-btn" onclick="filterChart(\'1m\',this)">1M</button>' +
-            '<button class="period-btn" onclick="filterChart(\'1w\',this)">1W</button>' +
-            '<button class="period-btn" onclick="filterChart(\'1d\',this)">1D</button>' +
+          '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
+            '<div class="chart-periods">' +
+              '<button class="period-btn active" onclick="filterChart(\'all\',this)">ALL</button>' +
+              '<button class="period-btn" onclick="filterChart(\'1m\',this)">1M</button>' +
+              '<button class="period-btn" onclick="filterChart(\'1w\',this)">1W</button>' +
+              '<button class="period-btn" onclick="filterChart(\'1d\',this)">1D</button>' +
+            '</div>' +
+            '<button id="chartModeBtn" onclick="toggleChartMode()" style="padding:5px 12px;font-size:0.75rem;font-weight:600;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--text);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:background .2s,color .2s;white-space:nowrap">◼ Área</button>' +
           '</div>' +
         '</div>' +
         (allHistory.length > 0
@@ -1010,6 +1015,22 @@ function renderPage() {
             '<div id="obNoRows"><div class="ob-empty"><strong>Carregando...</strong></div></div>' +
           '</div>' +
         '</div>' +
+      '</div>' +
+
+      '<!-- COMENTÁRIOS -->' +
+      '<div class="section-card" id="commentsSection">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">' +
+          '<div style="font-size:1rem;font-weight:700">💬 Discussão <span id="commentsCount" style="font-size:0.82rem;font-weight:500;color:var(--muted)"></span></div>' +
+          '<div style="font-size:0.72rem;color:var(--muted)">Atualiza a cada 30s</div>' +
+        '</div>' +
+        '<div id="commentInputArea" style="display:none;margin-bottom:16px">' +
+          '<textarea id="commentText" maxlength="500" placeholder="Compartilhe sua análise sobre este mercado..." style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:inherit;font-size:0.88rem;padding:12px 14px;resize:vertical;min-height:80px;outline:none;transition:border-color .2s" onfocus="this.style.borderColor=\'rgba(59,130,246,0.5)\'" onblur="this.style.borderColor=\'var(--border)\'" oninput="document.getElementById(\'charCount\').textContent=this.value.length+\'/500\'"></textarea>' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">' +
+            '<span id="charCount" style="font-size:0.75rem;color:var(--muted)">0/500</span>' +
+            '<button onclick="postComment()" style="padding:8px 20px;background:var(--blue);color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:0.85rem;font-weight:600;transition:opacity .2s" onmouseover="this.style.opacity=\'0.85\'" onmouseout="this.style.opacity=\'1\'">Enviar</button>' +
+          '</div>' +
+        '</div>' +
+        '<div id="commentsList"><div style="text-align:center;padding:32px 0;color:var(--muted);font-size:0.88rem">Carregando comentários...</div></div>' +
       '</div>' +
 
       '<div class="section-card">' +
@@ -1086,9 +1107,10 @@ function renderChart(data) {
           backgroundColor: function(context) {
             var ch = context.chart;
             var chartArea = ch.chartArea;
-            if (!chartArea) return null;
+            if (!chartArea) return 'transparent';
+            if (chartMode === 'lines') return 'transparent';
             var grad = ch.ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-            grad.addColorStop(0, isYesFav ? 'rgba(16,185,129,0.25)' : 'rgba(244,63,94,0.25)');
+            grad.addColorStop(0, isYesFav ? 'rgba(16,185,129,0.32)' : 'rgba(244,63,94,0.32)');
             grad.addColorStop(1, 'rgba(3,3,3,0)');
             return grad;
           },
@@ -1096,20 +1118,29 @@ function renderChart(data) {
           pointRadius: ptRadius,
           pointHoverRadius: 6,
           pointBackgroundColor: isYesFav ? '#10b981' : '#f43f5e',
-          fill: true,
-          tension: 0.15
+          fill: chartMode === 'area',
+          tension: chartMode === 'area' ? 0.4 : 0.15
         },
         {
           label: 'NÃO %',
           data: noData,
           borderColor: isYesFav ? '#f43f5e' : '#10b981',
-          backgroundColor: 'transparent',
-          borderWidth: 1.5,
-          borderDash: [5, 4],
+          backgroundColor: function(context) {
+            var ch = context.chart;
+            var chartArea = ch.chartArea;
+            if (!chartArea) return 'transparent';
+            if (chartMode === 'lines') return 'transparent';
+            var grad = ch.ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+            grad.addColorStop(0, isYesFav ? 'rgba(244,63,94,0.18)' : 'rgba(16,185,129,0.18)');
+            grad.addColorStop(1, 'rgba(3,3,3,0)');
+            return grad;
+          },
+          borderWidth: chartMode === 'area' ? 2 : 1.5,
+          borderDash: chartMode === 'area' ? [] : [5, 4],
           pointRadius: ptRadius,
           pointHoverRadius: 5,
-          fill: false,
-          tension: 0.15
+          fill: chartMode === 'area',
+          tension: chartMode === 'area' ? 0.4 : 0.15
         }
       ]
     },
@@ -1154,6 +1185,26 @@ function renderChart(data) {
 function filterChart(period, el) {
   document.querySelectorAll('.period-btn').forEach(function(b){ b.classList.remove('active'); });
   el.classList.add('active');
+  var now = new Date();
+  var filtered = allHistory;
+  if (period === '1m') filtered = allHistory.filter(function(h){ return new Date(h.created_at) >= new Date(now - 30*24*3600*1000); });
+  else if (period === '1w') filtered = allHistory.filter(function(h){ return new Date(h.created_at) >= new Date(now - 7*24*3600*1000); });
+  else if (period === '1d') filtered = allHistory.filter(function(h){ return new Date(h.created_at) >= new Date(now - 24*3600*1000); });
+  if (filtered.length > 0) renderChart(filtered);
+}
+
+function toggleChartMode() {
+  chartMode = chartMode === 'lines' ? 'area' : 'lines';
+  var btn = document.getElementById('chartModeBtn');
+  if (btn) {
+    btn.textContent = chartMode === 'area' ? '〰 Linhas' : '◼ Área';
+    btn.style.background = chartMode === 'area' ? 'rgba(59,130,246,0.18)' : 'rgba(255,255,255,0.06)';
+    btn.style.color = chartMode === 'area' ? 'var(--blue)' : 'var(--text)';
+    btn.style.borderColor = chartMode === 'area' ? 'rgba(59,130,246,0.35)' : 'var(--border)';
+  }
+  // Re-render with current period filter
+  var activePeriod = document.querySelector('.period-btn.active');
+  var period = activePeriod ? activePeriod.textContent.toLowerCase() : 'all';
   var now = new Date();
   var filtered = allHistory;
   if (period === '1m') filtered = allHistory.filter(function(h){ return new Date(h.created_at) >= new Date(now - 30*24*3600*1000); });
@@ -1221,6 +1272,87 @@ async function loadOrderBook() {
 }
 
 setInterval(loadOrderBook, 10000);
+
+// ---- COMMENTS ----
+var _commentsInterval = null;
+
+function _formatTimeAgo(dateStr) {
+  var diff = (Date.now() - new Date(dateStr)) / 1000;
+  if (diff < 60) return 'agora';
+  if (diff < 3600) return Math.floor(diff/60) + 'm atrás';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h atrás';
+  return Math.floor(diff/86400) + 'd atrás';
+}
+
+async function loadComments() {
+  try {
+    var data = await apiGet('/markets/' + marketId + '/comments');
+    if (!Array.isArray(data)) return;
+    var countEl = document.getElementById('commentsCount');
+    if (countEl) countEl.textContent = data.length > 0 ? '(' + data.length + ')' : '';
+    var list = document.getElementById('commentsList');
+    if (!list) return;
+    if (data.length === 0) {
+      list.innerHTML = '<div style="text-align:center;padding:32px 0;color:var(--muted);font-size:0.88rem">Seja o primeiro a comentar!</div>';
+      return;
+    }
+    list.innerHTML = data.map(function(c) {
+      var initial = (c.name || c.username || '?')[0].toUpperCase();
+      var displayName = c.name || c.username || 'Usuário';
+      return '<div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.05)">' +
+        '<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;flex-shrink:0">' + initial + '</div>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px">' +
+            '<span style="font-weight:600;font-size:0.88rem">' + escapeHtml(displayName) + '</span>' +
+            '<span style="font-size:0.72rem;color:var(--muted)">' + _formatTimeAgo(c.created_at) + '</span>' +
+          '</div>' +
+          '<div style="font-size:0.88rem;color:rgba(255,255,255,0.82);line-height:1.5;word-break:break-word">' + escapeHtml(c.content) + '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  } catch(e) { console.error('Comments error:', e); }
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+async function postComment() {
+  var textarea = document.getElementById('commentText');
+  if (!textarea) return;
+  var content = textarea.value.trim();
+  if (!content) return;
+  if (!state.token) { alert('Faça login para comentar.'); return; }
+  var btn = document.querySelector('#commentInputArea button');
+  if (btn) { btn.disabled = true; btn.textContent = 'Enviando...'; }
+  try {
+    var res = await fetch(API + '/markets/' + marketId + '/comments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + state.token },
+      body: JSON.stringify({ content: content })
+    });
+    var data = await res.json();
+    if (!res.ok) { alert(data.error || 'Erro ao enviar comentário.'); return; }
+    textarea.value = '';
+    var charCount = document.getElementById('charCount');
+    if (charCount) charCount.textContent = '0/500';
+    await loadComments();
+  } catch(e) { alert('Erro ao enviar comentário.'); }
+  finally { if (btn) { btn.disabled = false; btn.textContent = 'Enviar'; } }
+}
+
+function initComments() {
+  // Mostrar área de input se logado
+  var inputArea = document.getElementById('commentInputArea');
+  if (inputArea && state.token) inputArea.style.display = 'block';
+  // Carregar comentários
+  loadComments();
+  // Polling a cada 30s
+  if (_commentsInterval) clearInterval(_commentsInterval);
+  _commentsInterval = setInterval(loadComments, 30000);
+}
 
 // ---- BET LOGIC ----
 function selectSide(side) {
@@ -1354,6 +1486,7 @@ async function loadMarket() {
     allHistory = data.history || [];
     renderPage();
     loadOrderBook();
+    initComments();
   } catch(e) {
     document.getElementById('pageContent').innerHTML =
       '<div style="text-align:center;padding:80px;color:var(--muted)">Erro ao carregar mercado.</div>';

@@ -911,7 +911,18 @@ window.renderMarkets = () => {
   if (sort === 'closing') filtered = [...filtered].sort((a,b) => new Date(a.ends_at||a.expiration_date||'9999') - new Date(b.ends_at||b.expiration_date||'9999'));
 
   if(filtered.length === 0) {
-    grid.innerHTML = '<div style=\"text-align:center; grid-column:1/-1; padding:60px; color:var(--muted)\">Nenhum mercado ativo no momento.</div>';
+    const isSearching = window.state.searchQuery || (window.state.catFilter && window.state.catFilter !== 'all');
+    grid.innerHTML = isSearching
+      ? '<div style="grid-column:1/-1;text-align:center;padding:80px 24px;color:var(--muted)">' +
+          '<div style="font-size:3rem;margin-bottom:16px">🔍</div>' +
+          '<div style="font-size:1.05rem;font-weight:700;margin-bottom:8px;color:var(--text)">Nenhum mercado encontrado</div>' +
+          '<div style="font-size:0.88rem">Tente outra categoria ou remova o filtro de busca</div>' +
+        '</div>'
+      : '<div style="grid-column:1/-1;text-align:center;padding:80px 24px;color:var(--muted)">' +
+          '<div style="font-size:3rem;margin-bottom:16px">📭</div>' +
+          '<div style="font-size:1.05rem;font-weight:700;margin-bottom:8px;color:var(--text)">Nenhum mercado ativo</div>' +
+          '<div style="font-size:0.88rem">Novos mercados em breve.</div>' +
+        '</div>';
     return;
   }
 
@@ -1265,12 +1276,18 @@ window.loadRanking = async () => {
     list.innerHTML = res.map((u, i) => {
       let medal = '';
       if(i===0) medal = 'gold'; else if(i===1) medal = 'silver'; else if(i===2) medal = 'bronze';
+      const profit = parseFloat(u.total_profit || 0);
+      const winRate = parseFloat(u.win_rate || 0).toFixed(1);
+      const totalBets = parseInt(u.total_bets || 0);
       return `
         <div class="ranking-card">
           <div class="rank-pos ${medal}">${i + 1}</div>
-          <div class="rank-avatar">${u.name[0]}</div>
-          <div class="rank-name">${u.name}</div>
-          <div class="rank-profit">R$${parseFloat(u.profit || 0).toLocaleString('pt-BR')}</div>
+          <div class="rank-avatar">${(u.name||'?')[0].toUpperCase()}</div>
+          <div style="flex:1;min-width:0">
+            <div class="rank-name">${u.name}</div>
+            <div style="font-size:0.73rem;color:var(--muted);margin-top:2px">${winRate}% acerto · ${totalBets} apostas</div>
+          </div>
+          <div class="rank-profit">R$${profit.toLocaleString('pt-BR', {minimumFractionDigits:2})}</div>
         </div>`;
     }).join('');
   } catch(e) { 

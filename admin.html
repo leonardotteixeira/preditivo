@@ -124,6 +124,31 @@ tr:hover td { background:rgba(255,255,255,0.015); }
 /* ── INFO BOX ── */
 .info-box { background:var(--surface2); border:1px solid var(--border); border-radius:14px; padding:16px 20px; margin-bottom:20px; font-size:0.85rem; color:var(--muted); line-height:1.75; }
 .info-box strong { color:var(--text); }
+
+/* ── COMPLIANCE BADGES ── */
+.sts { display:inline-flex; align-items:center; gap:5px; border-radius:8px; padding:3px 10px; font-size:0.78rem; font-weight:700; white-space:nowrap; }
+.sts-submitted  { background:rgba(245,158,11,0.12); color:#f59e0b; border:1px solid rgba(245,158,11,0.3); }
+.sts-approved   { background:rgba(16,185,129,0.12); color:#10b981; border:1px solid rgba(16,185,129,0.3); }
+.sts-rejected   { background:rgba(244,63,94,0.12);  color:#f43f5e; border:1px solid rgba(244,63,94,0.3); }
+.sts-flagged    { background:rgba(245,158,11,0.12); color:#f59e0b; border:1px solid rgba(245,158,11,0.3); }
+.sts-sanctioned { background:rgba(244,63,94,0.12);  color:#f43f5e; border:1px solid rgba(244,63,94,0.3); }
+.sts-clear      { background:rgba(16,185,129,0.08); color:#6ee7b7; border:1px solid rgba(16,185,129,0.15); }
+.sts-open       { background:rgba(244,63,94,0.12);  color:#f43f5e; border:1px solid rgba(244,63,94,0.3); }
+.sts-resolved   { background:rgba(16,185,129,0.08); color:#6ee7b7; border:1px solid rgba(16,185,129,0.15); }
+.sts-conservador{ background:rgba(59,130,246,0.12); color:#93c5fd; border:1px solid rgba(59,130,246,0.25); }
+.sts-moderado   { background:rgba(245,158,11,0.12); color:#fcd34d; border:1px solid rgba(245,158,11,0.25); }
+.sts-arrojado   { background:rgba(16,185,129,0.12); color:#6ee7b7; border:1px solid rgba(16,185,129,0.25); }
+
+/* ── COMPLIANCE STAT CARDS ── */
+.comp-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:28px; }
+.comp-card { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:18px 20px; }
+.comp-label { font-size:0.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:1.1px; margin-bottom:8px; }
+.comp-val { font-size:1.35rem; font-weight:800; font-family:'DM Mono',monospace; }
+
+/* ── COMPLIANCE SUB-SECTION ── */
+.comp-sub { margin-top:36px; }
+.comp-sub:first-child { margin-top:0; }
+.comp-divider { height:1px; background:var(--border); margin:32px 0; }
 </style>
 </head>
 <body>
@@ -159,6 +184,7 @@ tr:hover td { background:rgba(255,255,255,0.015); }
       <button class="tab" onclick="switchTab('novo',this)">+ Novo Mercado</button>
       <button class="tab" onclick="switchTab('saques',this)">Saques</button>
       <button class="tab" onclick="switchTab('bots',this)">🤖 Bots</button>
+      <button class="tab" onclick="switchTab('compliance',this)" id="tabCompliance">🛡️ Compliance</button>
       <button class="tab" onclick="switchTab('config',this)">⚙️ Configurações</button>
     </div>
 
@@ -309,6 +335,98 @@ tr:hover td { background:rgba(255,255,255,0.015); }
       </div>
     </div>
 
+    <!-- COMPLIANCE -->
+    <div id="sec-compliance" class="section">
+
+      <!-- KPI Summary row -->
+      <div class="comp-grid" id="complianceSummary">
+        <div class="comp-card"><div class="comp-label">KYC Pendentes</div><div class="comp-val" id="cKycPending" style="color:#f59e0b">—</div></div>
+        <div class="comp-card"><div class="comp-label">KYC Aprovados</div><div class="comp-val" id="cKycApproved" style="color:#10b981">—</div></div>
+        <div class="comp-card"><div class="comp-label">KYC Rejeitados</div><div class="comp-val" id="cKycRejected" style="color:#f43f5e">—</div></div>
+        <div class="comp-card"><div class="comp-label">PEP Flagged</div><div class="comp-val" id="cPepFlagged" style="color:#f59e0b">—</div></div>
+        <div class="comp-card"><div class="comp-label">Alertas COAF</div><div class="comp-val" id="cCoafOpen" style="color:#f43f5e">—</div></div>
+        <div class="comp-card"><div class="comp-label">Suitability OK</div><div class="comp-val" id="cSuitOk" style="color:#10b981">—</div></div>
+      </div>
+
+      <!-- ── 1. FILA KYC ─────────────────────────────────────────────────────── -->
+      <div class="comp-sub">
+        <div class="section-title">
+          🔍 Fila KYC — Aguardando Análise
+          <span class="badge" id="kycQueueBadge">0</span>
+          <button class="btn btn-resolve" style="margin-left:auto;font-size:0.78rem" onclick="loadComplianceKyc()">↻ Atualizar</button>
+        </div>
+        <div class="info-box" style="margin-bottom:16px">
+          <strong>BACEN Circular 3.978/2020:</strong> Usuários com CPF verificado pelo bureau mas identificados como PEP ficam em <em>submitted</em> para revisão manual obrigatória antes de aprovação. Aprovações diretas aplicam-se apenas a usuários <em>clear</em> no resultado bureau.
+        </div>
+        <table>
+          <thead><tr><th>Usuário</th><th>Email</th><th>Nome Completo</th><th>CPF</th><th>Nasc.</th><th>Enviado em</th><th>PEP?</th><th>Ações</th></tr></thead>
+          <tbody id="kycQueueTbody"><tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="comp-divider"></div>
+
+      <!-- ── 2. PEP IDENTIFICADOS ──────────────────────────────────────────── -->
+      <div class="comp-sub">
+        <div class="section-title">
+          🏛️ Pessoas Politicamente Expostas (PEP)
+          <span class="badge" id="pepBadge">0</span>
+          <button class="btn btn-resolve" style="margin-left:auto;font-size:0.78rem" onclick="loadCompliancePep()">↻ Atualizar</button>
+        </div>
+        <div class="info-box" style="margin-bottom:16px">
+          <strong>Art. 27 BACEN 3.978/2020:</strong> PEPs identificados devem permanecer em <em>submitted</em> até revisão manual e aprovação explícita pelo Compliance Officer. Aprovação não é automática mesmo com bureau OK.
+        </div>
+        <table>
+          <thead><tr><th>Usuário</th><th>Email</th><th>Nome Completo</th><th>KYC Status</th><th>Confiança</th><th>Keywords</th><th>Verificado em</th><th>Ações</th></tr></thead>
+          <tbody id="pepQueueTbody"><tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="comp-divider"></div>
+
+      <!-- ── 3. ALERTAS COAF ───────────────────────────────────────────────── -->
+      <div class="comp-sub">
+        <div class="section-title">
+          🚨 Alertas COAF — Monitoramento PLD/FT
+          <span class="badge" id="coafBadge">0</span>
+          <button class="btn btn-resolve" style="margin-left:auto;font-size:0.78rem" onclick="loadComplianceCoaf()">↻ Atualizar</button>
+        </div>
+        <div class="info-box" style="margin-bottom:16px">
+          <strong>Lei 9.613/98 — Art. 11:</strong> Operações que atingem R$10.000/mês devem ser monitoradas. <em>Dismiss</em> = registro interno arquivado. <em>Reportar COAF</em> = obrigação legal de comunicação ao COAF dentro de 24h.
+        </div>
+        <table>
+          <thead><tr><th>Usuário</th><th>Email</th><th>Mês</th><th>Volume Mensal</th><th>Limiar</th><th>Status</th><th>Criado em</th><th>Ações</th></tr></thead>
+          <tbody id="coafFlagsTbody"><tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="comp-divider"></div>
+
+      <!-- ── 4. SUITABILITY ─────────────────────────────────────────────────── -->
+      <div class="comp-sub">
+        <div class="section-title">
+          📊 Suitability — Perfil de Investidor
+          <button class="btn btn-resolve" style="margin-left:auto;font-size:0.78rem" onclick="loadComplianceSuitability()">↻ Atualizar</button>
+        </div>
+        <div class="info-box" style="margin-bottom:16px">
+          <strong>CVM Resolução 30/2021:</strong> Perfil válido por 12 meses. Limites de aposta por perfil: <strong>Conservador</strong> R$100/aposta · R$500/mês · <strong>Moderado</strong> R$500/aposta · R$2.000/mês · <strong>Arrojado</strong> R$2.000/aposta · R$10.000/mês.
+        </div>
+        <div class="comp-grid" id="suitGrid">
+          <div class="comp-card"><div class="comp-label">Total Respondentes</div><div class="comp-val" id="suitTotal" style="color:var(--text)">—</div></div>
+          <div class="comp-card"><div class="comp-label">Conservador</div><div class="comp-val" id="suitConservador" style="color:#93c5fd">—</div></div>
+          <div class="comp-card"><div class="comp-label">Moderado</div><div class="comp-val" id="suitModerado" style="color:#fcd34d">—</div></div>
+          <div class="comp-card"><div class="comp-label">Arrojado</div><div class="comp-val" id="suitArrojado" style="color:#6ee7b7">—</div></div>
+          <div class="comp-card"><div class="comp-label">Expirados</div><div class="comp-val" id="suitExpired" style="color:#f43f5e">—</div></div>
+          <div class="comp-card"><div class="comp-label">Score Médio</div><div class="comp-val" id="suitAvgScore" style="color:var(--gold)">—</div></div>
+        </div>
+        <table>
+          <thead><tr><th>Usuário</th><th>Email</th><th>Perfil</th><th>Score</th><th>Respondido em</th><th>Expira em</th><th>Status</th></tr></thead>
+          <tbody id="suitTbody"><tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+
+    </div>
+
     <!-- CONFIGURAÇÕES -->
     <div id="sec-config" class="section">
       <div class="section-title">Configurações do Site</div>
@@ -379,6 +497,33 @@ tr:hover td { background:rgba(255,255,255,0.015); }
   </div>
 </div>
 
+<!-- MODAL REJEITAR KYC -->
+<div id="kycRejectModal" class="modal-overlay">
+  <div class="modal">
+    <h3 style="margin-bottom:8px">Rejeitar KYC</h3>
+    <p id="kycRejectUserName" style="color:var(--muted);font-size:0.85rem;margin-bottom:16px"></p>
+    <div class="form-group">
+      <label class="form-label">Motivo da Rejeição</label>
+      <select id="kycRejectReason" class="form-select" style="margin-bottom:12px">
+        <option value="document_invalid">Documento inválido ou ilegível</option>
+        <option value="cpf_mismatch">CPF não confere com o documento</option>
+        <option value="name_mismatch">Nome divergente</option>
+        <option value="underage">Menor de 18 anos</option>
+        <option value="duplicate_account">Conta duplicada detectada</option>
+        <option value="suspicious_activity">Atividade suspeita</option>
+        <option value="incomplete_data">Dados incompletos</option>
+        <option value="other">Outro</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notas internas (opcional)</label>
+      <textarea id="kycRejectNotes" class="form-textarea" placeholder="Observações para registro interno..." style="min-height:80px;margin-bottom:12px"></textarea>
+    </div>
+    <button class="btn-no" onclick="confirmKycReject()">Confirmar Rejeição</button>
+    <button class="btn-cancel" onclick="closeModal('kycRejectModal')">Cancelar</button>
+  </div>
+</div>
+
 <!-- MODAL AJUSTAR SALDO -->
 <div id="balanceModal" class="modal-overlay">
   <div class="modal">
@@ -399,7 +544,7 @@ tr:hover td { background:rgba(255,255,255,0.015); }
 <script src="./admin-enhancements.js?v=20260317"></script>
 <script>
 var API = window.PREDITIVO_CONFIG.API_BASE;
-var ADMIN_SECRET = '';
+// Nota: ADMIN_SECRET foi removido por segurança. Usar sessionStorage para token JWT
 var resolveMarketId = null;
 var descMarketId = null;
 var balanceUserId = null;
@@ -408,23 +553,58 @@ var reopenMarketId = null;
 var botActivityChart = null;
 
 function adminHeaders() {
-  return { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET };
+  var token = sessionStorage.getItem('admin_token');
+  if (!token) {
+    // Logout automático se token expirou
+    logout();
+    return null;
+  }
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer ' + token
+  };
 }
 
 function adminLogin() {
   var pass = document.getElementById('adminPass').value;
-  if (!pass) { showToast('Digite a senha'); return; }
+  if (!pass) { showToast('Digite a secret'); return; }
+
   var btn = document.querySelector('#loginScreen button');
   if (btn) { btn.disabled = true; btn.textContent = 'Verificando...'; }
-  fetch(API + '/admin/deposits', { headers: { 'x-admin-secret': pass } })
+
+  // Fazer POST ao novo endpoint de login admin
+  fetch(API + '/admin/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ secret: pass })
+  })
     .then(function(r) {
       if (btn) { btn.disabled = false; btn.textContent = 'Entrar'; }
-      if (r.status === 403) { showToast('Senha incorreta (403)'); return; }
-      if (!r.ok) { showToast('Erro ' + r.status + ' ao autenticar'); return; }
-      ADMIN_SECRET = pass;
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('dashboard').style.display = 'block';
-      loadAll();
+
+      if (r.status === 403) {
+        showToast('Secret incorreta (403)');
+        return;
+      }
+
+      if (!r.ok) {
+        showToast('Erro ' + r.status + ' ao autenticar');
+        return;
+      }
+
+      return r.json().then(function(data) {
+        // Armazenar token em sessionStorage (não em variável global)
+        sessionStorage.setItem('admin_token', data.token);
+        showToast('Login bem-sucedido!');
+
+        // Limpar input
+        document.getElementById('adminPass').value = '';
+
+        // Mostrar dashboard
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+
+        loadAll();
+      });
     })
     .catch(function(e) {
       if (btn) { btn.disabled = false; btn.textContent = 'Entrar'; }
@@ -433,6 +613,11 @@ function adminLogin() {
 }
 
 function logout() {
+  // Limpar token do sessionStorage
+  sessionStorage.removeItem('admin_token');
+  showToast('Logout realizado. Secret apagada.');
+
+  // Mostrar tela de login
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('dashboard').style.display = 'none';
 }
@@ -448,6 +633,7 @@ function switchTab(name, el) {
   if (name === 'receita') loadReceita();
   if (name === 'saques') loadSaques();
   if (name === 'bots') loadBotStats();
+  if (name === 'compliance') loadCompliance();
   if (name === 'config') loadGlobalConfig();
 }
 
@@ -1229,6 +1415,311 @@ function saveGlobalConfig() {
   if(!url) return showToast('Informe uma URL válida');
   localStorage.setItem('custom_hero_image', url);
   showToast('Configurações salvas localmente!');
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ── COMPLIANCE PANEL ──────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+
+function loadCompliance() {
+  loadComplianceDashboard();
+  loadComplianceKyc();
+  loadCompliancePep();
+  loadComplianceCoaf();
+  loadComplianceSuitability();
+}
+
+// ── 1. KYC PENDING QUEUE ─────────────────────────────────────────────────────
+
+function loadComplianceKyc() {
+  var tbody = document.getElementById('kycQueueTbody');
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted)">Carregando...</td></tr>';
+
+  fetch(API + '/kyc/admin/pending', { headers: adminHeaders() })
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      var users = data.users || data || [];
+      var count = users.length;
+      document.getElementById('kycQueueBadge').textContent = count;
+      document.getElementById('cKycPending').textContent = count;
+
+      if (!count) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">✅ Nenhum KYC pendente</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = users.map(function(u) {
+        var dob = u.date_of_birth ? new Date(u.date_of_birth).toLocaleDateString('pt-BR') : '—';
+        var submittedAt = u.kyc_submitted_at ? new Date(u.kyc_submitted_at).toLocaleString('pt-BR') : '—';
+        var cpfMasked = u.cpf ? u.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4') : '—';
+        var pepBadge = u.pep_status === 'flagged'
+          ? '<span class="sts sts-flagged">🏛️ PEP</span>'
+          : u.pep_status === 'clear'
+            ? '<span class="sts sts-clear">Clear</span>'
+            : '<span style="color:var(--muted);font-size:0.78rem">—</span>';
+        var uId = u.id || u.user_id;
+        var uName = (u.username || u.name || '—').replace(/'/g, '');
+        var fullName = (u.full_name || '—').replace(/'/g, '');
+        return '<tr>' +
+          '<td><strong>' + uName + '</strong></td>' +
+          '<td style="color:var(--muted);font-size:0.82rem">' + (u.email || '—') + '</td>' +
+          '<td>' + fullName + '</td>' +
+          '<td style="font-family:\'DM Mono\',monospace;font-size:0.82rem;color:var(--muted)">' + cpfMasked + '</td>' +
+          '<td style="color:var(--muted);font-size:0.82rem">' + dob + '</td>' +
+          '<td style="color:var(--muted);font-size:0.78rem">' + submittedAt + '</td>' +
+          '<td>' + pepBadge + '</td>' +
+          '<td>' +
+            '<button class="btn btn-confirm" style="font-size:0.78rem;margin-right:4px" onclick="approveKyc(\'' + uId + '\',\'' + uName + '\')">✓ Aprovar</button>' +
+            '<button class="btn btn-reject" style="font-size:0.78rem" onclick="openKycReject(\'' + uId + '\',\'' + uName + '\')">✕ Rejeitar</button>' +
+          '</td>' +
+          '</tr>';
+      }).join('');
+    })
+    .catch(function(e) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--red)">Erro ao carregar: ' + e.message + '</td></tr>';
+    });
+}
+
+// ── 2. PEP FLAGGED ───────────────────────────────────────────────────────────
+
+function loadCompliancePep() {
+  var tbody = document.getElementById('pepQueueTbody');
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted)">Carregando...</td></tr>';
+
+  fetch(API + '/kyc/admin/pep', { headers: adminHeaders() })
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      var users = data.users || [];
+      document.getElementById('pepBadge').textContent = users.length;
+      document.getElementById('cPepFlagged').textContent = users.length;
+
+      if (!users.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">✅ Nenhum PEP identificado</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = users.map(function(u) {
+        var checkedAt = u.pep_checked_at ? new Date(u.pep_checked_at).toLocaleString('pt-BR') : '—';
+        var confidence = u.confidence ? (parseFloat(u.confidence) * 100).toFixed(0) + '%' : '—';
+        var details = u.pep_details || {};
+        var keywords = (details.matchedKeywords || []).join(', ') || '—';
+        var kycClass = 'sts-' + (u.kyc_status || 'submitted');
+        var uId = u.id || u.user_id;
+        var uName = (u.username || '—').replace(/'/g, '');
+        return '<tr>' +
+          '<td><strong>' + uName + '</strong></td>' +
+          '<td style="color:var(--muted);font-size:0.82rem">' + (u.email || '—') + '</td>' +
+          '<td>' + (u.full_name || '—') + '</td>' +
+          '<td><span class="sts ' + kycClass + '">' + (u.kyc_status || '—') + '</span></td>' +
+          '<td style="color:var(--gold);font-weight:700;font-family:\'DM Mono\',monospace">' + confidence + '</td>' +
+          '<td style="font-size:0.78rem;color:var(--muted);max-width:200px">' + keywords + '</td>' +
+          '<td style="color:var(--muted);font-size:0.78rem">' + checkedAt + '</td>' +
+          '<td>' +
+            (u.kyc_status === 'submitted'
+              ? '<button class="btn btn-confirm" style="font-size:0.78rem;margin-right:4px" onclick="approveKyc(\'' + uId + '\',\'' + uName + '\')">✓ Aprovar PEP</button>' +
+                '<button class="btn btn-reject" style="font-size:0.78rem" onclick="openKycReject(\'' + uId + '\',\'' + uName + '\')">✕ Rejeitar</button>'
+              : '<span style="color:var(--muted);font-size:0.78rem">' + (u.kyc_status || '—') + '</span>') +
+          '</td>' +
+          '</tr>';
+      }).join('');
+    })
+    .catch(function(e) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--red)">Erro: ' + e.message + '</td></tr>';
+    });
+}
+
+// ── 3. COAF FLAGS ────────────────────────────────────────────────────────────
+
+function loadComplianceCoaf() {
+  var tbody = document.getElementById('coafFlagsTbody');
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted)">Carregando...</td></tr>';
+
+  fetch(API + '/kyc/admin/coaf-flags', { headers: adminHeaders() })
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      var flags = data.flags || data || [];
+      var openCount = flags.filter(function(f){ return f.status === 'open'; }).length;
+      document.getElementById('coafBadge').textContent = openCount;
+      document.getElementById('cCoafOpen').textContent = openCount;
+
+      if (!flags.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">✅ Nenhum alerta COAF</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = flags.map(function(f) {
+        var vol = parseFloat(f.month_total || f.total_month || 0);
+        var thr = parseFloat(f.threshold || 10000);
+        var dt = f.created_at ? new Date(f.created_at).toLocaleString('pt-BR') : '—';
+        var flagDate = f.flag_date || (f.created_at ? f.created_at.substring(0,7) : '—');
+        var stsCls = f.status === 'open' ? 'sts-open' : 'sts-resolved';
+        var actions = f.status === 'open'
+          ? '<button class="btn btn-resolve" style="font-size:0.76rem;margin-right:4px" onclick="resolveCoaf(\'' + f.id + '\',\'dismiss\')">Arquivar</button>' +
+            '<button class="btn btn-reject" style="font-size:0.76rem" onclick="resolveCoaf(\'' + f.id + '\',\'report\')">Reportar COAF</button>'
+          : '<span style="color:var(--muted);font-size:0.78rem">' + (f.resolved_action || f.status) + '</span>';
+        return '<tr>' +
+          '<td><strong>' + (f.username || '—') + '</strong></td>' +
+          '<td style="color:var(--muted);font-size:0.82rem">' + (f.email || '—') + '</td>' +
+          '<td style="font-family:\'DM Mono\',monospace;font-size:0.82rem">' + flagDate + '</td>' +
+          '<td style="color:var(--gold);font-weight:700;font-family:\'DM Mono\',monospace">R$' + vol.toLocaleString('pt-BR',{minimumFractionDigits:2}) + '</td>' +
+          '<td style="color:var(--muted);font-family:\'DM Mono\',monospace;font-size:0.82rem">R$' + thr.toLocaleString('pt-BR',{minimumFractionDigits:2}) + '</td>' +
+          '<td><span class="sts ' + stsCls + '">' + f.status + '</span></td>' +
+          '<td style="color:var(--muted);font-size:0.78rem">' + dt + '</td>' +
+          '<td>' + actions + '</td>' +
+          '</tr>';
+      }).join('');
+    })
+    .catch(function(e) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--red)">Erro: ' + e.message + '</td></tr>';
+    });
+}
+
+// ── 4. SUITABILITY STATS ─────────────────────────────────────────────────────
+
+function loadComplianceSuitability() {
+  fetch(API + '/suitability/admin/stats', { headers: adminHeaders() })
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      var stats = data.stats || data || {};
+      var byProfile = stats.by_profile || {};
+      var total = parseInt(stats.total_responded || 0);
+      var expired = parseInt(stats.total_expired || 0);
+      var avgScore = stats.avg_score ? parseFloat(stats.avg_score).toFixed(1) : '—';
+
+      document.getElementById('suitTotal').textContent = total;
+      document.getElementById('suitConservador').textContent = byProfile.conservador || 0;
+      document.getElementById('suitModerado').textContent = byProfile.moderado || 0;
+      document.getElementById('suitArrojado').textContent = byProfile.arrojado || 0;
+      document.getElementById('suitExpired').textContent = expired;
+      document.getElementById('suitAvgScore').textContent = avgScore;
+      document.getElementById('cSuitOk').textContent = total - expired;
+
+      // Tabela de usuários recentes com perfil
+      var users = stats.recent_users || data.users || [];
+      var tbody = document.getElementById('suitTbody');
+      if (!users.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">Nenhum perfil registrado ainda</td></tr>';
+        return;
+      }
+      tbody.innerHTML = users.map(function(u) {
+        var completedAt = u.suitability_completed_at ? new Date(u.suitability_completed_at).toLocaleDateString('pt-BR') : '—';
+        var expiresAt = u.suitability_expires_at ? new Date(u.suitability_expires_at).toLocaleDateString('pt-BR') : '—';
+        var isExpired = u.suitability_expires_at && new Date(u.suitability_expires_at) < new Date();
+        var profile = u.suitability_profile || '—';
+        var profCls = profile === 'conservador' ? 'sts-conservador' : profile === 'moderado' ? 'sts-moderado' : profile === 'arrojado' ? 'sts-arrojado' : '';
+        return '<tr>' +
+          '<td><strong>' + (u.username || u.name || '—') + '</strong></td>' +
+          '<td style="color:var(--muted);font-size:0.82rem">' + (u.email || '—') + '</td>' +
+          '<td>' + (profCls ? '<span class="sts ' + profCls + '">' + profile + '</span>' : '—') + '</td>' +
+          '<td style="font-family:\'DM Mono\',monospace;color:var(--gold)">' + (u.suitability_score || '—') + '</td>' +
+          '<td style="color:var(--muted);font-size:0.82rem">' + completedAt + '</td>' +
+          '<td style="color:' + (isExpired ? 'var(--red)' : 'var(--muted)') + ';font-size:0.82rem">' + expiresAt + '</td>' +
+          '<td>' + (isExpired
+            ? '<span class="sts sts-rejected">Expirado</span>'
+            : '<span class="sts sts-approved">Válido</span>') + '</td>' +
+          '</tr>';
+      }).join('');
+    })
+    .catch(function(e) {
+      document.getElementById('suitTbody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--red)">Erro: ' + e.message + '</td></tr>';
+    });
+}
+
+// ── KYC ACTIONS ──────────────────────────────────────────────────────────────
+
+var _kycActionUserId = null;
+var _kycActionUserName = null;
+
+function approveKyc(userId, name) {
+  if (!confirm('Aprovar KYC de "' + name + '"?\n\nEsta ação libera o acesso completo à plataforma.')) return;
+  fetch(API + '/kyc/admin/' + userId + '/approve', {
+    method: 'POST',
+    headers: adminHeaders(),
+    body: JSON.stringify({ notes: 'Aprovado via painel admin' })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d) {
+    if (d.error) { showToast('Erro: ' + d.error); return; }
+    showToast('✅ KYC aprovado: ' + name);
+    loadComplianceKyc();
+    loadCompliancePep();
+    // Atualiza contador do header
+    fetch(API + '/admin/dashboard', { headers: adminHeaders() })
+      .then(function(r){ return r.json(); })
+      .then(function(d){ if(d.kyc) document.getElementById('cKycApproved').textContent = d.kyc.approved || '—'; })
+      .catch(function(){});
+  })
+  .catch(function(e){ showToast('Erro: ' + e.message); });
+}
+
+function openKycReject(userId, name) {
+  _kycActionUserId = userId;
+  _kycActionUserName = name;
+  document.getElementById('kycRejectUserName').textContent = 'Usuário: ' + name;
+  document.getElementById('kycRejectNotes').value = '';
+  document.getElementById('kycRejectReason').selectedIndex = 0;
+  openModal('kycRejectModal');
+}
+
+function confirmKycReject() {
+  if (!_kycActionUserId) return;
+  var reason = document.getElementById('kycRejectReason').value;
+  var notes = document.getElementById('kycRejectNotes').value.trim();
+
+  fetch(API + '/kyc/admin/' + _kycActionUserId + '/reject', {
+    method: 'POST',
+    headers: adminHeaders(),
+    body: JSON.stringify({ reason: reason, notes: notes || 'Rejeitado via painel admin' })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d) {
+    if (d.error) { showToast('Erro: ' + d.error); return; }
+    closeModal('kycRejectModal');
+    showToast('KYC rejeitado: ' + _kycActionUserName);
+    _kycActionUserId = null;
+    _kycActionUserName = null;
+    loadComplianceKyc();
+    loadCompliancePep();
+  })
+  .catch(function(e){ showToast('Erro: ' + e.message); });
+}
+
+// ── COAF ACTIONS ─────────────────────────────────────────────────────────────
+
+function resolveCoaf(flagId, action) {
+  var label = action === 'report' ? 'REPORTAR ao COAF (obrigação legal — não pode ser desfeito)' : 'arquivar este alerta';
+  if (!confirm('Confirma ' + label + '?')) return;
+
+  fetch(API + '/kyc/admin/coaf-flags/' + flagId + '/resolve', {
+    method: 'POST',
+    headers: adminHeaders(),
+    body: JSON.stringify({ action: action, resolved_by: 'admin' })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d) {
+    if (d.error) { showToast('Erro: ' + d.error); return; }
+    if (action === 'report') {
+      showToast('⚠️ Comunicação COAF registrada. Providencie o envio formal em 24h.');
+    } else {
+      showToast('Alerta arquivado internamente.');
+    }
+    loadComplianceCoaf();
+  })
+  .catch(function(e){ showToast('Erro: ' + e.message); });
+}
+
+// ── LOAD COMPLIANCE DASHBOARD KPIs (from /admin/dashboard) ───────────────────
+
+function loadComplianceDashboard() {
+  fetch(API + '/admin/dashboard', { headers: adminHeaders() })
+    .then(function(r){ return r.json(); })
+    .then(function(d) {
+      if (d.kyc) {
+        document.getElementById('cKycApproved').textContent = d.kyc.approved || 0;
+        document.getElementById('cKycRejected').textContent = d.kyc.rejected || 0;
+      }
+    })
+    .catch(function(){});
 }
 </script>
 </body>

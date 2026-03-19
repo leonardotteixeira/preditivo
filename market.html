@@ -1061,22 +1061,6 @@ function renderPage() {
         '</div>' +
       '</div>' +
 
-      '<!-- COMENTÁRIOS -->' +
-      '<div class="section-card" id="commentsSection">' +
-        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">' +
-          '<div style="font-size:1rem;font-weight:700">💬 Discussão <span id="commentsCount" style="font-size:0.82rem;font-weight:500;color:var(--muted)"></span></div>' +
-          '<div style="font-size:0.72rem;color:var(--muted)">Atualiza a cada 30s</div>' +
-        '</div>' +
-        '<div id="commentInputArea" style="display:none;margin-bottom:16px">' +
-          '<textarea id="commentText" maxlength="500" placeholder="Compartilhe sua análise sobre este mercado..." style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:inherit;font-size:0.88rem;padding:12px 14px;resize:vertical;min-height:80px;outline:none;transition:border-color .2s" onfocus="this.style.borderColor=\'rgba(59,130,246,0.5)\'" onblur="this.style.borderColor=\'var(--border)\'" oninput="document.getElementById(\'charCount\').textContent=this.value.length+\'/500\'"></textarea>' +
-          '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">' +
-            '<span id="charCount" style="font-size:0.75rem;color:var(--muted)">0/500</span>' +
-            '<button onclick="postComment()" style="padding:8px 20px;background:var(--blue);color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:0.85rem;font-weight:600;transition:opacity .2s" onmouseover="this.style.opacity=\'0.85\'" onmouseout="this.style.opacity=\'1\'">Enviar</button>' +
-          '</div>' +
-        '</div>' +
-        '<div id="commentsList"><div style="text-align:center;padding:32px 0;color:var(--muted);font-size:0.88rem">Carregando comentários...</div></div>' +
-      '</div>' +
-
       '<div class="section-card">' +
         '<div class="card-title">Timeline</div>' +
         '<div class="timeline">' +
@@ -1100,6 +1084,22 @@ function renderPage() {
         (m.description
           ? '<div class="rules-text">' + m.description + '</div>'
           : '<div class="rules-empty">Nenhuma regra cadastrada para este mercado.</div>') +
+      '</div>' +
+
+      '<!-- COMENTÁRIOS -->' +
+      '<div class="section-card" id="commentsSection">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">' +
+          '<div style="font-size:1rem;font-weight:700">💬 Discussão <span id="commentsCount" style="font-size:0.82rem;font-weight:500;color:var(--muted)"></span></div>' +
+          '<div style="font-size:0.72rem;color:var(--muted)">Atualiza a cada 30s</div>' +
+        '</div>' +
+        '<div id="commentInputArea" style="display:none;margin-bottom:16px">' +
+          '<textarea id="commentText" maxlength="500" placeholder="Compartilhe sua análise sobre este mercado..." style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:inherit;font-size:0.88rem;padding:12px 14px;resize:vertical;min-height:80px;outline:none;transition:border-color .2s" onfocus="this.style.borderColor=\'rgba(59,130,246,0.5)\'" onblur="this.style.borderColor=\'var(--border)\'" oninput="document.getElementById(\'charCount\').textContent=this.value.length+\'/500\'"></textarea>' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">' +
+            '<span id="charCount" style="font-size:0.75rem;color:var(--muted)">0/500</span>' +
+            '<button onclick="postComment()" style="padding:8px 20px;background:var(--blue);color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:0.85rem;font-weight:600;transition:opacity .2s" onmouseover="this.style.opacity=\'0.85\'" onmouseout="this.style.opacity=\'1\'">Enviar</button>' +
+          '</div>' +
+        '</div>' +
+        '<div id="commentsList"><div style="text-align:center;padding:32px 0;color:var(--muted);font-size:0.88rem">Carregando comentários...</div></div>' +
       '</div>' +
 
     '</div>' +

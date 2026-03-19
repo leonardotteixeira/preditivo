@@ -1031,7 +1031,7 @@ function loadUsers() {
           '<td style="color:#5a6878;font-size:0.8rem">' + dt + '</td>' +
           '<td style="display:flex;gap:6px">' +
             '<button class="btn" onclick="openBalance(\'' + u.id + '\',\'' + (u.username || u.name || '').replace(/'/g, '') + '\',' + balance + ')">Ajustar saldo</button>' +
-            '<button class="btn" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#ef4444" onclick="deleteUser(' + u.id + ',\'' + (u.username || u.name || '').replace(/'/g, '') + '\')">🗑 Excluir</button>' +
+            '<button class="btn" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#ef4444" onclick="deleteUser(\'' + u.id + '\',\'' + (u.username || u.name || '').replace(/'/g, '') + '\')">🗑 Excluir</button>' +
           '</td>' +
           '</tr>';
       }).join('');
@@ -1710,7 +1710,7 @@ function loadComplianceKyc() {
       }
 
       tbody.innerHTML = users.map(function(u) {
-        var dob = u.date_of_birth ? new Date(u.date_of_birth).toLocaleDateString('pt-BR') : '—';
+        var dob = u.date_of_birth ? new Date(u.date_of_birth.substring(0,10) + 'T12:00:00').toLocaleDateString('pt-BR') : '—';
         var submittedAt = u.kyc_submitted_at ? new Date(u.kyc_submitted_at).toLocaleString('pt-BR') : '—';
         var cpfMasked = u.cpf ? u.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4') : '—';
 
@@ -2053,7 +2053,7 @@ function renderDrawer(data) {
   document.getElementById('drwBadges').innerHTML = badges;
 
   function fmt(dt) { return dt ? new Date(dt).toLocaleString('pt-BR') : '—'; }
-  function fmtD(dt) { return dt ? new Date(dt).toLocaleDateString('pt-BR') : '—'; }
+  function fmtD(dt) { return dt ? new Date(dt.substring(0,10) + 'T12:00:00').toLocaleDateString('pt-BR') : '—'; }
   function cpfFmt(c) { return c ? c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4') : '—'; }
 
   var html = '';

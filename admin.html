@@ -514,6 +514,7 @@ tr:hover td { background:rgba(255,255,255,0.015); }
               <button class="btn" style="font-size:0.72rem;padding:4px 10px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:#10b981" onclick="sbPresetKyc('normal')">🟢 Normal</button>
               <button class="btn" style="font-size:0.72rem;padding:4px 10px;background:rgba(251,191,36,0.15);border:1px solid rgba(251,191,36,0.3);color:#fbbf24" onclick="sbPresetKyc('pep')">🟡 Nome PEP</button>
               <button class="btn" style="font-size:0.72rem;padding:4px 10px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#ef4444" onclick="sbPresetKyc('sanction')">🔴 CPF Sancionado</button>
+              <button class="btn" style="font-size:0.72rem;padding:4px 10px;background:rgba(251,146,60,0.15);border:1px solid rgba(251,146,60,0.3);color:#fb923c" onclick="sbPresetKyc('mismatch')">🟠 Nome Divergente</button>
             </div>
           </div>
 
@@ -2321,6 +2322,10 @@ function sbPresetKyc(type) {
     document.getElementById('sbKycCpf').value  = '000.000.001-91';
     document.getElementById('sbKycName').value = 'Sanctioned Test User';
     document.getElementById('sbKycDob').value  = '1980-01-01';
+  } else if (type === 'mismatch') {
+    document.getElementById('sbKycCpf').value  = '453.178.287-91';
+    document.getElementById('sbKycName').value = 'Nome Divergente Teste';
+    document.getElementById('sbKycDob').value  = '1990-06-15';
   }
 }
 
@@ -2346,6 +2351,7 @@ function sbStatusBadge(status) {
     submitted:    { bg:'rgba(251,191,36,.18)', color:'#fbbf24', text:'⏳ Pendente (PEP)' },
     rejected:     { bg:'rgba(239,68,68,.18)',  color:'#ef4444', text:'❌ Rejeitado' },
     bureau_error: { bg:'rgba(99,102,241,.18)', color:'#818cf8', text:'⚠️ Erro bureau' },
+    name_mismatch:{ bg:'rgba(251,146,60,.18)', color:'#fb923c', text:'🟠 Nome Divergente' },
   };
   var c = colors[status] || { bg:'rgba(255,255,255,.08)', color:'#ccc', text: status };
   return '<span style="background:' + c.bg + ';color:' + c.color + ';padding:4px 14px;border-radius:20px;font-weight:700;font-size:0.82rem">' + c.text + '</span>';
@@ -2375,13 +2381,24 @@ function sbRunKyc() {
     btn.disabled = false; btn.textContent = '▶ Simular KYC';
     var res = document.getElementById('sbKycResult');
     res.style.display = 'block';
-    document.getElementById('sbKycBadge').innerHTML = sbStatusBadge(d.finalStatus);
+
+    // Ajusta badge: name_mismatch tem cor própria
+    var displayStatus = d.finalStatus;
+    if (d.bureau && d.bureau.rejectionReason === 'name_mismatch') displayStatus = 'name_mismatch';
+    document.getElementById('sbKycBadge').innerHTML = sbStatusBadge(displayStatus);
+
+    var rejLabels = {
+      name_mismatch: 'Nome divergente do titular do CPF',
+      cpf_situacao_3: 'CPF cancelado (titular falecido)',
+      cpf_not_found: 'CPF não encontrado na RFB',
+      sanctions_match: 'Consta em lista de sanções internacionais',
+    };
 
     var details = '';
     if (d.bureau) {
       details += '<b>Bureau:</b> provider=' + (d.bureau.provider||'-') +
         ' | status=<b>' + (d.bureau.status||'-') + '</b>' +
-        (d.bureau.rejectionReason ? ' | motivo=' + d.bureau.rejectionReason : '') + '<br>';
+        (d.bureau.rejectionReason ? ' | motivo=' + (rejLabels[d.bureau.rejectionReason] || d.bureau.rejectionReason) : '') + '<br>';
     }
     if (d.pep) {
       details += '<b>PEP:</b> ' + (d.pep.isPep ? '🟡 Identificado' : '🟢 Limpo') +

@@ -433,6 +433,21 @@ tr:hover td { background:rgba(255,255,255,0.015); }
 
       <div class="comp-divider"></div>
 
+      <!-- ── 1b. KYC APROVADOS ──────────────────────────────────────────────── -->
+      <div class="comp-sub">
+        <div class="section-title">
+          ✅ KYC Aprovados
+          <span class="badge" id="kycApprovedBadge" style="background:rgba(16,185,129,0.15);color:#10b981">0</span>
+          <button class="btn btn-resolve" style="margin-left:auto;font-size:0.78rem" onclick="loadComplianceKycApproved()">↻ Atualizar</button>
+        </div>
+        <table>
+          <thead><tr><th>Usuário</th><th>Email</th><th>Nome Completo</th><th>CPF</th><th>Nasc.</th><th>Aprovado em</th><th>Provider</th><th>PEP?</th></tr></thead>
+          <tbody id="kycApprovedTbody"><tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="comp-divider"></div>
+
       <!-- ── 2. PEP IDENTIFICADOS ──────────────────────────────────────────── -->
       <div class="comp-sub">
         <div class="section-title">
@@ -1685,6 +1700,7 @@ function saveGlobalConfig() {
 function loadCompliance() {
   loadComplianceDashboard();
   loadComplianceKyc();
+  loadComplianceKycApproved();
   loadCompliancePep();
   loadComplianceCoaf();
   loadComplianceSuitability();
@@ -1753,6 +1769,48 @@ function loadComplianceKyc() {
     })
     .catch(function(e) {
       tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--red)">Erro ao carregar: ' + e.message + '</td></tr>';
+    });
+}
+
+// ── 1b. KYC APROVADOS ────────────────────────────────────────────────────────
+
+function loadComplianceKycApproved() {
+  var tbody = document.getElementById('kycApprovedTbody');
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted)">Carregando...</td></tr>';
+
+  fetch(API + '/kyc/admin/approved', { headers: adminHeaders() })
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      var users = data.users || [];
+      document.getElementById('kycApprovedBadge').textContent = users.length;
+      document.getElementById('cKycApproved').textContent = users.length;
+
+      if (!users.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">Nenhum KYC aprovado ainda</td></tr>';
+        return;
+      }
+      tbody.innerHTML = users.map(function(u) {
+        var dob = u.date_of_birth ? new Date(u.date_of_birth.substring(0,10) + 'T12:00:00').toLocaleDateString('pt-BR') : '—';
+        var approvedAt = u.kyc_approved_at ? new Date(u.kyc_approved_at).toLocaleString('pt-BR') : '—';
+        var cpfFmt = u.cpf ? u.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4') : '—';
+        var pepBadge = u.pep_status === 'flagged'
+          ? '<span class="sts sts-submitted" style="font-size:0.7rem">PEP</span>'
+          : '<span style="color:var(--muted)">—</span>';
+        var provider = u.kyc_provider_id ? '<span style="font-size:0.75rem;color:var(--muted);font-family:\'DM Mono\',monospace">' + u.kyc_provider_id.substring(0,8) + '…</span>' : '—';
+        return '<tr>' +
+          '<td><button class="btn" style="background:none;border:none;padding:0;font-weight:700;color:var(--text);cursor:pointer;font-size:0.88rem;text-decoration:underline;text-decoration-color:rgba(255,255,255,0.2)" onclick="openUserDrawer(\'' + u.id + '\')">' + (u.username || '—') + '</button></td>' +
+          '<td style="color:var(--muted);font-size:0.82rem">' + (u.email || '—') + '</td>' +
+          '<td>' + (u.full_name || '—') + '</td>' +
+          '<td style="font-family:\'DM Mono\',monospace;font-size:0.82rem;color:var(--muted)">' + cpfFmt + '</td>' +
+          '<td style="color:var(--muted);font-size:0.82rem">' + dob + '</td>' +
+          '<td style="color:var(--muted);font-size:0.78rem">' + approvedAt + '</td>' +
+          '<td>' + provider + '</td>' +
+          '<td>' + pepBadge + '</td>' +
+          '</tr>';
+      }).join('');
+    })
+    .catch(function(e) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--red)">Erro: ' + e.message + '</td></tr>';
     });
 }
 

@@ -441,6 +441,7 @@ function renderPage() {
       '<button class="tab-btn"        id="tab-btn-editar"    onclick="switchTab(\'editar\')">Editar Perfil</button>' +
       '<button class="tab-btn"        id="tab-btn-seguranca" onclick="switchTab(\'seguranca\')">🔒 Segurança</button>' +
       '<button class="tab-btn"        id="tab-btn-indicacoes" onclick="switchTab(\'indicacoes\')">🎁 Indicações</button>' +
+      '<button class="tab-btn"        id="tab-btn-protecao"   onclick="switchTab(\'protecao\')">🛡️ Proteção</button>' +
     '</div>' +
 
     /* Apostas */
@@ -526,9 +527,48 @@ function renderPage() {
     /* Indicações */
     '<div class="tab-content" id="tab-indicacoes">' +
       '<div id="sec-indicacoes"><div class="empty"><div class="empty-icon">🎁</div>Clique na aba para carregar seu link de indicação.</div></div>' +
+    '</div>' +
+
+    /* Proteção ao Investidor */
+    '<div class="tab-content" id="tab-protecao">' +
+      '<div class="edit-card" style="max-width:600px;margin-bottom:20px">' +
+        '<div style="font-weight:700;font-size:1.05rem;margin-bottom:4px">🛡️ Proteção ao Investidor</div>' +
+        '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:20px">Seu perfil de suitability e limites operacionais conforme CVM Resolução 30/2021.</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">' +
+          '<div style="background:var(--surface2);border-radius:12px;padding:16px">' +
+            '<div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Perfil de Risco</div>' +
+            '<div style="font-size:1.1rem;font-weight:700;color:var(--green)">' + (u.suitability_profile ? u.suitability_profile.charAt(0).toUpperCase()+u.suitability_profile.slice(1) : 'Não definido') + '</div>' +
+          '</div>' +
+          '<div style="background:var(--surface2);border-radius:12px;padding:16px">' +
+            '<div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Validade</div>' +
+            '<div style="font-size:0.95rem;font-weight:600">' + (u.suitability_expires_at ? new Date(u.suitability_expires_at).toLocaleDateString(\'pt-BR\') : '—') + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<table style="width:100%;border-collapse:collapse;font-size:0.85rem;margin-bottom:20px">' +
+          '<thead><tr style="border-bottom:1px solid var(--border)">' +
+            '<th style="text-align:left;padding:8px;color:var(--muted);font-weight:600">Perfil</th>' +
+            '<th style="text-align:right;padding:8px;color:var(--muted);font-weight:600">Limite/aposta</th>' +
+            '<th style="text-align:right;padding:8px;color:var(--muted);font-weight:600">Limite/mês</th>' +
+          '</tr></thead>' +
+          '<tbody>' +
+            '<tr style="border-bottom:1px solid rgba(255,255,255,0.04)"><td style="padding:8px">Conservador</td><td style="text-align:right;padding:8px;font-family:\'DM Mono\',monospace">R$ 100</td><td style="text-align:right;padding:8px;font-family:\'DM Mono\',monospace">R$ 500</td></tr>' +
+            '<tr style="border-bottom:1px solid rgba(255,255,255,0.04)"><td style="padding:8px">Moderado</td><td style="text-align:right;padding:8px;font-family:\'DM Mono\',monospace">R$ 500</td><td style="text-align:right;padding:8px;font-family:\'DM Mono\',monospace">R$ 2.000</td></tr>' +
+            '<tr><td style="padding:8px">Arrojado</td><td style="text-align:right;padding:8px;font-family:\'DM Mono\',monospace">R$ 2.000</td><td style="text-align:right;padding:8px;font-family:\'DM Mono\',monospace">R$ 10.000</td></tr>' +
+          '</tbody>' +
+        '</table>' +
+        '<div style="padding:14px;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:10px;font-size:0.82rem;color:var(--muted)">' +
+          '<strong style="color:var(--text)">Limite Sandbox CVM:</strong> R$ 20.000 por investidor pessoa física (CVM Resolução 30/2021).' +
+        '</div>' +
+      '</div>' +
+      '<div class="edit-card" style="max-width:600px" id="selfExcludeCard">' +
+        '<div style="font-weight:700;font-size:1.05rem;margin-bottom:4px">🚫 Auto-exclusão Temporária</div>' +
+        '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:20px">Suspenda sua conta temporariamente para fazer uma pausa. Durante o período, você não poderá realizar operações.</div>' +
+        '<div id="selfExcludeContent"><div class="empty" style="padding:20px"><div class="empty-icon" style="font-size:1.5rem">⏳</div>Carregando status...</div></div>' +
+      '</div>' +
     '</div>';
 
   document.getElementById('pageContent').innerHTML = html;
+  loadSelfExclusionStatus();
   updateAuthUI();
   renderExtrato(0);
 }
@@ -914,6 +954,62 @@ async function init() {
 }
 
 init();
+
+/* ── PROTEÇÃO AO INVESTIDOR: AUTO-EXCLUSÃO ── */
+async function loadSelfExclusionStatus() {
+  var container = document.getElementById('selfExcludeContent');
+  if (!container) return;
+  try {
+    var d = await apiGet('/auth/self-exclusion-status', state.token);
+    if (d.active) {
+      var until = new Date(d.excluded_until);
+      container.innerHTML =
+        '<div style="display:flex;align-items:center;gap:14px;padding:16px;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.2);border-radius:12px;margin-bottom:16px">' +
+          '<div style="font-size:1.5rem">🚫</div>' +
+          '<div>' +
+            '<div style="font-weight:700;color:#f43f5e;margin-bottom:2px">Conta suspensa temporariamente</div>' +
+            '<div style="font-size:0.85rem;color:var(--muted)">Ativa até <strong style="color:var(--text)">' + until.toLocaleDateString('pt-BR') + '</strong>' + (d.reason ? ' — ' + d.reason : '') + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div style="font-size:0.82rem;color:var(--muted)">A auto-exclusão não pode ser removida antes do prazo definido.</div>';
+    } else {
+      container.innerHTML =
+        '<div style="margin-bottom:16px;font-size:0.85rem;color:var(--muted);line-height:1.6">Selecione um período de suspensão. Durante esse período, você não poderá realizar apostas ou operações financeiras na plataforma.</div>' +
+        '<div style="margin-bottom:16px">' +
+          '<label style="display:block;font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Período de auto-exclusão</label>' +
+          '<select id="selfExcludePeriod" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--text);font-family:inherit;font-size:0.95rem;outline:none">' +
+            '<option value="30">30 dias</option>' +
+            '<option value="60">60 dias</option>' +
+            '<option value="90">90 dias</option>' +
+            '<option value="180">180 dias (6 meses)</option>' +
+            '<option value="365">365 dias (1 ano)</option>' +
+          '</select>' +
+        '</div>' +
+        '<div style="padding:14px;background:rgba(244,63,94,0.06);border:1px solid rgba(244,63,94,0.15);border-radius:10px;font-size:0.82rem;color:var(--muted);margin-bottom:16px">' +
+          '<strong style="color:#f43f5e">Aviso:</strong> A auto-exclusão é imediata e irreversível antes do prazo. Você não poderá operar até a data definida.' +
+        '</div>' +
+        '<button onclick="confirmSelfExclude()" style="padding:12px 24px;background:#ef4444;color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.95rem;transition:opacity .2s" onmouseover="this.style.opacity=\'.85\'" onmouseout="this.style.opacity=\'1\'">🚫 Suspender conta temporariamente</button>' +
+        '<div id="selfExcludeFeedback" style="margin-top:12px;font-size:0.85rem"></div>';
+    }
+  } catch(e) {
+    if (container) container.innerHTML = '<div style="color:#ef4444;font-size:0.85rem">Erro ao carregar status.</div>';
+  }
+}
+
+async function confirmSelfExclude() {
+  var sel = document.getElementById('selfExcludePeriod');
+  var days = parseInt(sel ? sel.value : 30);
+  var fb = document.getElementById('selfExcludeFeedback');
+  var until = new Date(Date.now() + days * 86400000);
+  if (!confirm('Confirma a suspensão da sua conta por ' + days + ' dias até ' + until.toLocaleDateString('pt-BR') + '?\n\nVocê NÃO poderá operar até essa data.')) return;
+  fb.style.color = 'var(--muted)'; fb.textContent = 'Processando...';
+  try {
+    var d = await apiPost('/auth/self-exclude', { period_days: days, reason: 'Solicitação do usuário via perfil' }, state.token);
+    if (d.error) { fb.style.color = '#ef4444'; fb.textContent = 'Erro: ' + d.error; return; }
+    showToast('🚫 Conta suspensa por ' + days + ' dias.');
+    loadSelfExclusionStatus();
+  } catch(e) { fb.style.color = '#ef4444'; fb.textContent = 'Erro de conexão.'; }
+}
 </script>
 
 <footer>

@@ -2130,6 +2130,9 @@ function renderDrawer(data) {
   html += field('2FA', u.two_fa_enabled
     ? '<span class="sts sts-approved">✓ Ativo' + (u.two_fa_enabled_at ? ' desde ' + fmtD(u.two_fa_enabled_at) : '') + '</span>'
     : '<span style="color:var(--muted)">Desativado</span>');
+  if (u.self_excluded_until && new Date(u.self_excluded_until) > new Date()) {
+    html += field('Auto-exclusão', '<span class="sts sts-rejected">Suspensa até ' + fmtD(u.self_excluded_until) + '</span>');
+  }
   html += '</div>';
 
   // ── 2. KYC ──

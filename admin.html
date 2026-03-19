@@ -993,6 +993,24 @@ function loadMarkets() {
     }).catch(function(e){ console.error(e); });
 }
 
+function deleteUser(userId, username) {
+  if (!confirm('⚠️ Excluir a conta "' + username + '" permanentemente?\n\nTodos os dados (KYC, suitability, apostas, transações) serão removidos.\n\nEssa ação não pode ser desfeita.')) return;
+  fetch(API + '/admin/users/' + userId, {
+    method: 'DELETE',
+    headers: adminHeaders()
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.ok) {
+      showToast('✅ ' + d.message);
+      loadUsers();
+    } else {
+      showToast('❌ ' + (d.error || 'Erro ao excluir conta'));
+    }
+  })
+  .catch(function(e) { showToast('❌ Erro de rede: ' + e.message); });
+}
+
 function loadUsers() {
   fetch(API + '/admin/users', { headers: adminHeaders() })
     .then(function(r){ return r.json(); })
@@ -1011,7 +1029,10 @@ function loadUsers() {
           '<td style="color:#ffc107">' + (locked > 0 ? 'R$' + locked.toFixed(2) : '-') + '</td>' +
           '<td style="color:#5a6878;text-align:center">' + (locked > 0 ? betsCount + '/3' : '-') + '</td>' +
           '<td style="color:#5a6878;font-size:0.8rem">' + dt + '</td>' +
-          '<td><button class="btn" onclick="openBalance(\'' + u.id + '\',\'' + (u.username || u.name || '').replace(/'/g, '') + '\',' + balance + ')">Ajustar saldo</button></td>' +
+          '<td style="display:flex;gap:6px">' +
+            '<button class="btn" onclick="openBalance(\'' + u.id + '\',\'' + (u.username || u.name || '').replace(/'/g, '') + '\',' + balance + ')">Ajustar saldo</button>' +
+            '<button class="btn" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#ef4444" onclick="deleteUser(' + u.id + ',\'' + (u.username || u.name || '').replace(/'/g, '') + '\')">🗑 Excluir</button>' +
+          '</td>' +
           '</tr>';
       }).join('');
     }).catch(function(e){ console.error(e); });

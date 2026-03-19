@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<title>Bubuya — Verificação de Identidade</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#030303;--surface:#0a0a0a;--surface2:#121212;--surface3:#181818;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.10);
+  --green:#10b981;--red:#f43f5e;--blue:#3b82f6;--gold:#f59e0b;
+  --text:#ffffff;--muted:#888888;--muted2:#555555;
+  --green-dim:rgba(16,185,129,0.10);--blue-dim:rgba(59,130,246,0.10);
+  --red-dim:rgba(244,63,94,0.10);--gold-dim:rgba(245,158,11,0.10);
+}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.3}
+.glow-container{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.glow{position:absolute;border-radius:50%;filter:blur(120px);opacity:0.5}
+.glow-1{top:-10%;left:5%;width:500px;height:500px;background:radial-gradient(circle,rgba(59,130,246,0.12) 0%,transparent 70%)}
+.glow-2{bottom:5%;right:-5%;width:600px;height:600px;background:radial-gradient(circle,rgba(16,185,129,0.08) 0%,transparent 70%)}
+
+/* ── HEADER ── */
+header{position:sticky;top:0;z-index:100;background:rgba(3,3,3,0.9);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:0 24px}
+.header-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;height:64px;gap:16px}
+.logo{font-size:1.25rem;font-weight:700;letter-spacing:-0.5px;background:linear-gradient(135deg,var(--green),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none}
+.header-title{font-size:0.82rem;color:var(--muted);margin-left:4px;padding-left:16px;border-left:1px solid var(--border2)}
+.header-badges{margin-left:auto;display:flex;gap:8px;align-items:center}
+.reg-badge{padding:3px 10px;border-radius:6px;font-size:0.68rem;font-weight:700;letter-spacing:.5px;border:1px solid}
+.reg-badge-cvm{color:#60a5fa;border-color:rgba(96,165,250,0.3);background:rgba(96,165,250,0.06)}
+.reg-badge-bacen{color:#a78bfa;border-color:rgba(167,139,250,0.3);background:rgba(167,139,250,0.06)}
+@media(max-width:600px){.header-badges{display:none}}
+
+/* ── LAYOUT ── */
+.page{max-width:700px;margin:0 auto;padding:40px 24px 80px;position:relative;z-index:1}
+
+/* ── HERO KYC ── */
+.kyc-hero{text-align:center;margin-bottom:40px}
+.kyc-hero-icon{
+  width:80px;height:80px;border-radius:24px;margin:0 auto 20px;
+  background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(16,185,129,0.10));
+  border:1px solid rgba(59,130,246,0.2);
+  display:flex;align-items:center;justify-content:center;font-size:2.2rem
+}
+.kyc-hero h1{font-size:1.7rem;font-weight:700;margin-bottom:10px;letter-spacing:-0.5px}
+.kyc-hero p{color:var(--muted);font-size:0.95rem;line-height:1.6;max-width:480px;margin:0 auto}
+
+/* ── PROGRESS STEPS ── */
+.steps{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:40px}
+.step{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;max-width:160px}
+.step-circle{
+  width:36px;height:36px;border-radius:50%;border:2px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.78rem;font-weight:700;color:var(--muted);
+  background:var(--surface);transition:all .3s;position:relative;z-index:1
+}
+.step.active .step-circle{border-color:var(--blue);color:var(--blue);background:rgba(59,130,246,0.1);box-shadow:0 0 0 4px rgba(59,130,246,0.12)}
+.step.done .step-circle{border-color:var(--green);background:var(--green);color:#080c10}
+.step-label{font-size:0.72rem;color:var(--muted);font-weight:600;text-align:center;line-height:1.3}
+.step.active .step-label{color:var(--text)}
+.step.done .step-label{color:var(--green)}
+.step-line{flex:1;height:2px;background:var(--border2);max-width:80px;transition:background .3s}
+.step-line.done{background:var(--green)}
+
+/* ── CARD ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px;margin-bottom:20px}
+.card-title{font-size:1rem;font-weight:700;margin-bottom:6px}
+.card-sub{font-size:0.83rem;color:var(--muted);margin-bottom:24px;line-height:1.5}
+.card-divider{height:1px;background:var(--border);margin:24px 0}
+
+/* ── FORM ── */
+.field{margin-bottom:20px}
+.field label{display:block;font-size:0.78rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.field label span.req{color:var(--red);margin-left:2px}
+.field input{
+  width:100%;padding:14px 16px;background:var(--surface2);
+  border:1px solid var(--border2);border-radius:12px;
+  color:var(--text);font-family:inherit;font-size:0.95rem;outline:none;
+  transition:border-color .2s
+}
+.field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,246,0.08)}
+.field input.error{border-color:var(--red)}
+.field input::placeholder{color:var(--muted2)}
+.field-hint{font-size:0.75rem;color:var(--muted);margin-top:6px;line-height:1.4}
+.field-error{font-size:0.75rem;color:var(--red);margin-top:6px;display:none}
+.field-error.show{display:block}
+.field input[readonly]{opacity:.6;cursor:not-allowed}
+
+.fields-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:500px){.fields-row{grid-template-columns:1fr}}
+
+/* ── REVIEW GRID ── */
+.review-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:480px){.review-grid{grid-template-columns:1fr}}
+.review-item{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.review-label{font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.review-value{font-size:0.95rem;font-weight:600;font-family:'DM Mono',monospace}
+
+/* ── LEGAL BOX ── */
+.legal-box{
+  background:rgba(59,130,246,0.05);border:1px solid rgba(59,130,246,0.15);
+  border-radius:14px;padding:20px;margin-bottom:20px
+}
+.legal-box-title{font-size:0.78rem;font-weight:700;color:var(--blue);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.legal-box p{font-size:0.78rem;color:var(--muted);line-height:1.6;margin-bottom:6px}
+.legal-box p:last-child{margin-bottom:0}
+
+/* ── ALERT BOX ── */
+.alert{border-radius:14px;padding:16px 20px;margin-bottom:20px;display:flex;gap:12px;align-items:flex-start}
+.alert-warning{background:var(--gold-dim);border:1px solid rgba(245,158,11,0.2)}
+.alert-error{background:var(--red-dim);border:1px solid rgba(244,63,94,0.2)}
+.alert-success{background:var(--green-dim);border:1px solid rgba(16,185,129,0.2)}
+.alert-info{background:var(--blue-dim);border:1px solid rgba(59,130,246,0.2)}
+.alert-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px}
+.alert-content{flex:1}
+.alert-title{font-size:0.85rem;font-weight:700;margin-bottom:4px}
+.alert-warning .alert-title{color:var(--gold)}
+.alert-error .alert-title{color:var(--red)}
+.alert-success .alert-title{color:var(--green)}
+.alert-info .alert-title{color:var(--blue)}
+.alert-text{font-size:0.8rem;color:var(--muted);line-height:1.5}
+
+/* ── STATUS TELAS ── */
+.status-screen{text-align:center;padding:20px 0}
+.status-icon{font-size:3.5rem;margin-bottom:20px;display:block}
+.status-screen h2{font-size:1.4rem;font-weight:700;margin-bottom:10px}
+.status-screen p{color:var(--muted);font-size:0.9rem;line-height:1.6;max-width:420px;margin:0 auto 24px}
+
+/* ── TIMER BADGE ── */
+.timer-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 18px;border-radius:100px;font-size:0.82rem;font-weight:700;
+  background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);color:var(--gold);
+  margin-bottom:24px
+}
+
+/* ── BUTTONS ── */
+.btn-row{display:flex;gap:12px;margin-top:28px}
+.btn{padding:14px 28px;border-radius:12px;font-family:inherit;font-size:0.9rem;font-weight:700;cursor:pointer;border:none;transition:all .2s;display:flex;align-items:center;gap:8px;justify-content:center}
+.btn-primary{background:var(--green);color:#080c10;flex:1}
+.btn-primary:hover:not(:disabled){opacity:.88}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed}
+.btn-outline{background:transparent;border:1px solid var(--border2);color:var(--text)}
+.btn-outline:hover{border-color:rgba(255,255,255,0.2)}
+.btn-blue{background:rgba(59,130,246,0.15);color:var(--blue);border:1px solid rgba(59,130,246,0.2)}
+.btn-blue:hover{background:rgba(59,130,246,0.25)}
+.spinner{width:18px;height:18px;border:2px solid rgba(8,12,16,0.3);border-top-color:#080c10;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── SECURITY BADGES ── */
+.security-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:28px}
+.sec-badge{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);font-size:0.7rem;color:var(--muted);font-weight:600}
+.sec-badge-icon{font-size:0.9rem}
+
+/* ── FOOTER LEGAL ── */
+.legal-footer{text-align:center;margin-top:32px;padding:0 8px}
+.legal-footer p{font-size:0.72rem;color:var(--muted2);line-height:1.6;max-width:560px;margin:0 auto}
+.legal-footer a{color:var(--muted);text-decoration:underline}
+
+/* ── HIDDEN ── */
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="glow-container"><div class="glow glow-1"></div><div class="glow glow-2"></div></div>
+
+<header>
+  <div class="header-inner">
+    <a href="/" class="logo">Bubuya.</a>
+    <span class="header-title">Verificação de Identidade (KYC)</span>
+    <div class="header-badges">
+      <span class="reg-badge reg-badge-cvm">CVM</span>
+      <span class="reg-badge reg-badge-bacen">BACEN</span>
+    </div>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="kyc-hero">
+    <div class="kyc-hero-icon">🔐</div>
+    <h1>Verificação de Identidade</h1>
+    <p>Para operar na Bubuya em conformidade com a regulação brasileira de mercado de capitais, precisamos verificar sua identidade antes de liberar operações.</p>
+  </div>
+
+  <!-- STEPS -->
+  <div class="steps">
+    <div class="step" id="step1-indicator">
+      <div class="step-circle">1</div>
+      <div class="step-label">Seus Dados</div>
+    </div>
+    <div class="step-line" id="line-1-2"></div>
+    <div class="step" id="step2-indicator">
+      <div class="step-circle">2</div>
+      <div class="step-label">Revisão</div>
+    </div>
+    <div class="step-line" id="line-2-3"></div>
+    <div class="step" id="step3-indicator">
+      <div class="step-circle">3</div>
+      <div class="step-label">Confirmado</div>
+    </div>
+  </div>
+
+  <!-- ─── TELA: LOADING ─── -->
+  <div id="screen-loading">
+    <div class="card" style="text-align:center;padding:48px">
+      <div class="spinner" style="margin:0 auto 16px;width:28px;height:28px;border-top-color:var(--green)"></div>
+      <p style="color:var(--muted);font-size:0.9rem">Verificando status da conta...</p>
+    </div>
+  </div>
+
+  <!-- ─── TELA: APROVADO (redirect) ─── -->
+  <div id="screen-approved" class="hidden">
+    <div class="card">
+      <div class="status-screen">
+        <span class="status-icon">✅</span>
+        <h2>Identidade Verificada</h2>
+        <p>Sua identidade já foi verificada com sucesso. Redirecionando para o próximo passo...</p>
+        <div class="spinner" style="margin:16px auto 0;width:24px;height:24px;border-top-color:var(--green)"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── TELA: SUBMETIDO (aguardando) ─── -->
+  <div id="screen-submitted" class="hidden">
+    <div class="card">
+      <div class="status-screen">
+        <span class="status-icon">⏳</span>
+        <h2>Análise em Andamento</h2>
+        <div class="timer-badge">⏱ Prazo: até 24 horas úteis</div>
+        <p>Seus dados foram enviados e estão sendo verificados pela nossa equipe de compliance. Você receberá uma notificação por e-mail assim que o processo for concluído.</p>
+        <div class="alert alert-info" style="text-align:left;max-width:440px;margin:0 auto 24px">
+          <span class="alert-icon">ℹ️</span>
+          <div class="alert-content">
+            <div class="alert-title">O que acontece durante a análise?</div>
+            <div class="alert-text">Nossa equipe verifica seus dados junto às bases cadastrais autorizadas pelo Banco Central do Brasil. O processo é confidencial e seguro.</div>
+          </div>
+        </div>
+        <a href="/" class="btn btn-outline" style="display:inline-flex;margin:0 auto;text-decoration:none">Voltar ao início</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── TELA: REJEITADO ─── -->
+  <div id="screen-rejected" class="hidden">
+    <div class="card">
+      <div class="status-screen">
+        <span class="status-icon">❌</span>
+        <h2>Verificação Não Aprovada</h2>
+        <p id="rejected-msg">Sua verificação de identidade não foi aprovada. Você pode tentar novamente com as informações corretas.</p>
+        <button class="btn btn-primary" onclick="showStep1()" style="margin:0 auto;max-width:240px">Tentar novamente</button>
+      </div>
+    </div>
+    <div class="alert alert-warning">
+      <span class="alert-icon">⚠️</span>
+      <div class="alert-content">
+        <div class="alert-title">Precisa de ajuda?</div>
+        <div class="alert-text">Se acredita que houve um erro, entre em contato com nosso suporte em <strong>suporte@bubuya.com.br</strong> informando seu nome completo e CPF.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── PASSO 1: DADOS PESSOAIS ─── -->
+  <div id="screen-step1" class="hidden">
+    <div class="alert alert-info">
+      <span class="alert-icon">🔒</span>
+      <div class="alert-content">
+        <div class="alert-title">Por que solicitamos esses dados?</div>
+        <div class="alert-text">A coleta de dados de identificação é obrigatória pela Circular BACEN n.º 3.978/2020 e pela regulação CVM para prevenção à lavagem de dinheiro (PLD/FT). Seus dados são criptografados e nunca compartilhados com terceiros.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Dados Pessoais</div>
+      <div class="card-sub">Preencha com seus dados exatamente como constam na Receita Federal. Qualquer divergência pode atrasar ou impedir a verificação.</div>
+
+      <div class="field">
+        <label>CPF <span class="req">*</span></label>
+        <input type="text" id="cpf-input" placeholder="000.000.000-00" maxlength="14" autocomplete="off" inputmode="numeric">
+        <div class="field-hint">Cadastro de Pessoa Física — conforme Receita Federal</div>
+        <div class="field-error" id="cpf-error"></div>
+      </div>
+
+      <div class="field">
+        <label>Nome completo <span class="req">*</span></label>
+        <input type="text" id="name-input" placeholder="Seu nome completo sem abreviações" autocomplete="name">
+        <div class="field-hint">Exatamente como consta no seu documento de identidade (RG, CNH ou RNE)</div>
+        <div class="field-error" id="name-error"></div>
+      </div>
+
+      <div class="fields-row">
+        <div class="field" style="margin-bottom:0">
+          <label>Data de nascimento <span class="req">*</span></label>
+          <input type="date" id="dob-input" max="" autocomplete="bday">
+          <div class="field-error" id="dob-error"></div>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label>E-mail cadastrado</label>
+          <input type="email" id="email-display" readonly>
+          <div class="field-hint">Usado para notificações de compliance</div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-step1" onclick="goToStep2()">
+          Continuar para revisão
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="legal-box">
+      <div class="legal-box-title">
+        <span>📋</span> Fundamento Legal
+      </div>
+      <p><strong>Circular BACEN n.º 3.978/2020</strong> — Estabelece procedimentos para a prevenção à lavagem de dinheiro e financiamento do terrorismo.</p>
+      <p><strong>Lei n.º 9.613/1998 (Lei da Lavagem)</strong> — Institui obrigações de identificação de clientes para entidades do mercado financeiro.</p>
+      <p><strong>Resolução CVM n.º 50/2021</strong> — Regulamenta o dever de identificação e cadastro de investidores.</p>
+    </div>
+
+    <div class="security-row">
+      <div class="sec-badge"><span class="sec-badge-icon">🔒</span> Criptografia TLS 1.3</div>
+      <div class="sec-badge"><span class="sec-badge-icon">🛡️</span> LGPD Conforme</div>
+      <div class="sec-badge"><span class="sec-badge-icon">🏦</span> Padrão BACEN</div>
+      <div class="sec-badge"><span class="sec-badge-icon">🔍</span> Verificação Serpro</div>
+    </div>
+  </div>
+
+  <!-- ─── PASSO 2: REVISÃO ─── -->
+  <div id="screen-step2" class="hidden">
+    <div class="card">
+      <div class="card-title">Revise seus dados</div>
+      <div class="card-sub">Verifique se todas as informações estão corretas antes de enviar. Após a confirmação, seus dados serão enviados para verificação.</div>
+
+      <div class="review-grid">
+        <div class="review-item">
+          <div class="review-label">CPF</div>
+          <div class="review-value" id="review-cpf">—</div>
+        </div>
+        <div class="review-item">
+          <div class="review-label">Data de Nascimento</div>
+          <div class="review-value" id="review-dob">—</div>
+        </div>
+        <div class="review-item" style="grid-column:span 2">
+          <div class="review-label">Nome Completo</div>
+          <div class="review-value" id="review-name" style="font-family:inherit;font-size:1rem">—</div>
+        </div>
+      </div>
+
+      <div class="card-divider"></div>
+
+      <div class="alert alert-warning">
+        <span class="alert-icon">⚠️</span>
+        <div class="alert-content">
+          <div class="alert-title">Declaração de Veracidade</div>
+          <div class="alert-text">Ao confirmar, declaro que as informações prestadas são verdadeiras e que sou o titular dos dados informados. Estou ciente de que a prestação de informações falsas configura crime nos termos do Art. 299 do Código Penal Brasileiro.</div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-outline" onclick="showStep1()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Corrigir
+        </button>
+        <button class="btn btn-primary" id="btn-confirm" onclick="submitKYC()">
+          <span id="btn-confirm-text">Confirmar e enviar</span>
+          <span id="btn-confirm-spinner" class="spinner hidden"></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="legal-box">
+      <div class="legal-box-title"><span>🔍</span> O que verificamos</div>
+      <p>Seus dados são verificados em tempo real junto ao <strong>Cadastro Sincronizado da Receita Federal</strong> e às bases autorizadas pelo Banco Central do Brasil, incluindo triagem de <strong>Pessoa Exposta Politicamente (PEP)</strong> conforme exigência BACEN e verificação em listas de sanções internacionais (OFAC, ONU, UE).</p>
+    </div>
+  </div>
+
+  <!-- FOOTER LEGAL -->
+  <div class="legal-footer">
+    <p>A Bubuya Plataforma realiza o processo de Conheça seu Cliente (KYC) em conformidade com as normas do Banco Central do Brasil (BACEN), Conselho de Controle de Atividades Financeiras (COAF) e Comissão de Valores Mobiliários (CVM). Seus dados pessoais são tratados conforme a Lei n.º 13.709/2018 (LGPD). Para exercer seus direitos como titular de dados, acesse nossa <a href="/terms.html">Política de Privacidade</a>.</p>
+  </div>
+
+</div><!-- /page -->
+
+<script src="/config.js"></script>
+<script>
+const API = (window.PREDITIVO_CONFIG && window.PREDITIVO_CONFIG.API_BASE) || 'https://preditivo-backend-production.up.railway.app';
+
+// ── Estado ────────────────────────────────────────────────────────────────────
+let userData = null;
+let formData = {};
+
+function getToken() { return localStorage.getItem('preditivo_token'); }
+
+// ── Mostrar/esconder telas ────────────────────────────────────────────────────
+const SCREENS = ['loading','approved','submitted','rejected','step1','step2'];
+function showScreen(name) {
+  SCREENS.forEach(s => {
+    const el = document.getElementById('screen-' + s);
+    if (el) el.classList.toggle('hidden', s !== name);
+  });
+}
+
+// ── Indicadores de passo ──────────────────────────────────────────────────────
+function setStepIndicators(active) {
+  [1,2,3].forEach(n => {
+    const el = document.getElementById('step' + n + '-indicator');
+    if (!el) return;
+    el.classList.remove('active','done');
+    if (n < active) el.classList.add('done');
+    else if (n === active) el.classList.add('active');
+  });
+  [['1','2'],['2','3']].forEach(([a,b]) => {
+    const line = document.getElementById('line-' + a + '-' + b);
+    if (!line) return;
+    line.classList.toggle('done', active > parseInt(b));
+  });
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+async function init() {
+  const token = getToken();
+  if (!token) {
+    window.location.href = '/?login=1';
+    return;
+  }
+
+  showScreen('loading');
+
+  try {
+    const r = await fetch(API + '/auth/me', { headers: { Authorization: 'Bearer ' + token } });
+    if (!r.ok) { localStorage.removeItem('preditivo_token'); window.location.href = '/?login=1'; return; }
+    userData = await r.json();
+
+    // Definir data máxima (18 anos atrás)
+    const maxDate = new Date();
+    maxDate.setFullYear(maxDate.getFullYear() - 18);
+    document.getElementById('dob-input').max = maxDate.toISOString().split('T')[0];
+    document.getElementById('email-display').value = userData.email || '';
+
+    const kyc = userData.kyc_status || 'pending';
+
+    if (kyc === 'approved') {
+      showScreen('approved');
+      setStepIndicators(3);
+      // Redireciona para suitability se necessário, senão para home
+      setTimeout(() => {
+        const suit = userData.suitability_profile;
+        const exp  = userData.suitability_expires_at ? new Date(userData.suitability_expires_at) : null;
+        if (!suit || !exp || exp <= new Date()) {
+          window.location.href = '/suitability.html';
+        } else {
+          window.location.href = '/';
+        }
+      }, 1800);
+      return;
+    }
+
+    if (kyc === 'submitted') { showScreen('submitted'); setStepIndicators(2); return; }
+
+    if (kyc === 'rejected') {
+      const reason = userData.kyc_rejection_reason || '';
+      const msg = document.getElementById('rejected-msg');
+      if (reason === 'sanctions_match') {
+        msg.textContent = 'Sua verificação de identidade não foi aprovada. Entre em contato com o suporte para mais informações.';
+      } else if (reason) {
+        msg.textContent = 'Motivo: ' + reason + '. Você pode corrigir os dados e tentar novamente.';
+      }
+      showScreen('rejected');
+      setStepIndicators(1);
+      return;
+    }
+
+    // pending ou qualquer outro → passo 1
+    showStep1();
+
+  } catch (err) {
+    console.error(err);
+    showStep1();
+  }
+}
+
+// ── Passo 1 ───────────────────────────────────────────────────────────────────
+function showStep1() {
+  showScreen('step1');
+  setStepIndicators(1);
+}
+
+// Máscara de CPF
+document.getElementById('cpf-input').addEventListener('input', function() {
+  let v = this.value.replace(/\D/g,'').slice(0,11);
+  if (v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/,'$1.$2.$3-$4');
+  else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{1,3})/,'$1.$2.$3');
+  else if (v.length > 3) v = v.replace(/(\d{3})(\d{1,3})/,'$1.$2');
+  this.value = v;
+});
+
+function validateCPF(cpf) {
+  cpf = cpf.replace(/\D/g,'');
+  if (cpf.length !== 11) return false;
+  if (/^(\d)\1{10}$/.test(cpf)) return false;
+  let s = 0;
+  for (let i = 0; i < 9; i++) s += parseInt(cpf[i]) * (10 - i);
+  let r = (s * 10) % 11; if (r === 10 || r === 11) r = 0;
+  if (r !== parseInt(cpf[9])) return false;
+  s = 0;
+  for (let i = 0; i < 10; i++) s += parseInt(cpf[i]) * (11 - i);
+  r = (s * 10) % 11; if (r === 10 || r === 11) r = 0;
+  return r === parseInt(cpf[10]);
+}
+
+function showFieldError(id, msg) {
+  const el = document.getElementById(id);
+  const inp = id.replace('-error','-input');
+  if (el) { el.textContent = msg; el.classList.add('show'); }
+  const input = document.getElementById(inp);
+  if (input) input.classList.add('error');
+}
+function clearFieldErrors() {
+  document.querySelectorAll('.field-error').forEach(e => { e.textContent=''; e.classList.remove('show'); });
+  document.querySelectorAll('.field input').forEach(i => i.classList.remove('error'));
+}
+
+function goToStep2() {
+  clearFieldErrors();
+  let valid = true;
+
+  const cpfRaw = document.getElementById('cpf-input').value;
+  const cpfClean = cpfRaw.replace(/\D/g,'');
+  if (!validateCPF(cpfClean)) { showFieldError('cpf-error','CPF inválido. Verifique os dígitos.'); valid = false; }
+
+  const name = document.getElementById('name-input').value.trim();
+  if (name.length < 5) { showFieldError('name-error','Informe seu nome completo (mínimo 5 caracteres).'); valid = false; }
+  if (!/\s/.test(name)) { showFieldError('name-error','Informe nome e sobrenome completos.'); valid = false; }
+
+  const dob = document.getElementById('dob-input').value;
+  if (!dob) { showFieldError('dob-error','Informe sua data de nascimento.'); valid = false; }
+  else {
+    const age = (new Date() - new Date(dob)) / (365.25 * 24 * 60 * 60 * 1000);
+    if (age < 18) { showFieldError('dob-error','Você deve ter no mínimo 18 anos para operar.'); valid = false; }
+    if (age > 120) { showFieldError('dob-error','Data de nascimento inválida.'); valid = false; }
+  }
+
+  if (!valid) return;
+
+  formData = { cpf: cpfClean, full_name: name, date_of_birth: dob };
+
+  // Preenche revisão
+  document.getElementById('review-cpf').textContent = cpfRaw;
+  document.getElementById('review-name').textContent = name;
+  document.getElementById('review-dob').textContent = new Date(dob + 'T12:00:00').toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
+
+  showScreen('step2');
+  setStepIndicators(2);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── Submit ────────────────────────────────────────────────────────────────────
+async function submitKYC() {
+  const btn = document.getElementById('btn-confirm');
+  const txt = document.getElementById('btn-confirm-text');
+  const spn = document.getElementById('btn-confirm-spinner');
+
+  btn.disabled = true;
+  txt.textContent = 'Verificando...';
+  spn.classList.remove('hidden');
+
+  try {
+    const r = await fetch(API + '/kyc/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + getToken() },
+      body: JSON.stringify(formData)
+    });
+    const data = await r.json();
+
+    if (!r.ok) {
+      btn.disabled = false;
+      txt.textContent = 'Confirmar e enviar';
+      spn.classList.add('hidden');
+
+      const errMsg = data.error || 'Erro ao enviar dados. Tente novamente.';
+      const step2Card = document.querySelector('#screen-step2 .card');
+      // Remove alerta anterior se existir
+      const prev = document.getElementById('submit-error-alert');
+      if (prev) prev.remove();
+      const alertEl = document.createElement('div');
+      alertEl.id = 'submit-error-alert';
+      alertEl.className = 'alert alert-error';
+      alertEl.innerHTML = `<span class="alert-icon">❌</span><div class="alert-content"><div class="alert-title">Erro no envio</div><div class="alert-text">${errMsg}</div></div>`;
+      step2Card.insertBefore(alertEl, step2Card.querySelector('.btn-row'));
+      return;
+    }
+
+    setStepIndicators(3);
+    if (data.kyc_status === 'approved') {
+      showScreen('approved');
+      setTimeout(() => { window.location.href = '/suitability.html'; }, 1800);
+    } else {
+      showScreen('submitted');
+    }
+
+  } catch (err) {
+    btn.disabled = false;
+    txt.textContent = 'Confirmar e enviar';
+    spn.classList.add('hidden');
+    alert('Erro de conexão. Verifique sua internet e tente novamente.');
+  }
+}
+
+// ── Start ─────────────────────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>

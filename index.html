@@ -84,9 +84,8 @@
     margin-top: 24px;
   }
   
-  @media (max-width: 768px) {
-    .footer-inner { grid-template-columns: 1fr; gap: 40px; }
-  }
+  @media (max-width: 960px) { .footer-inner { grid-template-columns: 1fr 1fr; gap: 32px; } }
+  @media (max-width: 600px) { .footer-inner { grid-template-columns: 1fr; gap: 28px; } }
 
   * { margin:0; padding:0; box-sizing:border-box; }
 
@@ -2065,6 +2064,53 @@ window.onSearchInput = (val) => {
   window.renderMarkets();
 };
 
+// ── COMPLIANCE GATE ───────────────────────────────────────────────────────────
+// Verifica KYC e Suitability. Exibe banner persistente e redireciona se necessário.
+// Páginas de compliance são excluídas do gate para evitar loop.
+function checkComplianceGate(user) {
+  if (!user) return;
+  const path = window.location.pathname;
+  if (path.includes('kyc.html') || path.includes('suitability.html')) return;
+
+  const kycOk    = user.kyc_status === 'approved';
+  const now      = new Date();
+  const suitExp  = user.suitability_expires_at ? new Date(user.suitability_expires_at) : null;
+  const suitOk   = user.suitability_profile && suitExp && suitExp > now;
+
+  if (!kycOk || !suitOk) {
+    // Mostrar banner de compliance
+    const existing = document.getElementById('compliance-banner');
+    if (existing) existing.remove();
+
+    const banner = document.createElement('div');
+    banner.id = 'compliance-banner';
+    banner.style.cssText = [
+      'position:fixed;top:64px;left:0;right:0;z-index:9999',
+      'background:linear-gradient(90deg,rgba(245,158,11,0.95),rgba(234,130,0,0.95))',
+      'backdrop-filter:blur(12px);padding:12px 24px',
+      'display:flex;align-items:center;justify-content:space-between;gap:16px',
+      'box-shadow:0 4px 24px rgba(0,0,0,0.4);flex-wrap:wrap'
+    ].join(';');
+
+    const targetUrl = !kycOk ? '/kyc.html' : '/suitability.html';
+    const msg       = !kycOk
+      ? '🔐 Verificação de identidade necessária para operar na Bubuya.'
+      : '📊 Defina seu perfil de investidor para começar a operar.';
+    const btnLabel  = !kycOk ? 'Verificar identidade' : 'Definir perfil';
+
+    banner.innerHTML = `
+      <span style="font-size:0.88rem;font-weight:600;color:#000;flex:1">${msg}</span>
+      <a href="${targetUrl}" style="
+        padding:8px 20px;background:#000;color:#f59e0b;
+        border-radius:10px;font-size:0.83rem;font-weight:800;
+        text-decoration:none;white-space:nowrap;flex-shrink:0;
+        transition:opacity .2s
+      " onmouseenter="this.style.opacity='.8'" onmouseleave="this.style.opacity='1'">${btnLabel} →</a>
+    `;
+    document.body.appendChild(banner);
+  }
+}
+
 async function init() {
   try {
     const statsResult = await fetch(window.API + '/markets/stats');
@@ -2102,6 +2148,11 @@ async function init() {
         }
         // Tentar registrar push se ainda não estiver inscrito
         setTimeout(function(){ window.registerPush(token); }, 3000);
+
+        // ── COMPLIANCE GATE: KYC e Suitability obrigatórios ──────────────
+        // Não bloqueia a página (é home pública), mas exibe banner persistente
+        // e bloqueia qualquer ação de operar via requireKyc/requireSuitability no backend.
+        checkComplianceGate(user);
       }
     }
   } catch(e) {
@@ -2374,5 +2425,5 @@ function tourRender(i) {
   </div>
 </div>
 
-<footer><div class="footer-inner"><div class="footer-col" style="padding-right: 40px"><div class="logo" style="margin-bottom: 20px; font-size: 1.8rem">Bubuya.</div><p style="color: var(--muted); font-size: 0.95rem; line-height: 1.6">A principal plataforma brasileira de mercados de previsao.</p></div><div class="footer-col"><h4>Plataforma</h4><ul><li><a href="/about.html">Quem Somos</a></li><li><a href="/terms.html">Termos de Uso</a></li></ul></div><div class="footer-col"><h4>Suporte</h4><ul><li><a href="/how-it-works.html">Como Funciona</a></li><li><a href="mailto:suporte@bubuya.com.br">Suporte</a></li></ul></div><div class="footer-col"><h4>Categorias</h4><ul><li><a onclick="window.setCatFilter('politica', event.target)">Politica</a></li><li><a onclick="window.setCatFilter('economia', event.target)">Economia</a></li></ul></div></div><div class="footer-legal"><div class="footer-disclaimer"><strong>Aviso Legal Importante:</strong> A Bubuya e uma plataforma de tecnologia de mercados de previsao. Nao constitui recomendacao financeira.</div><div style="margin-top: 32px"><p>&copy; 2026 Bubuya &middot; Todos os direitos reservados.</p></div></div></footer><div id="aboutModal" class="modal-overlay"><div class="modal" style="max-width: 600px"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px"><h2 style="font-size:1.5rem">Quem Somos</h2><button class="modal-close" onclick="window.closeModal('aboutModal')">x</button></div><div style="line-height:1.7; color:var(--muted)"><p>A Bubuya e a principal plataforma brasileira de mercados de previsao.</p></div></div></div><div id="howToBetModal" class="modal-overlay"><div class="modal" style="max-width: 600px"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px"><h2 style="font-size:1.5rem">Como Funciona</h2><button class="modal-close" onclick="window.closeModal('howToBetModal')">x</button></div><div style="line-height:1.7; color:var(--muted)"><p>Escolha um mercado, compre SIM ou NAO e lucre se estiver certo.</p></div></div></div></body>
+<footer><div class="footer-inner"><div class="footer-col" style="padding-right: 40px"><div class="logo" style="margin-bottom: 20px; font-size: 1.8rem">Bubuya.</div><p style="color: var(--muted); font-size: 0.95rem; line-height: 1.6">A principal plataforma brasileira de mercados de previs&atilde;o.</p></div><div class="footer-col"><h4>Plataforma</h4><ul><li><a href="/about.html">Quem Somos</a></li><li><a href="/terms.html">Termos de Uso</a></li></ul></div><div class="footer-col"><h4>Suporte</h4><ul><li><a href="/how-it-works.html">Como Funciona</a></li><li><a href="mailto:suporte@bubuya.com.br">Suporte</a></li></ul></div><div class="footer-col"><h4>Categorias</h4><ul><li><a onclick="window.setCatFilter('politica', event.target)">Pol&iacute;tica</a></li><li><a onclick="window.setCatFilter('economia', event.target)">Economia</a></li></ul></div></div><div class="footer-legal"><div class="footer-disclaimer"><strong>Aviso Legal Importante:</strong> A Bubuya &eacute; uma plataforma de tecnologia de mercados de previs&atilde;o. N&atilde;o constitui recomenda&ccedil;&atilde;o financeira.</div><div style="margin-top: 32px"><p>&copy; 2026 Bubuya &middot; Todos os direitos reservados.</p></div></div></footer><div id="aboutModal" class="modal-overlay"><div class="modal" style="max-width: 600px"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px"><h2 style="font-size:1.5rem">Quem Somos</h2><button class="modal-close" onclick="window.closeModal('aboutModal')">x</button></div><div style="line-height:1.7; color:var(--muted)"><p>A Bubuya e a principal plataforma brasileira de mercados de previsao.</p></div></div></div><div id="howToBetModal" class="modal-overlay"><div class="modal" style="max-width: 600px"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px"><h2 style="font-size:1.5rem">Como Funciona</h2><button class="modal-close" onclick="window.closeModal('howToBetModal')">x</button></div><div style="line-height:1.7; color:var(--muted)"><p>Escolha um mercado, compre SIM ou NAO e lucre se estiver certo.</p></div></div></div></body>
 </html>

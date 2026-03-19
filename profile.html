@@ -872,6 +872,22 @@ async function init() {
   if(!savedToken){ openModal('loginModal'); return; }
   state.token=savedToken;
   await loadProfile();
+
+  // ── COMPLIANCE GATE ──────────────────────────────────────────────────────
+  // Profile é página autenticada — redireciona hard se compliance incompleto
+  try {
+    const apiBase = (window.PREDITIVO_CONFIG && window.PREDITIVO_CONFIG.API_BASE) || 'https://preditivo-backend-production.up.railway.app';
+    const r = await fetch(apiBase + '/auth/me', { headers: { Authorization: 'Bearer ' + savedToken } });
+    if (r.ok) {
+      const me = await r.json();
+      const kycOk   = me.kyc_status === 'approved';
+      const now     = new Date();
+      const suitExp = me.suitability_expires_at ? new Date(me.suitability_expires_at) : null;
+      const suitOk  = me.suitability_profile && suitExp && suitExp > now;
+      if (!kycOk)   { window.location.href = '/kyc.html';         return; }
+      if (!suitOk)  { window.location.href = '/suitability.html'; return; }
+    }
+  } catch(e) { /* ignora erro de rede — não bloqueia acesso ao perfil */ }
   // Abrir tab via sessionStorage (vindo do dropdown do header)
   var pendingTab = sessionStorage.getItem('profileTab');
   if (pendingTab) {

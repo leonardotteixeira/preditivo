@@ -39,6 +39,7 @@ body {
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 /* Noise texture — igual ao index.html */
@@ -176,6 +177,33 @@ header {
 /* LAYOUT */
 .market-layout { display: grid; grid-template-columns: 1fr 380px; gap: 28px; align-items: start; }
 @media(max-width:1100px) { .market-layout { grid-template-columns: 1fr; } }
+@media(max-width:900px) { .market-layout { grid-template-columns: 1fr !important; } .bet-widget { position: static !important; } }
+
+/* MOBILE BET CTA */
+.mobile-bet-cta { display: none; }
+@media(max-width:900px) {
+  .mobile-bet-cta {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .mbc-btn {
+    flex: 1;
+    padding: 14px 12px;
+    border-radius: 14px;
+    border: 1px solid transparent;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .mbc-yes { background: var(--green-dim); color: var(--green); border-color: rgba(16,185,129,0.25); }
+  .mbc-yes:hover { background: rgba(16,185,129,0.2); }
+  .mbc-no { background: var(--red-dim); color: var(--red); border-color: rgba(244,63,94,0.25); }
+  .mbc-no:hover { background: rgba(244,63,94,0.2); }
+  .page { padding-bottom: 24px !important; }
+}
 
 /* CATEGORY BADGE */
 .market-category {
@@ -775,7 +803,8 @@ footer {
   grid-template-columns: 2fr 1fr 1fr 1fr;
   gap: 48px;
 }
-@media(max-width:768px) { .footer-inner { grid-template-columns: 1fr; gap: 40px; } }
+@media(max-width:960px) { .footer-inner { grid-template-columns: 1fr 1fr; gap: 32px; } }
+@media(max-width:600px) { .footer-inner { grid-template-columns: 1fr; gap: 28px; } }
 .footer-col h4 {
   color: var(--text);
   margin-bottom: 24px;
@@ -909,7 +938,7 @@ function shareTwitter() {
 }
 function copyLink() {
   if (navigator.clipboard) {
-    navigator.clipboard.writeText(location.href).then(function(){ showToast('🔗 Link copiado!'); });
+    navigator.clipboard.writeText(location.href).then(function(){ showToast('Link copiado!'); });
   } else {
     var input = document.createElement('input');
     input.value = location.href;
@@ -917,7 +946,7 @@ function copyLink() {
     input.select();
     document.execCommand('copy');
     document.body.removeChild(input);
-    showToast('🔗 Link copiado!');
+    showToast('Link copiado!');
   }
 }
 
@@ -1017,10 +1046,16 @@ function renderPage() {
         '</div>' +
       '</div>' +
 
+      (isResolved ? '' :
+        '<div class="mobile-bet-cta">' +
+          '<button class="mbc-btn mbc-yes" onclick="selectSide(\'yes\');document.querySelector(\'.bet-widget\').scrollIntoView({behavior:\'smooth\'})">SIM &bull; ' + probYes + '%</button>' +
+          '<button class="mbc-btn mbc-no" onclick="selectSide(\'no\');document.querySelector(\'.bet-widget\').scrollIntoView({behavior:\'smooth\'})">N&atilde;O &bull; ' + probNo + '%</button>' +
+        '</div>') +
+
       '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">' +
-        '<button onclick="shareWhatsApp()" style="display:flex;align-items:center;gap:6px;padding:9px 16px;background:rgba(37,211,102,0.12);color:#25d366;border:1px solid rgba(37,211,102,0.2);border-radius:10px;cursor:pointer;font-family:inherit;font-size:0.82rem;font-weight:700;transition:background .2s" onmouseover="this.style.background=\'rgba(37,211,102,0.2)\'" onmouseout="this.style.background=\'rgba(37,211,102,0.12)\'">📲 WhatsApp</button>' +
-        '<button onclick="shareTwitter()" style="display:flex;align-items:center;gap:6px;padding:9px 16px;background:rgba(255,255,255,0.06);color:var(--text);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-family:inherit;font-size:0.82rem;font-weight:700;transition:background .2s" onmouseover="this.style.background=\'rgba(255,255,255,0.1)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.06)\'">𝕏 Twitter</button>' +
-        '<button onclick="copyLink()" style="display:flex;align-items:center;gap:6px;padding:9px 16px;background:rgba(59,130,246,0.1);color:var(--blue);border:1px solid rgba(59,130,246,0.2);border-radius:10px;cursor:pointer;font-family:inherit;font-size:0.82rem;font-weight:700;transition:background .2s" onmouseover="this.style.background=\'rgba(59,130,246,0.18)\'" onmouseout="this.style.background=\'rgba(59,130,246,0.1)\'">🔗 Copiar link</button>' +
+        '<button onclick="shareWhatsApp()" style="display:flex;align-items:center;gap:6px;padding:9px 16px;background:rgba(37,211,102,0.12);color:#25d366;border:1px solid rgba(37,211,102,0.2);border-radius:10px;cursor:pointer;font-family:inherit;font-size:0.82rem;font-weight:700;transition:background .2s" onmouseover="this.style.background=\'rgba(37,211,102,0.2)\'" onmouseout="this.style.background=\'rgba(37,211,102,0.12)\'">WhatsApp</button>' +
+        '<button onclick="shareTwitter()" style="display:flex;align-items:center;gap:6px;padding:9px 16px;background:rgba(255,255,255,0.06);color:var(--text);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-family:inherit;font-size:0.82rem;font-weight:700;transition:background .2s" onmouseover="this.style.background=\'rgba(255,255,255,0.1)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.06)\'">X / Twitter</button>' +
+        '<button onclick="copyLink()" style="display:flex;align-items:center;gap:6px;padding:9px 16px;background:rgba(59,130,246,0.1);color:var(--blue);border:1px solid rgba(59,130,246,0.2);border-radius:10px;cursor:pointer;font-family:inherit;font-size:0.82rem;font-weight:700;transition:background .2s" onmouseover="this.style.background=\'rgba(59,130,246,0.18)\'" onmouseout="this.style.background=\'rgba(59,130,246,0.1)\'">Copiar link</button>' +
       '</div>' +
 
       '<div class="chart-card">' +
@@ -1089,7 +1124,7 @@ function renderPage() {
       '<!-- COMENTÁRIOS -->' +
       '<div class="section-card" id="commentsSection">' +
         '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">' +
-          '<div style="font-size:1rem;font-weight:700">💬 Discussão <span id="commentsCount" style="font-size:0.82rem;font-weight:500;color:var(--muted)"></span></div>' +
+          '<div style="font-size:1rem;font-weight:700">Discuss&atilde;o <span id="commentsCount" style="font-size:0.82rem;font-weight:500;color:var(--muted)"></span></div>' +
           '<div style="font-size:0.72rem;color:var(--muted)">Atualiza a cada 30s</div>' +
         '</div>' +
         '<div id="commentInputArea" style="display:none;margin-bottom:16px">' +
@@ -1552,6 +1587,15 @@ async function init() {
         state.token = savedToken;
         state.balance = parseFloat(user.balance);
         updateAuthUI();
+
+        // ── COMPLIANCE GATE ───────────────────────────────────────────────
+        // Market é página onde ocorrem apostas — redireciona se compliance incompleto
+        const kycOk   = user.kyc_status === 'approved';
+        const now     = new Date();
+        const suitExp = user.suitability_expires_at ? new Date(user.suitability_expires_at) : null;
+        const suitOk  = user.suitability_profile && suitExp && suitExp > now;
+        if (!kycOk) { window.location.href = '/kyc.html?next=' + encodeURIComponent(window.location.href); return; }
+        if (!suitOk){ window.location.href = '/suitability.html?next=' + encodeURIComponent(window.location.href); return; }
       }
     } catch(e) { localStorage.removeItem('preditivo_token'); }
   }
@@ -1611,10 +1655,10 @@ init();
   </div>
   <div class="footer-legal">
     <div class="footer-disclaimer">
-      <strong>⚠️ Aviso Legal:</strong> As operações na Bubuya envolvem riscos. Nenhuma informação nesta plataforma constitui recomendação de investimento.
+      <strong>Aviso Legal Importante:</strong> As opera&ccedil;&otilde;es na Bubuya envolvem riscos. Nenhuma informa&ccedil;&atilde;o nesta plataforma constitui recomenda&ccedil;&atilde;o de investimento.
     </div>
     <div style="margin-top:32px">
-      <p>© 2026 Bubuya — Todos os direitos reservados.</p>
+      <p>&copy; 2026 Bubuya &mdash; Todos os direitos reservados.</p>
     </div>
   </div>
 </footer>

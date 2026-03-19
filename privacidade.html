@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<title>Política de Privacidade — Bubuya</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #030303;
+    --surface: #0a0a0a;
+    --surface2: #121212;
+    --border: rgba(255,255,255,0.06);
+    --green: #10b981;
+    --green-dim: rgba(16,185,129,0.1);
+    --red: #f43f5e;
+    --blue: #3b82f6;
+    --text: #ffffff;
+    --muted: #888888;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(3,3,3,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .logo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--text);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+  }
+  .logo span { color: var(--green); }
+  .back-link {
+    margin-left: auto;
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--text); }
+
+  /* ── MAIN ── */
+  .page-wrap {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  .page-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+  }
+  .page-version {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── SECTIONS ── */
+  .policy-section {
+    margin-bottom: 40px;
+  }
+  .policy-section h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--green);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .policy-section p {
+    color: rgba(255,255,255,0.8);
+    font-size: 0.93rem;
+    margin-bottom: 10px;
+  }
+  .policy-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0;
+  }
+  .policy-section ul li {
+    font-size: 0.93rem;
+    color: rgba(255,255,255,0.8);
+    padding: 5px 0 5px 18px;
+    position: relative;
+  }
+  .policy-section ul li::before {
+    content: '·';
+    position: absolute;
+    left: 4px;
+    color: var(--green);
+    font-weight: 700;
+  }
+
+  .highlight-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--green);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 0.88rem;
+    color: rgba(255,255,255,0.75);
+  }
+  .highlight-box strong {
+    color: var(--text);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* ── FOOTER ── */
+  .site-footer {
+    border-top: 1px solid var(--border);
+    padding: 28px 24px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+  .site-footer a {
+    color: var(--green);
+    text-decoration: none;
+  }
+  .site-footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="./index.html" class="logo">Bubu<span>ya</span></a>
+  <a href="./index.html" class="back-link">← Voltar ao site</a>
+</header>
+
+<main class="page-wrap">
+  <h1 class="page-title">Política de Privacidade</h1>
+  <p class="page-version">Versão v1.0 — vigente desde 19 de março de 2026 &nbsp;|&nbsp; Bubuya Mercados de Previsão Ltda.</p>
+
+  <!-- 1. Dados coletados -->
+  <div class="policy-section">
+    <h2>1. Dados Coletados</h2>
+    <p>Coletamos os seguintes dados pessoais para a operação da plataforma:</p>
+    <ul>
+      <li>Nome completo e nome de usuário</li>
+      <li>CPF (Cadastro de Pessoa Física) — obrigatório para KYC e conformidade regulatória</li>
+      <li>Endereço de e-mail</li>
+      <li>Data de nascimento</li>
+      <li>Endereço IP e informações de dispositivo (user-agent) ao acessar a plataforma</li>
+      <li>Dados de apostas, depósitos e saques realizados na plataforma</li>
+      <li>Histórico de respostas ao questionário de perfil de investidor (Suitability)</li>
+      <li>Dados de KYC fornecidos voluntariamente (documentos, selfie)</li>
+    </ul>
+  </div>
+
+  <!-- 2. Finalidade do tratamento -->
+  <div class="policy-section">
+    <h2>2. Finalidade do Tratamento</h2>
+    <p>Seus dados são tratados para as seguintes finalidades:</p>
+    <ul>
+      <li>Verificação de identidade (KYC — Know Your Customer) conforme exigência do BACEN e CVM</li>
+      <li>Prevenção à Lavagem de Dinheiro e Financiamento do Terrorismo (PLD/FT — COAF)</li>
+      <li>Avaliação do perfil de investidor conforme regulamentação CVM Sandbox (Resolução CVM 30/2021)</li>
+      <li>Operação, manutenção e melhoria da plataforma de mercados de previsão</li>
+      <li>Comunicação sobre sua conta, transações e atualizações relevantes</li>
+      <li>Cumprimento de obrigações legais e regulatórias aplicáveis</li>
+    </ul>
+  </div>
+
+  <!-- 3. Base legal -->
+  <div class="policy-section">
+    <h2>3. Base Legal</h2>
+    <p>O tratamento de dados na Bubuya é fundamentado nas seguintes bases legais previstas no Art. 7º da Lei 13.709/2018 (LGPD):</p>
+    <div class="highlight-box">
+      <strong>Obrigação Legal (Art. 7º, II)</strong>
+      Dados de KYC, CPF, PEP e monitoramento PLD/FT são tratados para cumprimento de obrigações legais impostas pelo BACEN (Circular 3.978/2020), COAF e CVM.
+    </div>
+    <div class="highlight-box">
+      <strong>Consentimento (Art. 7º, I)</strong>
+      Dados de perfil, preferências e dados não obrigatórios por lei são tratados com base no consentimento expresso fornecido no momento do cadastro.
+    </div>
+    <div class="highlight-box">
+      <strong>Execução de Contrato (Art. 7º, V)</strong>
+      Dados necessários para a operação da conta, processamento de apostas, depósitos e saques são tratados para execução do contrato de uso da plataforma.
+    </div>
+  </div>
+
+  <!-- 4. Compartilhamento -->
+  <div class="policy-section">
+    <h2>4. Compartilhamento de Dados</h2>
+    <p>Seus dados podem ser compartilhados nas seguintes situações:</p>
+    <ul>
+      <li>Com bureaus de KYC parceiros (ex.: Serpro, IDwall) para verificação de identidade e CPF</li>
+      <li>Com o COAF (Conselho de Controle de Atividades Financeiras) quando exigido por lei, em casos de transações suspeitas que ultrapassem os limiares regulatórios</li>
+      <li>Com autoridades regulatórias (BACEN, CVM, Ministério da Fazenda) quando solicitado por ordem judicial ou administrativa</li>
+    </ul>
+    <div class="highlight-box">
+      <strong>Não compartilhamos dados comercialmente</strong>
+      Seus dados pessoais nunca são vendidos, alugados ou compartilhados com terceiros para fins comerciais ou de marketing.
+    </div>
+  </div>
+
+  <!-- 5. Retenção -->
+  <div class="policy-section">
+    <h2>5. Retenção de Dados</h2>
+    <ul>
+      <li><strong>Dados financeiros</strong> (depósitos, saques, apostas, KYC): retidos por <strong>5 anos</strong> conforme exigência do BACEN e legislação antilavagem</li>
+      <li><strong>Dados de conta ativa</strong>: mantidos enquanto a conta estiver ativa na plataforma</li>
+      <li><strong>Registros de consentimento LGPD</strong>: mantidos por 5 anos para fins de auditoria</li>
+      <li>Após o encerramento da conta e decorridos os prazos legais, os dados são anonimizados ou excluídos de forma segura</li>
+    </ul>
+  </div>
+
+  <!-- 6. Direitos do titular -->
+  <div class="policy-section">
+    <h2>6. Direitos do Titular</h2>
+    <p>Nos termos do Art. 18 da Lei 13.709/2018, você tem direito a:</p>
+    <ul>
+      <li><strong>Acesso</strong> — solicitar cópia de todos os seus dados pessoais que tratamos</li>
+      <li><strong>Correção</strong> — solicitar a correção de dados incompletos, inexatos ou desatualizados</li>
+      <li><strong>Exclusão</strong> — solicitar a exclusão de dados desnecessários ou tratados em desconformidade com a LGPD (sujeito a obrigações legais de retenção)</li>
+      <li><strong>Portabilidade</strong> — solicitar a portabilidade dos seus dados a outro fornecedor de serviço</li>
+      <li><strong>Revogação do consentimento</strong> — revogar o consentimento a qualquer momento, sem prejuízo da licitude do tratamento realizado anteriormente</li>
+      <li><strong>Informação sobre compartilhamento</strong> — ser informado sobre entidades com as quais compartilhamos seus dados</li>
+    </ul>
+    <div class="highlight-box">
+      <strong>Como exercer seus direitos</strong>
+      Envie um e-mail para <a href="mailto:suporte@bubuya.com.br" style="color:var(--green)">suporte@bubuya.com.br</a> com o assunto "Direitos LGPD" e seu pedido. Responderemos em até 15 dias úteis.
+      <br><br>
+      Para solicitar a exclusão de dados diretamente na plataforma, acesse sua conta e use a opção "Solicitar exclusão de dados" nas configurações de privacidade.
+    </div>
+  </div>
+
+  <!-- 7. DPO -->
+  <div class="policy-section">
+    <h2>7. Contato — Encarregado de Proteção de Dados (DPO)</h2>
+    <p>Nossa Encarregada pela Proteção de Dados Pessoais (DPO), conforme Art. 41 da LGPD, pode ser contatada pelo seguinte canal:</p>
+    <div class="highlight-box">
+      <strong>E-mail do DPO</strong>
+      <a href="mailto:privacidade@bubuya.com.br" style="color:var(--green)">privacidade@bubuya.com.br</a>
+      <br><br>
+      Para questões relacionadas especificamente ao tratamento de dados, reclamações ou exercício de direitos previstos na LGPD, utilize preferencialmente este canal.
+    </div>
+    <p>A Autoridade Nacional de Proteção de Dados (ANPD) também pode ser contatada em caso de descumprimento da LGPD: <a href="https://www.gov.br/anpd" target="_blank" rel="noopener" style="color:var(--green)">www.gov.br/anpd</a></p>
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  <p>© 2026 Bubuya Mercados de Previsão Ltda. — Política de Privacidade v1.0</p>
+  <p style="margin-top:6px">
+    <a href="./terms.html">Termos de Uso</a> &nbsp;·&nbsp;
+    <a href="./index.html">Início</a> &nbsp;·&nbsp;
+    <a href="mailto:privacidade@bubuya.com.br">privacidade@bubuya.com.br</a>
+  </p>
+</footer>
+
+</body>
+</html>

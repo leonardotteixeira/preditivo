@@ -791,7 +791,14 @@
         style="text-transform:uppercase"
         oninput="this.value=this.value.toUpperCase()"
         onkeydown="if(event.key==='Enter')window.doRegister()">
-      <button class="btn-primary" style="width:100%" onclick="window.doRegister()">Criar Conta e Ganhar</button>
+      <label style="display:flex;align-items:flex-start;gap:10px;margin:12px 0 4px;cursor:pointer">
+        <input type="checkbox" id="regLgpd" style="margin-top:3px;accent-color:var(--green);flex-shrink:0;width:16px;height:16px">
+        <span style="font-size:0.82rem;color:var(--muted);line-height:1.5">
+          Li e aceito a <a href="./privacidade.html" target="_blank" style="color:var(--green)">Política de Privacidade</a>
+          e consinto com o tratamento dos meus dados conforme a Lei 13.709/2018 (LGPD). <span style="color:var(--red)">*</span>
+        </span>
+      </label>
+      <button class="btn-primary" style="width:100%;margin-top:8px" onclick="window.doRegister()">Criar Conta e Ganhar</button>
       <p style="text-align:center;margin-top:12px;font-size:0.82rem;color:var(--muted)">
         Ao criar uma conta você concorda com os
         <a href="./terms.html" target="_blank" style="color:var(--green)">Termos de Uso</a>.
@@ -1243,14 +1250,17 @@ window.doRegister = async () => {
   const email    = (document.getElementById('regEmail').value || '').trim();
   const password = document.getElementById('regPass').value || '';
   const ref      = (document.getElementById('regRef').value || '').trim().toUpperCase();
+  const lgpdCb   = document.getElementById('regLgpd');
+  const lgpd_consent = lgpdCb ? lgpdCb.checked : false;
 
   if (!name || !email || !password) return window.showToast('❌', 'Erro', 'Preencha nome, email e senha.');
   if (password.length < 6) return window.showToast('❌', 'Erro', 'Senha deve ter pelo menos 6 caracteres.');
+  if (!lgpd_consent) return window.showToast('❌', 'Erro', 'Você precisa aceitar a Política de Privacidade (LGPD) para continuar.');
 
   const btn = document.querySelector('#regStep1 .btn-primary');
   if (btn) { btn.disabled = true; btn.textContent = 'Enviando...'; }
   try {
-    const body = { name, email, password };
+    const body = { name, email, password, lgpd_consent: true };
     if (ref) body.ref = ref;
     const res = await fetch(window.API + '/auth/register', {
       method: 'POST',

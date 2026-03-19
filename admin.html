@@ -2215,6 +2215,22 @@ function renderDrawer(data) {
   }
   html += '</div>';
 
+  // ── 3c. LGPD ──
+  html += '<div class="drawer-section">';
+  html += '<div class="drawer-section-title">🔒 LGPD — Privacidade</div>';
+  var lgpdHistory = data.lgpd_history || [];
+  if (u.lgpd_consent_at) {
+    html += field('Consentimento', '<span class="sts sts-approved">✓ Coletado</span>');
+    html += field('Aceito em', fmt(u.lgpd_consent_at));
+    html += field('IP do aceite', u.lgpd_consent_ip || '—');
+  } else {
+    html += field('Consentimento', '<span class="sts sts-rejected">✗ Não coletado</span>');
+  }
+  if (u.data_deletion_requested_at) {
+    html += field('Exclusão solicitada em', '<span style="color:var(--red)">' + fmt(u.data_deletion_requested_at) + '</span>');
+  }
+  html += '</div>';
+
   // ── 4. PEP / SANÇÕES ──
   html += '<div class="drawer-section">';
   html += '<div class="drawer-section-title">🏛️ PEP &amp; Sanções Internacionais</div>';

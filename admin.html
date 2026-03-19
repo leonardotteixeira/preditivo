@@ -2126,6 +2126,9 @@ function renderDrawer(data) {
   html += field('Data de nascimento', fmtD(u.date_of_birth));
   html += field('Membro desde', fmtD(u.created_at));
   html += field('Saldo atual', '<span style="color:var(--green);font-family:\'DM Mono\',monospace">R$' + parseFloat(u.balance||0).toFixed(2) + '</span>');
+  html += field('2FA', u.two_fa_enabled
+    ? '<span class="sts sts-approved">✓ Ativo' + (u.two_fa_enabled_at ? ' desde ' + fmtD(u.two_fa_enabled_at) : '') + '</span>'
+    : '<span style="color:var(--muted)">Desativado</span>');
   html += '</div>';
 
   // ── 2. KYC ──

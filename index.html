@@ -718,13 +718,14 @@
       </p>
     </div>
 
-    <!-- Step 2: Código 2FA (oculto por padrão) -->
+    <!-- Step 2: Código 2FA TOTP (oculto por padrão) -->
     <div id="loginStep2" style="display:none">
       <h2 class="modal-title">Verificação em 2 Etapas</h2>
-      <p class="modal-sub" style="text-align:center">Código de verificação enviado para seu email.</p>
+      <p class="modal-sub" style="text-align:center">Abra o Google Authenticator ou Authy e digite o código de 6 dígitos.</p>
       <input class="modal-input" id="login2faCode" type="text" inputmode="numeric"
-        placeholder="Código de 6 dígitos" maxlength="6"
+        placeholder="Código de 6 dígitos" maxlength="6" autocomplete="one-time-code"
         onkeydown="if(event.key==='Enter')window.doLogin2fa()">
+      <div id="login2faMsg" style="display:none;padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:0.88rem;background:rgba(244,63,94,0.1);color:#f43f5e;border:1px solid rgba(244,63,94,0.2)"></div>
       <button class="btn-primary" style="width:100%;margin-top:4px" onclick="window.doLogin2fa()">Verificar</button>
       <button onclick="window.backToLoginStep1()"
         style="width:100%;margin-top:10px;background:none;border:none;color:var(--muted);font-size:0.85rem;cursor:pointer;padding:8px">
@@ -1145,7 +1146,7 @@ window.renderMarkets = () => {
   }).join('');
 };
 
-let _login2faEmail = null;
+let _login2faTempToken = null;
 
 window.doLogin = async () => {
   const email    = document.getElementById('loginEmail').value;
@@ -1159,12 +1160,15 @@ window.doLogin = async () => {
     const d = await res.json();
     if (d.error) return window.showToast('❌', 'Erro', d.error);
 
-    // 2FA requerido: mostrar step 2
+    // 2FA TOTP requerido: armazenar temp_token e mostrar step 2
     if (d.requires_2fa) {
-      _login2faEmail = d.email;
+      _login2faTempToken = d.temp_token;
+      localStorage.setItem('preditivo_temp_token', d.temp_token);
       document.getElementById('loginStep1').style.display = 'none';
       document.getElementById('loginStep2').style.display = 'block';
       document.getElementById('login2faCode').value = '';
+      var msgEl = document.getElementById('login2faMsg');
+      if (msgEl) msgEl.style.display = 'none';
       document.getElementById('login2faCode').focus();
       return;
     }
@@ -1176,14 +1180,22 @@ window.doLogin = async () => {
 window.doLogin2fa = async () => {
   const code = (document.getElementById('login2faCode').value || '').trim();
   if (!code) return window.showToast('❌', 'Erro', 'Digite o código de 6 dígitos.');
+  const temp_token = _login2faTempToken || localStorage.getItem('preditivo_temp_token');
+  if (!temp_token) return window.showToast('❌', 'Erro', 'Sessão expirada. Faça login novamente.');
   try {
-    const res = await fetch(window.API + '/auth/login/2fa', {
+    const res = await fetch(window.API + '/auth/2fa/validate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: _login2faEmail, code })
+      body: JSON.stringify({ temp_token, code })
     });
     const d = await res.json();
-    if (d.error) return window.showToast('❌', 'Erro', d.error);
+    if (d.error) {
+      var msgEl = document.getElementById('login2faMsg');
+      if (msgEl) { msgEl.textContent = 'Código inválido. Tente novamente.'; msgEl.style.display = 'block'; }
+      return;
+    }
+    localStorage.removeItem('preditivo_temp_token');
+    _login2faTempToken = null;
     window._finalizeLogin(d);
   } catch(e) { window.showToast('❌', 'Erro', 'Falha na conexão com o servidor.'); }
 };
@@ -1235,11 +1247,14 @@ function _urlBase64ToUint8Array(base64String) {
 }
 
 window.backToLoginStep1 = function() {
-  _login2faEmail = null;
+  _login2faTempToken = null;
+  localStorage.removeItem('preditivo_temp_token');
   const s1 = document.getElementById('loginStep1');
   const s2 = document.getElementById('loginStep2');
   if (s1) s1.style.display = 'block';
   if (s2) s2.style.display = 'none';
+  var msgEl = document.getElementById('login2faMsg');
+  if (msgEl) msgEl.style.display = 'none';
 };
 
 // ---- REGISTRO ----

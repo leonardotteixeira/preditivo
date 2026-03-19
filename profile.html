@@ -483,30 +483,38 @@ function renderPage() {
       '</div>' +
     '</div>' +
 
-    /* Segurança */
+    /* Segurança — 2FA TOTP */
     '<div class="tab-content" id="tab-seguranca">' +
       '<div class="edit-card">' +
-        '<div style="font-weight:700;font-size:1.05rem;margin-bottom:4px">Verificação em duas etapas</div>' +
-        '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:20px">Receba um código no email a cada novo login para maior segurança.</div>' +
+        '<div style="font-weight:700;font-size:1.05rem;margin-bottom:4px">Autenticação de dois fatores (TOTP)</div>' +
+        '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:20px">Aumente a segurança da sua conta com autenticação de dois fatores via Google Authenticator ou Authy.</div>' +
         '<div style="display:flex;align-items:center;gap:12px;padding:16px;background:var(--surface2);border-radius:12px;margin-bottom:16px">' +
           '<div style="font-size:1.5rem">'+(u.two_fa_enabled?'🟢':'⚪')+'</div>' +
           '<div style="flex:1">' +
-            '<div style="font-weight:600">2FA por email</div>' +
-            '<div style="font-size:0.82rem;color:var(--muted)">'+(u.two_fa_enabled?'Ativado — cada login exige verificação por email':'Desativado — ative para mais segurança')+'</div>' +
+            '<div style="font-weight:600">2FA via aplicativo autenticador</div>' +
+            '<div style="font-size:0.82rem;color:var(--muted)">'+(u.two_fa_enabled?('Ativado' + (u.two_fa_enabled_at ? ' desde ' + new Date(u.two_fa_enabled_at).toLocaleDateString('pt-BR') : '') + ' — cada login exige código do app'):'Desativado — ative para mais segurança')+'</div>' +
           '</div>' +
-          '<span style="padding:4px 12px;border-radius:100px;font-size:0.73rem;font-weight:700;background:'+(u.two_fa_enabled?'rgba(0,230,118,0.12);color:var(--green)':'rgba(90,104,120,0.2);color:var(--muted)')+'">'+(u.two_fa_enabled?'Ativo':'Inativo')+'</span>' +
+          (u.two_fa_enabled
+            ? '<span style="padding:4px 12px;border-radius:100px;font-size:0.73rem;font-weight:700;background:rgba(0,230,118,0.12);color:var(--green)">✓ Ativo</span>'
+            : '<span style="padding:4px 12px;border-radius:100px;font-size:0.73rem;font-weight:700;background:rgba(90,104,120,0.2);color:var(--muted)">Inativo</span>') +
         '</div>' +
         (u.two_fa_enabled
           ? '<button class="btn-save btn-danger" onclick="disable2faPrompt()">Desativar 2FA</button>'
-          : '<button class="btn-save" onclick="enable2fa()">Ativar 2FA</button>') +
-        '<div id="twoFaStep2" style="display:none;margin-top:16px">' +
-          '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:8px">Digite o código enviado para o seu email:</div>' +
-          '<input class="form-input" type="text" id="twoFaCode" placeholder="Código de 6 dígitos" maxlength="6" inputmode="numeric">' +
-          '<button class="btn-save" style="margin-top:10px" onclick="verify2faEnable()">Confirmar ativação</button>' +
+          : '<button class="btn-save" onclick="setup2fa()">Ativar 2FA</button>') +
+        /* Setup TOTP: QR code + confirmação */
+        '<div id="twoFaSetupStep" style="display:none;margin-top:20px">' +
+          '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:12px">Escaneie o QR code abaixo com o <strong>Google Authenticator</strong> ou <strong>Authy</strong>:</div>' +
+          '<div id="twoFaQRWrap" style="text-align:center;margin-bottom:12px"></div>' +
+          '<div id="twoFaSecretWrap" style="display:none;font-size:0.75rem;color:var(--muted);word-break:break-all;background:var(--surface);padding:10px;border-radius:8px;margin-bottom:12px;border:1px solid var(--border)"></div>' +
+          '<button onclick="toggleTwoFaSecret()" style="background:none;border:none;color:var(--muted);font-size:0.78rem;cursor:pointer;text-decoration:underline;margin-bottom:14px;font-family:inherit">Não consigo escanear — mostrar código manual</button>' +
+          '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:8px">Após escanear, digite o código gerado pelo app:</div>' +
+          '<input class="form-input" type="text" id="twoFaCode" placeholder="Código de 6 dígitos" maxlength="6" inputmode="numeric" autocomplete="one-time-code">' +
+          '<button class="btn-save" style="margin-top:10px" onclick="verify2faSetup()">Confirmar ativação</button>' +
         '</div>' +
+        /* Desativar 2FA: requer código TOTP atual */
         '<div id="twoFaDisableStep" style="display:none;margin-top:16px">' +
-          '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:8px">Confirme sua senha para desativar:</div>' +
-          '<input class="form-input" type="password" id="twoFaDisablePass" placeholder="Sua senha atual">' +
+          '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:8px">Digite o código atual do seu app autenticador para desativar:</div>' +
+          '<input class="form-input" type="text" id="twoFaDisableCode" placeholder="Código de 6 dígitos" maxlength="6" inputmode="numeric" autocomplete="one-time-code">' +
           '<button class="btn-save btn-danger" style="margin-top:10px" onclick="disable2fa()">Confirmar desativação</button>' +
         '</div>' +
         '<div id="twoFaFeedback" style="margin-top:12px;font-size:0.85rem"></div>' +
@@ -594,40 +602,48 @@ async function saveProfile() {
   } catch(e){ fb.style.color='#ef4444'; fb.textContent='Erro de conexão.'; }
 }
 
-/* ── 2FA ── */
-async function enable2fa() {
+/* ── 2FA TOTP ── */
+async function setup2fa() {
   var fb=document.getElementById('twoFaFeedback');
-  fb.textContent='Enviando código...'; fb.style.color='var(--muted)';
+  fb.textContent='Gerando QR code...'; fb.style.color='var(--muted)';
   try {
-    var d=await apiPost('/auth/2fa/enable',{},state.token);
+    var d=await apiPost('/auth/2fa/setup',{},state.token);
     if(d.error){ fb.style.color='#ef4444'; fb.textContent='Erro: '+d.error; return; }
-    fb.textContent='Código enviado! Verifique seu email.'; fb.style.color='var(--green)';
-    document.getElementById('twoFaStep2').style.display='';
+    fb.textContent='';
+    var qrWrap=document.getElementById('twoFaQRWrap');
+    qrWrap.innerHTML='<img src="'+d.qr_code+'" style="width:200px;height:200px;border-radius:12px;border:2px solid var(--border)" alt="QR Code 2FA">';
+    var secretWrap=document.getElementById('twoFaSecretWrap');
+    secretWrap.textContent='Chave manual: '+d.secret;
+    document.getElementById('twoFaSetupStep').style.display='';
     document.getElementById('twoFaCode').focus();
   } catch(e){ fb.style.color='#ef4444'; fb.textContent='Erro de conexão.'; }
 }
-async function verify2faEnable() {
+function toggleTwoFaSecret(){
+  var sw=document.getElementById('twoFaSecretWrap');
+  sw.style.display=sw.style.display==='none'?'':'none';
+}
+async function verify2faSetup() {
   var code=document.getElementById('twoFaCode').value.trim();
   var fb=document.getElementById('twoFaFeedback');
-  if(!code){ fb.style.color='#ef4444'; fb.textContent='Informe o código.'; return; }
+  if(!code){ fb.style.color='#ef4444'; fb.textContent='Informe o código gerado pelo app.'; return; }
   try {
-    var d=await apiPost('/auth/2fa/enable/verify',{code},state.token);
+    var d=await apiPost('/auth/2fa/verify-setup',{code},state.token);
     if(d.error){ fb.style.color='#ef4444'; fb.textContent='Erro: '+d.error; return; }
     state.user.two_fa_enabled=true;
-    showToast('🔒 2FA ativado!');
+    showToast('🔒 2FA ativado com sucesso!');
     renderPage(); switchTab('seguranca');
   } catch(e){ fb.style.color='#ef4444'; fb.textContent='Erro de conexão.'; }
 }
 function disable2faPrompt(){
   document.getElementById('twoFaDisableStep').style.display='';
-  document.getElementById('twoFaDisablePass').focus();
+  document.getElementById('twoFaDisableCode').focus();
 }
 async function disable2fa(){
-  var password=document.getElementById('twoFaDisablePass').value;
+  var code=document.getElementById('twoFaDisableCode').value.trim();
   var fb=document.getElementById('twoFaFeedback');
-  if(!password){ fb.style.color='#ef4444'; fb.textContent='Informe a senha.'; return; }
+  if(!code){ fb.style.color='#ef4444'; fb.textContent='Informe o código do app autenticador.'; return; }
   try {
-    var d=await apiPost('/auth/2fa/disable',{password},state.token);
+    var d=await apiPost('/auth/2fa/disable',{code},state.token);
     if(d.error){ fb.style.color='#ef4444'; fb.textContent='Erro: '+d.error; return; }
     state.user.two_fa_enabled=false;
     showToast('2FA desativado.');

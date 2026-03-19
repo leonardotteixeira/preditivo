@@ -1554,8 +1554,8 @@ function loadComplianceCoaf() {
         var flagDate = f.flag_date || (f.created_at ? f.created_at.substring(0,7) : '—');
         var stsCls = f.status === 'open' ? 'sts-open' : 'sts-resolved';
         var actions = f.status === 'open'
-          ? '<button class="btn btn-resolve" style="font-size:0.76rem;margin-right:4px" onclick="resolveCoaf(\'' + f.id + '\',\'dismiss\')">Arquivar</button>' +
-            '<button class="btn btn-reject" style="font-size:0.76rem" onclick="resolveCoaf(\'' + f.id + '\',\'report\')">Reportar COAF</button>'
+          ? '<button class="btn btn-resolve" style="font-size:0.76rem;margin-right:4px" onclick="resolveCoaf(\'' + f.id + '\',\'dismissed\')">Arquivar</button>' +
+            '<button class="btn btn-reject" style="font-size:0.76rem" onclick="resolveCoaf(\'' + f.id + '\',\'reported\')">Reportar COAF</button>'
           : '<span style="color:var(--muted);font-size:0.78rem">' + (f.resolved_action || f.status) + '</span>';
         return '<tr>' +
           '<td><strong>' + (f.username || '—') + '</strong></td>' +
@@ -1581,21 +1581,21 @@ function loadComplianceSuitability() {
     .then(function(r){ return r.json(); })
     .then(function(data) {
       var stats = data.stats || data || {};
-      var byProfile = stats.by_profile || {};
+      // campos retornados pelo backend: conservador, moderado, arrojado, expirados, total_responded, avg_score
       var total = parseInt(stats.total_responded || 0);
-      var expired = parseInt(stats.total_expired || 0);
-      var avgScore = stats.avg_score ? parseFloat(stats.avg_score).toFixed(1) : '—';
+      var expired = parseInt(stats.expirados || 0);
+      var avgScore = stats.avg_score != null ? parseFloat(stats.avg_score).toFixed(1) : '—';
 
       document.getElementById('suitTotal').textContent = total;
-      document.getElementById('suitConservador').textContent = byProfile.conservador || 0;
-      document.getElementById('suitModerado').textContent = byProfile.moderado || 0;
-      document.getElementById('suitArrojado').textContent = byProfile.arrojado || 0;
+      document.getElementById('suitConservador').textContent = parseInt(stats.conservador || 0);
+      document.getElementById('suitModerado').textContent = parseInt(stats.moderado || 0);
+      document.getElementById('suitArrojado').textContent = parseInt(stats.arrojado || 0);
       document.getElementById('suitExpired').textContent = expired;
       document.getElementById('suitAvgScore').textContent = avgScore;
-      document.getElementById('cSuitOk').textContent = total - expired;
+      document.getElementById('cSuitOk').textContent = total;
 
       // Tabela de usuários recentes com perfil
-      var users = stats.recent_users || data.users || [];
+      var users = stats.recent_users || [];
       var tbody = document.getElementById('suitTbody');
       if (!users.length) {
         tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">Nenhum perfil registrado ainda</td></tr>';
@@ -1687,7 +1687,7 @@ function confirmKycReject() {
 // ── COAF ACTIONS ─────────────────────────────────────────────────────────────
 
 function resolveCoaf(flagId, action) {
-  var label = action === 'report' ? 'REPORTAR ao COAF (obrigação legal — não pode ser desfeito)' : 'arquivar este alerta';
+  var label = action === 'reported' ? 'REPORTAR ao COAF (obrigação legal — não pode ser desfeito)' : 'arquivar este alerta';
   if (!confirm('Confirma ' + label + '?')) return;
 
   fetch(API + '/kyc/admin/coaf-flags/' + flagId + '/resolve', {
@@ -1698,7 +1698,7 @@ function resolveCoaf(flagId, action) {
   .then(function(r){ return r.json(); })
   .then(function(d) {
     if (d.error) { showToast('Erro: ' + d.error); return; }
-    if (action === 'report') {
+    if (action === 'reported') {
       showToast('⚠️ Comunicação COAF registrada. Providencie o envio formal em 24h.');
     } else {
       showToast('Alerta arquivado internamente.');

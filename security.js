@@ -1,4 +1,6 @@
 (() => {
+  const nativeInnerHtml = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
+
   function sanitizeNodeTree(root) {
     const blockedTags = new Set(['SCRIPT', 'IFRAME', 'OBJECT', 'EMBED', 'LINK', 'STYLE']);
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
@@ -30,19 +32,26 @@
 
   function sanitizeHtml(input) {
     const template = document.createElement('template');
-    template.innerHTML = String(input == null ? '' : input);
+    const html = String(input == null ? '' : input);
+    if (nativeInnerHtml && nativeInnerHtml.set && nativeInnerHtml.get) {
+      nativeInnerHtml.set.call(template, html);
+    } else {
+      template.innerHTML = html;
+    }
     sanitizeNodeTree(template.content);
+    if (nativeInnerHtml && nativeInnerHtml.get) {
+      return nativeInnerHtml.get.call(template);
+    }
     return template.innerHTML;
   }
 
-  const innerHtmlDescriptor = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
-  if (innerHtmlDescriptor && innerHtmlDescriptor.set && innerHtmlDescriptor.get) {
+  if (nativeInnerHtml && nativeInnerHtml.set && nativeInnerHtml.get) {
     Object.defineProperty(Element.prototype, 'innerHTML', {
       configurable: true,
-      enumerable: innerHtmlDescriptor.enumerable,
-      get: innerHtmlDescriptor.get,
+      enumerable: nativeInnerHtml.enumerable,
+      get: nativeInnerHtml.get,
       set(value) {
-        return innerHtmlDescriptor.set.call(this, sanitizeHtml(value));
+        return nativeInnerHtml.set.call(this, sanitizeHtml(value));
       }
     });
   }

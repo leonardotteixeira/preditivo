@@ -596,6 +596,16 @@ async function submitKYC() {
     }
 
     setStepIndicators(3);
+
+    // ── Didit: redirecionar para verificação de documento ──────────────────
+    if (data.provider === 'didit' && data.verification_url) {
+      txt.textContent = 'Redirecionando...';
+      // Salvar session_id no localStorage para polling ao retornar
+      if (data.session_id) localStorage.setItem('didit_session_id', data.session_id);
+      setTimeout(() => { window.location.href = data.verification_url; }, 800);
+      return;
+    }
+
     if (data.kyc_status === 'approved') {
       showScreen('approved');
       setTimeout(() => { window.location.href = '/suitability.html'; }, 1800);
@@ -611,8 +621,46 @@ async function submitKYC() {
   }
 }
 
+// ── Retorno do Didit (didit_return=1 na URL) ──────────────────────────────────
+async function handleDiditReturn() {
+  const sessionId = localStorage.getItem('didit_session_id');
+  showScreen('submitted');
+  setStepIndicators(3);
+
+  if (!sessionId) return;
+
+  // Polling por até 30s para capturar aprovação imediata
+  for (let i = 0; i < 6; i++) {
+    await new Promise(r => setTimeout(r, 5000));
+    try {
+      const r = await fetch(API + '/kyc/didit/session/' + sessionId, {
+        headers: { Authorization: 'Bearer ' + getToken() }
+      });
+      if (!r.ok) break;
+      const d = await r.json();
+      if (d.kyc_status === 'approved') {
+        localStorage.removeItem('didit_session_id');
+        showScreen('approved');
+        setTimeout(() => { window.location.href = '/suitability.html'; }, 1800);
+        return;
+      }
+      if (d.kyc_status === 'rejected') {
+        localStorage.removeItem('didit_session_id');
+        showScreen('rejected');
+        return;
+      }
+    } catch { break; }
+  }
+  localStorage.removeItem('didit_session_id');
+}
+
 // ── Start ─────────────────────────────────────────────────────────────────────
-init();
+// Verificar se está retornando do Didit
+if (new URLSearchParams(window.location.search).get('didit_return') === '1') {
+  handleDiditReturn();
+} else {
+  init();
+}
 </script>
 </body>
 </html>

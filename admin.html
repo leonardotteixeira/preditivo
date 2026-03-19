@@ -1537,22 +1537,37 @@ function loadComplianceKyc() {
         var dob = u.date_of_birth ? new Date(u.date_of_birth).toLocaleDateString('pt-BR') : '—';
         var submittedAt = u.kyc_submitted_at ? new Date(u.kyc_submitted_at).toLocaleString('pt-BR') : '—';
         var cpfMasked = u.cpf ? u.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4') : '—';
-        var pepBadge = u.pep_status === 'flagged'
-          ? '<span class="sts sts-flagged">🏛️ PEP</span>'
-          : u.pep_status === 'clear'
+
+        // Badges de alerta — PEP e/ou nome divergente
+        var alertBadges = '';
+        if (u.has_bureau_alert) {
+          var alertTitle = (u.bureau_alert_notes || 'Nome divergente do bureau').replace(/"/g, '&quot;');
+          alertBadges += '<span class="sts" style="background:rgba(251,146,60,0.15);border-color:rgba(251,146,60,0.5);color:#fb923c" title="' + alertTitle + '">⚠ Nome</span> ';
+        }
+        if (u.pep_status === 'flagged') {
+          alertBadges += '<span class="sts sts-flagged">🏛️ PEP</span>';
+        } else if (!u.has_bureau_alert) {
+          alertBadges += u.pep_status === 'clear'
             ? '<span class="sts sts-clear">Clear</span>'
             : '<span style="color:var(--muted);font-size:0.78rem">—</span>';
+        }
+
+        // Linha com fundo alaranjado quando há alerta de nome divergente
+        var rowStyle = u.has_bureau_alert
+          ? 'style="background:rgba(251,146,60,0.06);border-left:3px solid rgba(251,146,60,0.5)"'
+          : '';
+
         var uId = u.id || u.user_id;
         var uName = (u.username || u.name || '—').replace(/'/g, '');
         var fullName = (u.full_name || '—').replace(/'/g, '');
-        return '<tr>' +
+        return '<tr ' + rowStyle + '>' +
           '<td><button class="btn" style="background:none;border:none;padding:0;font-weight:700;color:var(--text);cursor:pointer;font-size:0.88rem;text-decoration:underline;text-decoration-color:rgba(255,255,255,0.2)" onclick="openUserDrawer(\'' + uId + '\')">' + uName + '</button></td>' +
           '<td style="color:var(--muted);font-size:0.82rem">' + (u.email || '—') + '</td>' +
           '<td>' + fullName + '</td>' +
           '<td style="font-family:\'DM Mono\',monospace;font-size:0.82rem;color:var(--muted)">' + cpfMasked + '</td>' +
           '<td style="color:var(--muted);font-size:0.82rem">' + dob + '</td>' +
           '<td style="color:var(--muted);font-size:0.78rem">' + submittedAt + '</td>' +
-          '<td>' + pepBadge + '</td>' +
+          '<td>' + alertBadges + '</td>' +
           '<td>' +
             '<button class="btn btn-confirm" style="font-size:0.78rem;margin-right:4px" onclick="approveKyc(\'' + uId + '\',\'' + uName + '\')">✓ Aprovar</button>' +
             '<button class="btn btn-reject" style="font-size:0.78rem" onclick="openKycReject(\'' + uId + '\',\'' + uName + '\')">✕ Rejeitar</button>' +
@@ -1893,8 +1908,17 @@ function renderDrawer(data) {
   if (kycReviews.length) {
     html += '<ul class="drawer-timeline" style="margin-top:12px">';
     kycReviews.forEach(function(r) {
-      var actionColor = r.action === 'approved' ? 'var(--green)' : r.action === 'rejected' ? 'var(--red)' : 'var(--gold)';
-      html += '<li><strong style="color:' + actionColor + '">' + r.action.toUpperCase() + '</strong>' +
+      var isBureauAlert = r.action === 'bureau_alert';
+      var actionColor = r.action === 'approved' ? 'var(--green)'
+        : r.action === 'rejected' ? 'var(--red)'
+        : isBureauAlert ? '#fb923c'
+        : r.action === 'pep_flagged' ? '#c084fc'
+        : 'var(--gold)';
+      var actionLabel = isBureauAlert ? '⚠ ALERTA BUREAU' : r.action.toUpperCase().replace('_', ' ');
+      var liStyle = isBureauAlert
+        ? ' style="background:rgba(251,146,60,0.08);border-left:3px solid rgba(251,146,60,0.5);padding-left:8px;border-radius:4px;margin-bottom:6px"'
+        : '';
+      html += '<li' + liStyle + '><strong style="color:' + actionColor + '">' + actionLabel + '</strong>' +
         (r.actor ? ' por <em>' + r.actor + '</em>' : '') +
         (r.notes ? ' — ' + r.notes : '') +
         '<span style="float:right;font-size:0.75rem">' + fmt(r.created_at) + '</span></li>';

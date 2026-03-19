@@ -1531,6 +1531,8 @@ async function doLogin() {
     closeModal('loginModal');
     updateAuthUI();
     showToast('👋 Bem-vindo, ' + data.user.name);
+    // BLOCO 5: verificar termo de riscos após login manual
+    await checkRiskTermStatus();
   } catch(e) { showToast('Erro de conexão'); }
 }
 
@@ -1596,14 +1598,129 @@ async function init() {
         const suitOk  = user.suitability_profile && suitExp && suitExp > now;
         if (!kycOk) { window.location.href = '/kyc.html?next=' + encodeURIComponent(window.location.href); return; }
         if (!suitOk){ window.location.href = '/suitability.html?next=' + encodeURIComponent(window.location.href); return; }
+        // BLOCO 5: verificar termo de riscos após login
+        await checkRiskTermStatus();
       }
     } catch(e) { localStorage.removeItem('preditivo_token'); }
   }
   await loadMarket();
 }
 
+// ── BLOCO 5: Termo de Ciência de Riscos ──────────────────────────────────────
+
+function showRiskTermModal() {
+  var modal = document.getElementById('riskTermModal');
+  if (modal) { modal.style.display = 'flex'; }
+}
+
+function toggleRiskTermBtn() {
+  var chk = document.getElementById('riskTermCheck');
+  var btn = document.getElementById('riskTermAcceptBtn');
+  if (!chk || !btn) return;
+  btn.disabled = !chk.checked;
+  btn.style.opacity = chk.checked ? '1' : '0.4';
+  btn.style.cursor = chk.checked ? 'pointer' : 'not-allowed';
+}
+
+async function acceptRiskTerm() {
+  var btn = document.getElementById('riskTermAcceptBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Registrando...'; }
+  try {
+    var res = await fetch(API + '/auth/accept-risk-term', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + state.token }
+    });
+    var data = await res.json();
+    if (!res.ok) {
+      showToast('Erro ao registrar aceite: ' + (data.error || res.status));
+      if (btn) { btn.disabled = false; btn.textContent = 'Aceitar e Continuar'; }
+      return;
+    }
+    var modal = document.getElementById('riskTermModal');
+    if (modal) modal.style.display = 'none';
+    showToast('Termo aceito. Boa sorte!');
+  } catch(e) {
+    showToast('Erro de conexão ao registrar termo');
+    if (btn) { btn.disabled = false; btn.textContent = 'Aceitar e Continuar'; }
+  }
+}
+
+async function checkRiskTermStatus() {
+  if (!state.token) return;
+  try {
+    var res = await fetch(API + '/auth/risk-term-status', {
+      headers: { 'Authorization': 'Bearer ' + state.token }
+    });
+    if (!res.ok) return;
+    var data = await res.json();
+    if (!data.accepted) { showRiskTermModal(); }
+  } catch(e) { /* silencioso */ }
+}
+
+// Interceptação de RISK_TERM_REQUIRED nas chamadas de aposta
+var _origConfirmBet = confirmBet;
+confirmBet = async function() {
+  if (!state.token) { openModal('loginModal'); return; }
+  var amt = parseFloat(document.getElementById('betAmt') ? document.getElementById('betAmt').value : 0);
+  if (!amt || amt <= 0) { showToast('Insira um valor válido'); return; }
+
+  if (state.betAction === 'sell') {
+    try {
+      var data = await apiPost('/bets/sell', { market_id: marketId, side: state.betSide, amount: amt }, state.token);
+      if (data.error === 'RISK_TERM_REQUIRED') { showRiskTermModal(); return; }
+      if (data.error) { showToast('Erro: ' + data.error); return; }
+      state.balance = parseFloat(data.new_balance);
+      var balEl = document.getElementById('balDisplay');
+      if (balEl) balEl.textContent = 'R$' + state.balance.toFixed(2);
+      showToast('Venda concluída! Recebeu: R$' + data.sell_value.toFixed(2));
+      document.getElementById('betAmt').value = '';
+      await loadMarket();
+    } catch(e) { showToast('Erro de conexão'); }
+    return;
+  }
+
+  if (amt > state.balance) { showToast('Saldo insuficiente'); return; }
+  try {
+    var data = await apiPost('/bets', { market_id: marketId, side: state.betSide, amount: amt }, state.token);
+    if (data.error === 'RISK_TERM_REQUIRED') { showRiskTermModal(); return; }
+    if (data.error) { showToast('Erro: ' + data.error); return; }
+    state.balance = parseFloat(data.new_balance);
+    var balEl2 = document.getElementById('balDisplay');
+    if (balEl2) balEl2.textContent = 'R$' + state.balance.toFixed(2);
+    showToast('Aposta confirmada! Retorno potencial: R$' + parseFloat(data.bet.potential_payout).toFixed(2));
+    document.getElementById('betAmt').value = '';
+    await loadMarket();
+  } catch(e) { showToast('Erro de conexão'); }
+};
+
 init();
 </script>
+
+<!-- RISK TERM MODAL (BLOCO 5) — não pode ser fechado sem aceitar -->
+<div id="riskTermModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);align-items:center;justify-content:center">
+  <div style="background:#0f0f0f;border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:36px;max-width:560px;width:90%;max-height:90vh;overflow-y:auto;position:relative">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+      <div style="width:40px;height:40px;background:rgba(245,158,11,0.15);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">⚠️</div>
+      <h3 style="font-size:1.15rem;font-weight:700;color:#fff">Termo de Ciência de Riscos</h3>
+    </div>
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px;margin-bottom:20px;font-size:0.875rem;color:rgba(255,255,255,0.75);line-height:1.7;max-height:280px;overflow-y:auto">
+      <p style="font-weight:600;color:#fff;margin-bottom:12px">Antes de operar, leia atentamente:</p>
+      <p style="margin-bottom:10px"><strong style="color:rgba(255,255,255,0.9)">1. Natureza do produto:</strong> Mercados de previsão envolvem risco de perda total do capital investido. Não há garantia de retorno.</p>
+      <p style="margin-bottom:10px"><strong style="color:rgba(255,255,255,0.9)">2. Risco de liquidez:</strong> Posições abertas podem não ter compradores disponíveis ao preço desejado, podendo resultar em perdas.</p>
+      <p style="margin-bottom:10px"><strong style="color:rgba(255,255,255,0.9)">3. Volatilidade:</strong> Os preços das posições podem variar significativamente em curtos períodos de tempo.</p>
+      <p style="margin-bottom:10px"><strong style="color:rgba(255,255,255,0.9)">4. Limitações do perfil:</strong> Seu perfil de investidor (suitability) determina os limites máximos de operação. Esses limites visam proteger seu patrimônio.</p>
+      <p style="margin-bottom:10px"><strong style="color:rgba(255,255,255,0.9)">5. Responsabilidade:</strong> As decisões de investimento são de sua exclusiva responsabilidade. A Bubuya não presta aconselhamento financeiro.</p>
+      <p style="margin-bottom:10px"><strong style="color:rgba(255,255,255,0.9)">6. Regulamentação:</strong> Esta plataforma opera em conformidade com a Resolução CVM 30/2021 e demais normas aplicáveis.</p>
+      <p><strong style="color:rgba(255,255,255,0.9)">7. Público adequado:</strong> Este produto é destinado apenas a investidores que compreenderam e aceitam os riscos envolvidos.</p>
+    </div>
+    <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-bottom:20px;padding:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;transition:border-color .2s" id="riskTermLabel">
+      <input type="checkbox" id="riskTermCheck" onchange="toggleRiskTermBtn()" style="width:18px;height:18px;margin-top:2px;flex-shrink:0;accent-color:var(--green);cursor:pointer">
+      <span style="font-size:0.875rem;color:rgba(255,255,255,0.8);line-height:1.5">Li e compreendi os riscos descritos acima. Declaro que estou ciente de que posso perder o capital investido e que as decisões de operação são de minha exclusiva responsabilidade.</span>
+    </label>
+    <button id="riskTermAcceptBtn" onclick="acceptRiskTerm()" disabled style="width:100%;padding:14px;background:#10b981;color:#000;font-weight:700;font-size:0.95rem;border:none;border-radius:12px;cursor:not-allowed;opacity:0.4;transition:all .2s;font-family:inherit">Aceitar e Continuar</button>
+    <p style="text-align:center;margin-top:12px;font-size:0.78rem;color:var(--muted)">Versão v1.0 — Este aceite fica registrado conforme Resolução CVM 30/2021</p>
+  </div>
+</div>
 
 <!-- ABOUT MODAL -->
 <div id="aboutModal" class="modal-overlay">

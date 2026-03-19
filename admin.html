@@ -149,6 +149,72 @@ tr:hover td { background:rgba(255,255,255,0.015); }
 .comp-sub { margin-top:36px; }
 .comp-sub:first-child { margin-top:0; }
 .comp-divider { height:1px; background:var(--border); margin:32px 0; }
+
+/* ── USER DRAWER ── */
+.drawer-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); z-index:200; }
+.drawer-backdrop.open { display:block; }
+.user-drawer {
+  position:fixed; top:0; right:0; height:100vh; width:640px; max-width:95vw;
+  background:var(--surface); border-left:1px solid var(--border);
+  z-index:201; display:flex; flex-direction:column;
+  transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.2,0,0,1);
+  box-shadow:-40px 0 80px rgba(0,0,0,0.6);
+}
+.user-drawer.open { transform:translateX(0); }
+.drawer-header {
+  padding:20px 24px; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:14px; flex-shrink:0;
+}
+.drawer-avatar {
+  width:44px; height:44px; border-radius:50%; flex-shrink:0;
+  background:linear-gradient(135deg,var(--green),var(--blue));
+  display:flex; align-items:center; justify-content:center;
+  font-weight:800; font-size:1.1rem; color:#030303;
+}
+.drawer-name { font-size:1.05rem; font-weight:700; }
+.drawer-email { font-size:0.8rem; color:var(--muted); margin-top:2px; }
+.drawer-close {
+  margin-left:auto; background:none; border:none; color:var(--muted);
+  font-size:1.6rem; cursor:pointer; padding:4px 8px; border-radius:8px;
+  transition:background 0.15s,color 0.15s; line-height:1;
+}
+.drawer-close:hover { background:var(--surface2); color:var(--text); }
+.drawer-body { overflow-y:auto; flex:1; padding:0 24px 32px; }
+.drawer-section { margin-top:24px; }
+.drawer-section-title {
+  font-size:0.7rem; text-transform:uppercase; letter-spacing:1.5px;
+  color:var(--muted); font-weight:700; margin-bottom:12px;
+  display:flex; align-items:center; gap:8px;
+}
+.drawer-section-title::after { content:''; flex:1; height:1px; background:var(--border); }
+.drawer-field { display:flex; gap:8px; margin-bottom:8px; align-items:baseline; }
+.drawer-field-label { font-size:0.75rem; color:var(--muted); min-width:130px; flex-shrink:0; }
+.drawer-field-val { font-size:0.88rem; font-weight:600; }
+.drawer-timeline { list-style:none; margin-top:8px; }
+.drawer-timeline li {
+  padding:8px 0 8px 18px; border-left:2px solid var(--border);
+  margin-left:6px; position:relative; font-size:0.82rem; color:var(--muted);
+}
+.drawer-timeline li::before {
+  content:''; position:absolute; left:-5px; top:12px;
+  width:8px; height:8px; border-radius:50%;
+  background:var(--surface2); border:2px solid var(--muted);
+}
+.drawer-timeline li strong { display:block; color:var(--text); font-size:0.84rem; }
+.drawer-qa { background:var(--surface2); border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-top:8px; }
+.drawer-qa-row { padding:10px 14px; border-bottom:1px solid var(--border); display:flex; gap:12px; }
+.drawer-qa-row:last-child { border-bottom:none; }
+.drawer-qa-q { font-size:0.78rem; color:var(--muted); flex:1; }
+.drawer-qa-a { font-size:0.82rem; font-weight:700; color:var(--green); flex-shrink:0; text-align:right; max-width:200px; }
+.risk-sel { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:8px 12px; color:var(--text); font-family:'Inter',sans-serif; font-size:0.88rem; outline:none; cursor:pointer; }
+.risk-sel:focus { border-color:var(--blue); }
+.drawer-notes { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:12px 14px; color:var(--text); font-family:'Inter',sans-serif; font-size:0.88rem; resize:vertical; min-height:90px; outline:none; transition:border-color 0.2s; }
+.drawer-notes:focus { border-color:var(--blue); }
+.drawer-save-btn { width:100%; padding:11px; background:var(--green-dim); color:var(--green); border:1px solid rgba(16,185,129,0.3); border-radius:11px; cursor:pointer; font-family:'Inter',sans-serif; font-weight:700; font-size:0.9rem; margin-top:10px; transition:all 0.2s; }
+.drawer-save-btn:hover { background:var(--green); color:#000; }
+.risk-low      { color:#6ee7b7; } .risk-medium { color:#fcd34d; }
+.risk-high     { color:#fb923c; } .risk-critical { color:#f43f5e; }
+.risk-normal   { color:var(--muted); }
 </style>
 </head>
 <body>
@@ -535,6 +601,25 @@ tr:hover td { background:rgba(255,255,255,0.015); }
       <button class="btn" style="flex:1;background:#00e676;color:#080c10;font-weight:700" onclick="saveBalance()">Salvar</button>
       <button class="btn-cancel" style="flex:1;margin-top:0" onclick="closeModal('balanceModal')">Cancelar</button>
     </div>
+  </div>
+</div>
+
+<!-- BACKDROP + DRAWER DO USUÁRIO -->
+<div class="drawer-backdrop" id="drawerBackdrop" onclick="closeUserDrawer()"></div>
+
+<div class="user-drawer" id="userDrawer">
+  <div class="drawer-header">
+    <div class="drawer-avatar" id="drwAvatar">—</div>
+    <div>
+      <div class="drawer-name" id="drwName">—</div>
+      <div class="drawer-email" id="drwEmail">—</div>
+    </div>
+    <div style="margin-left:12px;display:flex;gap:6px;flex-wrap:wrap" id="drwBadges"></div>
+    <button class="drawer-close" onclick="closeUserDrawer()">&times;</button>
+  </div>
+
+  <div class="drawer-body" id="drawerBody">
+    <div style="padding:60px;text-align:center;color:var(--muted)">Carregando...</div>
   </div>
 </div>
 
@@ -1461,7 +1546,7 @@ function loadComplianceKyc() {
         var uName = (u.username || u.name || '—').replace(/'/g, '');
         var fullName = (u.full_name || '—').replace(/'/g, '');
         return '<tr>' +
-          '<td><strong>' + uName + '</strong></td>' +
+          '<td><button class="btn" style="background:none;border:none;padding:0;font-weight:700;color:var(--text);cursor:pointer;font-size:0.88rem;text-decoration:underline;text-decoration-color:rgba(255,255,255,0.2)" onclick="openUserDrawer(\'' + uId + '\')">' + uName + '</button></td>' +
           '<td style="color:var(--muted);font-size:0.82rem">' + (u.email || '—') + '</td>' +
           '<td>' + fullName + '</td>' +
           '<td style="font-family:\'DM Mono\',monospace;font-size:0.82rem;color:var(--muted)">' + cpfMasked + '</td>' +
@@ -1507,7 +1592,7 @@ function loadCompliancePep() {
         var uId = u.id || u.user_id;
         var uName = (u.username || '—').replace(/'/g, '');
         return '<tr>' +
-          '<td><strong>' + uName + '</strong></td>' +
+          '<td><button class="btn" style="background:none;border:none;padding:0;font-weight:700;color:var(--text);cursor:pointer;font-size:0.88rem;text-decoration:underline;text-decoration-color:rgba(255,255,255,0.2)" onclick="openUserDrawer(\'' + uId + '\')">' + uName + '</button></td>' +
           '<td style="color:var(--muted);font-size:0.82rem">' + (u.email || '—') + '</td>' +
           '<td>' + (u.full_name || '—') + '</td>' +
           '<td><span class="sts ' + kycClass + '">' + (u.kyc_status || '—') + '</span></td>' +
@@ -1608,7 +1693,7 @@ function loadComplianceSuitability() {
         var profile = u.suitability_profile || '—';
         var profCls = profile === 'conservador' ? 'sts-conservador' : profile === 'moderado' ? 'sts-moderado' : profile === 'arrojado' ? 'sts-arrojado' : '';
         return '<tr>' +
-          '<td><strong>' + (u.username || u.name || '—') + '</strong></td>' +
+          '<td><button class="btn" style="background:none;border:none;padding:0;font-weight:700;color:var(--text);cursor:pointer;font-size:0.88rem;text-decoration:underline;text-decoration-color:rgba(255,255,255,0.2)" onclick="openUserDrawer(\'' + u.id + '\')">' + (u.username || u.name || '—') + '</button></td>' +
           '<td style="color:var(--muted);font-size:0.82rem">' + (u.email || '—') + '</td>' +
           '<td>' + (profCls ? '<span class="sts ' + profCls + '">' + profile + '</span>' : '—') + '</td>' +
           '<td style="font-family:\'DM Mono\',monospace;color:var(--gold)">' + (u.suitability_score || '—') + '</td>' +
@@ -1705,6 +1790,300 @@ function resolveCoaf(flagId, action) {
     }
     loadComplianceCoaf();
   })
+  .catch(function(e){ showToast('Erro: ' + e.message); });
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ── USER COMPLIANCE DRAWER ───────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+
+var SUIT_QUESTIONS = {
+  objetivo:    { text: 'O que você busca ao participar?',        options: { a:'Diversão e entretenimento', b:'Renda complementar com risco controlado', c:'Alto retorno, aceito riscos maiores' } },
+  perda:       { text: 'Se perdesse 30% do valor aplicado…',     options: { a:'Retiraria tudo imediatamente', b:'Aguardaria uma recuperação', c:'Aproveitaria para aumentar minha posição' } },
+  experiencia: { text: 'Experiência com investimentos?',          options: { a:'Nenhuma ou apenas poupança/CDB', b:'Fundos e ações básicas', c:'Derivativos, opções ou mercados complexos' } },
+  horizonte:   { text: 'Por quanto tempo manteria recursos?',    options: { a:'Menos de 6 meses', b:'De 6 meses a 2 anos', c:'Mais de 2 anos' } },
+  renda:       { text: 'Renda mensal aproximada?',               options: { a:'Até R$3.000', b:'Entre R$3.000 e R$10.000', c:'Acima de R$10.000' } }
+};
+
+var _drawerUserId = null;
+
+function openUserDrawer(userId) {
+  _drawerUserId = userId;
+  document.getElementById('drwName').textContent = '—';
+  document.getElementById('drwEmail').textContent = '—';
+  document.getElementById('drwAvatar').textContent = '…';
+  document.getElementById('drwBadges').innerHTML = '';
+  document.getElementById('drawerBody').innerHTML = '<div style="padding:60px;text-align:center;color:var(--muted)">Carregando...</div>';
+  document.getElementById('userDrawer').classList.add('open');
+  document.getElementById('drawerBackdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  fetch(API + '/admin/users/' + userId + '/compliance', { headers: adminHeaders() })
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      if (data.error) {
+        document.getElementById('drawerBody').innerHTML = '<div style="padding:40px;color:var(--red)">Erro: ' + data.error + '</div>';
+        return;
+      }
+      renderDrawer(data);
+    })
+    .catch(function(e) {
+      document.getElementById('drawerBody').innerHTML = '<div style="padding:40px;color:var(--red)">Erro de conexão: ' + e.message + '</div>';
+    });
+}
+
+function closeUserDrawer() {
+  document.getElementById('userDrawer').classList.remove('open');
+  document.getElementById('drawerBackdrop').classList.remove('open');
+  document.body.style.overflow = '';
+  _drawerUserId = null;
+}
+
+function renderDrawer(data) {
+  var u = data.user;
+  var kycReviews = data.kyc_reviews || [];
+  var pepReviews = data.pep_reviews || [];
+  var coafFlags  = data.coaf_flags || [];
+  var suitHist   = data.suitability_history || [];
+
+  // Header
+  document.getElementById('drwAvatar').textContent = (u.username || u.full_name || '?')[0].toUpperCase();
+  document.getElementById('drwName').textContent = (u.full_name || u.username || '—') + (u.username ? ' (@' + u.username + ')' : '');
+  document.getElementById('drwEmail').textContent = u.email || '—';
+
+  // Risk badge + KYC badge no header
+  var riskColors = { normal:'var(--muted)', low:'#6ee7b7', medium:'#fcd34d', high:'#fb923c', critical:'#f43f5e' };
+  var riskLevel = u.risk_level || 'normal';
+  var badges =
+    '<span class="sts sts-' + (u.kyc_status || 'submitted') + '">KYC ' + (u.kyc_status || '—') + '</span>' +
+    '<span class="sts" style="background:rgba(0,0,0,0.3);border:1px solid ' + (riskColors[riskLevel]||'var(--muted)') + ';color:' + (riskColors[riskLevel]||'var(--muted)') + '">⚠ ' + riskLevel.toUpperCase() + '</span>';
+  if (u.pep_status === 'flagged') badges += '<span class="sts sts-flagged">🏛️ PEP</span>';
+  if (u.sanctions_status === 'sanctioned') badges += '<span class="sts sts-sanctioned">🚫 Sancionado</span>';
+  document.getElementById('drwBadges').innerHTML = badges;
+
+  function fmt(dt) { return dt ? new Date(dt).toLocaleString('pt-BR') : '—'; }
+  function fmtD(dt) { return dt ? new Date(dt).toLocaleDateString('pt-BR') : '—'; }
+  function cpfFmt(c) { return c ? c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4') : '—'; }
+
+  var html = '';
+
+  // ── 1. DADOS PESSOAIS ──
+  html += '<div class="drawer-section">';
+  html += '<div class="drawer-section-title">👤 Dados Pessoais</div>';
+  html += field('Username', u.username || '—');
+  html += field('Nome completo', u.full_name || '—');
+  html += field('E-mail', u.email || '—');
+  html += field('CPF', cpfFmt(u.cpf));
+  html += field('Data de nascimento', fmtD(u.date_of_birth));
+  html += field('Membro desde', fmtD(u.created_at));
+  html += field('Saldo atual', '<span style="color:var(--green);font-family:\'DM Mono\',monospace">R$' + parseFloat(u.balance||0).toFixed(2) + '</span>');
+  html += '</div>';
+
+  // ── 2. KYC ──
+  html += '<div class="drawer-section">';
+  html += '<div class="drawer-section-title">🔍 KYC — Know Your Customer</div>';
+  var kycCls = 'sts-' + (u.kyc_status || 'submitted');
+  html += field('Status', '<span class="sts ' + kycCls + '">' + (u.kyc_status || '—') + '</span>');
+  if (u.kyc_submitted_at) html += field('Enviado em', fmt(u.kyc_submitted_at));
+  if (u.kyc_approved_at)  html += field('Aprovado em', fmt(u.kyc_approved_at));
+  if (u.kyc_rejected_at)  html += field('Rejeitado em', fmt(u.kyc_rejected_at));
+  if (u.kyc_rejection_reason) html += field('Motivo rejeição', '<span style="color:var(--red)">' + u.kyc_rejection_reason + '</span>');
+  if (u.kyc_provider_id) html += field('ID bureau', '<span style="font-family:\'DM Mono\',monospace;font-size:0.75rem;color:var(--muted)">' + u.kyc_provider_id + '</span>');
+
+  if (kycReviews.length) {
+    html += '<ul class="drawer-timeline" style="margin-top:12px">';
+    kycReviews.forEach(function(r) {
+      var actionColor = r.action === 'approved' ? 'var(--green)' : r.action === 'rejected' ? 'var(--red)' : 'var(--gold)';
+      html += '<li><strong style="color:' + actionColor + '">' + r.action.toUpperCase() + '</strong>' +
+        (r.actor ? ' por <em>' + r.actor + '</em>' : '') +
+        (r.notes ? ' — ' + r.notes : '') +
+        '<span style="float:right;font-size:0.75rem">' + fmt(r.created_at) + '</span></li>';
+    });
+    html += '</ul>';
+  }
+  html += '</div>';
+
+  // ── 3. SUITABILITY ──
+  html += '<div class="drawer-section">';
+  html += '<div class="drawer-section-title">📊 Suitability — Perfil de Investidor</div>';
+  if (u.suitability_profile) {
+    var profCls = 'sts-' + u.suitability_profile;
+    var isExpired = u.suitability_expires_at && new Date(u.suitability_expires_at) < new Date();
+    html += field('Perfil', '<span class="sts ' + profCls + '">' + u.suitability_profile + '</span>' + (isExpired ? ' <span class="sts sts-rejected" style="margin-left:4px">Expirado</span>' : ''));
+    html += field('Score', '<span style="color:var(--gold);font-family:\'DM Mono\',monospace;font-size:1rem">' + (u.suitability_score || '—') + ' / 15</span>');
+    html += field('Respondido em', fmt(u.suitability_completed_at));
+    html += field('Expira em', fmtD(u.suitability_expires_at));
+
+    // Mostrar respostas do último questionário
+    if (suitHist.length && suitHist[0].answers) {
+      var answers = typeof suitHist[0].answers === 'string' ? JSON.parse(suitHist[0].answers) : suitHist[0].answers;
+      html += '<div class="drawer-qa" style="margin-top:12px">';
+      Object.keys(SUIT_QUESTIONS).forEach(function(key) {
+        var q = SUIT_QUESTIONS[key];
+        var ans = answers[key];
+        var label = ans ? q.options[ans] : '—';
+        html += '<div class="drawer-qa-row">' +
+          '<span class="drawer-qa-q">' + q.text + '</span>' +
+          '<span class="drawer-qa-a">' + label + '</span>' +
+          '</div>';
+      });
+      html += '</div>';
+    }
+  } else {
+    html += '<div style="color:var(--muted);font-size:0.85rem;padding:8px 0">Questionário não respondido ainda.</div>';
+  }
+  html += '</div>';
+
+  // ── 4. PEP / SANÇÕES ──
+  html += '<div class="drawer-section">';
+  html += '<div class="drawer-section-title">🏛️ PEP &amp; Sanções Internacionais</div>';
+  html += field('Status PEP', pepStatusBadge(u.pep_status));
+  html += field('Verificado PEP em', fmt(u.pep_checked_at));
+  html += field('Status Sanções', sanctStatusBadge(u.sanctions_status));
+  html += field('Verificado Sanções em', fmt(u.sanctions_checked_at));
+
+  if (pepReviews.length) {
+    html += '<ul class="drawer-timeline" style="margin-top:12px">';
+    pepReviews.forEach(function(r) {
+      var isPep = r.screening_type === 'pep';
+      var icon = isPep ? '🏛️' : '🚫';
+      var resultColor = r.result === 'flagged' || r.result === 'sanctioned' ? 'var(--red)' : 'var(--green)';
+      var details = r.details ? (typeof r.details === 'string' ? JSON.parse(r.details) : r.details) : {};
+      var keywords = details.matchedKeywords ? details.matchedKeywords.join(', ') : '';
+      html += '<li>' +
+        '<strong style="color:' + resultColor + '">' + icon + ' ' + r.screening_type.toUpperCase() + ': ' + r.result + '</strong>' +
+        (r.source ? ' via <em>' + r.source + '</em>' : '') +
+        (keywords ? ' · Keywords: ' + keywords : '') +
+        (r.confidence ? ' · Confiança: ' + (parseFloat(r.confidence)*100).toFixed(0) + '%' : '') +
+        '<span style="float:right;font-size:0.75rem">' + fmt(r.created_at) + '</span></li>';
+    });
+    html += '</ul>';
+  }
+  html += '</div>';
+
+  // ── 5. COAF ──
+  html += '<div class="drawer-section">';
+  html += '<div class="drawer-section-title">🚨 Alertas COAF</div>';
+  if (coafFlags.length) {
+    html += '<ul class="drawer-timeline" style="margin-top:4px">';
+    coafFlags.forEach(function(f) {
+      var vol = parseFloat(f.month_total||0).toLocaleString('pt-BR',{minimumFractionDigits:2});
+      var stsCls = f.status === 'open' ? 'var(--red)' : 'var(--green)';
+      html += '<li>' +
+        '<strong style="color:' + stsCls + '">' + f.status.toUpperCase() + '</strong>' +
+        ' · R$' + vol + ' · ' + (f.flag_date || '') +
+        (f.resolution_notes ? ' — ' + f.resolution_notes : '') +
+        '<span style="float:right;font-size:0.75rem">' + fmt(f.created_at) + '</span></li>';
+    });
+    html += '</ul>';
+  } else {
+    html += '<div style="color:var(--muted);font-size:0.85rem;padding:8px 0">✅ Nenhum alerta COAF.</div>';
+  }
+  html += '</div>';
+
+  // ── 6. CONTROLES ADMIN ──
+  html += '<div class="drawer-section">';
+  html += '<div class="drawer-section-title">⚙️ Controles Admin</div>';
+
+  // Nível de risco
+  html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">';
+  html += '<label style="font-size:0.78rem;color:var(--muted);min-width:130px">Nível de risco</label>';
+  html += '<select id="drwRiskLevel" class="risk-sel">';
+  ['normal','low','medium','high','critical'].forEach(function(r) {
+    html += '<option value="' + r + '"' + (riskLevel === r ? ' selected' : '') + '>' + r.charAt(0).toUpperCase()+r.slice(1) + '</option>';
+  });
+  html += '</select>';
+  html += '</div>';
+
+  // Override PEP (somente se não for clear já)
+  html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">';
+  html += '<label style="font-size:0.78rem;color:var(--muted);min-width:130px">Status PEP</label>';
+  html += '<select id="drwPepStatus" class="risk-sel">';
+  ['not_checked','clear','flagged'].forEach(function(s) {
+    html += '<option value="' + s + '"' + (u.pep_status === s ? ' selected' : '') + '>' + s + '</option>';
+  });
+  html += '</select>';
+  html += '</div>';
+
+  // Notas internas
+  html += '<label style="font-size:0.78rem;color:var(--muted);display:block;margin-bottom:6px">Notas internas</label>';
+  html += '<textarea id="drwNotes" class="drawer-notes" placeholder="Observações de compliance, histórico de contato, alertas...">' + (u.admin_notes || '') + '</textarea>';
+
+  if (u.last_reviewed_at) {
+    html += '<div style="font-size:0.74rem;color:var(--muted);margin-top:6px">Última revisão: ' + fmt(u.last_reviewed_at) + (u.reviewed_by ? ' por ' + u.reviewed_by : '') + '</div>';
+  }
+
+  html += '<button class="drawer-save-btn" onclick="saveDrawerCompliance()">💾 Salvar alterações</button>';
+  html += '</div>';
+
+  // ── Ações rápidas ──
+  html += '<div class="drawer-section">';
+  html += '<div class="drawer-section-title">⚡ Ações Rápidas</div>';
+  html += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+  if (u.kyc_status === 'submitted') {
+    html += '<button class="btn btn-confirm" onclick="approveKyc(\'' + u.id + '\',\'' + (u.username||'').replace(/'/g,'') + '\');closeUserDrawer()" style="font-size:0.8rem">✓ Aprovar KYC</button>';
+    html += '<button class="btn btn-reject" onclick="openKycReject(\'' + u.id + '\',\'' + (u.username||'').replace(/'/g,'') + '\')" style="font-size:0.8rem">✕ Rejeitar KYC</button>';
+  }
+  html += '<button class="btn" onclick="manualCoafFlag(\'' + u.id + '\')" style="font-size:0.8rem;background:rgba(244,63,94,0.1);color:var(--red);border-color:rgba(244,63,94,0.25)">🚨 Flag COAF manual</button>';
+  html += '</div>';
+  html += '</div>';
+
+  document.getElementById('drawerBody').innerHTML = html;
+}
+
+function field(label, value) {
+  return '<div class="drawer-field"><span class="drawer-field-label">' + label + '</span><span class="drawer-field-val">' + value + '</span></div>';
+}
+function pepStatusBadge(s) {
+  if (s === 'flagged') return '<span class="sts sts-flagged">🏛️ Flagged</span>';
+  if (s === 'clear') return '<span class="sts sts-clear">✅ Clear</span>';
+  return '<span style="color:var(--muted);font-size:0.82rem">' + (s || 'not_checked') + '</span>';
+}
+function sanctStatusBadge(s) {
+  if (s === 'sanctioned') return '<span class="sts sts-sanctioned">🚫 Sancionado</span>';
+  if (s === 'clear') return '<span class="sts sts-clear">✅ Clear</span>';
+  return '<span style="color:var(--muted);font-size:0.82rem">' + (s || 'not_checked') + '</span>';
+}
+
+function saveDrawerCompliance() {
+  if (!_drawerUserId) return;
+  var btn = document.querySelector('.drawer-save-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Salvando...'; }
+
+  var payload = {
+    admin_notes: document.getElementById('drwNotes').value,
+    risk_level:  document.getElementById('drwRiskLevel').value,
+    pep_status:  document.getElementById('drwPepStatus').value
+  };
+
+  fetch(API + '/admin/users/' + _drawerUserId + '/compliance', {
+    method: 'PATCH',
+    headers: adminHeaders(),
+    body: JSON.stringify(payload)
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d) {
+    if (btn) { btn.disabled = false; btn.textContent = '💾 Salvar alterações'; }
+    if (d.error) { showToast('Erro: ' + d.error); return; }
+    showToast('✅ Alterações salvas');
+    // Atualizar badge de risco no header
+    loadCompliance();
+  })
+  .catch(function(e) {
+    if (btn) { btn.disabled = false; btn.textContent = '💾 Salvar alterações'; }
+    showToast('Erro: ' + e.message);
+  });
+}
+
+function manualCoafFlag(userId) {
+  if (!confirm('Lançar flag COAF manual para este usuário?\n\nIsso registra uma operação suspeita para revisão interna.')) return;
+  // Insere direto via endpoint de resolve (registra uma flag open)
+  fetch(API + '/admin/users/' + userId + '/compliance', {
+    method: 'PATCH',
+    headers: adminHeaders(),
+    body: JSON.stringify({ admin_notes: (document.getElementById('drwNotes')?.value || '') + '\n[FLAG COAF MANUAL — ' + new Date().toLocaleString('pt-BR') + ']' })
+  })
+  .then(function(){ showToast('⚠️ Flag COAF registrado nas notas. Crie o alerta formal via endpoint COAF.'); })
   .catch(function(e){ showToast('Erro: ' + e.message); });
 }
 

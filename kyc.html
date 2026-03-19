@@ -387,14 +387,13 @@ header{position:sticky;top:0;z-index:100;background:rgba(3,3,3,0.9);backdrop-fil
 </div><!-- /page -->
 
 <script src="/config.js"></script>
+<script src="/security.js?v=20260321"></script>
 <script>
 const API = (window.PREDITIVO_CONFIG && window.PREDITIVO_CONFIG.API_BASE) || 'https://preditivo-backend-production.up.railway.app';
 
 // ── Estado ────────────────────────────────────────────────────────────────────
 let userData = null;
 let formData = {};
-
-function getToken() { return localStorage.getItem('preditivo_token'); }
 
 // ── Mostrar/esconder telas ────────────────────────────────────────────────────
 const SCREENS = ['loading','approved','submitted','rejected','step1','step2'];
@@ -423,17 +422,11 @@ function setStepIndicators(active) {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
-  const token = getToken();
-  if (!token) {
-    window.location.href = '/?login=1';
-    return;
-  }
-
   showScreen('loading');
 
   try {
-    const r = await fetch(API + '/auth/me', { headers: { Authorization: 'Bearer ' + token } });
-    if (!r.ok) { localStorage.removeItem('preditivo_token'); window.location.href = '/?login=1'; return; }
+    const r = await fetch(API + '/auth/me');
+    if (!r.ok) { window.location.href = '/?login=1'; return; }
     userData = await r.json();
 
     // Definir data máxima (18 anos atrás)
@@ -590,7 +583,21 @@ async function submitKYC() {
       const alertEl = document.createElement('div');
       alertEl.id = 'submit-error-alert';
       alertEl.className = 'alert alert-error';
-      alertEl.innerHTML = `<span class="alert-icon">❌</span><div class="alert-content"><div class="alert-title">Erro no envio</div><div class="alert-text">${errMsg}</div></div>`;
+      const iconEl = document.createElement('span');
+      iconEl.className = 'alert-icon';
+      iconEl.textContent = '❌';
+      const contentEl = document.createElement('div');
+      contentEl.className = 'alert-content';
+      const titleEl = document.createElement('div');
+      titleEl.className = 'alert-title';
+      titleEl.textContent = 'Erro no envio';
+      const textEl = document.createElement('div');
+      textEl.className = 'alert-text';
+      textEl.textContent = errMsg;
+      contentEl.appendChild(titleEl);
+      contentEl.appendChild(textEl);
+      alertEl.appendChild(iconEl);
+      alertEl.appendChild(contentEl);
       step2Card.insertBefore(alertEl, step2Card.querySelector('.btn-row'));
       return;
     }

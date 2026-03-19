@@ -1004,6 +1004,7 @@
 </div>
 
 <script src="./config.js?v=20260321"></script>
+<script src="./security.js?v=20260321"></script>
 <script>
 window.state = { markets: [], user: null, balance: 0, catFilter: 'all', searchQuery: '', walletAddress: null };
 window.API = window.PREDITIVO_CONFIG.API_BASE;
@@ -1494,7 +1495,7 @@ window.updateAuthUI = () => {
               Indicações
             </a>
             <div style="border-top:1px solid var(--border);margin:4px 0"></div>
-            <button onclick="localStorage.removeItem('preditivo_token');location.reload()" style="display:flex;align-items:center;gap:10px;padding:11px 16px;color:#f43f5e;background:none;border:none;font-size:0.86rem;font-weight:600;cursor:pointer;width:100%;font-family:inherit;transition:background .15s" onmouseenter="this.style.background='rgba(244,63,94,0.08)'" onmouseleave="this.style.background='transparent'">
+            <button onclick="window.logoutUser(window.API)" style="display:flex;align-items:center;gap:10px;padding:11px 16px;color:#f43f5e;background:none;border:none;font-size:0.86rem;font-weight:600;cursor:pointer;width:100%;font-family:inherit;transition:background .15s" onmouseenter="this.style.background='rgba(244,63,94,0.08)'" onmouseleave="this.style.background='transparent'">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
               Sair
             </button>
@@ -1529,7 +1530,7 @@ window.updateAuthUI = () => {
             <button class="btn-finance btn-withdraw" style="flex:1;padding:12px" onclick="window.openModal('withdrawModal');closeMobileMenu()">Sacar</button>
           </div>
           <a href="./profile.html" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:14px;color:var(--text);text-decoration:none;font-size:0.95rem;font-weight:700">Meu Perfil</a>
-          <button onclick="localStorage.removeItem('preditivo_token');location.reload()" style="padding:14px;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.2);border-radius:14px;color:#f43f5e;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:inherit">Sair</button>
+          <button onclick="window.logoutUser(window.API)" style="padding:14px;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.2);border-radius:14px;color:#f43f5e;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:inherit">Sair</button>
         </div>`;
     }
   }

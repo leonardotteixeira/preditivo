@@ -257,6 +257,7 @@ footer{background:rgba(5,5,5,0.5);border-top:1px solid var(--border);padding:60p
 <div class="toast" id="toast"></div>
 
 <script src="./config.js?v=20260321"></script>
+<script src="./security.js?v=20260321"></script>
 <script>
 var API = window.PREDITIVO_CONFIG.API_BASE;
 var state = { user: null, token: null, bets: [], deposits: [], withdrawals: [] };
@@ -318,8 +319,9 @@ function updateAuthUI() {
 }
 
 function doLogout() {
-  localStorage.removeItem('preditivo_token');
-  window.location.href = '/';
+  window.BubuyaAuth.logout(API).finally(function() {
+    window.location.href = '/';
+  });
 }
 
 /* ── RENDER PAGE ── */
@@ -884,16 +886,14 @@ async function loadProfile() {
 }
 
 async function init() {
-  var savedToken=localStorage.getItem('preditivo_token');
-  if(!savedToken){ openModal('loginModal'); return; }
-  state.token=savedToken;
+  state.token=null;
   await loadProfile();
 
   // ── COMPLIANCE GATE ──────────────────────────────────────────────────────
   // Profile é página autenticada — redireciona hard se compliance incompleto
   try {
     const apiBase = (window.PREDITIVO_CONFIG && window.PREDITIVO_CONFIG.API_BASE) || 'https://preditivo-backend-production.up.railway.app';
-    const r = await fetch(apiBase + '/auth/me', { headers: { Authorization: 'Bearer ' + savedToken } });
+    const r = await fetch(apiBase + '/auth/me');
     if (r.ok) {
       const me = await r.json();
       const kycOk   = me.kyc_status === 'approved';

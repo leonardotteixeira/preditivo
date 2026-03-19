@@ -282,6 +282,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(3,3,3,0.9);backdrop-fil
 </div>
 
 <script src="/config.js"></script>
+<script src="/security.js?v=20260321"></script>
 <script>
 const API = (window.PREDITIVO_CONFIG && window.PREDITIVO_CONFIG.API_BASE) || 'https://preditivo-backend-production.up.railway.app';
 
@@ -343,8 +344,6 @@ const PROFILES = {
 // ── Estado ────────────────────────────────────────────────────────────────────
 let currentQ = 0;
 let answers  = {};
-
-function getToken() { return localStorage.getItem('preditivo_token'); }
 
 // ── Mostrar/esconder telas ────────────────────────────────────────────────────
 function showScreen(name) {
@@ -516,15 +515,12 @@ function showResult(data) {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
-  const token = getToken();
-  if (!token) { window.location.href = '/?login=1'; return; }
-
   showScreen('loading');
 
   try {
     // Verifica KYC primeiro
-    const r = await fetch(API + '/auth/me', { headers: { Authorization: 'Bearer ' + token } });
-    if (!r.ok) { localStorage.removeItem('preditivo_token'); window.location.href = '/?login=1'; return; }
+    const r = await fetch(API + '/auth/me');
+    if (!r.ok) { window.location.href = '/?login=1'; return; }
     const me = await r.json();
 
     // KYC obrigatório antes do suitability

@@ -1,5 +1,11 @@
 (() => {
-  const nativeInnerHtml = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
+  if (window.__BUBUYA_SECURITY_PATCHED__) return;
+  window.__BUBUYA_SECURITY_PATCHED__ = true;
+
+  if (!window.__BUBUYA_NATIVE_INNERHTML__) {
+    window.__BUBUYA_NATIVE_INNERHTML__ = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
+  }
+  const nativeInnerHtml = window.__BUBUYA_NATIVE_INNERHTML__;
 
   function sanitizeNodeTree(root) {
     const blockedTags = new Set(['SCRIPT', 'IFRAME', 'OBJECT', 'EMBED', 'LINK', 'STYLE']);

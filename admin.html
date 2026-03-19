@@ -1623,7 +1623,7 @@ function loadComplianceCoaf() {
     .then(function(r){ return r.json(); })
     .then(function(data) {
       var flags = data.flags || data || [];
-      var openCount = flags.filter(function(f){ return f.status === 'open'; }).length;
+      var openCount = flags.filter(function(f){ return f.status === 'pending'; }).length;
       document.getElementById('coafBadge').textContent = openCount;
       document.getElementById('cCoafOpen').textContent = openCount;
 
@@ -1636,9 +1636,9 @@ function loadComplianceCoaf() {
         var vol = parseFloat(f.month_total || f.total_month || 0);
         var thr = parseFloat(f.threshold || 10000);
         var dt = f.created_at ? new Date(f.created_at).toLocaleString('pt-BR') : '—';
-        var flagDate = f.flag_date || (f.created_at ? f.created_at.substring(0,7) : '—');
-        var stsCls = f.status === 'open' ? 'sts-open' : 'sts-resolved';
-        var actions = f.status === 'open'
+        var flagDate = f.created_at ? f.created_at.substring(0,7) : '—';
+        var stsCls = f.status === 'pending' ? 'sts-open' : 'sts-resolved';
+        var actions = f.status === 'pending'
           ? '<button class="btn btn-resolve" style="font-size:0.76rem;margin-right:4px" onclick="resolveCoaf(\'' + f.id + '\',\'dismissed\')">Arquivar</button>' +
             '<button class="btn btn-reject" style="font-size:0.76rem" onclick="resolveCoaf(\'' + f.id + '\',\'reported\')">Reportar COAF</button>'
           : '<span style="color:var(--muted);font-size:0.78rem">' + (f.resolved_action || f.status) + '</span>';
@@ -1968,10 +1968,10 @@ function renderDrawer(data) {
     html += '<ul class="drawer-timeline" style="margin-top:4px">';
     coafFlags.forEach(function(f) {
       var vol = parseFloat(f.month_total||0).toLocaleString('pt-BR',{minimumFractionDigits:2});
-      var stsCls = f.status === 'open' ? 'var(--red)' : 'var(--green)';
+      var stsCls = f.status === 'pending' ? 'var(--red)' : 'var(--green)';
       html += '<li>' +
         '<strong style="color:' + stsCls + '">' + f.status.toUpperCase() + '</strong>' +
-        ' · R$' + vol + ' · ' + (f.flag_date || '') +
+        ' · R$' + vol + ' · ' + (f.created_at ? f.created_at.substring(0,7) : '') +
         (f.resolution_notes ? ' — ' + f.resolution_notes : '') +
         '<span style="float:right;font-size:0.75rem">' + fmt(f.created_at) + '</span></li>';
     });
@@ -2076,14 +2076,23 @@ function saveDrawerCompliance() {
 }
 
 function manualCoafFlag(userId) {
-  if (!confirm('Lançar flag COAF manual para este usuário?\n\nIsso registra uma operação suspeita para revisão interna.')) return;
-  // Insere direto via endpoint de resolve (registra uma flag open)
-  fetch(API + '/admin/users/' + userId + '/compliance', {
-    method: 'PATCH',
+  var reason = prompt('Motivo do flag COAF manual (obrigatório para registro de auditoria):');
+  if (reason === null) return; // cancelou
+  if (!reason.trim()) { showToast('Informe o motivo do flag'); return; }
+
+  fetch(API + '/admin/users/' + userId + '/coaf-flag', {
+    method: 'POST',
     headers: adminHeaders(),
-    body: JSON.stringify({ admin_notes: (document.getElementById('drwNotes')?.value || '') + '\n[FLAG COAF MANUAL — ' + new Date().toLocaleString('pt-BR') + ']' })
+    body: JSON.stringify({ reason: reason.trim() })
   })
-  .then(function(){ showToast('⚠️ Flag COAF registrado nas notas. Crie o alerta formal via endpoint COAF.'); })
+  .then(function(r){ return r.json(); })
+  .then(function(d) {
+    if (d.error) { showToast('Erro: ' + d.error); return; }
+    showToast('🚨 Flag COAF inserido com sucesso');
+    // Recarregar drawer e painel
+    loadComplianceCoaf();
+    openUserDrawer(userId);
+  })
   .catch(function(e){ showToast('Erro: ' + e.message); });
 }
 

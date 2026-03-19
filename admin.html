@@ -2192,6 +2192,29 @@ function renderDrawer(data) {
   }
   html += '</div>';
 
+  // ── 3b. TERMO DE CIÊNCIA DE RISCOS ──
+  html += '<div class="drawer-section">';
+  html += '<div class="drawer-section-title">📋 Termo de Ciência de Riscos</div>';
+  var riskTermHistory = data.risk_term_history || [];
+  if (u.risk_term_accepted_at) {
+    html += field('Status', '<span class="sts sts-approved">✓ Aceito</span>');
+    html += field('Versão aceita', u.risk_term_version || '—');
+    html += field('Aceito em', fmt(u.risk_term_accepted_at));
+  } else {
+    html += field('Status', '<span class="sts sts-rejected">✗ Não aceito</span>');
+  }
+  if (riskTermHistory.length > 1) {
+    html += '<div style="margin-top:10px;font-size:0.78rem;color:var(--muted)">Histórico de aceites:</div>';
+    html += '<ul class="drawer-timeline" style="margin-top:6px">';
+    riskTermHistory.forEach(function(r) {
+      html += '<li style="font-size:0.78rem"><span style="color:var(--green)">✓ v' + (r.term_version||'?') + '</span>' +
+        ' — ' + new Date(r.accepted_at).toLocaleString('pt-BR') +
+        (r.ip_address ? ' <span style="color:var(--muted)">(' + r.ip_address + ')</span>' : '') + '</li>';
+    });
+    html += '</ul>';
+  }
+  html += '</div>';
+
   // ── 4. PEP / SANÇÕES ──
   html += '<div class="drawer-section">';
   html += '<div class="drawer-section-title">🏛️ PEP &amp; Sanções Internacionais</div>';

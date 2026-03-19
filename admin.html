@@ -251,6 +251,7 @@ tr:hover td { background:rgba(255,255,255,0.015); }
       <button class="tab" onclick="switchTab('saques',this)">Saques</button>
       <button class="tab" onclick="switchTab('bots',this)">🤖 Bots</button>
       <button class="tab" onclick="switchTab('compliance',this)" id="tabCompliance">🛡️ Compliance</button>
+      <button class="tab" onclick="switchTab('sandbox',this)" id="tabSandbox">🧪 Sandbox</button>
       <button class="tab" onclick="switchTab('config',this)">⚙️ Configurações</button>
     </div>
 
@@ -493,6 +494,158 @@ tr:hover td { background:rgba(255,255,255,0.015); }
 
     </div>
 
+    <!-- SANDBOX DE TESTES -->
+    <div id="sec-sandbox" class="section">
+      <div class="section-title">🧪 Sandbox de Testes</div>
+      <div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.3);border-radius:12px;padding:14px 18px;margin-bottom:24px;font-size:0.85rem;color:#fbbf24">
+        ⚠️ <strong>Ambiente de testes:</strong> Simule o fluxo KYC e Suitability para qualquer usuário sem precisar logar na conta. Com "Aplicar ao usuário" OFF, nenhum dado é salvo no banco.
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+
+        <!-- CARTÃO KYC -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px">
+          <div style="font-size:1rem;font-weight:700;margin-bottom:16px;color:var(--text)">🔍 Simular KYC</div>
+
+          <!-- Atalhos rápidos -->
+          <div style="margin-bottom:14px">
+            <div style="font-size:0.72rem;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Cenários pré-definidos</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <button class="btn" style="font-size:0.72rem;padding:4px 10px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:#10b981" onclick="sbPresetKyc('normal')">🟢 Normal</button>
+              <button class="btn" style="font-size:0.72rem;padding:4px 10px;background:rgba(251,191,36,0.15);border:1px solid rgba(251,191,36,0.3);color:#fbbf24" onclick="sbPresetKyc('pep')">🟡 Nome PEP</button>
+              <button class="btn" style="font-size:0.72rem;padding:4px 10px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#ef4444" onclick="sbPresetKyc('sanction')">🔴 CPF Sancionado</button>
+            </div>
+          </div>
+
+          <div style="margin-bottom:12px">
+            <label style="font-size:0.78rem;color:var(--muted);display:block;margin-bottom:4px">Usuário</label>
+            <select id="sbKycUser" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:0.85rem">
+              <option value="">Selecione um usuário…</option>
+            </select>
+          </div>
+          <div style="margin-bottom:12px">
+            <label style="font-size:0.78rem;color:var(--muted);display:block;margin-bottom:4px">CPF</label>
+            <input id="sbKycCpf" type="text" placeholder="000.000.000-00" maxlength="14"
+              style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:0.85rem"
+              oninput="sbMaskCpf(this)">
+          </div>
+          <div style="margin-bottom:12px">
+            <label style="font-size:0.78rem;color:var(--muted);display:block;margin-bottom:4px">Nome completo</label>
+            <input id="sbKycName" type="text" placeholder="Nome conforme RFB"
+              style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:0.85rem">
+          </div>
+          <div style="margin-bottom:16px">
+            <label style="font-size:0.78rem;color:var(--muted);display:block;margin-bottom:4px">Data de nascimento</label>
+            <input id="sbKycDob" type="date"
+              style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:0.85rem">
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+            <label class="toggle" style="margin:0">
+              <input type="checkbox" id="sbKycApply">
+              <span class="slider"></span>
+            </label>
+            <span style="font-size:0.82rem;color:var(--muted)">Aplicar ao usuário (salva no banco)</span>
+          </div>
+          <button class="btn btn-primary" style="width:100%" onclick="sbRunKyc()">▶ Simular KYC</button>
+
+          <!-- Resultado KYC -->
+          <div id="sbKycResult" style="display:none;margin-top:18px;border-top:1px solid var(--border);padding-top:16px">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+              <span style="font-size:0.8rem;color:var(--muted)">Resultado:</span>
+              <span id="sbKycBadge" style="padding:3px 12px;border-radius:20px;font-size:0.8rem;font-weight:700"></span>
+            </div>
+            <div id="sbKycDetails" style="font-size:0.8rem;color:var(--muted);line-height:1.8"></div>
+            <div id="sbKycMsg" style="margin-top:10px;padding:10px 14px;border-radius:8px;font-size:0.82rem;background:rgba(255,255,255,0.04);border:1px solid var(--border)"></div>
+          </div>
+        </div>
+
+        <!-- CARTÃO SUITABILITY -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px">
+          <div style="font-size:1rem;font-weight:700;margin-bottom:16px;color:var(--text)">📊 Simular Suitability</div>
+
+          <!-- Atalhos rápidos -->
+          <div style="margin-bottom:14px">
+            <div style="font-size:0.72rem;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Perfis pré-definidos</div>
+            <div style="display:flex;gap:6px">
+              <button class="btn" style="font-size:0.72rem;padding:4px 10px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:#10b981" onclick="sbPresetSuit('conservador')">📉 Conservador</button>
+              <button class="btn" style="font-size:0.72rem;padding:4px 10px;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);color:#818cf8" onclick="sbPresetSuit('moderado')">📊 Moderado</button>
+              <button class="btn" style="font-size:0.72rem;padding:4px 10px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#ef4444" onclick="sbPresetSuit('arrojado')">📈 Arrojado</button>
+            </div>
+          </div>
+
+          <div style="margin-bottom:16px">
+            <label style="font-size:0.78rem;color:var(--muted);display:block;margin-bottom:4px">Usuário</label>
+            <select id="sbSuitUser" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:0.85rem">
+              <option value="">Selecione um usuário…</option>
+            </select>
+          </div>
+
+          <!-- 5 perguntas -->
+          <div id="sbSuitQuestions">
+            <div class="sb-q" data-q="objetivo">
+              <div style="font-size:0.78rem;font-weight:600;color:var(--text);margin-bottom:6px">Objetivo de investimento</div>
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <label style="font-size:0.78rem;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="radio" name="sq_objetivo" value="a"> Preservar capital (conservador)</label>
+                <label style="font-size:0.78rem;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="radio" name="sq_objetivo" value="b"> Crescimento moderado</label>
+                <label style="font-size:0.78rem;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="radio" name="sq_objetivo" value="c"> Maximizar retorno (arrojado)</label>
+              </div>
+            </div>
+            <div class="sb-q" data-q="perda" style="margin-top:10px">
+              <div style="font-size:0.78rem;font-weight:600;color:var(--text);margin-bottom:6px">Tolerância a perda</div>
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <label style="font-size:0.78rem;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="radio" name="sq_perda" value="a"> Até 5%</label>
+                <label style="font-size:0.78rem;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="radio" name="sq_perda" value="b"> Até 20%</label>
+                <label style="font-size:0.78rem;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="radio" name="sq_perda" value="c"> Mais de 20%</label>
+              </div>
+            </div>
+            <div class="sb-q" data-q="experiencia" style="margin-top:10px">
+              <div style="font-size:0.78rem;font-weight:600;color:var(--text);margin-bottom:6px">Experiência com investimentos</div>
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <label style="font-size:0.78rem;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="radio" name="sq_experiencia" value="a"> Nenhuma</label>
+                <label style="font-size:0.78rem;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="radio" name="sq_experiencia" value="b"> Básica (poupança, CDB)</label>
+                <label style="font-size:0.78rem;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="radio" name="sq_experiencia" value="c"> Avançada (ações, derivativos)</label>
+              </div>
+            </div>
+            <div class="sb-q" data-q="horizonte" style="margin-top:10px">
+              <div style="font-size:0.78rem;font-weight:600;color:var(--text);margin-bottom:6px">Horizonte de investimento</div>
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <label style="font-size:0.78rem;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="radio" name="sq_horizonte" value="a"> Menos de 1 ano</label>
+                <label style="font-size:0.78rem;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="radio" name="sq_horizonte" value="b"> 1 a 3 anos</label>
+                <label style="font-size:0.78rem;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="radio" name="sq_horizonte" value="c"> Mais de 3 anos</label>
+              </div>
+            </div>
+            <div class="sb-q" data-q="renda" style="margin-top:10px">
+              <div style="font-size:0.78rem;font-weight:600;color:var(--text);margin-bottom:6px">Renda mensal</div>
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <label style="font-size:0.78rem;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="radio" name="sq_renda" value="a"> Até R$3.000</label>
+                <label style="font-size:0.78rem;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="radio" name="sq_renda" value="b"> R$3.001 a R$10.000</label>
+                <label style="font-size:0.78rem;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="radio" name="sq_renda" value="c"> Acima de R$10.000</label>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;margin-top:16px;margin-bottom:16px">
+            <label class="toggle" style="margin:0">
+              <input type="checkbox" id="sbSuitApply">
+              <span class="slider"></span>
+            </label>
+            <span style="font-size:0.82rem;color:var(--muted)">Aplicar ao usuário (salva no banco)</span>
+          </div>
+          <button class="btn btn-primary" style="width:100%" onclick="sbRunSuit()">▶ Simular Suitability</button>
+
+          <!-- Resultado Suitability -->
+          <div id="sbSuitResult" style="display:none;margin-top:18px;border-top:1px solid var(--border);padding-top:16px">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+              <span style="font-size:0.8rem;color:var(--muted)">Perfil:</span>
+              <span id="sbSuitBadge" style="padding:3px 12px;border-radius:20px;font-size:0.8rem;font-weight:700"></span>
+            </div>
+            <div id="sbSuitDetails" style="font-size:0.8rem;color:var(--muted);line-height:1.9"></div>
+          </div>
+        </div>
+
+      </div><!-- /grid -->
+    </div>
+
     <!-- CONFIGURAÇÕES -->
     <div id="sec-config" class="section">
       <div class="section-title">Configurações do Site</div>
@@ -719,6 +872,7 @@ function switchTab(name, el) {
   if (name === 'saques') loadSaques();
   if (name === 'bots') loadBotStats();
   if (name === 'compliance') loadCompliance();
+  if (name === 'sandbox') loadSandboxUsers();
   if (name === 'config') loadGlobalConfig();
 }
 
@@ -2118,6 +2272,189 @@ function manualCoafFlag(userId) {
     openUserDrawer(userId);
   })
   .catch(function(e){ showToast('Erro: ' + e.message); });
+}
+
+// ── SANDBOX DE TESTES ─────────────────────────────────────────────────────────
+
+var _sbUsers = [];
+
+function loadSandboxUsers() {
+  if (_sbUsers.length) return; // já carregado
+  fetch(API + '/admin/sandbox/users', { headers: adminHeaders() })
+    .then(function(r){ return r.json(); })
+    .then(function(d) {
+      if (!d.users) return;
+      _sbUsers = d.users;
+      var opts = '<option value="">Selecione um usuário…</option>' +
+        d.users.map(function(u){
+          return '<option value="' + u.id + '">' + u.username + ' — ' + u.email +
+            ' [KYC:' + (u.kyc_status||'N/A') + ']</option>';
+        }).join('');
+      document.getElementById('sbKycUser').innerHTML = opts;
+      document.getElementById('sbSuitUser').innerHTML = opts;
+    })
+    .catch(function(){});
+}
+
+// Máscara CPF
+function sbMaskCpf(el) {
+  var v = el.value.replace(/\D/g,'').substring(0,11);
+  if (v.length >= 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/,'$1.$2.$3-$4');
+  else if (v.length >= 6) v = v.replace(/(\d{3})(\d{3})(\d{0,3})/,'$1.$2.$3');
+  else if (v.length >= 3) v = v.replace(/(\d{3})(\d{0,3})/,'$1.$2');
+  el.value = v;
+}
+
+// Cenários pré-definidos KYC
+function sbPresetKyc(type) {
+  var today = new Date();
+  var dob30 = new Date(today.getFullYear()-30, today.getMonth(), today.getDate()).toISOString().substring(0,10);
+  if (type === 'normal') {
+    document.getElementById('sbKycCpf').value  = '453.178.287-91';
+    document.getElementById('sbKycName').value = 'Carlos Maia da Silva';
+    document.getElementById('sbKycDob').value  = '1995-05-12';
+  } else if (type === 'pep') {
+    document.getElementById('sbKycCpf').value  = '453.178.287-91';
+    document.getElementById('sbKycName').value = 'João Ministro Pereira';
+    document.getElementById('sbKycDob').value  = '1975-03-20';
+  } else if (type === 'sanction') {
+    document.getElementById('sbKycCpf').value  = '000.000.001-91';
+    document.getElementById('sbKycName').value = 'Sanctioned Test User';
+    document.getElementById('sbKycDob').value  = '1980-01-01';
+  }
+}
+
+// Perfis pré-definidos Suitability
+function sbPresetSuit(profile) {
+  var map = {
+    conservador: { objetivo:'a', perda:'a', experiencia:'a', horizonte:'a', renda:'a' },
+    moderado:    { objetivo:'b', perda:'b', experiencia:'b', horizonte:'b', renda:'b' },
+    arrojado:    { objetivo:'c', perda:'c', experiencia:'c', horizonte:'c', renda:'c' },
+  };
+  var answers = map[profile];
+  if (!answers) return;
+  Object.keys(answers).forEach(function(q) {
+    var radio = document.querySelector('input[name="sq_' + q + '"][value="' + answers[q] + '"]');
+    if (radio) radio.checked = true;
+  });
+}
+
+// Badge helper
+function sbStatusBadge(status) {
+  var colors = {
+    approved:     { bg:'rgba(16,185,129,.18)', color:'#10b981', text:'✅ Aprovado' },
+    submitted:    { bg:'rgba(251,191,36,.18)', color:'#fbbf24', text:'⏳ Pendente (PEP)' },
+    rejected:     { bg:'rgba(239,68,68,.18)',  color:'#ef4444', text:'❌ Rejeitado' },
+    bureau_error: { bg:'rgba(99,102,241,.18)', color:'#818cf8', text:'⚠️ Erro bureau' },
+  };
+  var c = colors[status] || { bg:'rgba(255,255,255,.08)', color:'#ccc', text: status };
+  return '<span style="background:' + c.bg + ';color:' + c.color + ';padding:4px 14px;border-radius:20px;font-weight:700;font-size:0.82rem">' + c.text + '</span>';
+}
+
+// Simular KYC
+function sbRunKyc() {
+  var userId = document.getElementById('sbKycUser').value;
+  var cpf    = document.getElementById('sbKycCpf').value;
+  var name   = document.getElementById('sbKycName').value.trim();
+  var dob    = document.getElementById('sbKycDob').value;
+  var apply  = document.getElementById('sbKycApply').checked;
+
+  if (!userId) { showToast('Selecione um usuário'); return; }
+  if (!cpf || !name || !dob) { showToast('Preencha todos os campos KYC'); return; }
+
+  var btn = document.querySelector('#sec-sandbox button[onclick="sbRunKyc()"]');
+  btn.disabled = true; btn.textContent = '⏳ Simulando…';
+
+  fetch(API + '/admin/simulate/kyc', {
+    method: 'POST',
+    headers: Object.assign({ 'Content-Type':'application/json' }, adminHeaders()),
+    body: JSON.stringify({ user_id: userId, cpf: cpf, full_name: name, date_of_birth: dob, apply: apply })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d) {
+    btn.disabled = false; btn.textContent = '▶ Simular KYC';
+    var res = document.getElementById('sbKycResult');
+    res.style.display = 'block';
+    document.getElementById('sbKycBadge').innerHTML = sbStatusBadge(d.finalStatus);
+
+    var details = '';
+    if (d.bureau) {
+      details += '<b>Bureau:</b> provider=' + (d.bureau.provider||'-') +
+        ' | status=<b>' + (d.bureau.status||'-') + '</b>' +
+        (d.bureau.rejectionReason ? ' | motivo=' + d.bureau.rejectionReason : '') + '<br>';
+    }
+    if (d.pep) {
+      details += '<b>PEP:</b> ' + (d.pep.isPep ? '🟡 Identificado' : '🟢 Limpo') +
+        ' | confiança=' + ((d.pep.confidence||0)*100).toFixed(0) + '%' +
+        (d.pep.matchedKeywords && d.pep.matchedKeywords.length ? ' | keywords: ' + d.pep.matchedKeywords.join(', ') : '') + '<br>';
+    }
+    if (d.sanctions) {
+      details += '<b>Sanções:</b> ' + (d.sanctions.isSanctioned ? '🔴 SANCIONADO' : '🟢 Limpo') +
+        (d.sanctions.lists && d.sanctions.lists.length ? ' | listas: ' + d.sanctions.lists.join(', ') : '') + '<br>';
+    }
+    document.getElementById('sbKycDetails').innerHTML = details;
+    document.getElementById('sbKycMsg').innerHTML =
+      '<span style="color:var(--muted);font-size:0.78rem">Mensagem ao usuário:</span><br>' +
+      '<em>"' + (d.finalMessage||d.error||'Erro desconhecido') + '"</em>' +
+      (apply ? '<br><br><span style="color:#10b981;font-size:0.75rem">✅ Aplicado ao banco de dados</span>' : '');
+  })
+  .catch(function(e){
+    btn.disabled = false; btn.textContent = '▶ Simular KYC';
+    showToast('Erro: ' + e.message);
+  });
+}
+
+// Simular Suitability
+function sbRunSuit() {
+  var userId = document.getElementById('sbSuitUser').value;
+  var apply  = document.getElementById('sbSuitApply').checked;
+
+  if (!userId) { showToast('Selecione um usuário'); return; }
+
+  var questions = ['objetivo','perda','experiencia','horizonte','renda'];
+  var answers = {};
+  for (var i = 0; i < questions.length; i++) {
+    var q = questions[i];
+    var radio = document.querySelector('input[name="sq_' + q + '"]:checked');
+    if (!radio) { showToast('Responda todas as perguntas'); return; }
+    answers[q] = radio.value;
+  }
+
+  var btn = document.querySelector('#sec-sandbox button[onclick="sbRunSuit()"]');
+  btn.disabled = true; btn.textContent = '⏳ Calculando…';
+
+  fetch(API + '/admin/simulate/suitability', {
+    method: 'POST',
+    headers: Object.assign({ 'Content-Type':'application/json' }, adminHeaders()),
+    body: JSON.stringify({ user_id: userId, answers: answers, apply: apply })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d) {
+    btn.disabled = false; btn.textContent = '▶ Simular Suitability';
+    if (d.error) { showToast('Erro: ' + d.error); return; }
+
+    var res = document.getElementById('sbSuitResult');
+    res.style.display = 'block';
+
+    var profileColors = { conservador:'#10b981', moderado:'#818cf8', arrojado:'#ef4444' };
+    var pc = profileColors[d.profile] || '#ccc';
+    document.getElementById('sbSuitBadge').innerHTML =
+      '<span style="background:rgba(128,128,255,.15);color:' + pc + ';padding:4px 14px;border-radius:20px;font-weight:700">' +
+      (d.profileLabel || d.profile) + '</span>';
+
+    var lim = d.limits || {};
+    var exp = d.expiresAt ? new Date(d.expiresAt).toLocaleDateString('pt-BR') : '-';
+    document.getElementById('sbSuitDetails').innerHTML =
+      '<b>Score:</b> ' + (d.score||'-') + ' / 15<br>' +
+      '<b>Limite por aposta:</b> R$' + (lim.max_bet_single||0).toLocaleString('pt-BR') + '<br>' +
+      '<b>Limite mensal:</b> R$' + (lim.max_month_total||0).toLocaleString('pt-BR') + '<br>' +
+      '<b>Expira em:</b> ' + exp +
+      (apply ? '<br><br><span style="color:#10b981;font-size:0.75rem">✅ Aplicado ao banco de dados</span>' : '');
+  })
+  .catch(function(e){
+    btn.disabled = false; btn.textContent = '▶ Simular Suitability';
+    showToast('Erro: ' + e.message);
+  });
 }
 
 // ── LOAD COMPLIANCE DASHBOARD KPIs (from /admin/dashboard) ───────────────────

@@ -2072,8 +2072,10 @@ function confirmKycReject() {
 // ── COAF ACTIONS ─────────────────────────────────────────────────────────────
 
 function resolveCoaf(flagId, action) {
-  var label = action === 'reported' ? 'REPORTAR ao COAF (obrigação legal — não pode ser desfeito)' : 'arquivar este alerta';
-  if (!confirm('Confirma ' + label + '?')) return;
+  var label = action === 'reported'
+    ? 'REPORTAR ao COAF?\n\nO documento SISCOAF será baixado automaticamente.\nVocê tem 24h para submetê-lo em siscoaf.fazenda.gov.br (Lei 9.613/98 Art. 11).\n\nEsta ação não pode ser desfeita.'
+    : 'Arquivar este alerta internamente?';
+  if (!confirm(label)) return;
 
   fetch(API + '/kyc/admin/coaf-flags/' + flagId + '/resolve', {
     method: 'POST',
@@ -2084,9 +2086,11 @@ function resolveCoaf(flagId, action) {
   .then(function(d) {
     if (d.error) { showToast('Erro: ' + d.error); return; }
     if (action === 'reported') {
-      showToast('⚠️ Comunicação COAF registrada. Providencie o envio formal em 24h.');
+      // Baixa o documento SISCOAF automaticamente logo após o registro
+      showToast('⚠️ Comunicação COAF registrada — baixando documento SISCOAF...');
+      downloadSiscoafDoc(flagId);
     } else {
-      showToast('Alerta arquivado internamente.');
+      showToast('✅ Alerta arquivado internamente.');
     }
     loadComplianceCoaf();
   })

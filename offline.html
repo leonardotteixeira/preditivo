@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bubuya — Sem conexão</title>
+  <link rel="manifest" href="/manifest.json">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #030303;
+      color: #e2e8f0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      padding: 24px;
+    }
+    .logo { font-size: 2rem; font-weight: 900; color: #10b981; margin-bottom: 32px; }
+    .icon { font-size: 4rem; margin-bottom: 24px; }
+    h1 { font-size: 1.4rem; font-weight: 700; margin-bottom: 12px; }
+    p { color: #5a6878; font-size: 0.95rem; line-height: 1.6; max-width: 320px; margin-bottom: 32px; }
+    button {
+      background: #10b981;
+      color: #000;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 32px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button:active { opacity: 0.85; }
+  </style>
+</head>
+<body>
+  <div class="logo">Bubuya.</div>
+  <div class="icon">📡</div>
+  <h1>Sem conexão com a internet</h1>
+  <p>Verifique sua conexão e tente novamente. Seus dados e saldo estão seguros.</p>
+  <button onclick="window.location.reload()">Tentar novamente</button>
+</body>
+</html>

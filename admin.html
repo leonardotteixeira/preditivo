@@ -251,6 +251,7 @@ tr:hover td { background:rgba(255,255,255,0.015); }
       <button class="tab" onclick="switchTab('saques',this)">Saques</button>
       <button class="tab" onclick="switchTab('bots',this)">🤖 Bots</button>
       <button class="tab" onclick="switchTab('compliance',this)" id="tabCompliance">🛡️ Compliance</button>
+      <button class="tab" onclick="switchTab('reports',this)" id="tabReports">📊 Relatórios</button>
       <button class="tab" onclick="switchTab('sandbox',this)" id="tabSandbox">🧪 Sandbox</button>
       <button class="tab" onclick="switchTab('config',this)">⚙️ Configurações</button>
     </div>
@@ -507,6 +508,54 @@ tr:hover td { background:rgba(255,255,255,0.015); }
         </table>
       </div>
 
+    </div>
+
+    <!-- RELATÓRIOS CVM / SISCOAF -->
+    <div id="sec-reports" class="section">
+      <div class="section-title">📊 Relatórios Regulatórios</div>
+
+      <!-- ── BLOCO 11: CVM Sandbox ─────────────────────────────────────────── -->
+      <div class="comp-sub">
+        <div class="section-title" style="font-size:1rem">
+          📄 Relatório Operacional — CVM Sandbox
+        </div>
+        <div class="info-box" style="margin-bottom:20px">
+          <strong>CVM Resolução 30/2021 — Art. 10:</strong> Participantes do Sandbox Regulatório devem submeter
+          relatório operacional periódico à CVM contendo dados de usuários, volume financeiro, mercados e compliance.
+          Frequência recomendada: <em>mensal</em>.
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:20px">
+          <div>
+            <label style="display:block;font-size:0.82rem;color:var(--muted);margin-bottom:4px">Período (mês)</label>
+            <input type="month" id="cvmMonth" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:0.9rem">
+          </div>
+          <button class="btn btn-resolve" onclick="downloadCvmReport('json')">⬇ Baixar JSON</button>
+          <button class="btn btn-resolve" onclick="downloadCvmReport('csv')">📊 Baixar CSV</button>
+          <button class="btn" style="background:rgba(99,102,241,0.1);color:#818cf8;border:1px solid rgba(99,102,241,0.3)" onclick="previewCvmReport()">👁 Visualizar</button>
+        </div>
+        <div id="cvmReportPreview" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;font-size:0.82rem;font-family:'DM Mono',monospace;white-space:pre-wrap;max-height:500px;overflow:auto;color:var(--muted)"></div>
+      </div>
+
+      <div class="comp-divider"></div>
+
+      <!-- ── BLOCO 10: SISCOAF ──────────────────────────────────────────────── -->
+      <div class="comp-sub">
+        <div class="section-title" style="font-size:1rem">
+          🔴 SISCOAF — Comunicações ao COAF
+          <button class="btn btn-resolve" style="margin-left:auto;font-size:0.78rem" onclick="loadSiscoafReported()">↻ Atualizar</button>
+        </div>
+        <div class="info-box" style="margin-bottom:16px">
+          <strong>Lei 9.613/98 — Art. 11:</strong> Comunicações marcadas como <em>"Reportar COAF"</em> no painel de
+          Compliance devem ser submetidas ao SISCOAF em até <strong>24 horas</strong>.
+          Baixe o documento JSON de cada comunicação e faça o upload em
+          <a href="https://siscoaf.fazenda.gov.br/" target="_blank" style="color:var(--gold)">siscoaf.fazenda.gov.br</a>.
+          Registre o número de protocolo e arquive por 5 anos.
+        </div>
+        <table>
+          <thead><tr><th>Usuário</th><th>Email</th><th>Mês</th><th>Volume</th><th>Status</th><th>Reportado em</th><th>Download SISCOAF</th></tr></thead>
+          <tbody id="siscoafTbody"><tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">Carregando...</td></tr></tbody>
+        </table>
+      </div>
     </div>
 
     <!-- SANDBOX DE TESTES -->
@@ -889,6 +938,7 @@ function switchTab(name, el) {
   if (name === 'saques') loadSaques();
   if (name === 'bots') loadBotStats();
   if (name === 'compliance') loadCompliance();
+  if (name === 'reports') loadSiscoafReported();
   if (name === 'sandbox') loadSandboxUsers();
   if (name === 'config') loadGlobalConfig();
 }
@@ -2041,6 +2091,115 @@ function resolveCoaf(flagId, action) {
     loadComplianceCoaf();
   })
   .catch(function(e){ showToast('Erro: ' + e.message); });
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ── BLOCO 10: SISCOAF ────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+
+function loadSiscoafReported() {
+  var tbody = document.getElementById('siscoafTbody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--muted)">Carregando...</td></tr>';
+
+  fetch(API + '/kyc/admin/coaf-flags?status=all', { headers: adminHeaders() })
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      var flags = (data.flags || []).filter(function(f){ return f.status === 'reported'; });
+      if (!flags.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">Nenhuma comunicação COAF registrada ainda.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = flags.map(function(f) {
+        var vol = parseFloat(f.month_total || 0);
+        var periodo = f.created_at ? f.created_at.substring(0,7) : '—';
+        var resolvedAt = f.resolved_at ? new Date(f.resolved_at).toLocaleString('pt-BR') : '—';
+        return '<tr>' +
+          '<td><strong>' + (f.username || '—') + '</strong></td>' +
+          '<td style="color:var(--muted);font-size:0.82rem">' + (f.email || '—') + '</td>' +
+          '<td style="font-family:\'DM Mono\',monospace;font-size:0.82rem">' + periodo + '</td>' +
+          '<td style="color:var(--gold);font-weight:700;font-family:\'DM Mono\',monospace">R$' + vol.toLocaleString('pt-BR',{minimumFractionDigits:2}) + '</td>' +
+          '<td><span class="sts" style="background:rgba(251,191,36,0.15);color:#fbbf24;border-color:rgba(251,191,36,0.3)">reportado</span></td>' +
+          '<td style="color:var(--muted);font-size:0.78rem">' + resolvedAt + '</td>' +
+          '<td><button class="btn btn-resolve" style="font-size:0.76rem" onclick="downloadSiscoafDoc(\'' + f.id + '\')">⬇ SISCOAF</button></td>' +
+          '</tr>';
+      }).join('');
+    })
+    .catch(function(e){
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--red)">Erro: ' + e.message + '</td></tr>';
+    });
+}
+
+function downloadSiscoafDoc(flagId) {
+  var a = document.createElement('a');
+  a.href = API + '/kyc/admin/coaf-flags/' + flagId + '/siscoaf-report';
+  a.setAttribute('download', '');
+  // Injetar token via header não é possível via <a href>, então abrimos via fetch + blob
+  fetch(API + '/kyc/admin/coaf-flags/' + flagId + '/siscoaf-report', { headers: adminHeaders() })
+    .then(function(r){
+      var disposition = r.headers.get('Content-Disposition') || '';
+      var match = disposition.match(/filename="([^"]+)"/);
+      var filename = match ? match[1] : ('siscoaf-' + flagId.substring(0,8) + '.json');
+      return r.blob().then(function(blob){ return { blob: blob, filename: filename }; });
+    })
+    .then(function(d){
+      var url = URL.createObjectURL(d.blob);
+      var link = document.createElement('a');
+      link.href = url;
+      link.download = d.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast('📥 Documento SISCOAF baixado. Submeta em siscoaf.fazenda.gov.br em até 24h.');
+    })
+    .catch(function(e){ showToast('Erro ao baixar: ' + e.message); });
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ── BLOCO 11: RELATÓRIO CVM SANDBOX ─────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+
+function getCvmMonth() {
+  var input = document.getElementById('cvmMonth');
+  return input && input.value ? input.value : null;
+}
+
+function downloadCvmReport(format) {
+  var month = getCvmMonth();
+  var url = API + '/admin/reports/cvm-sandbox?format=' + format + (month ? '&month=' + month : '');
+  fetch(url, { headers: adminHeaders() })
+    .then(function(r){
+      var disposition = r.headers.get('Content-Disposition') || '';
+      var match = disposition.match(/filename="([^"]+)"/);
+      var filename = match ? match[1] : ('relatorio-cvm-sandbox.' + format);
+      return r.blob().then(function(blob){ return { blob: blob, filename: filename }; });
+    })
+    .then(function(d){
+      var url2 = URL.createObjectURL(d.blob);
+      var link = document.createElement('a');
+      link.href = url2;
+      link.download = d.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url2);
+      showToast('📊 Relatório CVM baixado com sucesso.');
+    })
+    .catch(function(e){ showToast('Erro: ' + e.message); });
+}
+
+function previewCvmReport() {
+  var month = getCvmMonth();
+  var preview = document.getElementById('cvmReportPreview');
+  preview.style.display = 'block';
+  preview.textContent = 'Carregando...';
+  fetch(API + '/admin/reports/cvm-sandbox?format=json' + (month ? '&month=' + month : ''), { headers: adminHeaders() })
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      preview.textContent = JSON.stringify(d.report || d, null, 2);
+    })
+    .catch(function(e){ preview.textContent = 'Erro: ' + e.message; });
 }
 
 // ══════════════════════════════════════════════════════════════════════════════

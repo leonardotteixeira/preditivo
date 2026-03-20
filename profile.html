@@ -958,14 +958,14 @@ async function loadProfile() {
 }
 
 async function init() {
-  state.token=null;
+  state.token = localStorage.getItem('preditivo_token') || null;
   await loadProfile();
 
   // ── COMPLIANCE GATE ──────────────────────────────────────────────────────
   // Profile é página autenticada — redireciona hard se compliance incompleto
   try {
     const apiBase = (window.PREDITIVO_CONFIG && window.PREDITIVO_CONFIG.API_BASE) || 'https://preditivo-backend-production.up.railway.app';
-    const r = await fetch(apiBase + '/auth/me');
+    const r = await fetch(apiBase + '/auth/me', { headers: state.token ? { Authorization: 'Bearer ' + state.token } : {} });
     if (r.ok) {
       const me = await r.json();
       const kycOk   = me.kyc_status === 'approved';

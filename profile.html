@@ -297,6 +297,7 @@ function switchTab(name) {
   if (content) content.classList.add('active');
   if (name === 'indicacoes') loadIndicacoes();
   if (name === 'extrato') renderExtrato(_extratoPeriod);
+  if (name === 'ouvidoria') loadComplaints();
 }
 
 /* ── AUTH UI ── */
@@ -442,6 +443,7 @@ function renderPage() {
       '<button class="tab-btn"        id="tab-btn-seguranca" onclick="switchTab(\'seguranca\')">🔒 Segurança</button>' +
       '<button class="tab-btn"        id="tab-btn-indicacoes" onclick="switchTab(\'indicacoes\')">🎁 Indicações</button>' +
       '<button class="tab-btn"        id="tab-btn-protecao"   onclick="switchTab(\'protecao\')">🛡️ Proteção</button>' +
+      '<button class="tab-btn"        id="tab-btn-ouvidoria"  onclick="switchTab(\'ouvidoria\')">📣 Ouvidoria</button>' +
     '</div>' +
 
     /* Apostas */
@@ -564,6 +566,36 @@ function renderPage() {
         '<div style="font-weight:700;font-size:1.05rem;margin-bottom:4px">🚫 Auto-exclusão Temporária</div>' +
         '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:20px">Suspenda sua conta temporariamente para fazer uma pausa. Durante o período, você não poderá realizar operações.</div>' +
         '<div id="selfExcludeContent"><div class="empty" style="padding:20px"><div class="empty-icon" style="font-size:1.5rem">⏳</div>Carregando status...</div></div>' +
+      '</div>' +
+    '</div>' +
+
+    /* Ouvidoria */
+    '<div class="tab-content" id="tab-ouvidoria">' +
+      '<div class="edit-card" style="max-width:620px;margin-bottom:20px">' +
+        '<div style="font-weight:700;font-size:1.05rem;margin-bottom:4px">📣 Ouvidoria — Canal de Reclamações</div>' +
+        '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:20px">Registre formalmente uma reclamação. Prazo de resposta: até 5 dias úteis (CVM Sandbox).</div>' +
+        '<div style="margin-bottom:12px">' +
+          '<label style="display:block;font-size:0.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Categoria</label>' +
+          '<select id="complaintCategory" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-size:0.9rem">' +
+            '<option value="">Selecione...</option>' +
+            '<option value="resolucao_mercado">Contestação de resultado de mercado</option>' +
+            '<option value="kyc_bloqueio">Problema com verificação de identidade (KYC)</option>' +
+            '<option value="saque_bloqueado">Saque não processado</option>' +
+            '<option value="suitability">Contestação de perfil de investidor</option>' +
+            '<option value="privacidade">Privacidade e dados pessoais (LGPD)</option>' +
+            '<option value="outro">Outro</option>' +
+          '</select>' +
+        '</div>' +
+        '<div style="margin-bottom:16px">' +
+          '<label style="display:block;font-size:0.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Descrição detalhada</label>' +
+          '<textarea id="complaintDesc" rows="5" placeholder="Descreva sua reclamação com o máximo de detalhes possível (mínimo 20 caracteres)..." style="width:100%;box-sizing:border-box;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:0.9rem;resize:vertical;font-family:inherit"></textarea>' +
+        '</div>' +
+        '<button onclick="submitComplaint()" style="width:100%;padding:13px;background:var(--green);color:#000;border:none;border-radius:10px;font-weight:700;font-size:0.95rem;cursor:pointer">Enviar Reclamação</button>' +
+        '<div id="complaintFeedback" style="margin-top:10px;font-size:0.85rem;text-align:center"></div>' +
+      '</div>' +
+      '<div class="edit-card" style="max-width:620px">' +
+        '<div style="font-weight:700;font-size:1rem;margin-bottom:16px">Minhas Reclamações</div>' +
+        '<div id="complaintsList"><div class="empty" style="padding:20px"><div class="empty-icon" style="font-size:1.5rem">📭</div>Nenhuma reclamação registrada.</div></div>' +
       '</div>' +
     '</div>';
 
@@ -1009,6 +1041,62 @@ async function confirmSelfExclude() {
     showToast('🚫 Conta suspensa por ' + days + ' dias.');
     loadSelfExclusionStatus();
   } catch(e) { fb.style.color = '#ef4444'; fb.textContent = 'Erro de conexão.'; }
+}
+
+/* ── OUVIDORIA ── */
+var COMPLAINT_LABELS = {
+  resolucao_mercado: 'Contestação de resultado',
+  kyc_bloqueio:      'Problema com KYC',
+  saque_bloqueado:   'Saque não processado',
+  suitability:       'Perfil de investidor',
+  privacidade:       'Privacidade / LGPD',
+  outro:             'Outro',
+};
+var STATUS_LABELS = { open:'Aberta', in_progress:'Em análise', resolved:'Resolvida', rejected:'Indeferida' };
+var STATUS_COLORS = { open:'#fbbf24', in_progress:'#60a5fa', resolved:'#34d399', rejected:'#f87171' };
+
+async function submitComplaint() {
+  var category = document.getElementById('complaintCategory').value;
+  var description = document.getElementById('complaintDesc').value.trim();
+  var fb = document.getElementById('complaintFeedback');
+  if (!category) { fb.style.color='#ef4444'; fb.textContent='Selecione uma categoria.'; return; }
+  if (description.length < 20) { fb.style.color='#ef4444'; fb.textContent='Descrição muito curta (mínimo 20 caracteres).'; return; }
+  fb.style.color='var(--muted)'; fb.textContent='Enviando...';
+  try {
+    var d = await apiPost('/auth/complaints', { category, description }, state.token);
+    if (d.error) { fb.style.color='#ef4444'; fb.textContent='Erro: '+d.error; return; }
+    fb.style.color='#34d399'; fb.textContent='✅ Reclamação registrada! Protocolo: '+d.complaint.id.substring(0,8).toUpperCase();
+    document.getElementById('complaintCategory').value = '';
+    document.getElementById('complaintDesc').value = '';
+    loadComplaints();
+  } catch(e) { fb.style.color='#ef4444'; fb.textContent='Erro de conexão.'; }
+}
+
+async function loadComplaints() {
+  var el = document.getElementById('complaintsList');
+  if (!el) return;
+  el.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;padding:10px">Carregando...</div>';
+  try {
+    var d = await apiGet('/auth/complaints/my', state.token);
+    var list = d.complaints || [];
+    if (!list.length) {
+      el.innerHTML = '<div class="empty" style="padding:20px"><div class="empty-icon" style="font-size:1.5rem">📭</div>Nenhuma reclamação registrada.</div>';
+      return;
+    }
+    el.innerHTML = list.map(function(c) {
+      var color = STATUS_COLORS[c.status] || '#aaa';
+      var dt = new Date(c.created_at).toLocaleString('pt-BR');
+      return '<div style="border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+          '<span style="font-weight:700;font-size:0.9rem">' + (COMPLAINT_LABELS[c.category]||c.category) + '</span>' +
+          '<span style="font-size:0.78rem;font-weight:700;color:'+color+'">● '+(STATUS_LABELS[c.status]||c.status)+'</span>' +
+        '</div>' +
+        '<div style="font-size:0.82rem;color:var(--muted);margin-bottom:6px">Protocolo: <strong style="color:var(--text)">'+c.id.substring(0,8).toUpperCase()+'</strong> · '+dt+'</div>' +
+        '<div style="font-size:0.85rem;margin-bottom:' + (c.admin_response ? '10px' : '0') + '">' + c.description + '</div>' +
+        (c.admin_response ? '<div style="background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);border-radius:8px;padding:10px;font-size:0.83rem"><strong style="color:#34d399">Resposta:</strong> '+c.admin_response+'</div>' : '') +
+        '</div>';
+    }).join('');
+  } catch(e) { el.innerHTML = '<div style="color:#f87171;font-size:0.85rem">Erro ao carregar reclamações.</div>'; }
 }
 </script>
 

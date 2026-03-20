@@ -508,6 +508,47 @@ tr:hover td { background:rgba(255,255,255,0.015); }
         </table>
       </div>
 
+      <div class="comp-divider"></div>
+
+      <!-- ── 5. OUVIDORIA ───────────────────────────────────────────────────── -->
+      <div class="comp-sub">
+        <div class="section-title">
+          📣 Ouvidoria — Reclamações de Usuários
+          <span class="badge" id="complaintsBadge">0</span>
+          <button class="btn btn-resolve" style="margin-left:auto;font-size:0.78rem" onclick="loadAdminComplaints()">↻ Atualizar</button>
+        </div>
+        <div class="info-box" style="margin-bottom:16px">
+          <strong>CVM Sandbox:</strong> Canal formal de reclamações. Prazo de resposta: 5 dias úteis. Responda diretamente neste painel — o usuário verá a resposta no perfil dele.
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+          <button class="btn btn-resolve" style="font-size:0.78rem" onclick="loadAdminComplaints()">Todas</button>
+          <button class="btn" style="font-size:0.78rem;background:rgba(251,191,36,0.1);color:#fbbf24;border:1px solid rgba(251,191,36,0.3)" onclick="loadAdminComplaints('open')">Abertas</button>
+          <button class="btn" style="font-size:0.78rem;background:rgba(96,165,250,0.1);color:#60a5fa;border:1px solid rgba(96,165,250,0.3)" onclick="loadAdminComplaints('in_progress')">Em análise</button>
+          <button class="btn" style="font-size:0.78rem;background:rgba(52,211,153,0.1);color:#34d399;border:1px solid rgba(52,211,153,0.3)" onclick="loadAdminComplaints('resolved')">Resolvidas</button>
+        </div>
+        <table>
+          <thead><tr><th>Usuário</th><th>Categoria</th><th>Descrição</th><th>Status</th><th>Data</th><th>Ações</th></tr></thead>
+          <tbody id="complaintsTbody"><tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted)">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="comp-divider"></div>
+
+      <!-- ── 6. AUDITORIA ADMIN ─────────────────────────────────────────────── -->
+      <div class="comp-sub">
+        <div class="section-title">
+          🔍 Auditoria — Ações Administrativas
+          <button class="btn btn-resolve" style="margin-left:auto;font-size:0.78rem" onclick="loadAuditLogs()">↻ Atualizar</button>
+        </div>
+        <div class="info-box" style="margin-bottom:16px">
+          <strong>Rastreabilidade CVM:</strong> Registro de todas as ações administrativas — resolução de mercados, aprovação de KYC, alterações de compliance e limites. Retenção: 5 anos.
+        </div>
+        <table>
+          <thead><tr><th>Data/Hora</th><th>Ação</th><th>Tipo</th><th>ID Entidade</th><th>Detalhes</th><th>IP</th></tr></thead>
+          <tbody id="auditTbody"><tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted)">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+
     </div>
 
     <!-- RELATÓRIOS CVM / SISCOAF -->
@@ -725,8 +766,16 @@ tr:hover td { background:rgba(255,255,255,0.015); }
           <button class="btn btn-green" style="width:100%;padding:14px" onclick="saveGlobalConfig()">Salvar Alterações</button>
         </div>
 
-        <div class="info-box">
-          <strong>Persistência:</strong> No momento, as alterações de layout são aplicadas localmente no seu navegador. Para persistência global em todos os usuários, as configurações serão migradas para o banco de dados Supabase na próxima atualização do backend.
+        <div class="info-box" style="margin-bottom:24px">
+          <strong>Persistência:</strong> Alterações de layout são aplicadas localmente. Os limites operacionais abaixo são persistidos no banco e aplicados imediatamente.
+        </div>
+
+        <!-- ── LIMITES OPERACIONAIS ── -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px;margin-bottom:24px">
+          <div class="section-title" style="font-size:0.95rem;margin-bottom:4px">⚖️ Limites Operacionais por Perfil</div>
+          <p style="color:var(--muted);font-size:0.82rem;margin-bottom:20px">CVM Resolução 30/2021 — Alterações aplicadas imediatamente sem necessidade de deploy.</p>
+          <div id="limitsEditor"><p style="color:var(--muted);font-size:0.85rem">Carregando...</p></div>
+          <div id="limitsFeedback" style="margin-top:10px;font-size:0.82rem;text-align:center"></div>
         </div>
       </div>
     </div>
@@ -1755,6 +1804,8 @@ function loadCompliance() {
   loadCompliancePep();
   loadComplianceCoaf();
   loadComplianceSuitability();
+  loadAdminComplaints();
+  loadAuditLogs();
 }
 
 // ── 1. KYC PENDING QUEUE ─────────────────────────────────────────────────────
@@ -2095,6 +2146,169 @@ function resolveCoaf(flagId, action) {
     loadComplianceCoaf();
   })
   .catch(function(e){ showToast('Erro: ' + e.message); });
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ── A: OUVIDORIA (ADMIN) ─────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+
+var COMPLAINT_LABELS_ADMIN = {
+  resolucao_mercado:'Resultado de mercado', kyc_bloqueio:'KYC', saque_bloqueado:'Saque',
+  suitability:'Suitability', privacidade:'Privacidade/LGPD', outro:'Outro'
+};
+var COMPLAINT_STATUS_COLORS = { open:'#fbbf24', in_progress:'#60a5fa', resolved:'#34d399', rejected:'#f87171' };
+var COMPLAINT_STATUS_LABELS = { open:'Aberta', in_progress:'Em análise', resolved:'Resolvida', rejected:'Indeferida' };
+
+function loadAdminComplaints(status) {
+  var tbody = document.getElementById('complaintsTbody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--muted)">Carregando...</td></tr>';
+  var url = API + '/admin/complaints' + (status ? '?status=' + status : '');
+  fetch(url, { headers: adminHeaders() })
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      var list = data.complaints || [];
+      var open = list.filter(function(c){ return c.status === 'open'; }).length;
+      document.getElementById('complaintsBadge').textContent = open;
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted)">✅ Nenhuma reclamação</td></tr>';
+        return;
+      }
+      tbody.innerHTML = list.map(function(c) {
+        var color = COMPLAINT_STATUS_COLORS[c.status] || '#aaa';
+        var dt = new Date(c.created_at).toLocaleString('pt-BR');
+        var desc = (c.description || '').substring(0, 80) + (c.description && c.description.length > 80 ? '…' : '');
+        return '<tr>' +
+          '<td><strong>' + (c.username||'—') + '</strong><br><span style="color:var(--muted);font-size:0.78rem">' + (c.email||'') + '</span></td>' +
+          '<td style="font-size:0.82rem">' + (COMPLAINT_LABELS_ADMIN[c.category]||c.category) + '</td>' +
+          '<td style="font-size:0.82rem;color:var(--muted);max-width:200px">' + desc + '</td>' +
+          '<td><span class="sts" style="background:' + color + '22;color:' + color + ';border-color:' + color + '55">' + (COMPLAINT_STATUS_LABELS[c.status]||c.status) + '</span></td>' +
+          '<td style="font-size:0.78rem;color:var(--muted)">' + dt + '</td>' +
+          '<td><button class="btn btn-resolve" style="font-size:0.74rem" onclick="openComplaintReply(\'' + c.id + '\')">Responder</button></td>' +
+          '</tr>';
+      }).join('');
+    })
+    .catch(function(e){ tbody.innerHTML = '<tr><td colspan="6" style="color:var(--red);padding:20px">' + e.message + '</td></tr>'; });
+}
+
+var _complaintReplyId = null;
+function openComplaintReply(id) {
+  _complaintReplyId = id;
+  var response = prompt('Resposta para o usuário (obrigatório):');
+  if (!response || !response.trim()) return;
+  var status = confirm('Marcar como RESOLVIDA? (Cancelar = manter em análise)') ? 'resolved' : 'in_progress';
+  fetch(API + '/admin/complaints/' + id, {
+    method: 'PATCH',
+    headers: adminHeaders(),
+    body: JSON.stringify({ status: status, admin_response: response.trim() })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d) {
+    if (d.error) { showToast('Erro: ' + d.error); return; }
+    showToast('✅ Resposta enviada.');
+    loadAdminComplaints();
+  })
+  .catch(function(e){ showToast('Erro: ' + e.message); });
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ── B: LIMITES OPERACIONAIS ───────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+
+function loadGlobalConfig() {
+  fetch(API + '/admin/config/limits', { headers: adminHeaders() })
+    .then(function(r){ return r.json(); })
+    .then(function(d) {
+      renderLimitsEditor(d.limits || {});
+    })
+    .catch(function(){ document.getElementById('limitsEditor').innerHTML = '<p style="color:var(--red)">Erro ao carregar limites.</p>'; });
+
+  // hero config (original)
+  var heroUrl = localStorage.getItem('cfg_hero_url');
+  if (heroUrl && document.getElementById('cfg-hero-url')) document.getElementById('cfg-hero-url').value = heroUrl;
+}
+
+function renderLimitsEditor(limits) {
+  var profiles = ['conservador', 'moderado', 'arrojado'];
+  var colors = { conservador: '#93c5fd', moderado: '#fcd34d', arrojado: '#6ee7b7' };
+  var html = '<div style="display:grid;gap:16px">';
+  profiles.forEach(function(p) {
+    var l = limits[p] || {};
+    html += '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:18px">' +
+      '<div style="font-weight:700;color:' + colors[p] + ';margin-bottom:14px;text-transform:capitalize">' + p + '</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">' +
+        '<div><label style="font-size:0.72rem;color:var(--muted);display:block;margin-bottom:4px">Máx/Aposta (R$)</label>' +
+        '<input type="number" id="lim_' + p + '_single" value="' + (l.max_bet_single||0) + '" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--text);font-size:0.9rem"></div>' +
+        '<div><label style="font-size:0.72rem;color:var(--muted);display:block;margin-bottom:4px">Máx Mensal (R$)</label>' +
+        '<input type="number" id="lim_' + p + '_month" value="' + (l.max_month_total||0) + '" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--text);font-size:0.9rem"></div>' +
+        '<div><label style="font-size:0.72rem;color:var(--muted);display:block;margin-bottom:4px">Máx/Mercado (R$)</label>' +
+        '<input type="number" id="lim_' + p + '_market" value="' + (l.max_market_total||0) + '" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--text);font-size:0.9rem"></div>' +
+      '</div>' +
+      '<button class="btn btn-resolve" style="margin-top:12px;font-size:0.8rem" onclick="saveLimits(\'' + p + '\')">💾 Salvar ' + p.charAt(0).toUpperCase()+p.slice(1) + '</button>' +
+      '</div>';
+  });
+  html += '</div>';
+  document.getElementById('limitsEditor').innerHTML = html;
+}
+
+function saveLimits(profile) {
+  var fb = document.getElementById('limitsFeedback');
+  var single = parseFloat(document.getElementById('lim_' + profile + '_single').value);
+  var month  = parseFloat(document.getElementById('lim_' + profile + '_month').value);
+  var market = parseFloat(document.getElementById('lim_' + profile + '_market').value);
+  if ([single, month, market].some(isNaN)) { fb.style.color='#f87171'; fb.textContent='Valores inválidos.'; return; }
+  fb.style.color='var(--muted)'; fb.textContent='Salvando...';
+  fetch(API + '/admin/config/limits', {
+    method: 'PATCH',
+    headers: adminHeaders(),
+    body: JSON.stringify({ profile: profile, max_bet_single: single, max_month_total: month, max_market_total: market })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d) {
+    if (d.error) { fb.style.color='#f87171'; fb.textContent='Erro: '+d.error; return; }
+    fb.style.color='#34d399'; fb.textContent='✅ Limites do perfil ' + profile + ' salvos e aplicados imediatamente.';
+    renderLimitsEditor(d.all || {});
+  })
+  .catch(function(e){ fb.style.color='#f87171'; fb.textContent='Erro: '+e.message; });
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ── C: AUDIT LOG ADMIN ───────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+
+var ACTION_LABELS = {
+  resolve_market:'Resolver Mercado', compliance_update:'Atualizar Compliance',
+  complaint_update:'Responder Reclamação', update_limits:'Alterar Limites',
+  delete_user:'Excluir Usuário', kyc_update:'Atualizar KYC',
+};
+
+function loadAuditLogs() {
+  var tbody = document.getElementById('auditTbody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--muted)">Carregando...</td></tr>';
+  fetch(API + '/admin/audit-logs?limit=100', { headers: adminHeaders() })
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      var logs = data.logs || [];
+      if (!logs.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted)">Nenhuma ação registrada ainda.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = logs.map(function(l) {
+        var dt = new Date(l.created_at).toLocaleString('pt-BR');
+        var details = '';
+        try { var d = l.details || {}; details = Object.keys(d).slice(0,2).map(function(k){ return k+': '+JSON.stringify(d[k]).substring(0,30); }).join(' | '); } catch(_){}
+        return '<tr>' +
+          '<td style="font-size:0.78rem;color:var(--muted);font-family:\'DM Mono\',monospace">' + dt + '</td>' +
+          '<td><span style="background:rgba(99,102,241,0.1);color:#818cf8;border:1px solid rgba(99,102,241,0.3);border-radius:6px;padding:2px 8px;font-size:0.78rem">' + (ACTION_LABELS[l.action]||l.action) + '</span></td>' +
+          '<td style="font-size:0.82rem;color:var(--muted)">' + (l.entity_type||'—') + '</td>' +
+          '<td style="font-size:0.78rem;font-family:\'DM Mono\',monospace;color:var(--muted)">' + (l.entity_id ? l.entity_id.substring(0,8)+'…' : '—') + '</td>' +
+          '<td style="font-size:0.78rem;color:var(--muted);max-width:200px">' + details + '</td>' +
+          '<td style="font-size:0.78rem;color:var(--muted)">' + (l.ip||'—') + '</td>' +
+          '</tr>';
+      }).join('');
+    })
+    .catch(function(e){ tbody.innerHTML = '<tr><td colspan="6" style="color:var(--red);padding:20px">' + e.message + '</td></tr>'; });
 }
 
 // ══════════════════════════════════════════════════════════════════════════════

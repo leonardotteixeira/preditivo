@@ -590,6 +590,11 @@ function renderPage() {
           '<label style="display:block;font-size:0.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Descrição detalhada</label>' +
           '<textarea id="complaintDesc" rows="5" placeholder="Descreva sua reclamação com o máximo de detalhes possível (mínimo 20 caracteres)..." style="width:100%;box-sizing:border-box;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:0.9rem;resize:vertical;font-family:inherit"></textarea>' +
         '</div>' +
+        '<div style="margin-bottom:16px">' +
+          '<label style="display:block;font-size:0.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Anexo (opcional — print, comprovante, documento)</label>' +
+          '<input type="file" id="complaintFile" accept="image/*,.pdf" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px;color:var(--text);font-size:0.85rem;cursor:pointer">' +
+          '<div id="complaintFileInfo" style="font-size:0.78rem;color:var(--muted);margin-top:4px"></div>' +
+        '</div>' +
         '<button onclick="submitComplaint()" style="width:100%;padding:13px;background:var(--green);color:#000;border:none;border-radius:10px;font-weight:700;font-size:0.95rem;cursor:pointer">Enviar Reclamação</button>' +
         '<div id="complaintFeedback" style="margin-top:10px;font-size:0.85rem;text-align:center"></div>' +
       '</div>' +
@@ -1055,6 +1060,39 @@ var COMPLAINT_LABELS = {
 var STATUS_LABELS = { open:'Aberta', in_progress:'Em análise', resolved:'Resolvida', rejected:'Indeferida' };
 var STATUS_COLORS = { open:'#fbbf24', in_progress:'#60a5fa', resolved:'#34d399', rejected:'#f87171' };
 
+// Lê arquivo selecionado como base64
+function readFileAsBase64(file) {
+  return new Promise(function(resolve, reject) {
+    var reader = new FileReader();
+    reader.onload = function(e) { resolve(e.target.result); };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// Valida tamanho do arquivo (max 2MB)
+var MAX_ATTACH_BYTES = 2 * 1024 * 1024;
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('change', function(e) {
+    if (e.target && e.target.id === 'complaintFile') {
+      var f = e.target.files[0];
+      var info = document.getElementById('complaintFileInfo');
+      if (!info) return;
+      if (f && f.size > MAX_ATTACH_BYTES) {
+        info.style.color = '#f87171';
+        info.textContent = 'Arquivo muito grande (máximo 2 MB). Selecione outro.';
+        e.target.value = '';
+      } else if (f) {
+        info.style.color = '#34d399';
+        info.textContent = '✓ ' + f.name + ' (' + (f.size/1024).toFixed(0) + ' KB)';
+      } else {
+        info.textContent = '';
+      }
+    }
+  });
+});
+
 async function submitComplaint() {
   var category = document.getElementById('complaintCategory').value;
   var description = document.getElementById('complaintDesc').value.trim();
@@ -1062,12 +1100,26 @@ async function submitComplaint() {
   if (!category) { fb.style.color='#ef4444'; fb.textContent='Selecione uma categoria.'; return; }
   if (description.length < 20) { fb.style.color='#ef4444'; fb.textContent='Descrição muito curta (mínimo 20 caracteres).'; return; }
   fb.style.color='var(--muted)'; fb.textContent='Enviando...';
+
+  // Lê anexo, se houver
+  var attachment = null;
+  var fileInput = document.getElementById('complaintFile');
+  if (fileInput && fileInput.files && fileInput.files[0]) {
+    var f = fileInput.files[0];
+    if (f.size > MAX_ATTACH_BYTES) { fb.style.color='#ef4444'; fb.textContent='Arquivo muito grande (máximo 2 MB).'; return; }
+    try {
+      var b64 = await readFileAsBase64(f);
+      attachment = { filename: f.name, data: b64, mime_type: f.type };
+    } catch(e) { fb.style.color='#ef4444'; fb.textContent='Erro ao ler arquivo.'; return; }
+  }
+
   try {
-    var d = await apiPost('/auth/complaints', { category, description }, state.token);
+    var d = await apiPost('/auth/complaints', { category, description, attachment }, state.token);
     if (d.error) { fb.style.color='#ef4444'; fb.textContent='Erro: '+d.error; return; }
     fb.style.color='#34d399'; fb.textContent='✅ Reclamação registrada! Protocolo: '+d.complaint.id.substring(0,8).toUpperCase();
     document.getElementById('complaintCategory').value = '';
     document.getElementById('complaintDesc').value = '';
+    if (fileInput) { fileInput.value = ''; document.getElementById('complaintFileInfo').textContent=''; }
     loadComplaints();
   } catch(e) { fb.style.color='#ef4444'; fb.textContent='Erro de conexão.'; }
 }
@@ -1086,17 +1138,91 @@ async function loadComplaints() {
     el.innerHTML = list.map(function(c) {
       var color = STATUS_COLORS[c.status] || '#aaa';
       var dt = new Date(c.created_at).toLocaleString('pt-BR');
+      var msgs = c.messages || [];
+      var atts = c.attachments || [];
+      var canReply = c.status !== 'resolved' && c.status !== 'rejected';
+
+      // Thread de mensagens
+      var threadHtml = '';
+      msgs.forEach(function(m) {
+        var isAdmin = m.sender_type === 'admin';
+        var bg = isAdmin ? 'rgba(52,211,153,0.07)' : 'rgba(96,165,250,0.07)';
+        var brd = isAdmin ? 'rgba(52,211,153,0.2)' : 'rgba(96,165,250,0.2)';
+        var lbl = isAdmin ? '👤 Equipe Bubuya' : '🙋 Você';
+        var clr = isAdmin ? '#34d399' : '#60a5fa';
+        threadHtml += '<div style="background:'+bg+';border:1px solid '+brd+';border-radius:8px;padding:10px 12px;margin-top:8px">' +
+          '<div style="display:flex;justify-content:space-between;margin-bottom:4px">' +
+            '<span style="font-size:0.72rem;font-weight:700;color:'+clr+'">'+lbl+'</span>' +
+            '<span style="font-size:0.72rem;color:var(--muted)">'+new Date(m.created_at).toLocaleString('pt-BR')+'</span>' +
+          '</div>' +
+          '<div style="font-size:0.85rem;white-space:pre-wrap">'+m.message+'</div>' +
+        '</div>';
+      });
+
+      // Anexos
+      var attHtml = '';
+      if (atts.length) {
+        attHtml = '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">' +
+          atts.map(function(a) {
+            var url = (window.API || '') + '/auth/complaints/' + c.id + '/attachment/' + a.id;
+            return '<a href="'+url+'" target="_blank" style="font-size:0.78rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:3px 9px;color:var(--text);text-decoration:none">📎 '+a.filename+'</a>';
+          }).join('') +
+        '</div>';
+      }
+
+      // Formulário de resposta
+      var replyHtml = '';
+      if (canReply) {
+        replyHtml = '<div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px">' +
+          '<textarea id="reply_'+c.id+'" rows="2" placeholder="Adicionar informação ao ticket..." style="width:100%;box-sizing:border-box;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:0.85rem;resize:vertical;font-family:inherit"></textarea>' +
+          '<div style="display:flex;gap:8px;margin-top:6px;align-items:center">' +
+            '<input type="file" id="replyFile_'+c.id+'" accept="image/*,.pdf" style="flex:1;font-size:0.78rem;color:var(--muted)">' +
+            '<button onclick="sendComplaintReply(\''+c.id+'\')" style="background:var(--green);border:none;border-radius:8px;padding:7px 14px;color:#000;font-weight:700;font-size:0.82rem;cursor:pointer;white-space:nowrap">Enviar</button>' +
+          '</div>' +
+          '<div id="replyFb_'+c.id+'" style="font-size:0.8rem;margin-top:4px"></div>' +
+        '</div>';
+      }
+
       return '<div style="border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px">' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
           '<span style="font-weight:700;font-size:0.9rem">' + (COMPLAINT_LABELS[c.category]||c.category) + '</span>' +
           '<span style="font-size:0.78rem;font-weight:700;color:'+color+'">● '+(STATUS_LABELS[c.status]||c.status)+'</span>' +
         '</div>' +
-        '<div style="font-size:0.82rem;color:var(--muted);margin-bottom:6px">Protocolo: <strong style="color:var(--text)">'+c.id.substring(0,8).toUpperCase()+'</strong> · '+dt+'</div>' +
-        '<div style="font-size:0.85rem;margin-bottom:' + (c.admin_response ? '10px' : '0') + '">' + c.description + '</div>' +
-        (c.admin_response ? '<div style="background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);border-radius:8px;padding:10px;font-size:0.83rem"><strong style="color:#34d399">Resposta:</strong> '+c.admin_response+'</div>' : '') +
-        '</div>';
+        '<div style="font-size:0.82rem;color:var(--muted);margin-bottom:8px">Protocolo: <strong style="color:var(--text)">'+c.id.substring(0,8).toUpperCase()+'</strong> · '+dt+'</div>' +
+        '<div style="font-size:0.85rem;background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.15);border-radius:8px;padding:10px 12px;margin-bottom:4px">'+c.description+'</div>' +
+        attHtml +
+        threadHtml +
+        replyHtml +
+      '</div>';
     }).join('');
   } catch(e) { el.innerHTML = '<div style="color:#f87171;font-size:0.85rem">Erro ao carregar reclamações.</div>'; }
+}
+
+async function sendComplaintReply(id) {
+  var ta = document.getElementById('reply_' + id);
+  var fb = document.getElementById('replyFb_' + id);
+  var fileInput = document.getElementById('replyFile_' + id);
+  if (!ta || !fb) return;
+  var msg = ta.value.trim();
+  if (!msg) { fb.style.color='#f87171'; fb.textContent='Escreva uma mensagem.'; return; }
+  fb.style.color='var(--muted)'; fb.textContent='Enviando…';
+
+  var attachment = null;
+  if (fileInput && fileInput.files && fileInput.files[0]) {
+    var f = fileInput.files[0];
+    if (f.size > MAX_ATTACH_BYTES) { fb.style.color='#f87171'; fb.textContent='Arquivo muito grande (máximo 2 MB).'; return; }
+    try { attachment = { filename: f.name, data: await readFileAsBase64(f), mime_type: f.type }; }
+    catch(e) { fb.style.color='#f87171'; fb.textContent='Erro ao ler arquivo.'; return; }
+  }
+
+  try {
+    var d = await apiPost('/auth/complaints/' + id + '/messages', { message: msg, attachment }, state.token);
+    if (d.error) { fb.style.color='#f87171'; fb.textContent='Erro: ' + d.error; return; }
+    ta.value = '';
+    if (fileInput) fileInput.value = '';
+    fb.style.color='#34d399'; fb.textContent='✅ Mensagem enviada.';
+    loadComplaints();
+  } catch(e) { fb.style.color='#f87171'; fb.textContent='Erro de conexão.'; }
 }
 </script>
 

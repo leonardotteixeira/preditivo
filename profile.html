@@ -304,6 +304,7 @@ function switchTab(name) {
   if (name === 'indicacoes') loadIndicacoes();
   if (name === 'extrato') renderExtrato(_extratoPeriod);
   if (name === 'ouvidoria') loadComplaints();
+  if (name === 'seguranca') initPushUI();
 }
 
 /* ── AUTH UI ── */
@@ -530,6 +531,22 @@ function renderPage() {
         '</div>' +
         '<div id="twoFaFeedback" style="margin-top:12px;font-size:0.85rem"></div>' +
       '</div>' +
+
+      /* Push Notifications */
+      '<div class="edit-card" style="margin-top:16px">' +
+        '<div style="font-weight:700;font-size:1.05rem;margin-bottom:4px">Notificações Push</div>' +
+        '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:20px">Receba alertas mesmo com o navegador em segundo plano: resultado de apostas, respostas de tickets, novos indicados e depósitos confirmados.</div>' +
+        '<div style="display:flex;align-items:center;gap:12px;padding:16px;background:var(--surface2);border-radius:12px;margin-bottom:16px">' +
+          '<div style="font-size:1.5rem" id="pushStatusIcon">🔔</div>' +
+          '<div style="flex:1">' +
+            '<div style="font-weight:600">Notificações no navegador</div>' +
+            '<div style="font-size:0.82rem;color:var(--muted)" id="pushStatusText">Verificando...</div>' +
+          '</div>' +
+          '<div id="pushStatusBadge"></div>' +
+        '</div>' +
+        '<div id="pushActionArea"></div>' +
+        '<div id="pushFeedback" style="margin-top:10px;font-size:0.85rem"></div>' +
+      '</div>' +
     '</div>' +
 
     /* Indicações */
@@ -734,6 +751,133 @@ async function disable2fa(){
     showToast('2FA desativado.');
     renderPage(); switchTab('seguranca');
   } catch(e){ fb.style.color='#ef4444'; fb.textContent='Erro de conexão.'; }
+}
+
+/* ── PUSH NOTIFICATIONS ── */
+var pushState = { sw: null, subscription: null, vapidKey: null };
+
+function urlBase64ToUint8Array(base64String) {
+  var padding = '='.repeat((4 - base64String.length % 4) % 4);
+  var base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  var rawData = window.atob(base64);
+  var outputArray = new Uint8Array(rawData.length);
+  for (var i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+  return outputArray;
+}
+
+async function initPushUI() {
+  var icon = document.getElementById('pushStatusIcon');
+  var text = document.getElementById('pushStatusText');
+  var badge = document.getElementById('pushStatusBadge');
+  var area = document.getElementById('pushActionArea');
+  if (!icon) return; // tab not rendered yet
+
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    icon.textContent = '🚫';
+    text.textContent = 'Seu navegador não suporta notificações push.';
+    badge.innerHTML = '<span style="padding:4px 12px;border-radius:100px;font-size:0.73rem;font-weight:700;background:rgba(239,68,68,0.15);color:#ef4444">Indisponível</span>';
+    return;
+  }
+
+  var permission = Notification.permission;
+  if (permission === 'denied') {
+    icon.textContent = '🔕';
+    text.textContent = 'Notificações bloqueadas pelo navegador. Habilite nas configurações do site.';
+    badge.innerHTML = '<span style="padding:4px 12px;border-radius:100px;font-size:0.73rem;font-weight:700;background:rgba(239,68,68,0.15);color:#ef4444">Bloqueado</span>';
+    area.innerHTML = '<p style="font-size:0.82rem;color:var(--muted)">Para habilitar: clique no ícone de cadeado na barra de endereço → Notificações → Permitir.</p>';
+    return;
+  }
+
+  // Buscar chave VAPID
+  try {
+    var keyResp = await fetch(API + '/notifications/vapid-public-key');
+    var keyData = await keyResp.json();
+    if (!keyData.publicKey) throw new Error('sem chave');
+    pushState.vapidKey = keyData.publicKey;
+  } catch(e) {
+    text.textContent = 'Push notifications não configuradas no servidor.';
+    return;
+  }
+
+  // Verificar subscription atual
+  try {
+    var reg = await navigator.serviceWorker.ready;
+    pushState.sw = reg;
+    var existing = await reg.pushManager.getSubscription();
+    pushState.subscription = existing;
+
+    if (existing) {
+      icon.textContent = '🟢';
+      text.textContent = 'Notificações ativadas neste dispositivo.';
+      badge.innerHTML = '<span style="padding:4px 12px;border-radius:100px;font-size:0.73rem;font-weight:700;background:rgba(0,230,118,0.12);color:var(--green)">✓ Ativo</span>';
+      area.innerHTML = '<button class="btn-save btn-danger" onclick="disablePush()" style="margin-top:0">Desativar notificações</button>';
+    } else {
+      icon.textContent = permission === 'granted' ? '🔔' : '🔕';
+      text.textContent = permission === 'granted' ? 'Notificações desativadas neste dispositivo.' : 'Permissão pendente.';
+      badge.innerHTML = '<span style="padding:4px 12px;border-radius:100px;font-size:0.73rem;font-weight:700;background:rgba(90,104,120,0.2);color:var(--muted)">Inativo</span>';
+      area.innerHTML = '<button class="btn-save" onclick="enablePush()" style="margin-top:0">Ativar notificações</button>';
+    }
+  } catch(e) {
+    text.textContent = 'Erro ao verificar status de notificações.';
+  }
+}
+
+async function enablePush() {
+  var fb = document.getElementById('pushFeedback');
+  fb.style.color = 'var(--muted)';
+  fb.textContent = 'Solicitando permissão...';
+  try {
+    var permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      fb.style.color = '#ef4444';
+      fb.textContent = 'Permissão negada. Habilite nas configurações do navegador.';
+      return;
+    }
+    fb.textContent = 'Registrando dispositivo...';
+    var reg = pushState.sw || await navigator.serviceWorker.ready;
+    var sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(pushState.vapidKey)
+    });
+    pushState.subscription = sub;
+    var resp = await fetch(API + '/notifications/push-subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + state.token },
+      body: JSON.stringify({ subscription: sub.toJSON() })
+    });
+    var data = await resp.json();
+    if (data.error) throw new Error(data.error);
+    fb.style.color = 'var(--green)';
+    fb.textContent = '✓ Notificações ativadas com sucesso!';
+    setTimeout(initPushUI, 1000);
+  } catch(e) {
+    fb.style.color = '#ef4444';
+    fb.textContent = 'Erro: ' + e.message;
+  }
+}
+
+async function disablePush() {
+  var fb = document.getElementById('pushFeedback');
+  fb.style.color = 'var(--muted)';
+  fb.textContent = 'Desativando...';
+  try {
+    var sub = pushState.subscription;
+    if (sub) {
+      await fetch(API + '/notifications/push-unsubscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + state.token },
+        body: JSON.stringify({ endpoint: sub.endpoint })
+      });
+      await sub.unsubscribe();
+      pushState.subscription = null;
+    }
+    fb.style.color = 'var(--green)';
+    fb.textContent = 'Notificações desativadas.';
+    setTimeout(initPushUI, 800);
+  } catch(e) {
+    fb.style.color = '#ef4444';
+    fb.textContent = 'Erro: ' + e.message;
+  }
 }
 
 /* ── INDICAÇÕES ── */

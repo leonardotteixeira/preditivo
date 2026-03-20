@@ -2508,8 +2508,11 @@ function sbRunKyc() {
     res.style.display = 'block';
 
     // Ajusta badge: name_mismatch tem cor própria
+    var bureau = d.bureauResult || {};
+    var pep    = d.pepResult || {};
+    var sanc   = d.sanctionsResult || {};
     var displayStatus = d.finalStatus;
-    if (d.bureau && d.bureau.rejectionReason === 'name_mismatch') displayStatus = 'name_mismatch';
+    if (bureau.rejectionReason === 'name_mismatch') displayStatus = 'name_mismatch';
     document.getElementById('sbKycBadge').innerHTML = sbStatusBadge(displayStatus);
 
     var rejLabels = {
@@ -2520,24 +2523,19 @@ function sbRunKyc() {
     };
 
     var details = '';
-    if (d.bureau) {
-      details += '<b>Bureau:</b> provider=' + (d.bureau.provider||'-') +
-        ' | status=<b>' + (d.bureau.status||'-') + '</b>' +
-        (d.bureau.rejectionReason ? ' | motivo=' + (rejLabels[d.bureau.rejectionReason] || d.bureau.rejectionReason) : '') + '<br>';
-    }
-    if (d.pep) {
-      details += '<b>PEP:</b> ' + (d.pep.isPep ? '🟡 Identificado' : '🟢 Limpo') +
-        ' | confiança=' + ((d.pep.confidence||0)*100).toFixed(0) + '%' +
-        (d.pep.matchedKeywords && d.pep.matchedKeywords.length ? ' | keywords: ' + d.pep.matchedKeywords.join(', ') : '') + '<br>';
-    }
-    if (d.sanctions) {
-      details += '<b>Sanções:</b> ' + (d.sanctions.isSanctioned ? '🔴 SANCIONADO' : '🟢 Limpo') +
-        (d.sanctions.lists && d.sanctions.lists.length ? ' | listas: ' + d.sanctions.lists.join(', ') : '') + '<br>';
-    }
+    details += '<b>Bureau:</b> provider=' + (bureau.provider||'-') +
+      ' | status=<b>' + (bureau.status||'-') + '</b>' +
+      (bureau.rejectionReason ? ' | motivo=' + (rejLabels[bureau.rejectionReason] || bureau.rejectionReason) : '') + '<br>';
+    details += '<b>PEP:</b> ' + (pep.isPep ? '🟡 Identificado' : '🟢 Limpo') +
+      ' | confiança=' + ((pep.confidence||0)*100).toFixed(0) + '%' +
+      (pep.matchedKeywords && pep.matchedKeywords.length ? ' | keywords: ' + pep.matchedKeywords.join(', ') : '') + '<br>';
+    details += '<b>Sanções:</b> ' + (sanc.isSanctioned ? '🔴 SANCIONADO' : '🟢 Limpo') +
+      (sanc.lists && sanc.lists.length ? ' | listas: ' + sanc.lists.join(', ') : '') + '<br>';
+
     document.getElementById('sbKycDetails').innerHTML = details;
     document.getElementById('sbKycMsg').innerHTML =
       '<span style="color:var(--muted);font-size:0.78rem">Mensagem ao usuário:</span><br>' +
-      '<em>"' + (d.finalMessage||d.error||'Erro desconhecido') + '"</em>' +
+      '<em>"' + (d.message||d.error||'Erro desconhecido') + '"</em>' +
       (apply ? '<br><br><span style="color:#10b981;font-size:0.75rem">✅ Aplicado ao banco de dados</span>' : '');
   })
   .catch(function(e){
@@ -2580,12 +2578,13 @@ function sbRunSuit() {
 
     var profileColors = { conservador:'#10b981', moderado:'#818cf8', arrojado:'#ef4444' };
     var pc = profileColors[d.profile] || '#ccc';
+    var profileLabel = (d.profileData && d.profileData.label) ? d.profileData.label : d.profile;
     document.getElementById('sbSuitBadge').innerHTML =
       '<span style="background:rgba(128,128,255,.15);color:' + pc + ';padding:4px 14px;border-radius:20px;font-weight:700">' +
-      (d.profileLabel || d.profile) + '</span>';
+      profileLabel + '</span>';
 
     var lim = d.limits || {};
-    var exp = d.expiresAt ? new Date(d.expiresAt).toLocaleDateString('pt-BR') : '-';
+    var exp = d.expires_at ? new Date(d.expires_at).toLocaleDateString('pt-BR') : '-';
     document.getElementById('sbSuitDetails').innerHTML =
       '<b>Score:</b> ' + (d.score||'-') + ' / 15<br>' +
       '<b>Limite por aposta:</b> R$' + (lim.max_bet_single||0).toLocaleString('pt-BR') + '<br>' +

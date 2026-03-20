@@ -1164,8 +1164,7 @@ async function loadComplaints() {
       if (atts.length) {
         attHtml = '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">' +
           atts.map(function(a) {
-            var url = (window.API || '') + '/auth/complaints/' + c.id + '/attachment/' + a.id;
-            return '<a href="'+url+'" target="_blank" style="font-size:0.78rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:3px 9px;color:var(--text);text-decoration:none">📎 '+a.filename+'</a>';
+            return '<button onclick="downloadUserAttachment(\''+c.id+'\',\''+a.id+'\',\''+(a.filename||'arquivo').replace(/'/g,"\\'")+'\',\''+(a.mime_type||'application/octet-stream')+'\')" style="font-size:0.78rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:3px 9px;color:var(--text);cursor:pointer">📎 '+a.filename+'</button>';
           }).join('') +
         '</div>';
       }
@@ -1196,6 +1195,20 @@ async function loadComplaints() {
       '</div>';
     }).join('');
   } catch(e) { el.innerHTML = '<div style="color:#f87171;font-size:0.85rem">Erro ao carregar reclamações.</div>'; }
+}
+
+async function downloadUserAttachment(complaintId, attId, filename, mimeType) {
+  var url = (window.API || API) + '/auth/complaints/' + complaintId + '/attachment/' + attId;
+  try {
+    var r = await fetch(url, { headers: state.token ? { Authorization: 'Bearer ' + state.token } : {} });
+    if (!r.ok) { alert('Erro ao baixar anexo (' + r.status + ')'); return; }
+    var blob = await r.blob();
+    var objUrl = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = objUrl; a.download = filename || 'anexo'; a.target = '_blank';
+    document.body.appendChild(a); a.click();
+    setTimeout(function() { URL.revokeObjectURL(objUrl); document.body.removeChild(a); }, 1000);
+  } catch(e) { alert('Erro ao baixar: ' + e.message); }
 }
 
 async function sendComplaintReply(id) {

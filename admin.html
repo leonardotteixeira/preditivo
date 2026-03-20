@@ -2289,11 +2289,13 @@ function renderTicketDetail(d) {
   var kyc = { approved:'✅ Aprovado', pending:'⏳ Pendente', rejected:'❌ Rejeitado' }[c.kyc_status] || c.kyc_status;
   var suit = c.suitability_profile ? c.suitability_profile.charAt(0).toUpperCase() + c.suitability_profile.slice(1) : '—';
   document.getElementById('tkUserProfile').innerHTML =
-    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;font-size:0.82rem">' +
+    '<div style="display:grid;grid-template-columns:1fr 2fr 1fr 1fr;gap:8px 14px;font-size:0.82rem;margin-bottom:6px">' +
       '<div><div style="color:var(--muted);font-size:0.7rem;margin-bottom:2px">Usuário</div><strong>' + (c.username||'—') + '</strong></div>' +
-      '<div><div style="color:var(--muted);font-size:0.7rem;margin-bottom:2px">Email</div>' + (c.email||'—') + '</div>' +
+      '<div><div style="color:var(--muted);font-size:0.7rem;margin-bottom:2px">Email</div><span style="word-break:break-all;font-size:0.78rem">' + (c.email||'—') + '</span></div>' +
       '<div><div style="color:var(--muted);font-size:0.7rem;margin-bottom:2px">KYC</div>' + kyc + '</div>' +
       '<div><div style="color:var(--muted);font-size:0.7rem;margin-bottom:2px">Suitability</div>' + suit + '</div>' +
+    '</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px 14px;font-size:0.82rem">' +
       '<div><div style="color:var(--muted);font-size:0.7rem;margin-bottom:2px">Saldo</div>R$ ' + parseFloat(c.balance||0).toFixed(2) + '</div>' +
       '<div><div style="color:var(--muted);font-size:0.7rem;margin-bottom:2px">Total Depositado</div>R$ ' + parseFloat(c.total_deposited||0).toFixed(2) + '</div>' +
       '<div><div style="color:var(--muted);font-size:0.7rem;margin-bottom:2px">Apostas</div>' + (c.total_bets||0) + '</div>' +
@@ -2308,12 +2310,12 @@ function renderTicketDetail(d) {
   msgs.forEach(function(m) { threadHtml += renderThreadMsg(m); });
   document.getElementById('tkThread').innerHTML = threadHtml || '<div style="color:var(--muted);font-size:0.85rem;text-align:center;padding:20px">Sem mensagens ainda.</div>';
 
-  // Anexos
+  // Anexos — usa fetch com token (endpoint exige Bearer admin)
   if (atts.length) {
     document.getElementById('tkAttachments').style.display = '';
     document.getElementById('tkAttList').innerHTML = atts.map(function(a) {
-      var url = API + '/admin/complaints/' + c.id + '/attachment/' + a.id;
-      return '<a href="' + url + '" target="_blank" style="display:inline-flex;align-items:center;gap:5px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:5px 10px;color:var(--text);text-decoration:none;font-size:0.8rem">📎 ' + (a.filename||'arquivo') + '</a>';
+      return '<button onclick="downloadAttachment(\'' + c.id + '\',\'' + a.id + '\',\'' + (a.filename||'arquivo').replace(/'/g,"\\'") + '\',\'' + (a.mime_type||'application/octet-stream') + '\')" ' +
+        'style="display:inline-flex;align-items:center;gap:5px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:5px 10px;color:var(--text);font-size:0.8rem;cursor:pointer">📎 ' + (a.filename||'arquivo') + '</button>';
     }).join('');
   }
 }
@@ -2373,6 +2375,28 @@ function saveTicketNotes() {
     showToast('✅ Notas salvas.');
   })
   .catch(function(e){ showToast('Erro: ' + e.message); });
+}
+
+// Download de anexo com Bearer token (não pode usar link direto pois exige auth)
+function downloadAttachment(complaintId, attId, filename, mimeType) {
+  var url = API + '/admin/complaints/' + complaintId + '/attachment/' + attId;
+  fetch(url, { headers: adminHeaders() })
+    .then(function(r) {
+      if (!r.ok) { showToast('Erro ao baixar anexo (' + r.status + ')'); return null; }
+      return r.blob();
+    })
+    .then(function(blob) {
+      if (!blob) return;
+      var objUrl = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = objUrl;
+      a.download = filename || 'anexo';
+      a.target = '_blank';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function() { URL.revokeObjectURL(objUrl); document.body.removeChild(a); }, 1000);
+    })
+    .catch(function(e) { showToast('Erro ao baixar: ' + e.message); });
 }
 
 // ══════════════════════════════════════════════════════════════════════════════

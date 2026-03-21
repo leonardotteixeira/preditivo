@@ -11,519 +11,20 @@
   <meta name="apple-mobile-web-app-title" content="Bubuya">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <title>Bubuya — Mercados de Previsão</title>
-
-<!-- Fonts -->
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-
-<style>
-  :root {
-    --bg: #030303;
-    --surface: #0a0a0a;
-    --surface2: #121212;
-    --border: rgba(255,255,255,0.06);
-    --green: #10b981;
-    --green-dim: rgba(16,185,129,0.1);
-    --red: #f43f5e;
-    --red-dim: rgba(244,63,94,0.1);
-    --blue: #3b82f6;
-    --gold: #f59e0b;
-    --text: #ffffff;
-    --muted: #888888;
-    --accent: var(--blue);
-    --glow-blue: rgba(59,130,246,0.12);
-    --glow-green: rgba(16,185,129,0.08);
-  }
-
-  /* FOOTER STYLES */
-  footer {
-    background: rgba(5,5,5,0.5);
-    border-top: 1px solid var(--border);
-    padding: 80px 24px 40px;
-    margin-top: 80px;
-    position: relative;
-    z-index: 1;
-  }
-  .footer-inner {
-    max-width: 1440px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
-    gap: 48px;
-  }
-  .footer-col h4 {
-    color: var(--text);
-    margin-bottom: 24px;
-    font-size: 0.95rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-  .footer-col ul { list-style: none; }
-  .footer-col li { margin-bottom: 12px; }
-  .footer-col a {
-    color: var(--muted);
-    text-decoration: none;
-    font-size: 0.95rem;
-    transition: all 0.2s;
-    cursor: pointer;
-    font-weight: 500;
-  }
-  .footer-col a:hover { color: var(--blue); }
-  
-  .footer-legal {
-    max-width: 1440px;
-    margin: 48px auto 0;
-    padding-top: 32px;
-    border-top: 1px solid var(--border);
-    color: var(--muted);
-    font-size: 0.85rem;
-    line-height: 1.8;
-  }
-  .footer-disclaimer {
-    background: rgba(255,255,255,0.02);
-    border: 1px solid var(--border);
-    padding: 20px;
-    border-radius: 12px;
-    margin-top: 24px;
-  }
-  
-  @media (max-width: 960px) { .footer-inner { grid-template-columns: 1fr 1fr; gap: 32px; } }
-  @media (max-width: 600px) { .footer-inner { grid-template-columns: 1fr; gap: 28px; } }
-
-  * { margin:0; padding:0; box-sizing:border-box; }
-
-  body {
-    font-family: 'Inter', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* NOISE TEXTURE */
-  body::before {
-    content:'';
-    position:fixed;
-    inset:0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events:none;
-    z-index:0;
-    opacity:0.3;
-  }
-
-  /* AMBIENT GLOWS - Spreading Blue/Green Aura */
-  .glow-container { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-  .glow { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.6; }
-  .glow-1 { top: -10%; left: 10%; width: 600px; height: 600px; background: radial-gradient(circle, var(--glow-blue) 0%, transparent 70%); }
-  .glow-2 { bottom: 10%; right: -10%; width: 800px; height: 800px; background: radial-gradient(circle, var(--glow-green) 0%, transparent 70%); }
-  .glow-3 { top: 40%; left: -20%; width: 700px; height: 700px; background: radial-gradient(circle, var(--glow-blue) 0%, transparent 70%); }
-  .glow-4 { bottom: -10%; left: 30%; width: 500px; height: 500px; background: radial-gradient(circle, var(--glow-blue) 0%, transparent 70%); }
-
-  /* ---- HEADERS & NAV ---- */
-  header {
-    position:sticky; top:0; z-index:100;
-    background:rgba(5,5,5,0.85);
-    backdrop-filter:blur(24px);
-    border-bottom:1px solid var(--border);
-    padding:0 24px;
-  }
-  .header-inner {
-    max-width:1440px; margin:0 auto;
-    display:flex; align-items:center; height:72px;
-    gap:40px;
-  }
-  .logo {
-    font-size:1.6rem; font-weight:800; letter-spacing:-1px;
-    background:linear-gradient(135deg, var(--green), var(--blue));
-    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
-    cursor:pointer;
-  }
-  
-  .header-search {
-    flex:1; max-width:400px; margin:0 auto;
-    display:flex; align-items:center; gap:12px;
-    background:var(--surface2); border:1px solid var(--border);
-    border-radius:14px; padding:10px 18px;
-    transition:all 0.3s cubic-bezier(0.2, 0, 0, 1);
-  }
-  .header-search:focus-within { border-color:var(--blue); background:rgba(255,255,255,0.04); box-shadow:0 0 0 4px rgba(59,130,246,0.1); }
-  .header-search input {
-    background:transparent; border:none; outline:none;
-    color:var(--text); font-family:inherit; font-size:0.95rem; width:100%;
-  }
-
-  .header-right { display:flex; align-items:center; gap:20px; }
-  nav { display:flex; gap:12px; }
-  nav a {
-    padding:10px 16px; border-radius:12px; color:var(--muted);
-    text-decoration:none; font-size:0.95rem; font-weight:600;
-    transition:all 0.2s; cursor:pointer;
-  }
-  nav a:hover, nav a.active { color:var(--text); background:rgba(255,255,255,0.06); }
-
-  /* ---- BUTTONS ---- */
-  .btn-primary {
-    background:var(--green); color:#080c10; font-weight:800;
-    padding:14px 28px; border-radius:14px; border:none; cursor:pointer;
-    transition:all 0.3s cubic-bezier(0.2, 0, 0, 1); font-family:inherit;
-    box-shadow: 0 4px 12px rgba(16,185,129,0.2);
-  }
-  .btn-primary:hover { opacity:0.9; transform:translateY(-2px); box-shadow: 0 8px 24px rgba(16,185,129,0.3); }
-  
-  .btn-outline {
-    background:transparent; color:var(--text); font-weight:700;
-    padding:10px 20px; border-radius:12px; border:1px solid var(--border);
-    cursor:pointer; transition:all 0.2s; font-family:inherit;
-  }
-  .btn-outline:hover { border-color:var(--muted); background:rgba(255,255,255,0.05); }
-
-  .btn-finance {
-    padding: 10px 18px; border-radius: 12px; font-weight: 700; font-size: 0.9rem;
-    border: 1px solid var(--border); cursor: pointer; transition: all 0.2s;
-  }
-  .btn-deposit { background: var(--green-dim); color: var(--green); border-color: rgba(16,185,129,0.2); }
-  .btn-deposit:hover { background: var(--green); color: #000; }
-  .btn-withdraw { background: rgba(255,255,255,0.05); color: var(--text); }
-  .btn-withdraw:hover { border-color: var(--text); }
-
-  /* ---- HERO SECTION ---- */
-  .hero {
-    max-width:1440px; margin:0 auto; padding:80px 24px;
-    display:grid; grid-template-columns: 1.1fr 0.9fr; gap:80px; align-items:center;
-    position: relative; z-index: 1;
-  }
-  .hero-tag {
-    display:inline-flex; align-items:center; gap:8px;
-    padding:8px 20px; background:rgba(255,255,255,0.05); border:1px solid var(--border);
-    border-radius:100px; font-size:0.85rem; color:var(--green); font-weight:700;
-    margin-bottom:28px;
-  }
-  h1 { font-size:5rem; line-height:0.95; letter-spacing:-3px; margin-bottom:28px; font-weight:800; }
-  h1 span { color:var(--blue); }
-  .hero-sub { color:var(--muted); font-size:1.3rem; line-height:1.6; margin-bottom:54px; max-width:580px; }
-  
-  .hero-actions { display:flex; gap:20px; margin-bottom:72px; }
-  
-  .hero-stats { display:flex; gap:56px; border-top:1px solid var(--border); padding-top:40px; }
-  .hero-stat-item { display:flex; flex-direction:column; gap:6px; }
-  .hero-stat-val { font-size:2.4rem; font-weight:800; font-family:'Space Grotesk', sans-serif; letter-spacing:-1px; }
-  .hero-stat-lbl { font-size:0.85rem; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; font-weight:700; opacity:0.7; }
-
-  .hero-image-wrapper { position:relative; }
-  .hero-image-main {
-    width: 100%; border-radius: 36px; border: 1px solid var(--border);
-    box-shadow: 0 50px 100px -20px rgba(0,0,0,0.85);
-    transform: perspective(1000px) rotateY(-5deg) rotateX(2deg);
-    transition: all 0.6s cubic-bezier(0.2, 0, 0, 1);
-  }
-  .hero-image-wrapper:hover .hero-image-main { transform: perspective(1000px) rotateY(0deg) rotateX(0deg); box-shadow: 0 60px 120px -20px rgba(0,0,0,0.9); }
-
-  /* ---- SECTIONS ---- */
-  .section { display:none; max-width:1440px; margin:0 auto; padding:48px 24px 100px; position: relative; z-index: 1; }
-  .section.active { display:block; animation: fadeIn 0.4s ease-out; }
-  @keyframes fadeIn { from{opacity:0; transform:translateY(15px)} to{opacity:1; transform:translateY(0)} }
-
-  /* ---- MARKET GRID ---- */
-  .topic-tags { display:flex; gap:12px; margin-bottom:44px; overflow-x:auto; scrollbar-width:none; padding:4px 0; }
-  .topic-tag {
-    padding:12px 24px; background:var(--surface2); border:1px solid var(--border);
-    border-radius:100px; color:var(--muted); font-size:0.95rem; font-weight:600;
-    cursor:pointer; transition:all 0.3s cubic-bezier(0.2, 0, 0, 1); white-space:nowrap;
-  }
-  .topic-tag:hover { color:var(--text); border-color:var(--muted); background:rgba(255,255,255,0.06); transform:translateY(-2px); }
-  .topic-tag.active { background:var(--text); color:var(--bg); border-color:var(--text); }
-
-  .markets-grid {
-    display:grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap:28px;
-  }
-
-  /* ANIMATED CARDS BY CATEGORY */
-  @keyframes borderRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-  .market-card {
-    background:var(--surface); border:1px solid var(--border);
-    border-radius:32px; padding:32px; cursor:pointer;
-    transition:all 0.4s cubic-bezier(0.2, 0, 0, 1);
-    display:flex; flex-direction:column; gap:26px; height: 100%;
-    position: relative; overflow: hidden;
-  }
-  .market-card::before {
-    content: ''; position: absolute; inset: -2px;
-    background: conic-gradient(from 0deg, transparent, var(--card-color, var(--blue)), transparent);
-    animation: borderRotate 4s linear infinite; opacity: 0; transition: opacity 0.4s;
-    z-index: -1;
-  }
-  .market-card:hover::before { opacity: 0.8; }
-  .market-card::after {
-    content: ''; position: absolute; inset: 1px;
-    background: var(--surface); border-radius: 31px; z-index: -1;
-  }
-  
-  .market-card:hover { border-color:transparent; transform:translateY(-10px); box-shadow: 0 40px 80px -20px rgba(0,0,0,0.7); }
-  
-  .mc-title { font-size:1.2rem; font-weight:700; line-height:1.4; color:var(--text); }
-  .mc-category { font-size:0.8rem; font-weight:800; color:var(--card-color, var(--muted)); text-transform:uppercase; letter-spacing:2px; margin-bottom:8px; }
-  
-  .mc-sentiment { height:10px; background:var(--surface2); border-radius:12px; overflow:hidden; display:flex; border:1px solid rgba(255,255,255,0.03); }
-  .mc-sentiment-yes { background:var(--green); height:100%; transition: width 1s cubic-bezier(0.2, 0, 0, 1); filter: drop-shadow(0 0 8px var(--green)); }
-  .mc-sentiment-no { background:var(--red); height:100%; transition: width 1s cubic-bezier(0.2, 0, 0, 1); filter: drop-shadow(0 0 8px var(--red)); }
-  
-  .mc-footer { display:flex; justify-content:space-between; align-items:center; margin-top:auto; padding-top:24px; border-top:1px solid var(--border); }
-  .mc-stat { font-size:0.95rem; color:var(--muted); }
-  .mc-stat strong { color:var(--text); letter-spacing: -0.5px; }
-  .mc-odds { display:flex; gap:12px; }
-  .mc-odd { padding:12px 24px; border-radius:16px; font-weight:800; font-size:1rem; transition: all 0.2s; }
-  .mc-odd.yes { background:var(--green-dim); color:var(--green); }
-  .mc-odd.no { background:var(--red-dim); color:var(--red); }
-  .market-card:hover .mc-odd.yes { background: var(--green); color: #000; }
-  .market-card:hover .mc-odd.no { background: var(--red); color: #fff; }
-
-  /* ---- RANKING & PORTFOLIO ---- */
-  .ranking-list { display: flex; flex-direction: column; gap: 12px; }
-  .ranking-card { 
-    background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 20px; 
-    display: flex; align-items: center; gap: 20px; transition: all 0.3s;
-  }
-  .ranking-card:hover { border-color: var(--blue); transform: translateX(5px); }
-  .rank-pos { font-size: 1.5rem; font-weight: 900; color: var(--muted); width: 40px; text-align: center; font-family: 'Space Grotesk'; }
-  .rank-pos.gold { color: var(--gold); }
-  .rank-pos.silver { color: #c0c0c0; }
-  .rank-pos.bronze { color: #cd7f32; }
-  .rank-avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 800; }
-  .rank-name { flex: 1; font-weight: 700; font-size: 1.1rem; }
-  .rank-profit { font-family: 'DM Mono'; font-weight: 700; color: var(--green); }
-
-  .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-  .portfolio-card { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 24px; }
-  .port-profit { font-size: 1.6rem; font-weight: 800; margin: 10px 0; }
-  .pnl-tab { padding:3px 10px; border-radius:8px; border:none; font-size:0.72rem; font-weight:600; cursor:pointer; background:transparent; color:var(--muted); transition:all .2s; }
-  .pnl-tab.active, .pnl-tab:hover { background:var(--green); color:#000; }
-  @media (max-width:600px) { #portfolioSummary { grid-template-columns:1fr !important; } }
-
-  /* ---- MODALS ---- */
-  .modal-overlay {
-    display:none; position:fixed; inset:0;
-    background:rgba(0,0,0,0.85); backdrop-filter:blur(16px);
-    z-index:1000; align-items:center; justify-content:center;
-  }
-  .modal-overlay.active { display:flex; }
-  .modal {
-    background:var(--surface); border:1px solid var(--border);
-    border-radius:36px; padding:48px; width:90%; max-width:520px;
-    position:relative; animation: modalIn 0.5s cubic-bezier(0.2, 0, 0, 1);
-    box-shadow: 0 40px 120px rgba(0,0,0,0.9);
-  }
-  @keyframes modalIn { from{opacity:0; transform:scale(0.8) translateY(60px)} to{opacity:1; transform:scale(1) translateY(0)} }
-  .modal-close { position:absolute; top:28px; right:28px; background:none; border:none; color:var(--muted); cursor:pointer; font-size:2rem; }
-  .modal-title { font-size:2rem; font-weight:900; margin-bottom:12px; letter-spacing:-1.5px; }
-  .modal-sub { color:var(--muted); font-size:1.1rem; margin-bottom:36px; line-height:1.5; }
-  
-  .modal-input {
-    width:100%; background:var(--surface2); border:1px solid var(--border);
-    border-radius:16px; padding:18px 24px; color:var(--text); font-size:1.1rem;
-    margin-bottom:16px; outline:none; transition:all 0.3s;
-  }
-  .modal-input:focus { border-color:var(--blue); background:rgba(255,255,255,0.04); box-shadow: 0 0 0 4px rgba(59,130,246,0.1); }
-
-  /* ---- DEPOSIT TABS ---- */
-  .deposit-tabs {
-    display: flex; gap: 8px; margin-bottom: 28px;
-    background: var(--surface2); border-radius: 16px; padding: 6px;
-    border: 1px solid var(--border);
-  }
-  .deposit-tab {
-    flex: 1; padding: 10px 8px; border-radius: 12px; border: none;
-    background: transparent; color: var(--muted); font-family: inherit;
-    font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-  }
-  .deposit-tab:hover { color: var(--text); }
-  .deposit-tab.active { background: var(--surface); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
-  .deposit-tab.active.pix  { color: var(--green); }
-  .deposit-tab.active.gw   { color: var(--blue); }
-  .deposit-tab.active.eth  { color: #f97316; }
-
-  .deposit-panel { display: none; }
-  .deposit-panel.active { display: block; animation: fadeIn 0.25s ease-out; }
-
-  .pix-qr-box {
-    background: #ffffff; border-radius: 20px; padding: 20px;
-    display: flex; flex-direction: column; align-items: center; gap: 12px;
-    margin: 20px 0;
-  }
-  .pix-key-box {
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 14px; padding: 16px 20px; margin: 16px 0;
-    display: flex; justify-content: space-between; align-items: center; gap: 12px;
-  }
-  .pix-key-val { font-family: 'DM Mono', monospace; font-size: 0.85rem; color: var(--text); word-break: break-all; }
-  .btn-copy {
-    background: var(--green-dim); color: var(--green); border: 1px solid rgba(16,185,129,0.2);
-    border-radius: 10px; padding: 8px 16px; font-size: 0.82rem; font-weight: 700;
-    cursor: pointer; white-space: nowrap; transition: all 0.2s; font-family: inherit;
-  }
-  .btn-copy:hover { background: var(--green); color: #000; }
-
-  .wallet-chip {
-    display: flex; align-items: center; gap: 12px;
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 14px; padding: 14px 18px; margin-bottom: 20px;
-  }
-  .wallet-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); }
-  .wallet-addr { font-family: 'DM Mono', monospace; font-size: 0.85rem; color: var(--muted); }
-
-  .method-info {
-    background: rgba(255,255,255,0.02); border: 1px solid var(--border);
-    border-radius: 14px; padding: 14px 18px; margin-bottom: 20px;
-    font-size: 0.88rem; color: var(--muted); line-height: 1.6;
-  }
-  .method-info strong { color: var(--text); }
-
-  /* ---- TOAST ---- */
-  .toast {
-    position:fixed; bottom:32px; right:32px; z-index:2000;
-    background:var(--surface); border:1px solid var(--border);
-    padding:20px 36px; border-radius:24px; display:flex; align-items:center; gap:20px;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.7); border-left: 4px solid var(--green);
-    transform:translateY(150%); opacity:0; transition:all 0.6s cubic-bezier(0.2, 0, 0, 1);
-  }
-  .toast.show { transform:translateY(0); opacity:1; }
-
-  /* ---- MOBILE MENU ---- */
-  .mobile-menu-btn {
-    display: none; background: none; border: none; cursor: pointer;
-    padding: 8px; color: var(--text); margin-left: auto;
-    flex-direction: column; gap: 5px; align-items: center; justify-content: center;
-  }
-  .mobile-menu-btn span {
-    display: block; width: 22px; height: 2px; background: var(--text);
-    border-radius: 2px; transition: all 0.3s;
-  }
-  .mobile-menu-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-  .mobile-menu-btn.open span:nth-child(2) { opacity: 0; }
-  .mobile-menu-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
-  .mobile-nav {
-    display: none; position: fixed; top: 60px; left: 0; right: 0; bottom: 0;
-    background: rgba(3,3,3,0.97); backdrop-filter: blur(24px); z-index: 98;
-    padding: 20px 20px 40px; flex-direction: column; gap: 8px;
-    border-top: 1px solid var(--border); overflow-y: auto;
-    animation: mobileNavIn 0.25s cubic-bezier(0.2, 0, 0, 1);
-  }
-  .mobile-nav.open { display: flex; }
-  @keyframes mobileNavIn { from{opacity:0; transform:translateY(-12px)} to{opacity:1; transform:translateY(0)} }
-  .mobile-nav-search {
-    display: flex; align-items: center; gap: 12px;
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 14px; padding: 14px 18px; margin-bottom: 8px;
-  }
-  .mobile-nav-search input {
-    background: transparent; border: none; outline: none;
-    color: var(--text); font-family: inherit; font-size: 1rem; width: 100%;
-  }
-  .mobile-nav a {
-    padding: 16px 20px; border-radius: 14px; color: var(--text); font-size: 1.05rem;
-    font-weight: 700; text-decoration: none; cursor: pointer; display: block;
-    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
-    transition: background 0.2s;
-  }
-  .mobile-nav a:hover, .mobile-nav a.active { background: rgba(255,255,255,0.07); }
-  .mobile-nav-divider { height: 1px; background: var(--border); margin: 8px 0; }
-  .mobile-nav-auth { display: flex; gap: 10px; margin-top: 4px; }
-  .mobile-nav-auth button { flex: 1; padding: 14px !important; font-size: 0.95rem !important; }
-
-  /* ---- RESPONSIVE: TABLET ---- */
-  @media (max-width: 768px) {
-    /* Header */
-    .header-inner { height: 60px; gap: 16px; }
-    .header-search { display: none; }
-    nav { display: none; }
-    #authArea { display: none; }
-    .mobile-menu-btn { display: flex; }
-
-    /* Hero */
-    .hero { grid-template-columns: 1fr; gap: 0; padding: 36px 20px 28px; }
-    .hero-image-wrapper { display: none; }
-    h1 { font-size: clamp(2.4rem, 10vw, 4rem); letter-spacing: -2px; margin-bottom: 20px; }
-    .hero-sub { font-size: 1rem; margin-bottom: 28px; }
-    .hero-actions { flex-direction: column; gap: 10px; margin-bottom: 36px; }
-    .hero-actions .btn-primary,
-    .hero-actions .btn-outline { padding: 16px 24px !important; font-size: 1rem !important; text-align: center; width: 100%; }
-    .hero-stats { gap: 28px; flex-wrap: wrap; }
-    .hero-stat-val { font-size: 1.8rem; }
-    .hero-tag { font-size: 0.78rem; padding: 6px 14px; }
-
-    /* Markets */
-    .markets-grid { grid-template-columns: 1fr; gap: 14px; }
-    .market-card { padding: 20px; border-radius: 22px; gap: 16px; }
-    .mc-odd { padding: 10px 16px; font-size: 0.92rem; }
-
-    /* Sections */
-    .section { padding: 24px 16px 80px; }
-
-    /* Modal — bottom sheet */
-    .modal-overlay { align-items: flex-end; }
-    .modal {
-      width: 100%; max-width: 100%;
-      border-radius: 28px 28px 0 0;
-      padding: 32px 24px 40px;
-      max-height: 92vh; overflow-y: auto;
-    }
-    .modal::before {
-      content: ''; display: block; width: 40px; height: 4px;
-      background: rgba(255,255,255,0.15); border-radius: 2px;
-      margin: -16px auto 20px;
-    }
-    @keyframes modalIn { from{opacity:0; transform:translateY(100%)} to{opacity:1; transform:translateY(0)} }
-    .modal-title { font-size: 1.6rem; letter-spacing: -1px; }
-    .modal-sub { font-size: 0.95rem; margin-bottom: 24px; }
-    .modal-close { top: 20px; right: 20px; font-size: 1.6rem; }
-
-    /* Toast */
-    .toast { bottom: 16px; right: 16px; left: 16px; padding: 14px 18px; border-radius: 16px; }
-
-    /* Ranking */
-    .ranking-card { padding: 14px 16px; gap: 12px; }
-    .rank-avatar { width: 40px; height: 40px; font-size: 0.85rem; }
-    .rank-name { font-size: 0.95rem; }
-
-    /* Portfolio */
-    .portfolio-grid { grid-template-columns: 1fr; }
-    .portfolio-card { padding: 18px; }
-
-    /* Footer */
-    footer { padding: 48px 20px 32px; margin-top: 40px; }
-  }
-
-  /* ---- RESPONSIVE: SMALL PHONES ---- */
-  @media (max-width: 400px) {
-    h1 { font-size: 2.1rem; letter-spacing: -1.5px; }
-    .hero-stat-val { font-size: 1.5rem; }
-    .hero-stats { gap: 20px; }
-    .mc-footer { flex-direction: column; align-items: flex-start; gap: 12px; }
-    .mc-odds { width: 100%; }
-    .mc-odd { flex: 1; text-align: center; }
-  }
-
-</style>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 </head>
-<body>
-
-<div class="glow-container">
-  <div class="glow glow-1"></div>
-  <div class="glow glow-2"></div>
-  <div class="glow glow-3"></div>
-  <div class="glow glow-4"></div>
-</div>
+<body class="min-h-screen bg-bubuya-void text-zinc-100 antialiased">
+<a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[2001] focus:rounded-md focus:bg-zinc-100 focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-zinc-950">Ir para o conteúdo</a>
 
 <!-- TOAST -->
 <div class="toast" id="toast">
-  <div class="toast-icon" id="toastIcon">✨</div>
+  <div class="toast-icon" id="toastIcon">âœ¨</div>
   <div>
     <span class="toast-title" id="toastTitle">Sucesso</span>
-    <span class="toast-msg" id="toastMsg">Operação realizada com êxito.</span>
+    <span class="toast-msg" id="toastMsg">OperaÃ§Ã£o realizada com Ãªxito.</span>
   </div>
 </div>
 
@@ -540,7 +41,7 @@
     <div class="header-right">
       <nav>
         <a onclick="window.showSection('home')" id="nav-home" class="active">Explorar</a>
-        <a onclick="window.showSection('portfolio')" id="nav-portfolio">Portfólio</a>
+        <a onclick="window.showSection('portfolio')" id="nav-portfolio">PortfÃ³lio</a>
         <a onclick="window.showSection('ranking')" id="nav-ranking">Ranking</a>
       </nav>
       <div id="authArea">
@@ -563,9 +64,9 @@
     <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
     <input type="text" placeholder="O que vai acontecer?" oninput="window.onSearchInput(this.value);closeMobileMenu()">
   </div>
-  <a onclick="window.showSection('home');closeMobileMenu()" id="mnav-home" class="active">🔥 Explorar</a>
-  <a onclick="window.showSection('portfolio');closeMobileMenu()" id="mnav-portfolio">📊 Portfólio</a>
-  <a onclick="window.showSection('ranking');closeMobileMenu()" id="mnav-ranking">🏆 Ranking</a>
+  <a onclick="window.showSection('home');closeMobileMenu()" id="mnav-home" class="active">ðŸ”¥ Explorar</a>
+  <a onclick="window.showSection('portfolio');closeMobileMenu()" id="mnav-portfolio">ðŸ“Š PortfÃ³lio</a>
+  <a onclick="window.showSection('ranking');closeMobileMenu()" id="mnav-ranking">ðŸ† Ranking</a>
   <div class="mobile-nav-divider"></div>
   <div class="mobile-nav-auth" id="mobileAuthArea">
     <button class="btn-primary" onclick="window.openModal('loginModal');closeMobileMenu()">Entrar</button>
@@ -574,16 +75,17 @@
 </div>
 
 <!-- SECTION: HOME -->
+<main id="main-content">
 <div class="section active" id="section-home">
   <div class="hero">
     <div class="hero-content">
-      <div class="hero-tag">✨ O futuro é agora</div>
+      <div class="hero-tag">Mercados de eventos · Brasil</div>
       <h1 id="heroH1">A plataforma de<br><span>mercados preditivos</span><br>do Brasil.</h1>
-      <p class="hero-sub" id="heroSub">Aposte no que você acredita. Política, esportes, economia e entretenimento com pagamentos instantâneos via PIX.</p>
+      <p class="hero-sub" id="heroSub">Aposte no que vocÃª acredita. PolÃ­tica, esportes, economia e entretenimento com pagamentos instantÃ¢neos via PIX.</p>
       
-      <div class="hero-actions" id="heroActions" style="display: flex; gap: 20px;">
-        <button class="btn-primary" style="padding:20px 54px; font-size:1.2rem" onclick="window.openModal('registerModal')">Começar Agora — R$100 Grátis</button>
-        <button class="btn-outline" style="padding:20px 36px; font-size:1.2rem" onclick="document.getElementById('marketsGrid').scrollIntoView({behavior:'smooth'})">Explorar</button>
+      <div class="hero-actions flex flex-col gap-3 sm:flex-row sm:items-center" id="heroActions">
+        <button type="button" class="btn-primary px-8 py-3 text-base" onclick="window.openModal('registerModal')">Abrir conta</button>
+        <button type="button" class="btn-outline px-6 py-3 text-base" onclick="document.getElementById('marketsGrid').scrollIntoView({behavior:'smooth'})">Ver mercados</button>
       </div>
 
       <div class="hero-stats">
@@ -607,59 +109,54 @@
     </div>
   </div>
 
-  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:44px">
-    <div class="topic-tags" id="topicTags" style="margin-bottom:0;flex:1">
-      <span class="topic-tag active" onclick="window.setCatFilter('all', this)">🔥 Em Alta</span>
-      <span class="topic-tag" onclick="window.setCatFilter('politica', this)">🏛️ Política</span>
-      <span class="topic-tag" onclick="window.setCatFilter('economia', this)">📈 Economia</span>
-      <span class="topic-tag" onclick="window.setCatFilter('futebol', this)">⚽ Esportes</span>
-      <span class="topic-tag" onclick="window.setCatFilter('tech', this)">💻 Tecnologia</span>
+  <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div class="topic-tags mb-0 flex-1" id="topicTags" role="tablist" aria-label="Categorias">
+      <button type="button" class="topic-tag active" role="tab" aria-selected="true" onclick="window.setCatFilter('all', this)">Em alta</button>
+      <button type="button" class="topic-tag" role="tab" aria-selected="false" onclick="window.setCatFilter('politica', this)">Política</button>
+      <button type="button" class="topic-tag" role="tab" aria-selected="false" onclick="window.setCatFilter('economia', this)">Economia</button>
+      <button type="button" class="topic-tag" role="tab" aria-selected="false" onclick="window.setCatFilter('futebol', this)">Esportes</button>
+      <button type="button" class="topic-tag" role="tab" aria-selected="false" onclick="window.setCatFilter('tech', this)">Tecnologia</button>
     </div>
-    <!-- Ordenação -->
-    <div style="display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:4px;flex-shrink:0">
-      <button class="sort-btn" onclick="window.setSortOrder('hot',this)"
-        style="padding:5px 12px;border:none;border-radius:8px;font-size:0.78rem;font-weight:600;cursor:pointer;background:var(--surface2);color:var(--text);transition:all .15s">🔥 Hot</button>
-      <button class="sort-btn" onclick="window.setSortOrder('recent',this)"
-        style="padding:5px 12px;border:none;border-radius:8px;font-size:0.78rem;font-weight:600;cursor:pointer;background:none;color:var(--muted);transition:all .15s">✨ Recentes</button>
-      <button class="sort-btn" onclick="window.setSortOrder('volume',this)"
-        style="padding:5px 12px;border:none;border-radius:8px;font-size:0.78rem;font-weight:600;cursor:pointer;background:none;color:var(--muted);transition:all .15s">💰 Volume</button>
-      <button class="sort-btn" onclick="window.setSortOrder('closing',this)"
-        style="padding:5px 12px;border:none;border-radius:8px;font-size:0.78rem;font-weight:600;cursor:pointer;background:none;color:var(--muted);transition:all .15s">⏰ Encerra</button>
+    <div class="sort-toolbar flex shrink-0 gap-0.5 rounded-md border border-bubuya-line bg-bubuya-surface p-1" role="group" aria-label="Ordenação">
+      <button type="button" class="sort-btn rounded px-3 py-1.5 text-xs font-semibold text-zinc-100 bg-bubuya-raised" onclick="window.setSortOrder('hot',this)">Hot</button>
+      <button type="button" class="sort-btn rounded px-3 py-1.5 text-xs font-semibold text-zinc-500 hover:text-zinc-300" onclick="window.setSortOrder('recent',this)">Recentes</button>
+      <button type="button" class="sort-btn rounded px-3 py-1.5 text-xs font-semibold text-zinc-500 hover:text-zinc-300" onclick="window.setSortOrder('volume',this)">Volume</button>
+      <button type="button" class="sort-btn rounded px-3 py-1.5 text-xs font-semibold text-zinc-500 hover:text-zinc-300" onclick="window.setSortOrder('closing',this)">Encerra</button>
     </div>
   </div>
 
   <div class="markets-grid" id="marketsGrid">
-    <div style="text-align:center; grid-column:1/-1; padding:120px; color:var(--muted); font-size: 1.2rem;">Carregando sua próxima previsão...</div>
+    <div class="col-span-full py-24 text-center text-sm text-zinc-500">Carregando mercados…</div>
   </div>
 </div>
 
 <!-- SECTION: PORTFOLIO -->
 <div class="section" id="section-portfolio">
   <div style="max-width: 1000px; margin: 0 auto;">
-    <h2 class="modal-title">Portfólio Ativo</h2>
-    <p class="modal-sub">Gerencie seus ativos e posições em tempo real.</p>
+    <h2 class="modal-title">PortfÃ³lio Ativo</h2>
+    <p class="modal-sub">Gerencie seus ativos e posiÃ§Ãµes em tempo real.</p>
     <!-- RESUMO: CARTEIRA + P&L -->
     <div id="portfolioSummary" style="display:none;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px">
       <!-- CARTEIRA -->
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px">
         <div style="margin-bottom:4px"><span style="font-size:0.78rem;font-weight:600;color:var(--muted);letter-spacing:.06em">CARTEIRA</span></div>
-        <div id="pnlPortfolioValue" style="font-size:2rem;font-weight:800;color:var(--text);margin-bottom:2px">R$ —</div>
+        <div id="pnlPortfolioValue" style="font-size:2rem;font-weight:800;color:var(--text);margin-bottom:2px">R$ â€”</div>
         <div id="pnlPortfolioChange" style="font-size:0.82rem;color:var(--muted);margin-bottom:16px"></div>
         <div style="display:flex;gap:12px">
           <div style="flex:1;background:var(--bg);border-radius:12px;padding:12px">
-            <div style="font-size:0.7rem;color:var(--muted);margin-bottom:4px">DISPONÍVEL</div>
-            <div id="pnlAvailable" style="font-size:1rem;font-weight:700;color:var(--green)">R$ —</div>
+            <div style="font-size:0.7rem;color:var(--muted);margin-bottom:4px">DISPONÃVEL</div>
+            <div id="pnlAvailable" style="font-size:1rem;font-weight:700;color:var(--green)">R$ â€”</div>
           </div>
           <div style="flex:1;background:var(--bg);border-radius:12px;padding:12px">
-            <div style="font-size:0.7rem;color:var(--muted);margin-bottom:4px">EM POSIÇÕES</div>
-            <div id="pnlInvested" style="font-size:1rem;font-weight:700;color:var(--text)">R$ —</div>
+            <div style="font-size:0.7rem;color:var(--muted);margin-bottom:4px">EM POSIÃ‡Ã•ES</div>
+            <div id="pnlInvested" style="font-size:1rem;font-weight:700;color:var(--text)">R$ â€”</div>
           </div>
         </div>
       </div>
-      <!-- LUCRO / PREJUÍZO -->
+      <!-- LUCRO / PREJUÃZO -->
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-          <span style="font-size:0.78rem;font-weight:600;color:var(--muted);letter-spacing:.06em">LUCRO / PREJUÍZO</span>
+          <span style="font-size:0.78rem;font-weight:600;color:var(--muted);letter-spacing:.06em">LUCRO / PREJUÃZO</span>
           <div style="display:flex;gap:4px">
             <button onclick="window.loadPnl('day')"   class="pnl-tab" data-p="day">1D</button>
             <button onclick="window.loadPnl('week')"  class="pnl-tab" data-p="week">1S</button>
@@ -667,7 +164,7 @@
             <button onclick="window.loadPnl('all')"   class="pnl-tab active" data-p="all">ALL</button>
           </div>
         </div>
-        <div id="pnlTotal" style="font-size:2rem;font-weight:800;margin-bottom:2px;color:var(--text)">R$ —</div>
+        <div id="pnlTotal" style="font-size:2rem;font-weight:800;margin-bottom:2px;color:var(--text)">R$ â€”</div>
         <div id="pnlMeta" style="font-size:0.82rem;color:var(--muted);margin-bottom:12px"></div>
         <canvas id="pnlChart" height="60" style="width:100%;display:block"></canvas>
       </div>
@@ -687,7 +184,7 @@
 
     <div id="portfolioContent" class="portfolio-grid">
       <div style="grid-column: 1/-1; padding:100px; text-align:center; background: var(--surface2); border: 1px solid var(--border); border-radius: 32px; color:var(--muted);">
-        Conecte-se para visualizar suas previsões e lucros acumulados.
+        Conecte-se para visualizar suas previsÃµes e lucros acumulados.
       </div>
     </div>
   </div>
@@ -699,10 +196,11 @@
     <h2 class="modal-title">Hall da Fama</h2>
     <p class="modal-sub">Os traders mais lucrativos da plataforma.</p>
     <div id="rankingList" class="ranking-list">
-      <div style="padding:80px; text-align:center; color:var(--muted)">Calculando posições...</div>
+      <div style="padding:80px; text-align:center; color:var(--muted)">Calculando posiÃ§Ãµes...</div>
     </div>
   </div>
 </div>
+</main>
 
 <!-- MODALS -->
 <div class="modal-overlay" id="loginModal">
@@ -712,7 +210,7 @@
     <!-- Step 1: Email + Senha -->
     <div id="loginStep1">
       <h2 class="modal-title">Entrar</h2>
-      <p class="modal-sub">Bem-vindo de volta à Bubuya.</p>
+      <p class="modal-sub">Bem-vindo de volta Ã  Bubuya.</p>
       <input class="modal-input" type="email" id="loginEmail" placeholder="Email" onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()">
       <input class="modal-input" type="password" id="loginPass" placeholder="Senha" onkeydown="if(event.key==='Enter')window.doLogin()">
       <button class="btn-primary" style="width:100%" onclick="window.doLogin()">Acessar Conta</button>
@@ -724,24 +222,24 @@
       </p>
     </div>
 
-    <!-- Step 2: Código 2FA TOTP (oculto por padrão) -->
+    <!-- Step 2: CÃ³digo 2FA TOTP (oculto por padrÃ£o) -->
     <div id="loginStep2" style="display:none">
-      <h2 class="modal-title">Verificação em 2 Etapas</h2>
-      <p class="modal-sub" style="text-align:center">Abra o Google Authenticator ou Authy e digite o código de 6 dígitos.</p>
+      <h2 class="modal-title">VerificaÃ§Ã£o em 2 Etapas</h2>
+      <p class="modal-sub" style="text-align:center">Abra o Google Authenticator ou Authy e digite o cÃ³digo de 6 dÃ­gitos.</p>
       <input class="modal-input" id="login2faCode" type="text" inputmode="numeric"
-        placeholder="Código de 6 dígitos" maxlength="6" autocomplete="one-time-code"
+        placeholder="CÃ³digo de 6 dÃ­gitos" maxlength="6" autocomplete="one-time-code"
         onkeydown="if(event.key==='Enter')window.doLogin2fa()">
       <div id="login2faMsg" style="display:none;padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:0.88rem;background:rgba(244,63,94,0.1);color:#f43f5e;border:1px solid rgba(244,63,94,0.2)"></div>
       <button class="btn-primary" style="width:100%;margin-top:4px" onclick="window.doLogin2fa()">Verificar</button>
       <button onclick="window.backToLoginStep1()"
         style="width:100%;margin-top:10px;background:none;border:none;color:var(--muted);font-size:0.85rem;cursor:pointer;padding:8px">
-        ← Voltar
+        â† Voltar
       </button>
     </div>
   </div>
 </div>
 
-<!-- MODAL: Recuperação de Senha -->
+<!-- MODAL: RecuperaÃ§Ã£o de Senha -->
 <div class="modal-overlay" id="forgotModal">
   <div class="modal">
     <button class="modal-close" onclick="window.closeModal('forgotModal')">&times;</button>
@@ -749,10 +247,10 @@
     <!-- Step 1: Email -->
     <div id="forgotStep1">
       <h2 class="modal-title">Recuperar Senha</h2>
-      <p class="modal-sub">Informe seu email e enviaremos um código de verificação.</p>
+      <p class="modal-sub">Informe seu email e enviaremos um cÃ³digo de verificaÃ§Ã£o.</p>
       <input class="modal-input" type="email" id="forgotEmail" placeholder="Seu email">
       <div id="forgotMsg1" style="display:none;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:0.9rem"></div>
-      <button class="btn-primary" style="width:100%" onclick="window.doForgotPassword()">Enviar Código</button>
+      <button class="btn-primary" style="width:100%" onclick="window.doForgotPassword()">Enviar CÃ³digo</button>
       <p style="text-align:center;margin-top:16px;font-size:0.9rem">
         <a href="#" style="color:var(--muted);text-decoration:underline;cursor:pointer"
            onclick="event.preventDefault();window.closeModal('forgotModal');window.openModal('loginModal')">
@@ -761,19 +259,19 @@
       </p>
     </div>
 
-    <!-- Step 2: Código + Nova Senha -->
+    <!-- Step 2: CÃ³digo + Nova Senha -->
     <div id="forgotStep2" style="display:none">
       <h2 class="modal-title">Nova Senha</h2>
-      <p class="modal-sub">Insira o código recebido no email e escolha sua nova senha.</p>
-      <input class="modal-input" id="forgotCode" placeholder="Código de verificação" maxlength="10">
-      <input class="modal-input" type="password" id="forgotNewPass" placeholder="Nova senha (mín. 6 caracteres)">
+      <p class="modal-sub">Insira o cÃ³digo recebido no email e escolha sua nova senha.</p>
+      <input class="modal-input" id="forgotCode" placeholder="CÃ³digo de verificaÃ§Ã£o" maxlength="10">
+      <input class="modal-input" type="password" id="forgotNewPass" placeholder="Nova senha (mÃ­n. 6 caracteres)">
       <input class="modal-input" type="password" id="forgotConfirmPass" placeholder="Confirmar nova senha">
       <div id="forgotMsg2" style="display:none;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:0.9rem"></div>
       <button class="btn-primary" style="width:100%" onclick="window.doResetPassword()">Redefinir Senha</button>
       <p style="text-align:center;margin-top:16px;font-size:0.9rem">
         <a href="#" style="color:var(--muted);text-decoration:underline;cursor:pointer"
            onclick="event.preventDefault();document.getElementById('forgotStep2').style.display='none';document.getElementById('forgotStep1').style.display='block'">
-          Reenviar código
+          Reenviar cÃ³digo
         </a>
       </p>
     </div>
@@ -786,42 +284,42 @@
 
     <!-- Step 1: Dados de cadastro -->
     <div id="regStep1">
-      <h2 class="modal-title">Começar Agora</h2>
-      <p class="modal-sub">Dê seu primeiro palpite com R$100 de bônus.</p>
+      <h2 class="modal-title">ComeÃ§ar Agora</h2>
+      <p class="modal-sub">DÃª seu primeiro palpite com R$100 de bÃ´nus.</p>
       <input class="modal-input" id="regUser" placeholder="Nome completo"
         onkeydown="if(event.key==='Enter')document.getElementById('regEmail').focus()">
       <input class="modal-input" type="email" id="regEmail" placeholder="E-mail"
         onkeydown="if(event.key==='Enter')document.getElementById('regPass').focus()">
-      <input class="modal-input" type="password" id="regPass" placeholder="Sua senha (mín. 6 caracteres)"
+      <input class="modal-input" type="password" id="regPass" placeholder="Sua senha (mÃ­n. 6 caracteres)"
         onkeydown="if(event.key==='Enter')document.getElementById('regRef').focus()">
-      <input class="modal-input" id="regRef" placeholder="Código de convite (opcional)"
+      <input class="modal-input" id="regRef" placeholder="CÃ³digo de convite (opcional)"
         style="text-transform:uppercase"
         oninput="this.value=this.value.toUpperCase()"
         onkeydown="if(event.key==='Enter')window.doRegister()">
       <label style="display:flex;align-items:flex-start;gap:10px;margin:12px 0 4px;cursor:pointer">
         <input type="checkbox" id="regLgpd" style="margin-top:3px;accent-color:var(--green);flex-shrink:0;width:16px;height:16px">
         <span style="font-size:0.82rem;color:var(--muted);line-height:1.5">
-          Li e aceito a <a href="./privacidade.html" target="_blank" style="color:var(--green)">Política de Privacidade</a>
+          Li e aceito a <a href="./privacidade.html" target="_blank" style="color:var(--green)">PolÃ­tica de Privacidade</a>
           e consinto com o tratamento dos meus dados conforme a Lei 13.709/2018 (LGPD). <span style="color:var(--red)">*</span>
         </span>
       </label>
       <button class="btn-primary" style="width:100%;margin-top:8px" onclick="window.doRegister()">Criar Conta e Ganhar</button>
       <p style="text-align:center;margin-top:12px;font-size:0.82rem;color:var(--muted)">
-        Ao criar uma conta você concorda com os
+        Ao criar uma conta vocÃª concorda com os
         <a href="./terms.html" target="_blank" style="color:var(--green)">Termos de Uso</a>.
       </p>
     </div>
 
-    <!-- Step 2: Verificação de email -->
+    <!-- Step 2: VerificaÃ§Ã£o de email -->
     <div id="regStep2" style="display:none">
       <h2 class="modal-title">Confirme seu email</h2>
-      <p class="modal-sub" id="regStep2Sub">Enviamos um código para o seu email.</p>
-      <input class="modal-input" id="regCode" placeholder="Código de verificação"
+      <p class="modal-sub" id="regStep2Sub">Enviamos um cÃ³digo para o seu email.</p>
+      <input class="modal-input" id="regCode" placeholder="CÃ³digo de verificaÃ§Ã£o"
         maxlength="10" onkeydown="if(event.key==='Enter')window.doRegisterVerify()">
       <button class="btn-primary" style="width:100%" onclick="window.doRegisterVerify()">Confirmar e Entrar</button>
       <button onclick="window.backToRegStep1()"
         style="width:100%;margin-top:10px;background:none;border:none;color:var(--muted);font-size:0.85rem;cursor:pointer;padding:8px">
-        ← Voltar
+        â† Voltar
       </button>
     </div>
   </div>
@@ -836,34 +334,34 @@
     <!-- TABS -->
     <div class="deposit-tabs">
       <button class="deposit-tab pix active" onclick="window.switchDepositTab('pix',this)">
-        <span>💚</span> PIX Direto
+        <span>ðŸ’š</span> PIX Direto
       </button>
       <button class="deposit-tab gw" onclick="window.switchDepositTab('gw',this)">
-        <span>⚡</span> PIX Asaas
+        <span>âš¡</span> PIX Asaas
       </button>
       <button class="deposit-tab eth" onclick="window.switchDepositTab('eth',this)">
-        <span>🦊</span> Cripto
+        <span>ðŸ¦Š</span> Cripto
       </button>
     </div>
 
     <!-- PAINEL: PIX DIRETO -->
     <div class="deposit-panel active" id="panel-pix">
       <div class="method-info">
-        Transfira o valor diretamente para a chave PIX da plataforma. <strong>Envie o comprovante</strong> para nosso suporte após o pagamento.
+        Transfira o valor diretamente para a chave PIX da plataforma. <strong>Envie o comprovante</strong> para nosso suporte apÃ³s o pagamento.
       </div>
-      <input class="modal-input" type="number" id="pixDirectAmount" placeholder="Valor (R$) — mínimo R$10" min="10">
+      <input class="modal-input" type="number" id="pixDirectAmount" placeholder="Valor (R$) â€” mÃ­nimo R$10" min="10">
       <button class="btn-primary" style="width:100%;font-size:1rem" onclick="window.depositPIXDireto()">Ver Chave PIX</button>
       <div id="pixDirectOutput" style="display:none; margin-top:20px;">
         <div class="pix-qr-box">
           <img id="pixDirectQR" src="" alt="QR Code PIX" style="width:160px;height:160px;border-radius:8px;">
-          <p style="font-size:0.85rem; color:#333; font-weight:700">Escaneie com qualquer app bancário</p>
+          <p style="font-size:0.85rem; color:#333; font-weight:700">Escaneie com qualquer app bancÃ¡rio</p>
         </div>
         <div class="pix-key-box">
-          <span class="pix-key-val" id="pixDirectKey">—</span>
+          <span class="pix-key-val" id="pixDirectKey">â€”</span>
           <button class="btn-copy" onclick="window.copyPixKey()">Copiar</button>
         </div>
         <p id="pixDirectInstr" style="text-align:center; color:var(--muted); font-size:0.85rem; margin-top:8px; line-height:1.6">
-          Após transferir, envie o comprovante para nosso suporte.
+          ApÃ³s transferir, envie o comprovante para nosso suporte.
         </p>
       </div>
     </div>
@@ -871,14 +369,14 @@
     <!-- PAINEL: GATEWAY ASAAS (PIX QR Code inline) -->
     <div class="deposit-panel" id="panel-gw">
       <div class="method-info">
-        Gera um <strong>QR Code PIX</strong> instantaneamente. Escaneie pelo app do seu banco e o saldo é creditado de forma automática.
+        Gera um <strong>QR Code PIX</strong> instantaneamente. Escaneie pelo app do seu banco e o saldo Ã© creditado de forma automÃ¡tica.
       </div>
-      <input class="modal-input" type="number" id="gatewayAmount" placeholder="Valor (R$) — mínimo R$5" min="5">
+      <input class="modal-input" type="number" id="gatewayAmount" placeholder="Valor (R$) â€” mÃ­nimo R$5" min="5">
       <button class="btn-primary" style="width:100%;font-size:1rem;background:var(--blue);box-shadow:0 4px 12px rgba(59,130,246,0.25)" id="btnAsaas" onclick="window.depositGateway()">
         Gerar QR Code PIX
       </button>
 
-      <!-- QR Code exibido após gerar a cobrança -->
+      <!-- QR Code exibido apÃ³s gerar a cobranÃ§a -->
       <div id="asaasQrSection" style="display:none;margin-top:20px;text-align:center">
         <img id="asaasQrImage" src="" alt="QR Code PIX"
           style="width:200px;height:200px;border-radius:12px;border:1px solid var(--border);display:block;margin:0 auto">
@@ -891,7 +389,7 @@
           </div>
         </div>
         <p style="font-size:0.8rem;color:var(--muted);margin-top:12px;line-height:1.5">
-          Aguarde a confirmação automática.<br>O saldo aparece em segundos após o pagamento.
+          Aguarde a confirmaÃ§Ã£o automÃ¡tica.<br>O saldo aparece em segundos apÃ³s o pagamento.
         </p>
       </div>
     </div>
@@ -900,26 +398,26 @@
     <div class="deposit-panel" id="panel-eth">
       <div id="ethNoWallet" style="display:none">
         <div class="method-info" style="border-color:rgba(249,115,22,0.2)">
-          Você precisa conectar sua carteira MetaMask para usar essa opção.
+          VocÃª precisa conectar sua carteira MetaMask para usar essa opÃ§Ã£o.
         </div>
         <button class="btn-primary" style="width:100%;background:#f97316;box-shadow:0 4px 12px rgba(249,115,22,0.25)" onclick="window.connectWalletAndDeposit()">
-          🦊 Conectar MetaMask
+          ðŸ¦Š Conectar MetaMask
         </button>
       </div>
       <div id="ethWalletReady">
         <div class="wallet-chip">
           <div class="wallet-dot"></div>
-          <span class="wallet-addr" id="ethWalletAddr">—</span>
+          <span class="wallet-addr" id="ethWalletAddr">â€”</span>
         </div>
         <div class="method-info">
-          Envie <strong>ETH ou MATIC</strong> para a carteira da plataforma. O equivalente em reais é creditado após 1 confirmação na rede.
+          Envie <strong>ETH ou MATIC</strong> para a carteira da plataforma. O equivalente em reais Ã© creditado apÃ³s 1 confirmaÃ§Ã£o na rede.
         </div>
         <input class="modal-input" type="number" id="ethAmount" placeholder="Valor em ETH" step="0.001" min="0.001">
         <div style="font-size:0.82rem; color:var(--muted); margin:-8px 0 16px; padding:0 4px">
-          Taxa de rede (gas) cobrada pela MetaMask, não pela Bubuya.
+          Taxa de rede (gas) cobrada pela MetaMask, nÃ£o pela Bubuya.
         </div>
         <button class="btn-primary" style="width:100%;font-size:1rem;background:#f97316;box-shadow:0 4px 12px rgba(249,115,22,0.25)" onclick="window.depositCripto()">
-          🦊 Enviar via MetaMask
+          ðŸ¦Š Enviar via MetaMask
         </button>
       </div>
     </div>
@@ -932,29 +430,29 @@
     <button class="modal-close" onclick="window.closeModal('withdrawModal')">&times;</button>
     <h2 class="modal-title">Sacar Lucros</h2>
 
-    <!-- PASSO 1: escolha do método -->
+    <!-- PASSO 1: escolha do mÃ©todo -->
     <div id="withdrawStep1">
       <div class="deposit-tabs" style="margin-bottom:20px">
         <button class="deposit-tab pix active" id="wtab-pix" onclick="window.switchWithdrawTab('pix',this)">
-          <span>💸</span> PIX
+          <span>ðŸ’¸</span> PIX
         </button>
         <button class="deposit-tab eth" id="wtab-eth" onclick="window.switchWithdrawTab('eth',this)">
-          <span>🦊</span> Cripto
+          <span>ðŸ¦Š</span> Cripto
         </button>
       </div>
 
       <!-- PIX -->
       <div id="wpanel-pix" class="deposit-panel active">
         <div class="method-info">
-          Solicite o saque via PIX. Um <strong>código de confirmação</strong> será enviado ao seu e-mail.
+          Solicite o saque via PIX. Um <strong>cÃ³digo de confirmaÃ§Ã£o</strong> serÃ¡ enviado ao seu e-mail.
         </div>
-        <input class="modal-input" type="number" id="wAmountPix" placeholder="Valor (R$) — mínimo R$20" min="20">
+        <input class="modal-input" type="number" id="wAmountPix" placeholder="Valor (R$) â€” mÃ­nimo R$20" min="20">
         <select class="modal-input" id="wPixType" style="background:var(--surface2);color:var(--text);cursor:pointer">
           <option value="">Tipo de chave PIX</option>
           <option value="cpf">CPF</option>
           <option value="email">E-mail</option>
           <option value="telefone">Telefone</option>
-          <option value="aleatoria">Chave aleatória</option>
+          <option value="aleatoria">Chave aleatÃ³ria</option>
         </select>
         <input class="modal-input" id="wPixKey" placeholder="Sua chave PIX">
         <button class="btn-primary" style="width:100%" onclick="window.requestWithdraw('pix')">Solicitar Saque via PIX</button>
@@ -965,70 +463,71 @@
         <!-- sem wallet conectada -->
         <div id="wEthNoWallet">
           <div class="method-info" style="border-color:rgba(249,115,22,0.2)">
-            Conecte sua carteira MetaMask. O valor em <strong>ETH</strong> será enviado ao seu endereço após aprovação.
+            Conecte sua carteira MetaMask. O valor em <strong>ETH</strong> serÃ¡ enviado ao seu endereÃ§o apÃ³s aprovaÃ§Ã£o.
           </div>
           <button class="btn-primary" style="width:100%;background:#f97316;box-shadow:0 4px 12px rgba(249,115,22,0.25)" onclick="window.connectWalletAndWithdraw()">
-            🦊 Conectar MetaMask
+            ðŸ¦Š Conectar MetaMask
           </button>
         </div>
         <!-- com wallet conectada -->
         <div id="wEthReady" style="display:none">
           <div class="wallet-chip" style="margin-bottom:16px">
             <div class="wallet-dot"></div>
-            <span class="wallet-addr" id="wEthAddr">—</span>
+            <span class="wallet-addr" id="wEthAddr">â€”</span>
           </div>
           <div class="method-info" style="border-color:rgba(249,115,22,0.2)">
-            O saque será processado manualmente em até <strong>24h</strong>. Um código de confirmação será enviado ao seu e-mail.
+            O saque serÃ¡ processado manualmente em atÃ© <strong>24h</strong>. Um cÃ³digo de confirmaÃ§Ã£o serÃ¡ enviado ao seu e-mail.
           </div>
-          <input class="modal-input" type="number" id="wAmountEth" placeholder="Valor (R$) — mínimo R$20" min="20">
+          <input class="modal-input" type="number" id="wAmountEth" placeholder="Valor (R$) â€” mÃ­nimo R$20" min="20">
           <button class="btn-primary" style="width:100%;background:#f97316;box-shadow:0 4px 12px rgba(249,115,22,0.25)" onclick="window.requestWithdraw('eth')">
-            🦊 Solicitar Saque em Cripto
+            ðŸ¦Š Solicitar Saque em Cripto
           </button>
         </div>
       </div>
     </div>
 
-    <!-- PASSO 2: confirmação por e-mail -->
+    <!-- PASSO 2: confirmaÃ§Ã£o por e-mail -->
     <div id="withdrawStep2" style="display:none">
       <div class="method-info" style="text-align:center">
-        Enviamos um código para o seu e-mail. <br>Digite abaixo para confirmar o saque.
+        Enviamos um cÃ³digo para o seu e-mail. <br>Digite abaixo para confirmar o saque.
       </div>
-      <input class="modal-input" id="wVerifyCode" placeholder="Código de verificação" maxlength="6" style="text-align:center;letter-spacing:6px;font-size:1.4rem;font-weight:800">
+      <input class="modal-input" id="wVerifyCode" placeholder="CÃ³digo de verificaÃ§Ã£o" maxlength="6" style="text-align:center;letter-spacing:6px;font-size:1.4rem;font-weight:800">
       <button class="btn-primary" style="width:100%" onclick="window.confirmWithdraw()">Confirmar Saque</button>
       <button class="btn-outline" style="width:100%;margin-top:8px" onclick="window.withdrawBackToStep1()">Voltar</button>
     </div>
   </div>
 </div>
 
-<!-- RISK TERM MODAL (BLOCO 5) — não pode ser fechado sem aceitar -->
+<!-- RISK TERM MODAL (BLOCO 5) â€” nÃ£o pode ser fechado sem aceitar -->
 <div id="riskTermModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);align-items:center;justify-content:center">
   <div style="background:#0f0f0f;border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:36px;max-width:560px;width:90%;max-height:90vh;overflow-y:auto;position:relative">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
-      <div style="width:40px;height:40px;background:rgba(245,158,11,0.15);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">⚠️</div>
-      <h3 style="font-size:1.15rem;font-weight:700;color:#fff">Termo de Ciência de Riscos</h3>
+      <div style="width:40px;height:40px;background:rgba(245,158,11,0.15);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">âš ï¸</div>
+      <h3 style="font-size:1.15rem;font-weight:700;color:#fff">Termo de CiÃªncia de Riscos</h3>
     </div>
     <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px;margin-bottom:20px;font-size:0.875rem;color:rgba(255,255,255,0.75);line-height:1.7;max-height:280px;overflow-y:auto">
       <p style="font-weight:600;color:#fff;margin-bottom:12px">Antes de operar, leia atentamente:</p>
-      <p style="margin-bottom:10px"><strong style="color:rgba(255,255,255,0.9)">1. Natureza do produto:</strong> Mercados de previsão envolvem risco de perda total do capital investido. Não há garantia de retorno.</p>
-      <p style="margin-bottom:10px"><strong style="color:rgba(255,255,255,0.9)">2. Risco de liquidez:</strong> Posições abertas podem não ter compradores disponíveis ao preço desejado, podendo resultar em perdas.</p>
-      <p style="margin-bottom:10px"><strong style="color:rgba(255,255,255,0.9)">3. Volatilidade:</strong> Os preços das posições podem variar significativamente em curtos períodos de tempo.</p>
-      <p style="margin-bottom:10px"><strong style="color:rgba(255,255,255,0.9)">4. Limitações do perfil:</strong> Seu perfil de investidor (suitability) determina os limites máximos de operação. Esses limites visam proteger seu patrimônio.</p>
-      <p style="margin-bottom:10px"><strong style="color:rgba(255,255,255,0.9)">5. Responsabilidade:</strong> As decisões de investimento são de sua exclusiva responsabilidade. A Bubuya não presta aconselhamento financeiro.</p>
-      <p style="margin-bottom:10px"><strong style="color:rgba(255,255,255,0.9)">6. Regulamentação:</strong> Esta plataforma opera em conformidade com a Resolução CVM 30/2021 e demais normas aplicáveis.</p>
-      <p><strong style="color:rgba(255,255,255,0.9)">7. Público adequado:</strong> Este produto é destinado apenas a investidores que compreenderam e aceitam os riscos envolvidos.</p>
+      <p style="margin-bottom:10px"><strong style="color:rgba(255,255,255,0.9)">1. Natureza do produto:</strong> Mercados de previsÃ£o envolvem risco de perda total do capital investido. NÃ£o hÃ¡ garantia de retorno.</p>
+      <p style="margin-bottom:10px"><strong style="color:rgba(255,255,255,0.9)">2. Risco de liquidez:</strong> PosiÃ§Ãµes abertas podem nÃ£o ter compradores disponÃ­veis ao preÃ§o desejado, podendo resultar em perdas.</p>
+      <p style="margin-bottom:10px"><strong style="color:rgba(255,255,255,0.9)">3. Volatilidade:</strong> Os preÃ§os das posiÃ§Ãµes podem variar significativamente em curtos perÃ­odos de tempo.</p>
+      <p style="margin-bottom:10px"><strong style="color:rgba(255,255,255,0.9)">4. LimitaÃ§Ãµes do perfil:</strong> Seu perfil de investidor (suitability) determina os limites mÃ¡ximos de operaÃ§Ã£o. Esses limites visam proteger seu patrimÃ´nio.</p>
+      <p style="margin-bottom:10px"><strong style="color:rgba(255,255,255,0.9)">5. Responsabilidade:</strong> As decisÃµes de investimento sÃ£o de sua exclusiva responsabilidade. A Bubuya nÃ£o presta aconselhamento financeiro.</p>
+      <p style="margin-bottom:10px"><strong style="color:rgba(255,255,255,0.9)">6. RegulamentaÃ§Ã£o:</strong> Esta plataforma opera em conformidade com a ResoluÃ§Ã£o CVM 30/2021 e demais normas aplicÃ¡veis.</p>
+      <p><strong style="color:rgba(255,255,255,0.9)">7. PÃºblico adequado:</strong> Este produto Ã© destinado apenas a investidores que compreenderam e aceitam os riscos envolvidos.</p>
     </div>
     <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-bottom:20px;padding:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px">
       <input type="checkbox" id="riskTermCheck" onchange="window.toggleRiskTermBtn()" style="width:18px;height:18px;margin-top:2px;flex-shrink:0;accent-color:#10b981;cursor:pointer">
-      <span style="font-size:0.875rem;color:rgba(255,255,255,0.8);line-height:1.5">Li e compreendi os riscos descritos acima. Declaro que estou ciente de que posso perder o capital investido e que as decisões de operação são de minha exclusiva responsabilidade.</span>
+      <span style="font-size:0.875rem;color:rgba(255,255,255,0.8);line-height:1.5">Li e compreendi os riscos descritos acima. Declaro que estou ciente de que posso perder o capital investido e que as decisÃµes de operaÃ§Ã£o sÃ£o de minha exclusiva responsabilidade.</span>
     </label>
     <button id="riskTermAcceptBtn" onclick="window.acceptRiskTerm()" disabled style="width:100%;padding:14px;background:#10b981;color:#000;font-weight:700;font-size:0.95rem;border:none;border-radius:12px;cursor:not-allowed;opacity:0.4;transition:all .2s;font-family:inherit">Aceitar e Continuar</button>
-    <p style="text-align:center;margin-top:12px;font-size:0.78rem;color:#888">Versão v1.0 — Este aceite fica registrado conforme Resolução CVM 30/2021</p>
+    <p style="text-align:center;margin-top:12px;font-size:0.78rem;color:#888">VersÃ£o v1.0 â€” Este aceite fica registrado conforme ResoluÃ§Ã£o CVM 30/2021</p>
   </div>
 </div>
 
-<script src="./config.js?v=20260321"></script>
-<script src="./security.js?v=20260322"></script>
+<script src="/config.js?v=20260326"></script>
+<script src="/security.js?v=20260326"></script>
 <script>
+window.__bubuyaStart = function() {
 window.state = { markets: [], user: null, balance: 0, catFilter: 'all', searchQuery: '', walletAddress: null };
 window.API = window.PREDITIVO_CONFIG.API_BASE;
 
@@ -1056,12 +555,12 @@ document.addEventListener('click', function(e) {
 });
 
 const CAT_COLORS = {
-  politica: '#3b82f6', // Blue
-  economia: '#f59e0b', // Gold
-  futebol: '#10b981',  // Green
-  esportes: '#10b981', 
-  tech: '#8b5cf6',     // Purple
-  geral: '#6366f1'
+  politica: '#5b9bd5',
+  economia: '#a16207',
+  futebol: '#15803d',
+  esportes: '#15803d',
+  tech: '#6d28d9',
+  geral: '#71717a'
 };
 
 window.showToast = (icon, title, msg) => {
@@ -1130,52 +629,27 @@ window.renderMarkets = () => {
   if (window.state.catFilter !== 'all') filtered = filtered.filter(m => (m.category||'Geral').toLowerCase() === window.state.catFilter);
   if (window.state.searchQuery) filtered = filtered.filter(m => (m.title||'').toLowerCase().includes(window.state.searchQuery));
 
-  // Ordenação
+  // OrdenaÃ§Ã£o
   const sort = window.state.sortOrder || 'hot';
   if (sort === 'recent')  filtered = [...filtered].sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
   if (sort === 'volume')  filtered = [...filtered].sort((a,b) => parseFloat(b.total_volume||0) - parseFloat(a.total_volume||0));
   if (sort === 'closing') filtered = [...filtered].sort((a,b) => new Date(a.ends_at||a.expiration_date||'9999') - new Date(b.ends_at||b.expiration_date||'9999'));
 
-  if(filtered.length === 0) {
+  if (filtered.length === 0) {
     const isSearching = window.state.searchQuery || (window.state.catFilter && window.state.catFilter !== 'all');
-    grid.innerHTML = isSearching
-      ? '<div style="grid-column:1/-1;text-align:center;padding:80px 24px;color:var(--muted)">' +
-          '<div style="font-size:3rem;margin-bottom:16px">🔍</div>' +
-          '<div style="font-size:1.05rem;font-weight:700;margin-bottom:8px;color:var(--text)">Nenhum mercado encontrado</div>' +
-          '<div style="font-size:0.88rem">Tente outra categoria ou remova o filtro de busca</div>' +
-        '</div>'
-      : '<div style="grid-column:1/-1;text-align:center;padding:80px 24px;color:var(--muted)">' +
-          '<div style="font-size:3rem;margin-bottom:16px">📭</div>' +
-          '<div style="font-size:1.05rem;font-weight:700;margin-bottom:8px;color:var(--text)">Nenhum mercado ativo</div>' +
-          '<div style="font-size:0.88rem">Novos mercados em breve.</div>' +
-        '</div>';
+    grid.innerHTML = window.BubuyaComponents
+      ? window.BubuyaComponents.emptyMarketsHtml(isSearching)
+      : '';
     return;
   }
 
-  grid.innerHTML = filtered.map(m => {
-    const total = (parseFloat(m.q_yes) + parseFloat(m.q_no)) || 100;
-    const yes = Math.round((parseFloat(m.q_yes)/total)*100);
-    const cat = (m.category||'Geral').toLowerCase();
-    const color = CAT_COLORS[cat] || CAT_COLORS.geral;
-    return `
-      <div class="market-card" style="--card-color: ${color}" onclick="window.location.href='market.html?id=${m.id}'">
-        <div>
-          <div class="mc-category">${m.category || 'Geral'}</div>
-          <div class="mc-title">${m.title}</div>
-        </div>
-        <div class="mc-sentiment">
-          <div class="mc-sentiment-yes" style="width: ${yes}%"></div>
-          <div class="mc-sentiment-no" style="width: ${100-yes}%"></div>
-        </div>
-        <div class="mc-footer">
-          <div class="mc-stat">Vol: <strong>R$${(parseFloat(m.volume)||0).toLocaleString('pt-BR')}</strong></div>
-          <div class="mc-odds">
-            <div class="mc-odd yes">${yes}%</div>
-            <div class="mc-odd no">${100-yes}%</div>
-          </div>
-        </div>
-      </div>`;
-  }).join('');
+  grid.innerHTML = filtered
+    .map((m) =>
+      window.BubuyaComponents
+        ? window.BubuyaComponents.buildMarketCard(m, CAT_COLORS)
+        : ''
+    )
+    .join('');
 };
 
 let _login2faTempToken = null;
@@ -1190,7 +664,7 @@ window.doLogin = async () => {
       body: JSON.stringify({ email, password })
     });
     const d = await res.json();
-    if (d.error) return window.showToast('❌', 'Erro', d.error);
+    if (d.error) return window.showToast('âŒ', 'Erro', d.error);
 
     // 2FA TOTP requerido: armazenar temp_token e mostrar step 2
     if (d.requires_2fa) {
@@ -1206,14 +680,14 @@ window.doLogin = async () => {
     }
 
     window._finalizeLogin(d);
-  } catch(e) { window.showToast('❌', 'Erro', 'Falha na conexão com o servidor.'); }
+  } catch(e) { window.showToast('âŒ', 'Erro', 'Falha na conexÃ£o com o servidor.'); }
 };
 
 window.doLogin2fa = async () => {
   const code = (document.getElementById('login2faCode').value || '').trim();
-  if (!code) return window.showToast('❌', 'Erro', 'Digite o código de 6 dígitos.');
+  if (!code) return window.showToast('âŒ', 'Erro', 'Digite o cÃ³digo de 6 dÃ­gitos.');
   const temp_token = _login2faTempToken || localStorage.getItem('preditivo_temp_token');
-  if (!temp_token) return window.showToast('❌', 'Erro', 'Sessão expirada. Faça login novamente.');
+  if (!temp_token) return window.showToast('âŒ', 'Erro', 'SessÃ£o expirada. FaÃ§a login novamente.');
   try {
     const res = await fetch(window.API + '/auth/2fa/validate', {
       method: 'POST',
@@ -1223,13 +697,13 @@ window.doLogin2fa = async () => {
     const d = await res.json();
     if (d.error) {
       var msgEl = document.getElementById('login2faMsg');
-      if (msgEl) { msgEl.textContent = 'Código inválido. Tente novamente.'; msgEl.style.display = 'block'; }
+      if (msgEl) { msgEl.textContent = 'CÃ³digo invÃ¡lido. Tente novamente.'; msgEl.style.display = 'block'; }
       return;
     }
     localStorage.removeItem('preditivo_temp_token');
     _login2faTempToken = null;
     window._finalizeLogin(d);
-  } catch(e) { window.showToast('❌', 'Erro', 'Falha na conexão com o servidor.'); }
+  } catch(e) { window.showToast('âŒ', 'Erro', 'Falha na conexÃ£o com o servidor.'); }
 };
 
 window._finalizeLogin = function(d) {
@@ -1238,11 +712,11 @@ window._finalizeLogin = function(d) {
   window.state.balance = parseFloat(d.user.balance);
   window.closeModal('loginModal');
   window.updateAuthUI();
-  window.showToast('👋', 'Olá!', 'Bem-vindo de volta, ' + d.user.name);
-  window.backToLoginStep1(); // reset modal para próxima abertura
+  window.showToast('ðŸ‘‹', 'OlÃ¡!', 'Bem-vindo de volta, ' + d.user.name);
+  window.backToLoginStep1(); // reset modal para prÃ³xima abertura
   // Registrar push notifications (sem bloquear o fluxo)
   setTimeout(function(){ window.registerPush(d.token); }, 2000);
-  // BLOCO 5: verificar termo de riscos após login manual
+  // BLOCO 5: verificar termo de riscos apÃ³s login manual
   setTimeout(function(){ window.checkRiskTermStatus(); }, 500);
 };
 
@@ -1254,7 +728,7 @@ window.registerPush = async function(token) {
     var reg = await navigator.serviceWorker.register('/sw.js');
     await navigator.serviceWorker.ready;
     var existing = await reg.pushManager.getSubscription();
-    if (existing) return; // já inscrito
+    if (existing) return; // jÃ¡ inscrito
     var permission = await Notification.requestPermission();
     if (permission !== 'granted') return;
     var sub = await reg.pushManager.subscribe({
@@ -1266,7 +740,7 @@ window.registerPush = async function(token) {
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
       body: JSON.stringify({ subscription: sub })
     });
-  } catch(e) { /* push opcional — silencioso */ }
+  } catch(e) { /* push opcional â€” silencioso */ }
 };
 
 function _urlBase64ToUint8Array(base64String) {
@@ -1300,9 +774,9 @@ window.doRegister = async () => {
   const lgpdCb   = document.getElementById('regLgpd');
   const lgpd_consent = lgpdCb ? lgpdCb.checked : false;
 
-  if (!name || !email || !password) return window.showToast('❌', 'Erro', 'Preencha nome, email e senha.');
-  if (password.length < 6) return window.showToast('❌', 'Erro', 'Senha deve ter pelo menos 6 caracteres.');
-  if (!lgpd_consent) return window.showToast('❌', 'Erro', 'Você precisa aceitar a Política de Privacidade (LGPD) para continuar.');
+  if (!name || !email || !password) return window.showToast('âŒ', 'Erro', 'Preencha nome, email e senha.');
+  if (password.length < 6) return window.showToast('âŒ', 'Erro', 'Senha deve ter pelo menos 6 caracteres.');
+  if (!lgpd_consent) return window.showToast('âŒ', 'Erro', 'VocÃª precisa aceitar a PolÃ­tica de Privacidade (LGPD) para continuar.');
 
   const btn = document.querySelector('#regStep1 .btn-primary');
   if (btn) { btn.disabled = true; btn.textContent = 'Enviando...'; }
@@ -1315,15 +789,15 @@ window.doRegister = async () => {
       body: JSON.stringify(body)
     });
     const d = await res.json();
-    if (d.error) return window.showToast('❌', 'Erro', d.error);
+    if (d.error) return window.showToast('âŒ', 'Erro', d.error);
     _regEmail = email;
-    document.getElementById('regStep2Sub').textContent = `Enviamos um código para ${email}.`;
+    document.getElementById('regStep2Sub').textContent = `Enviamos um cÃ³digo para ${email}.`;
     document.getElementById('regStep1').style.display = 'none';
     document.getElementById('regStep2').style.display = 'block';
     document.getElementById('regCode').value = '';
     document.getElementById('regCode').focus();
   } catch(e) {
-    window.showToast('❌', 'Erro', 'Falha na conexão com o servidor.');
+    window.showToast('âŒ', 'Erro', 'Falha na conexÃ£o com o servidor.');
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = 'Criar Conta e Ganhar'; }
   }
@@ -1331,7 +805,7 @@ window.doRegister = async () => {
 
 window.doRegisterVerify = async () => {
   const code = (document.getElementById('regCode').value || '').trim();
-  if (!code) return window.showToast('❌', 'Erro', 'Digite o código recebido no email.');
+  if (!code) return window.showToast('âŒ', 'Erro', 'Digite o cÃ³digo recebido no email.');
   const btn = document.querySelector('#regStep2 .btn-primary');
   if (btn) { btn.disabled = true; btn.textContent = 'Verificando...'; }
   try {
@@ -1341,8 +815,8 @@ window.doRegisterVerify = async () => {
       body: JSON.stringify({ email: _regEmail, code })
     });
     const d = await res.json();
-    if (d.error) return window.showToast('❌', 'Erro', d.error);
-    // Login automático após verificação
+    if (d.error) return window.showToast('âŒ', 'Erro', d.error);
+    // Login automÃ¡tico apÃ³s verificaÃ§Ã£o
     const loginRes = await fetch(window.API + '/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1353,14 +827,14 @@ window.doRegisterVerify = async () => {
     window.backToRegStep1();
     if (loginData.token) {
       window._finalizeLogin({ ...loginData, user: { ...loginData.user } });
-      window.showToast('🎉', 'Conta criada!', 'Bem-vindo à Bubuya!');
+      window.showToast('ðŸŽ‰', 'Conta criada!', 'Bem-vindo Ã  Bubuya!');
     } else {
-      window.showToast('✅', 'Conta criada!', 'Agora faça login para começar.');
+      window.showToast('âœ…', 'Conta criada!', 'Agora faÃ§a login para comeÃ§ar.');
       window.openModal('loginModal');
       document.getElementById('loginEmail').value = _regEmail;
     }
   } catch(e) {
-    window.showToast('❌', 'Erro', 'Falha na conexão com o servidor.');
+    window.showToast('âŒ', 'Erro', 'Falha na conexÃ£o com o servidor.');
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = 'Confirmar e Entrar'; }
   }
@@ -1374,7 +848,7 @@ window.backToRegStep1 = function() {
   if (s2) s2.style.display = 'none';
 };
 
-// ---- RECUPERAÇÃO DE SENHA ----
+// ---- RECUPERAÃ‡ÃƒO DE SENHA ----
 window.doForgotPassword = async () => {
   const email = document.getElementById('forgotEmail').value.trim();
   const msgEl = document.getElementById('forgotMsg1');
@@ -1396,17 +870,17 @@ window.doForgotPassword = async () => {
       body: JSON.stringify({ email })
     });
     const d = await res.json();
-    if (!res.ok) return showMsg(d.error || 'Erro ao enviar código.', true);
+    if (!res.ok) return showMsg(d.error || 'Erro ao enviar cÃ³digo.', true);
 
-    // Independente de o email existir ou não, exibe step 2
-    showMsg(d.message || 'Se o email existir, enviaremos um código.', false);
+    // Independente de o email existir ou nÃ£o, exibe step 2
+    showMsg(d.message || 'Se o email existir, enviaremos um cÃ³digo.', false);
     setTimeout(() => {
       document.getElementById('forgotStep1').style.display = 'none';
       document.getElementById('forgotStep2').style.display = 'block';
       document.getElementById('forgotMsg2').style.display = 'none';
     }, 1200);
   } catch(e) {
-    showMsg('Falha na conexão com o servidor.', true);
+    showMsg('Falha na conexÃ£o com o servidor.', true);
   }
 };
 
@@ -1425,9 +899,9 @@ window.doResetPassword = async () => {
     msgEl.style.border = `1px solid ${isError ? 'rgba(244,63,94,0.3)' : 'rgba(16,185,129,0.3)'}`;
   };
 
-  if (!code) return showMsg('Informe o código recebido no email.', true);
-  if (password.length < 6) return showMsg('A senha deve ter no mínimo 6 caracteres.', true);
-  if (password !== confirm) return showMsg('As senhas não coincidem.', true);
+  if (!code) return showMsg('Informe o cÃ³digo recebido no email.', true);
+  if (password.length < 6) return showMsg('A senha deve ter no mÃ­nimo 6 caracteres.', true);
+  if (password !== confirm) return showMsg('As senhas nÃ£o coincidem.', true);
 
   try {
     const res = await fetch(window.API + '/auth/reset-password', {
@@ -1451,10 +925,10 @@ window.doResetPassword = async () => {
       document.getElementById('forgotMsg1').style.display = 'none';
       document.getElementById('forgotMsg2').style.display = 'none';
       window.openModal('loginModal');
-      window.showToast('✅', 'Senha redefinida', 'Faça login com sua nova senha.');
+      window.showToast('âœ…', 'Senha redefinida', 'FaÃ§a login com sua nova senha.');
     }, 1500);
   } catch(e) {
-    showMsg('Falha na conexão com o servidor.', true);
+    showMsg('Falha na conexÃ£o com o servidor.', true);
   }
 };
 
@@ -1472,9 +946,9 @@ window.updateAuthUI = () => {
           <button class="btn-finance btn-withdraw" onclick="window.openModal('withdrawModal')">Sacar</button>
         </div>
 
-        <!-- ── Sino de notificações ── -->
+        <!-- â”€â”€ Sino de notificaÃ§Ãµes â”€â”€ -->
         <div style="position:relative">
-          <button id="bellBtn" onclick="window.toggleNotifPanel()" title="Notificações"
+          <button id="bellBtn" onclick="window.toggleNotifPanel()" title="NotificaÃ§Ãµes"
             style="position:relative;background:transparent;border:none;cursor:pointer;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:10px;color:var(--muted);transition:background .2s,color .2s"
             onmouseenter="this.style.background='var(--surface2)';this.style.color='var(--text)'" onmouseleave="this.style.background='transparent';this.style.color='var(--muted)'">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1483,10 +957,10 @@ window.updateAuthUI = () => {
             </svg>
             <span id="notifBadge" style="display:none;position:absolute;top:3px;right:3px;background:#ef4444;color:#fff;border-radius:50%;min-width:16px;height:16px;font-size:0.6rem;font-weight:800;align-items:center;justify-content:center;padding:0 3px;line-height:1;border:2px solid var(--bg)">0</span>
           </button>
-          <!-- Painel de notificações -->
+          <!-- Painel de notificaÃ§Ãµes -->
           <div id="notifPanel" style="display:none;position:absolute;top:46px;right:-8px;width:340px;max-height:460px;overflow-y:auto;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,0.5);z-index:1000">
             <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1;border-radius:16px 16px 0 0">
-              <span style="font-weight:700;font-size:0.92rem">Notificações</span>
+              <span style="font-weight:700;font-size:0.92rem">NotificaÃ§Ãµes</span>
               <button onclick="window.markAllRead()" style="background:none;border:none;color:var(--muted);font-size:0.75rem;cursor:pointer;font-family:inherit;transition:color .2s" onmouseenter="this.style.color='var(--text)'" onmouseleave="this.style.color='var(--muted)'">Marcar lidas</button>
             </div>
             <div id="notifList">
@@ -1495,7 +969,7 @@ window.updateAuthUI = () => {
           </div>
         </div>
 
-        <!-- ── Perfil (dropdown) ── -->
+        <!-- â”€â”€ Perfil (dropdown) â”€â”€ -->
         <div style="position:relative">
           <button id="profileBtn" onclick="window.toggleProfileMenu()" title="Minha conta"
             style="display:flex;align-items:center;gap:9px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:6px 10px 6px 7px;cursor:pointer;font-family:inherit;transition:border-color .2s"
@@ -1519,11 +993,11 @@ window.updateAuthUI = () => {
             </a>
             <a href="./profile.html" onclick="sessionStorage.setItem('profileTab','security')" style="display:flex;align-items:center;gap:10px;padding:11px 16px;color:var(--text);text-decoration:none;font-size:0.86rem;font-weight:600;transition:background .15s" onmouseenter="this.style.background='rgba(255,255,255,0.05)'" onmouseleave="this.style.background='transparent'">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              Segurança
+              SeguranÃ§a
             </a>
             <a href="./profile.html" onclick="sessionStorage.setItem('profileTab','referrals')" style="display:flex;align-items:center;gap:10px;padding:11px 16px;color:var(--text);text-decoration:none;font-size:0.86rem;font-weight:600;transition:background .15s" onmouseenter="this.style.background='rgba(255,255,255,0.05)'" onmouseleave="this.style.background='transparent'">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-              Indicações
+              IndicaÃ§Ãµes
             </a>
             <div style="border-top:1px solid var(--border);margin:4px 0"></div>
             <button onclick="window.logoutUser(window.API)" style="display:flex;align-items:center;gap:10px;padding:11px 16px;color:#f43f5e;background:none;border:none;font-size:0.86rem;font-weight:600;cursor:pointer;width:100%;font-family:inherit;transition:background .15s" onmouseenter="this.style.background='rgba(244,63,94,0.08)'" onmouseleave="this.style.background='transparent'">
@@ -1536,13 +1010,13 @@ window.updateAuthUI = () => {
         ${window.state.walletAddress ? `<div style="font-size:0.72rem;color:var(--muted);background:var(--surface2);padding:4px 8px;border-radius:8px;border:1px solid var(--border)">${window.state.walletAddress.slice(0,6)}...${window.state.walletAddress.slice(-4)}</div>` : ''}
       </div>`;
     const h1 = document.getElementById('heroH1');
-    if(h1) h1.innerHTML = `Olá, <span>${window.state.user.name.split(' ')[0]}</span>.`;
+    if(h1) h1.innerHTML = `OlÃ¡, <span>${window.state.user.name.split(' ')[0]}</span>.`;
     const sub = document.getElementById('heroSub');
-    if(sub) sub.textContent = "Seu portfólio está esperando. Vamos lucrar hoje?";
-    // Se o portfólio já estava aberto quando o auth completou, recarregar
+    if(sub) sub.textContent = "Seu portfÃ³lio estÃ¡ esperando. Vamos lucrar hoje?";
+    // Se o portfÃ³lio jÃ¡ estava aberto quando o auth completou, recarregar
     const portSection = document.getElementById('section-portfolio');
     if(portSection && portSection.classList.contains('active')) window.loadPortfolio();
-    // Carregar notificações
+    // Carregar notificaÃ§Ãµes
     window.loadNotifications();
     // Sincronizar mobile nav
     const mobileAuth = document.getElementById('mobileAuthArea');
@@ -1584,7 +1058,7 @@ window.loadRanking = async () => {
           <div class="rank-avatar">${(u.name||'?')[0].toUpperCase()}</div>
           <div style="flex:1;min-width:0">
             <div class="rank-name">${u.name}</div>
-            <div style="font-size:0.73rem;color:var(--muted);margin-top:2px">${winRate}% acerto · ${totalBets} apostas</div>
+            <div style="font-size:0.73rem;color:var(--muted);margin-top:2px">${winRate}% acerto Â· ${totalBets} apostas</div>
           </div>
           <div class="rank-profit">R$${profit.toLocaleString('pt-BR', {minimumFractionDigits:2})}</div>
         </div>`;
@@ -1602,7 +1076,7 @@ window.loadPortfolio = async () => {
   const grid = document.getElementById('portfolioContent');
   const token = localStorage.getItem('preditivo_token');
   if(!token) {
-    grid.innerHTML = '<div style="grid-column:1/-1; padding:60px; text-align:center; color:var(--muted)">Conecte-se para visualizar suas previsões.</div>';
+    grid.innerHTML = '<div style="grid-column:1/-1; padding:60px; text-align:center; color:var(--muted)">Conecte-se para visualizar suas previsÃµes.</div>';
     return;
   }
   const apiBase = (window.PREDITIVO_CONFIG && window.PREDITIVO_CONFIG.API_BASE)
@@ -1611,7 +1085,7 @@ window.loadPortfolio = async () => {
   const headers = { 'Authorization': 'Bearer ' + token };
   const renderCards = (positions) => {
     if(!positions.length) {
-      grid.innerHTML = '<div style="grid-column:1/-1; padding:60px; text-align:center; color:var(--muted)">Você ainda não possui investimentos ativos.</div>';
+      grid.innerHTML = '<div style="grid-column:1/-1; padding:60px; text-align:center; color:var(--muted)">VocÃª ainda nÃ£o possui investimentos ativos.</div>';
       return;
     }
     grid.innerHTML = positions.map(p => `
@@ -1637,7 +1111,7 @@ window.loadPortfolio = async () => {
         </div>
       </div>`).join('');
   };
-  // Helper: mostra summary imediatamente com dados disponíveis + chama loadPnl async
+  // Helper: mostra summary imediatamente com dados disponÃ­veis + chama loadPnl async
   function showSummaryNow(positions) {
     const fmt = v => parseFloat(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2});
     const bal = window.state && window.state.balance || 0;
@@ -1655,7 +1129,7 @@ window.loadPortfolio = async () => {
   }
 
   try {
-    // Tenta endpoint enriquecido; se não disponível ainda, usa /bets/my como fallback
+    // Tenta endpoint enriquecido; se nÃ£o disponÃ­vel ainda, usa /bets/my como fallback
     const r = await fetch(apiBase + '/bets/portfolio', { headers });
     const res = await r.json();
     if(r.ok && Array.isArray(res)) {
@@ -1663,7 +1137,7 @@ window.loadPortfolio = async () => {
       showSummaryNow(res);
       return;
     }
-    // Fallback: /bets/my (sempre disponível) — filtra abertas e agrupa
+    // Fallback: /bets/my (sempre disponÃ­vel) â€” filtra abertas e agrupa
     const r2 = await fetch(apiBase + '/bets/my', { headers });
     const bets = await r2.json();
     if(!Array.isArray(bets)) { renderCards([]); showSummaryNow([]); return; }
@@ -1685,11 +1159,11 @@ window.loadPortfolio = async () => {
     renderCards(positions);
     showSummaryNow(positions);
   } catch(e) {
-    grid.innerHTML = '<div style="grid-column:1/-1; padding:60px; text-align:center; color:var(--muted)">Erro ao carregar portfólio. Tente novamente.</div>';
+    grid.innerHTML = '<div style="grid-column:1/-1; padding:60px; text-align:center; color:var(--muted)">Erro ao carregar portfÃ³lio. Tente novamente.</div>';
   }
 };
 
-/* ===== CARTEIRA + LUCRO/PREJUÍZO ===== */
+/* ===== CARTEIRA + LUCRO/PREJUÃZO ===== */
 function drawSparkline(history) {
   const canvas = document.getElementById('pnlChart');
   if (!canvas) return;
@@ -1742,7 +1216,7 @@ window.loadPnl = async function(period) {
     const pnlEl = document.getElementById('pnlTotal');
     if (pnlEl) { pnlEl.textContent = (pnl >= 0 ? '+' : '') + 'R$ ' + fmt(d.total_pnl); pnlEl.style.color = pnl >= 0 ? 'var(--green)' : '#ef4444'; }
     const metaEl = document.getElementById('pnlMeta');
-    if (metaEl) metaEl.textContent = d.win_count + ' vitórias · ' + d.loss_count + ' derrotas · ' + d.win_rate + '% de acerto';
+    if (metaEl) metaEl.textContent = d.win_count + ' vitÃ³rias Â· ' + d.loss_count + ' derrotas Â· ' + d.win_rate + '% de acerto';
     // Atualiza carteira com dados precisos do endpoint PnL
     const bal2 = window.state && window.state.balance || 0;
     const invested2 = parseFloat(d.open_invested);
@@ -1755,7 +1229,7 @@ window.loadPnl = async function(period) {
     const chEl = document.getElementById('pnlPortfolioChange');
     if (chEl && invested2 > 0) {
       const unrealized = parseFloat(d.open_value) - invested2;
-      chEl.textContent = (unrealized >= 0 ? '+' : '') + 'R$ ' + fmt(unrealized) + ' não realizado';
+      chEl.textContent = (unrealized >= 0 ? '+' : '') + 'R$ ' + fmt(unrealized) + ' nÃ£o realizado';
       chEl.style.color = unrealized >= 0 ? 'var(--green)' : '#ef4444';
     }
     drawSparkline(d.history);
@@ -1782,7 +1256,7 @@ window.loadEncerradas = async function() {
   const grid  = document.getElementById('portfolioContent');
   const token = localStorage.getItem('preditivo_token');
   if (!token) {
-    grid.innerHTML = '<div style="grid-column:1/-1;padding:60px;text-align:center;color:var(--muted)">Conecte-se para visualizar o histórico.</div>';
+    grid.innerHTML = '<div style="grid-column:1/-1;padding:60px;text-align:center;color:var(--muted)">Conecte-se para visualizar o histÃ³rico.</div>';
     return;
   }
   const apiBase = (window.PREDITIVO_CONFIG && window.PREDITIVO_CONFIG.API_BASE)
@@ -1793,7 +1267,7 @@ window.loadEncerradas = async function() {
     const bets = await r.json();
     const closed = Array.isArray(bets) ? bets.filter(b => b.status === 'won' || b.status === 'lost') : [];
     if (!closed.length) {
-      grid.innerHTML = '<div style="grid-column:1/-1;padding:60px;text-align:center;color:var(--muted)">Nenhuma posição encerrada ainda.</div>';
+      grid.innerHTML = '<div style="grid-column:1/-1;padding:60px;text-align:center;color:var(--muted)">Nenhuma posiÃ§Ã£o encerrada ainda.</div>';
       return;
     }
     const fmt = v => parseFloat(v||0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
@@ -1810,7 +1284,7 @@ window.loadEncerradas = async function() {
           <div style="background:${b.side==='yes'?'var(--green)':'var(--red)'};color:#000;border-radius:20px;padding:2px 10px;font-size:0.72rem;font-weight:800;white-space:nowrap">${b.side.toUpperCase()}</div>
         </div>
         <div style="display:inline-block;padding:3px 12px;border-radius:20px;font-size:0.75rem;font-weight:800;margin-bottom:10px;background:${won?'rgba(16,185,129,0.15)':'rgba(239,68,68,0.12)'};color:${won?'#10b981':'#ef4444'}">
-          ${won ? '✓ GANHOU' : '✗ PERDEU'}
+          ${won ? 'âœ“ GANHOU' : 'âœ— PERDEU'}
         </div>
         <div style="font-size:1.5rem;font-weight:800;color:${pnl>=0?'var(--green)':'#ef4444'};margin-bottom:12px">${pnlStr}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:0.87rem">
@@ -1827,7 +1301,7 @@ window.loadEncerradas = async function() {
       </div>`;
     }).join('');
   } catch(e) {
-    grid.innerHTML = '<div style="grid-column:1/-1;padding:60px;text-align:center;color:var(--muted)">Erro ao carregar histórico.</div>';
+    grid.innerHTML = '<div style="grid-column:1/-1;padding:60px;text-align:center;color:var(--muted)">Erro ao carregar histÃ³rico.</div>';
   }
 };
 
@@ -1840,10 +1314,10 @@ window.switchDepositTab = (tab, btn) => {
   if (tab === 'eth') window.refreshEthPanel();
 };
 
-/* ===== DEPOSIT: PIX DIRETO (chave estática do config.js) ===== */
+/* ===== DEPOSIT: PIX DIRETO (chave estÃ¡tica do config.js) ===== */
 window.depositPIXDireto = () => {
   const amt = document.getElementById('pixDirectAmount').value;
-  if (!amt || parseFloat(amt) < 10) return window.showToast('⚠️', 'Atenção', 'Valor mínimo é R$10.');
+  if (!amt || parseFloat(amt) < 10) return window.showToast('âš ï¸', 'AtenÃ§Ã£o', 'Valor mÃ­nimo Ã© R$10.');
   if (!localStorage.getItem('preditivo_token')) {
     window.closeModal('depositModal');
     return window.openModal('loginModal');
@@ -1855,7 +1329,7 @@ window.depositPIXDireto = () => {
   const amtFmt  = parseFloat(amt).toFixed(2);
 
   if (!pixKey || pixKey === 'COLE_A_CHAVE_PIX_AQUI') {
-    return window.showToast('⚠️', 'PIX indisponível', 'Use o Gateway para depositar. PIX direto ainda não configurado.');
+    return window.showToast('âš ï¸', 'PIX indisponÃ­vel', 'Use o Gateway para depositar. PIX direto ainda nÃ£o configurado.');
   }
 
   const output = document.getElementById('pixDirectOutput');
@@ -1868,25 +1342,25 @@ window.depositPIXDireto = () => {
   window._pixKey = pixKey;
   output.style.display = 'block';
 
-  // Atualiza texto de instrução com valor
+  // Atualiza texto de instruÃ§Ã£o com valor
   const instrEl = document.getElementById('pixDirectInstr');
   if (instrEl) instrEl.textContent = `Transfira exatamente R$${amtFmt} para ${name}. Envie o comprovante para ${cfg.SUPPORT_EMAIL}.`;
 
-  window.showToast('✅', 'Chave PIX exibida!', `Transfira R$${amtFmt} para a chave abaixo.`);
+  window.showToast('âœ…', 'Chave PIX exibida!', `Transfira R$${amtFmt} para a chave abaixo.`);
 };
 
 window.copyPixKey = () => {
   const key = window._pixKey || document.getElementById('pixDirectKey').textContent;
-  if (!key || key === '—') return;
+  if (!key || key === 'â€”') return;
   navigator.clipboard.writeText(key).then(() => {
-    window.showToast('📋', 'Copiado!', 'Chave PIX copiada para a área de transferência.');
+    window.showToast('ðŸ“‹', 'Copiado!', 'Chave PIX copiada para a Ã¡rea de transferÃªncia.');
   });
 };
 
 /* ===== DEPOSIT: GATEWAY ASAAS (PIX QR Code inline) ===== */
 window.depositGateway = async () => {
   const amt = document.getElementById('gatewayAmount').value;
-  if (!amt || parseFloat(amt) < 5) return window.showToast('⚠️', 'Atenção', 'Valor mínimo é R$5.');
+  if (!amt || parseFloat(amt) < 5) return window.showToast('âš ï¸', 'AtenÃ§Ã£o', 'Valor mÃ­nimo Ã© R$5.');
   const token = localStorage.getItem('preditivo_token');
   if (!token) { window.closeModal('depositModal'); return window.openModal('loginModal'); }
 
@@ -1903,11 +1377,11 @@ window.depositGateway = async () => {
     const data = await res.json().catch(() => ({}));
 
     if (!res.ok || data.error) {
-      return window.showToast('❌', 'Erro', data.message || data.error || `Status ${res.status}`);
+      return window.showToast('âŒ', 'Erro', data.message || data.error || `Status ${res.status}`);
     }
 
     if (data.warning) {
-      window.showToast('⚠️', 'PIX criado', data.warning);
+      window.showToast('âš ï¸', 'PIX criado', data.warning);
       return;
     }
 
@@ -1915,23 +1389,23 @@ window.depositGateway = async () => {
       document.getElementById('asaasQrImage').src = 'data:image/png;base64,' + data.pix.qr_code_image;
       document.getElementById('asaasPixCode').value = data.pix.qr_code || '';
       document.getElementById('asaasQrSection').style.display = 'block';
-      window.showToast('✅', 'PIX gerado!', 'Escaneie o QR Code ou copie o código PIX.');
+      window.showToast('âœ…', 'PIX gerado!', 'Escaneie o QR Code ou copie o cÃ³digo PIX.');
       window._pollAsaasDeposit(data.deposit.id, token);
     } else {
-      window.showToast('❌', 'Erro', 'QR Code não disponível. Tente o PIX Direto.');
+      window.showToast('âŒ', 'Erro', 'QR Code nÃ£o disponÃ­vel. Tente o PIX Direto.');
     }
   } catch(e) {
     console.error('Asaas fetch error:', e);
-    window.showToast('❌', 'Erro', 'Falha de conexão. Tente novamente.');
+    window.showToast('âŒ', 'Erro', 'Falha de conexÃ£o. Tente novamente.');
   } finally {
     btn.textContent = 'Gerar QR Code PIX'; btn.disabled = false;
   }
 };
 
-// Verifica a cada 5s se o depósito foi confirmado (máx. 10 min)
+// Verifica a cada 5s se o depÃ³sito foi confirmado (mÃ¡x. 10 min)
 window._pollAsaasDeposit = (depositId, token) => {
   let attempts = 0;
-  const MAX = 120; // 120 × 5s = 10 min
+  const MAX = 120; // 120 Ã— 5s = 10 min
   const interval = setInterval(async () => {
     attempts++;
     if (attempts > MAX) { clearInterval(interval); return; }
@@ -1952,7 +1426,7 @@ window._pollAsaasDeposit = (depositId, token) => {
       if (dep?.status === 'confirmed') {
         clearInterval(interval);
         document.getElementById('asaasQrSection').style.display = 'none';
-        window.showToast('🎉', 'Depósito confirmado!', `R$${parseFloat(dep.amount).toFixed(2)} adicionado ao seu saldo.`);
+        window.showToast('ðŸŽ‰', 'DepÃ³sito confirmado!', `R$${parseFloat(dep.amount).toFixed(2)} adicionado ao seu saldo.`);
         // Atualiza o saldo exibido na tela
         if (window.loadUserData) window.loadUserData();
         if (window.renderUserArea) window.renderUserArea();
@@ -1965,14 +1439,14 @@ window.copyAsaasPixCode = () => {
   const code = document.getElementById('asaasPixCode').value;
   if (!code) return;
   navigator.clipboard.writeText(code).then(() => {
-    window.showToast('📋', 'Copiado!', 'Código PIX copiado para a área de transferência.');
+    window.showToast('ðŸ“‹', 'Copiado!', 'CÃ³digo PIX copiado para a Ã¡rea de transferÃªncia.');
   });
 };
 
 /* ===== WALLET: CONNECT ===== */
 window.connectWallet = async () => {
   if (typeof window.ethereum === 'undefined') {
-    return window.showToast('🦊', 'MetaMask', 'Por favor, instale a extensão MetaMask!');
+    return window.showToast('ðŸ¦Š', 'MetaMask', 'Por favor, instale a extensÃ£o MetaMask!');
   }
   try {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -1981,10 +1455,10 @@ window.connectWallet = async () => {
     const btn = document.getElementById('btnConnectWallet');
     if (btn) btn.style.display = 'none';
     window.updateAuthUI();
-    window.showToast('🔗', 'Carteira conectada', window.state.walletAddress.slice(0,6) + '...' + window.state.walletAddress.slice(-4));
+    window.showToast('ðŸ”—', 'Carteira conectada', window.state.walletAddress.slice(0,6) + '...' + window.state.walletAddress.slice(-4));
     return true;
   } catch(e) {
-    window.showToast('❌', 'Erro', 'Conexão recusada ou MetaMask não disponível.');
+    window.showToast('âŒ', 'Erro', 'ConexÃ£o recusada ou MetaMask nÃ£o disponÃ­vel.');
     return false;
   }
 };
@@ -2016,7 +1490,7 @@ window.depositCripto = async () => {
     if (!ok) return;
   }
   const ethAmt = document.getElementById('ethAmount').value;
-  if (!ethAmt || parseFloat(ethAmt) <= 0) return window.showToast('⚠️', 'Atenção', 'Informe o valor em ETH.');
+  if (!ethAmt || parseFloat(ethAmt) <= 0) return window.showToast('âš ï¸', 'AtenÃ§Ã£o', 'Informe o valor em ETH.');
 
   const token = localStorage.getItem('preditivo_token');
   if (!token) { window.closeModal('depositModal'); return window.openModal('loginModal'); }
@@ -2025,7 +1499,7 @@ window.depositCripto = async () => {
   btn.textContent = 'Aguardando MetaMask...'; btn.disabled = true;
 
   try {
-    // Busca endereço da carteira da plataforma
+    // Busca endereÃ§o da carteira da plataforma
     let platformWallet;
     try {
       const addrRes = await fetch(window.API + '/deposits/crypto/address', {
@@ -2033,10 +1507,10 @@ window.depositCripto = async () => {
       });
       const addrData = await addrRes.json();
       platformWallet = addrData.address;
-    } catch(_) { /* endpoint pode não existir ainda */ }
+    } catch(_) { /* endpoint pode nÃ£o existir ainda */ }
 
     if (!platformWallet) {
-      window.showToast('⚠️', 'Indisponível', 'Depósito via cripto temporariamente indisponível. Use PIX ou Gateway.');
+      window.showToast('âš ï¸', 'IndisponÃ­vel', 'DepÃ³sito via cripto temporariamente indisponÃ­vel. Use PIX ou Gateway.');
       return;
     }
 
@@ -2047,10 +1521,10 @@ window.depositCripto = async () => {
     btn.textContent = 'Confirme na MetaMask...';
     const tx = await signer.sendTransaction({ to: platformWallet, value: valueWei });
 
-    window.showToast('⏳', 'Transação enviada', 'Aguardando confirmação na rede...');
+    window.showToast('â³', 'TransaÃ§Ã£o enviada', 'Aguardando confirmaÃ§Ã£o na rede...');
     btn.textContent = 'Confirmando na rede...';
 
-    await tx.wait(1); // 1 confirmação
+    await tx.wait(1); // 1 confirmaÃ§Ã£o
 
     // Notifica o backend
     await fetch(window.API + '/deposits/crypto/confirm', {
@@ -2059,16 +1533,16 @@ window.depositCripto = async () => {
       body: JSON.stringify({ tx_hash: tx.hash, amount_eth: parseFloat(ethAmt) })
     });
 
-    window.showToast('✅', 'Depósito confirmado!', `Tx: ${tx.hash.slice(0,10)}... — saldo atualizado em breve.`);
+    window.showToast('âœ…', 'DepÃ³sito confirmado!', `Tx: ${tx.hash.slice(0,10)}... â€” saldo atualizado em breve.`);
     window.closeModal('depositModal');
   } catch(e) {
     if (e.code === 4001) {
-      window.showToast('⚠️', 'Cancelado', 'Você recusou a transação na MetaMask.');
+      window.showToast('âš ï¸', 'Cancelado', 'VocÃª recusou a transaÃ§Ã£o na MetaMask.');
     } else {
-      window.showToast('❌', 'Erro', e.message || 'Falha na transação.');
+      window.showToast('âŒ', 'Erro', e.message || 'Falha na transaÃ§Ã£o.');
     }
   } finally {
-    btn.textContent = '🦊 Enviar via MetaMask'; btn.disabled = false;
+    btn.textContent = 'ðŸ¦Š Enviar via MetaMask'; btn.disabled = false;
   }
 };
 
@@ -2118,15 +1592,15 @@ window.requestWithdraw = async (method) => {
     amount     = parseFloat(document.getElementById('wAmountPix').value);
     pixKey     = document.getElementById('wPixKey').value.trim();
     pixKeyType = document.getElementById('wPixType').value;
-    if (!amount || amount < 20) return window.showToast('⚠️', 'Atenção', 'Valor mínimo de R$20.');
-    if (!pixKeyType)            return window.showToast('⚠️', 'Atenção', 'Selecione o tipo de chave PIX.');
-    if (!pixKey)                return window.showToast('⚠️', 'Atenção', 'Informe sua chave PIX.');
+    if (!amount || amount < 20) return window.showToast('âš ï¸', 'AtenÃ§Ã£o', 'Valor mÃ­nimo de R$20.');
+    if (!pixKeyType)            return window.showToast('âš ï¸', 'AtenÃ§Ã£o', 'Selecione o tipo de chave PIX.');
+    if (!pixKey)                return window.showToast('âš ï¸', 'AtenÃ§Ã£o', 'Informe sua chave PIX.');
   } else {
     amount     = parseFloat(document.getElementById('wAmountEth').value);
     pixKey     = window.state.walletAddress;
     pixKeyType = 'eth';
-    if (!amount || amount < 20) return window.showToast('⚠️', 'Atenção', 'Valor mínimo de R$20.');
-    if (!pixKey)                return window.showToast('⚠️', 'Atenção', 'Conecte sua carteira MetaMask.');
+    if (!amount || amount < 20) return window.showToast('âš ï¸', 'AtenÃ§Ã£o', 'Valor mÃ­nimo de R$20.');
+    if (!pixKey)                return window.showToast('âš ï¸', 'AtenÃ§Ã£o', 'Conecte sua carteira MetaMask.');
   }
 
   try {
@@ -2136,22 +1610,22 @@ window.requestWithdraw = async (method) => {
       body: JSON.stringify({ amount, pix_key: pixKey, pix_key_type: pixKeyType })
     });
     const d = await r.json();
-    if (d.error) return window.showToast('❌', 'Erro', d.error);
-    // vai para step 2 (verificação por e-mail)
+    if (d.error) return window.showToast('âŒ', 'Erro', d.error);
+    // vai para step 2 (verificaÃ§Ã£o por e-mail)
     document.getElementById('withdrawStep1').style.display = 'none';
     document.getElementById('withdrawStep2').style.display = 'block';
     document.getElementById('wVerifyCode').focus();
-    window.showToast('📧', 'Código enviado', 'Verifique seu e-mail para confirmar o saque.');
+    window.showToast('ðŸ“§', 'CÃ³digo enviado', 'Verifique seu e-mail para confirmar o saque.');
   } catch(e) {
-    window.showToast('❌', 'Erro', 'Falha na conexão. Tente novamente.');
+    window.showToast('âŒ', 'Erro', 'Falha na conexÃ£o. Tente novamente.');
   }
 };
 
-/* ===== WITHDRAW: CONFIRMAR CÓDIGO ===== */
+/* ===== WITHDRAW: CONFIRMAR CÃ“DIGO ===== */
 window.confirmWithdraw = async () => {
   const token = localStorage.getItem('preditivo_token');
   const code  = document.getElementById('wVerifyCode').value.trim();
-  if (!code) return window.showToast('⚠️', 'Atenção', 'Digite o código recebido por e-mail.');
+  if (!code) return window.showToast('âš ï¸', 'AtenÃ§Ã£o', 'Digite o cÃ³digo recebido por e-mail.');
 
   try {
     const r = await fetch(window.API + '/withdrawals/verify', {
@@ -2160,7 +1634,7 @@ window.confirmWithdraw = async () => {
       body: JSON.stringify({ code })
     });
     const d = await r.json();
-    if (d.error) return window.showToast('❌', 'Erro', d.error);
+    if (d.error) return window.showToast('âŒ', 'Erro', d.error);
     // Atualiza saldo local
     if (d.new_balance != null) {
       window.state.balance = parseFloat(d.new_balance);
@@ -2168,16 +1642,20 @@ window.confirmWithdraw = async () => {
     }
     window.closeModal('withdrawModal');
     window.withdrawBackToStep1();
-    window.showToast('✅', 'Saque solicitado', 'Seu saque foi registrado e está sendo processado.');
+    window.showToast('âœ…', 'Saque solicitado', 'Seu saque foi registrado e estÃ¡ sendo processado.');
   } catch(e) {
-    window.showToast('❌', 'Erro', 'Falha na conexão. Tente novamente.');
+    window.showToast('âŒ', 'Erro', 'Falha na conexÃ£o. Tente novamente.');
   }
 };
 
 window.setCatFilter = (cat, el) => {
   window.state.catFilter = cat.toLowerCase();
-  document.querySelectorAll('.topic-tag').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.topic-tag').forEach((t) => {
+    t.classList.remove('active');
+    t.setAttribute('aria-selected', 'false');
+  });
   el.classList.add('active');
+  el.setAttribute('aria-selected', 'true');
   window.renderMarkets();
 };
 
@@ -2186,7 +1664,7 @@ window.onSearchInput = (val) => {
   window.renderMarkets();
 };
 
-// ── BLOCO 5: Termo de Ciência de Riscos ──────────────────────────────────────
+// â”€â”€ BLOCO 5: Termo de CiÃªncia de Riscos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 window.toggleRiskTermBtn = function() {
   var chk = document.getElementById('riskTermCheck');
@@ -2208,15 +1686,15 @@ window.acceptRiskTerm = async function() {
     });
     var data = await res.json();
     if (!res.ok) {
-      window.showToast('❌', 'Erro', 'Não foi possível registrar o aceite: ' + (data.error || res.status));
+      window.showToast('âŒ', 'Erro', 'NÃ£o foi possÃ­vel registrar o aceite: ' + (data.error || res.status));
       if (btn) { btn.disabled = false; btn.textContent = 'Aceitar e Continuar'; }
       return;
     }
     var modal = document.getElementById('riskTermModal');
     if (modal) modal.style.display = 'none';
-    window.showToast('✅', 'Pronto!', 'Termo aceito. Você já pode operar na Bubuya.');
+    window.showToast('âœ…', 'Pronto!', 'Termo aceito. VocÃª jÃ¡ pode operar na Bubuya.');
   } catch(e) {
-    window.showToast('❌', 'Erro', 'Falha de conexão ao registrar termo.');
+    window.showToast('âŒ', 'Erro', 'Falha de conexÃ£o ao registrar termo.');
     if (btn) { btn.disabled = false; btn.textContent = 'Aceitar e Continuar'; }
   }
 };
@@ -2237,9 +1715,9 @@ window.checkRiskTermStatus = async function() {
   } catch(e) { /* silencioso */ }
 };
 
-// ── COMPLIANCE GATE ───────────────────────────────────────────────────────────
-// Verifica KYC e Suitability. Exibe banner persistente e redireciona se necessário.
-// Páginas de compliance são excluídas do gate para evitar loop.
+// â”€â”€ COMPLIANCE GATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Verifica KYC e Suitability. Exibe banner persistente e redireciona se necessÃ¡rio.
+// PÃ¡ginas de compliance sÃ£o excluÃ­das do gate para evitar loop.
 function checkComplianceGate(user) {
   if (!user) return;
   const path = window.location.pathname;
@@ -2267,8 +1745,8 @@ function checkComplianceGate(user) {
 
     const targetUrl = !kycOk ? '/kyc.html' : '/suitability.html';
     const msg       = !kycOk
-      ? '🔐 Verificação de identidade necessária para operar na Bubuya.'
-      : '📊 Defina seu perfil de investidor para começar a operar.';
+      ? 'ðŸ” VerificaÃ§Ã£o de identidade necessÃ¡ria para operar na Bubuya.'
+      : 'ðŸ“Š Defina seu perfil de investidor para comeÃ§ar a operar.';
     const btnLabel  = !kycOk ? 'Verificar identidade' : 'Definir perfil';
 
     banner.innerHTML = `
@@ -2278,7 +1756,7 @@ function checkComplianceGate(user) {
         border-radius:10px;font-size:0.83rem;font-weight:800;
         text-decoration:none;white-space:nowrap;flex-shrink:0;
         transition:opacity .2s
-      " onmouseenter="this.style.opacity='.8'" onmouseleave="this.style.opacity='1'">${btnLabel} →</a>
+      " onmouseenter="this.style.opacity='.8'" onmouseleave="this.style.opacity='1'">${btnLabel} â†’</a>
     `;
     document.body.appendChild(banner);
   }
@@ -2299,11 +1777,11 @@ async function init() {
     if(Array.isArray(mkts)) {
       window.state.markets = mkts.filter(m => !m.resolved_at);
       window.renderMarkets();
-      // Onboarding tour — só para novos usuários
+      // Onboarding tour â€” sÃ³ para novos usuÃ¡rios
       setTimeout(tourStart, 800);
     } else {
       const grid = document.getElementById('marketsGrid');
-      if (grid) grid.innerHTML = '<div style="text-align:center;grid-column:1/-1;padding:80px;color:var(--muted)">⚠️ Erro ao carregar mercados. <button onclick="init()" style="padding:8px 20px;border-radius:10px;background:var(--green);color:#000;border:none;cursor:pointer;font-weight:600;margin-left:8px">Recarregar</button></div>';
+      if (grid) grid.innerHTML = '<div style="text-align:center;grid-column:1/-1;padding:80px;color:var(--muted)">âš ï¸ Erro ao carregar mercados. <button onclick="init()" style="padding:8px 20px;border-radius:10px;background:var(--green);color:#000;border:none;cursor:pointer;font-weight:600;margin-left:8px">Recarregar</button></div>';
     }
 
     const token = localStorage.getItem('preditivo_token');
@@ -2319,25 +1797,25 @@ async function init() {
           const tag = document.querySelector('.hero-tag');
           if(tag) tag.innerHTML += ' <span style="color:var(--blue); cursor:pointer; margin-left:10px" onclick="window.changeHeroImage()">[Trocar Foto]</span>';
         }
-        // Tentar registrar push se ainda não estiver inscrito
+        // Tentar registrar push se ainda nÃ£o estiver inscrito
         setTimeout(function(){ window.registerPush(token); }, 3000);
 
-        // ── COMPLIANCE GATE: KYC e Suitability obrigatórios ──────────────
-        // Não bloqueia a página (é home pública), mas exibe banner persistente
-        // e bloqueia qualquer ação de operar via requireKyc/requireSuitability no backend.
+        // â”€â”€ COMPLIANCE GATE: KYC e Suitability obrigatÃ³rios â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // NÃ£o bloqueia a pÃ¡gina (Ã© home pÃºblica), mas exibe banner persistente
+        // e bloqueia qualquer aÃ§Ã£o de operar via requireKyc/requireSuitability no backend.
         checkComplianceGate(user);
-        // BLOCO 5: verificar termo de riscos após verificar login
+        // BLOCO 5: verificar termo de riscos apÃ³s verificar login
         window.checkRiskTermStatus();
       }
     }
   } catch(e) {
     console.error('Init failure:', e);
     const grid = document.getElementById('marketsGrid');
-    if (grid) grid.innerHTML = '<div style="text-align:center;grid-column:1/-1;padding:80px;color:var(--muted)">⚠️ Não foi possível carregar os mercados.<br><span style="font-size:0.85rem;opacity:0.6">' + e.message + '</span><br><br><button onclick="init()" style="padding:10px 24px;border-radius:12px;background:var(--green);color:#000;border:none;cursor:pointer;font-weight:600">Tentar novamente</button></div>';
+    if (grid) grid.innerHTML = '<div style="text-align:center;grid-column:1/-1;padding:80px;color:var(--muted)">âš ï¸ NÃ£o foi possÃ­vel carregar os mercados.<br><span style="font-size:0.85rem;opacity:0.6">' + e.message + '</span><br><br><button onclick="init()" style="padding:10px 24px;border-radius:12px;background:var(--green);color:#000;border:none;cursor:pointer;font-weight:600">Tentar novamente</button></div>';
   }
 }
 
-/* ===== NOTIFICAÇÕES ===== */
+/* ===== NOTIFICAÃ‡Ã•ES ===== */
 let _notifPanelOpen   = false;
 let _profileMenuOpen  = false;
 
@@ -2360,7 +1838,7 @@ window.loadNotifications = async function() {
     }
 
     if (!data.notifications || !data.notifications.length) {
-      list.innerHTML = '<div style="padding:36px;text-align:center;color:var(--muted);font-size:0.85rem">Nenhuma notificação ainda.</div>';
+      list.innerHTML = '<div style="padding:36px;text-align:center;color:var(--muted);font-size:0.85rem">Nenhuma notificaÃ§Ã£o ainda.</div>';
       return;
     }
 
@@ -2370,7 +1848,7 @@ window.loadNotifications = async function() {
 
     list.innerHTML = data.notifications.map((n, i) => {
       const meta   = (typeof n.meta === 'object' && n.meta) ? n.meta : {};
-      const icon   = n.type === 'market_won' ? '🎉' : n.type === 'market_lost' ? '📊' : '🔔';
+      const icon   = n.type === 'market_won' ? 'ðŸŽ‰' : n.type === 'market_lost' ? 'ðŸ“Š' : 'ðŸ””';
       const bg     = iconBg[n.type] || 'rgba(59,130,246,0.1)';
       const unread = !n.is_read;
 
@@ -2382,11 +1860,11 @@ window.loadNotifications = async function() {
               <div style="font-weight:600;line-height:1.4;margin-bottom:10px">${meta.market_title}</div>` : ''}
             ${n.type === 'market_won' ? `
               <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border)">
-                <span style="color:var(--muted);font-size:0.76rem">Prêmio recebido</span>
+                <span style="color:var(--muted);font-size:0.76rem">PrÃªmio recebido</span>
                 <span style="color:var(--green);font-weight:800;font-family:'DM Mono',monospace">+R$${(parseFloat(meta.payout)||0).toFixed(2)}</span>
               </div>` : ''}
             ${n.type === 'market_lost' ? `
-              <div style="color:var(--muted);font-size:0.76rem;padding-top:8px;border-top:1px solid var(--border)">Resultado: ${meta.market_title ? 'mercado encerrado sem prêmio' : 'sem prêmio'}</div>` : ''}
+              <div style="color:var(--muted);font-size:0.76rem;padding-top:8px;border-top:1px solid var(--border)">Resultado: ${meta.market_title ? 'mercado encerrado sem prÃªmio' : 'sem prÃªmio'}</div>` : ''}
           </div>
         </div>` : '';
 
@@ -2445,7 +1923,7 @@ window.toggleProfileMenu = function() {
   if (chevron) chevron.style.transform = _profileMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)';
 };
 
-// Fechar painéis ao clicar fora
+// Fechar painÃ©is ao clicar fora
 document.addEventListener('click', function(e) {
   const panel = document.getElementById('notifPanel');
   const bell  = document.getElementById('bellBtn');
@@ -2468,16 +1946,19 @@ setInterval(() => {
   if (window.state.user) window.loadNotifications();
 }, 60000);
 
-/* ===== ORDENAÇÃO DE MERCADOS ===== */
+/* ===== ORDENAÃ‡ÃƒO DE MERCADOS ===== */
 window.state.sortOrder = 'hot'; // hot | recent | volume | closing
 
 window.setSortOrder = function(order, el) {
   window.state.sortOrder = order;
-  document.querySelectorAll('.sort-btn').forEach(b => {
-    b.style.background = 'none';
-    b.style.color = 'var(--muted)';
+  const active =
+    'sort-btn rounded px-3 py-1.5 text-xs font-semibold text-zinc-100 bg-bubuya-raised';
+  const idle =
+    'sort-btn rounded px-3 py-1.5 text-xs font-semibold text-zinc-500 hover:text-zinc-300';
+  document.querySelectorAll('.sort-toolbar .sort-btn').forEach((b) => {
+    b.className = idle;
   });
-  if (el) { el.style.background = 'var(--surface2)'; el.style.color = 'var(--text)'; }
+  if (el) el.className = active;
   window.renderMarkets();
 };
 
@@ -2486,7 +1967,7 @@ window.changeHeroImage = () => {
   if(url) {
     document.getElementById('heroImg').src = url;
     localStorage.setItem('custom_hero_image', url);
-    window.showToast('🖼️', 'Admin', 'Imagem atualizada com sucesso.');
+    window.showToast('ðŸ–¼ï¸', 'Admin', 'Imagem atualizada com sucesso.');
   }
 };
 
@@ -2510,15 +1991,16 @@ if(savedHero && savedHero.startsWith('http')) {
 })();
 
 init();
+};
 
 /* ===== ONBOARDING TOUR ===== */
 var _tourStep = 0;
 var _tourSteps = [
-  { target: '#marketsGrid',    title: 'Mercados preditivos',  text: 'Cada card é uma pergunta sobre o futuro. Você aposta SIM ou NÃO e ganha se estiver certo.' },
+  { target: '#marketsGrid',    title: 'Mercados preditivos',  text: 'Cada card Ã© uma pergunta sobre o futuro. VocÃª aposta SIM ou NÃƒO e ganha se estiver certo.' },
   { target: '.market-card',   title: 'Probabilidade ao vivo', text: 'A barra mostra o que o mercado acha: quanto mais pessoas apostam SIM, maior fica a chance.' },
-  { target: '#searchInput',    title: 'Busca inteligente',    text: 'Encontre mercados por assunto: "Copa", "eleição", "Bitcoin", "Selic"...' },
-  { target: '#topicTags',      title: 'Filtros por categoria', text: 'Filtre por Política, Economia, Esportes ou Tecnologia para ver só o que te interessa.' },
-  { target: '#section-ranking',title: 'Ranking de traders',   text: 'Acerte previsões e suba no ranking! Os melhores traders ganham destaque na plataforma.' }
+  { target: '#searchInput',    title: 'Busca inteligente',    text: 'Encontre mercados por assunto: "Copa", "eleiÃ§Ã£o", "Bitcoin", "Selic"...' },
+  { target: '#topicTags',      title: 'Filtros por categoria', text: 'Filtre por PolÃ­tica, Economia, Esportes ou Tecnologia para ver sÃ³ o que te interessa.' },
+  { target: '#section-ranking',title: 'Ranking de traders',   text: 'Acerte previsÃµes e suba no ranking! Os melhores traders ganham destaque na plataforma.' }
 ];
 
 function tourStart() {
@@ -2559,7 +2041,7 @@ function tourRender(i) {
     spot.style.width  = (rect.width  + pad*2) + 'px';
     spot.style.height = (rect.height + pad*2) + 'px';
 
-    // Posicionar tooltip — abaixo do spotlight, ou acima se perto do rodapé
+    // Posicionar tooltip â€” abaixo do spotlight, ou acima se perto do rodapÃ©
     var tip   = document.getElementById('tourTooltip');
     var tipH  = 160;
     var tipW  = 300;
@@ -2570,32 +2052,33 @@ function tourRender(i) {
     tip.style.top  = Math.max(10, tipTop) + 'px';
     tip.style.left = tipLeft + 'px';
 
-    // Conteúdo
+    // ConteÃºdo
     document.getElementById('tourTitle').textContent = step.title;
     document.getElementById('tourText').textContent  = step.text;
-    document.getElementById('tourBtn').textContent   = i === _tourSteps.length - 1 ? 'Entendi! 🎉' : 'Próximo →';
+    document.getElementById('tourBtn').textContent   = i === _tourSteps.length - 1 ? 'Entendi! ðŸŽ‰' : 'PrÃ³ximo â†’';
 
     // Dots
     var dots = '';
     for (var d = 0; d < _tourSteps.length; d++) {
-      dots += '<div style="width:6px;height:6px;border-radius:50%;background:' + (d === i ? 'var(--green)' : 'rgba(255,255,255,0.2)') + '"></div>';
+      dots += '<div style="width:6px;height:6px;border-radius:50%;background:' + (d === i ? '#16a34a' : '#3f3f46') + '"></div>';
     }
     document.getElementById('tourDots').innerHTML = dots;
   }, 350);
 }
 </script>
-<!-- ── ONBOARDING TOUR ─────────────────────────────────────────────────────── -->
+<script type="module" src="/src/main.js"></script>
+<!-- â”€â”€ ONBOARDING TOUR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
 <div id="tourOverlay" style="display:none;position:fixed;inset:0;z-index:9997;pointer-events:none"></div>
 <div id="tourSpotlight" style="display:none;position:fixed;border-radius:14px;box-shadow:0 0 0 9999px rgba(0,0,0,0.72);z-index:9998;pointer-events:none;transition:top .3s,left .3s,width .3s,height .3s"></div>
 <div id="tourTooltip" style="display:none;position:fixed;z-index:9999;background:#0f1923;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:20px 22px;max-width:300px;width:300px;box-shadow:0 8px 32px rgba(0,0,0,0.6)">
-  <div style="font-size:0.7rem;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:700">Guia Rápido</div>
+  <div style="font-size:0.7rem;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:700">Guia RÃ¡pido</div>
   <div id="tourTitle" style="font-weight:800;font-size:1rem;margin-bottom:8px;color:#fff"></div>
   <div id="tourText" style="font-size:0.85rem;color:#aaa;line-height:1.5;margin-bottom:16px"></div>
   <div style="display:flex;align-items:center;justify-content:space-between">
     <div id="tourDots" style="display:flex;gap:5px;align-items:center"></div>
     <div style="display:flex;gap:8px">
       <button onclick="tourSkip()" style="padding:7px 14px;background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#888;cursor:pointer;font-size:0.8rem;font-family:inherit;transition:border-color .2s" onmouseover="this.style.borderColor='rgba(255,255,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'">Pular</button>
-      <button id="tourBtn" onclick="tourNext()" style="padding:7px 16px;background:var(--green);color:#080c10;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:700;font-family:inherit;transition:opacity .2s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Próximo →</button>
+      <button id="tourBtn" onclick="tourNext()" style="padding:7px 16px;background:var(--green);color:#080c10;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:700;font-family:inherit;transition:opacity .2s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">PrÃ³ximo â†’</button>
     </div>
   </div>
 </div>

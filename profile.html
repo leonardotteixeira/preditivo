@@ -304,6 +304,7 @@ function switchTab(name) {
   if (name === 'indicacoes') loadIndicacoes();
   if (name === 'extrato') renderExtrato(_extratoPeriod);
   if (name === 'ouvidoria') loadComplaints();
+  if (name === 'protecao') loadLgpdStatus();
   if (name === 'seguranca') initPushUI();
 }
 
@@ -590,6 +591,20 @@ function renderPage() {
         '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:20px">Suspenda sua conta temporariamente para fazer uma pausa. Durante o período, você não poderá realizar operações.</div>' +
         '<div id="selfExcludeContent"><div class="empty" style="padding:20px"><div class="empty-icon" style="font-size:1.5rem">⏳</div>Carregando status...</div></div>' +
       '</div>' +
+      '<div class="edit-card" style="max-width:600px" id="lgpdCard">' +
+        '<div style="font-weight:700;font-size:1.05rem;margin-bottom:4px">🔒 Privacidade e Dados Pessoais (LGPD)</div>' +
+        '<div style="font-size:0.85rem;color:var(--muted);margin-bottom:20px">Seus direitos conforme a Lei 13.709/2018 (LGPD).</div>' +
+        '<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">' +
+          '<a href="/lgpd/my-data" id="btnExportData" onclick="exportMyData(event)" style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);text-decoration:none;font-size:0.9rem;cursor:pointer"><span style="font-size:1.1rem">📦</span><div><div style="font-weight:600;margin-bottom:2px">Exportar meus dados</div><div style="font-size:0.78rem;color:var(--muted)">Baixar todos os dados pessoais e financeiros (Art. 18 LGPD)</div></div></a>' +
+        '</div>' +
+        '<div style="padding:14px;background:rgba(244,63,94,0.05);border:1px solid rgba(244,63,94,0.2);border-radius:10px;margin-bottom:16px">' +
+          '<div style="font-weight:700;font-size:0.9rem;color:#f87171;margin-bottom:6px">⚠️ Solicitar exclusão de conta</div>' +
+          '<div style="font-size:0.82rem;color:var(--muted);margin-bottom:12px;line-height:1.5">Solicita a exclusão dos seus dados pessoais. Registros financeiros são mantidos por 5 anos conforme exigência do BACEN. Seu pedido será analisado em até 15 dias úteis.</div>' +
+          '<div id="lgpdDeletionStatus"></div>' +
+          '<button onclick="requestDataDeletion()" id="btnDeletion" style="padding:10px 20px;background:#ef4444;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:0.875rem;cursor:pointer">Solicitar exclusão de dados</button>' +
+          '<div id="lgpdDeletionFb" style="margin-top:8px;font-size:0.82rem"></div>' +
+        '</div>' +
+      '</div>' +
     '</div>' +
 
     /* Ouvidoria */
@@ -629,6 +644,7 @@ function renderPage() {
 
   document.getElementById('pageContent').innerHTML = html;
   loadSelfExclusionStatus();
+  loadLgpdStatus();
   updateAuthUI();
   renderExtrato(0);
 }
@@ -1198,6 +1214,54 @@ async function confirmSelfExclude() {
   } catch(e) { fb.style.color = '#ef4444'; fb.textContent = 'Erro de conexão.'; }
 }
 
+/* ── LGPD ── */
+async function exportMyData(e) {
+  e.preventDefault();
+  try {
+    var r = await fetch(API + '/lgpd/my-data', { headers: { Authorization: 'Bearer ' + state.token } });
+    if (!r.ok) { showToast('Erro ao exportar dados (' + r.status + ')'); return; }
+    var blob = await r.blob();
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'meus-dados-bubuya.json'; a.click();
+    setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+  } catch(e) { showToast('Erro ao exportar dados.'); }
+}
+
+async function requestDataDeletion() {
+  var fb = document.getElementById('lgpdDeletionFb');
+  var btn = document.getElementById('btnDeletion');
+  if (!confirm('Tem certeza? Seus dados pessoais serão excluídos. Registros financeiros serão mantidos por 5 anos (BACEN).')) return;
+  btn.disabled = true; fb.style.color = 'var(--muted)'; fb.textContent = 'Enviando solicitação...';
+  try {
+    var d = await apiPost('/lgpd/request-deletion', {}, state.token);
+    if (d.error) { fb.style.color = '#ef4444'; fb.textContent = 'Erro: ' + d.error; btn.disabled = false; return; }
+    fb.style.color = '#34d399'; fb.textContent = '✅ Solicitação registrada. Você receberá uma resposta em até 15 dias úteis.';
+    btn.style.display = 'none';
+    loadLgpdStatus();
+  } catch(e) { fb.style.color = '#ef4444'; fb.textContent = 'Erro de conexão.'; btn.disabled = false; }
+}
+
+async function loadLgpdStatus() {
+  var el = document.getElementById('lgpdDeletionStatus');
+  if (!el) return;
+  try {
+    var d = await apiGet('/lgpd/deletion-status', state.token);
+    if (!d.has_request) { el.innerHTML = ''; return; }
+    var r = d.request;
+    var statusLabel = { pending: 'Pendente', approved: 'Aprovada', rejected: 'Indeferida' }[r.status] || r.status;
+    var statusColor = { pending: '#fbbf24', approved: '#34d399', rejected: '#f87171' }[r.status] || '#aaa';
+    el.innerHTML = '<div style="padding:10px 14px;background:var(--surface2);border-radius:8px;margin-bottom:12px;font-size:0.82rem">' +
+      '<span style="color:' + statusColor + ';font-weight:700">● ' + statusLabel + '</span>' +
+      '<span style="color:var(--muted);margin-left:8px">Solicitação em ' + new Date(r.requested_at).toLocaleDateString('pt-BR') + '</span>' +
+    '</div>';
+    if (r.status === 'pending' || r.status === 'approved') {
+      var btn = document.getElementById('btnDeletion');
+      if (btn) btn.style.display = 'none';
+    }
+  } catch(e) {}
+}
+
 /* ── OUVIDORIA ── */
 var COMPLAINT_LABELS = {
   resolucao_mercado: 'Contestação de resultado',
@@ -1264,7 +1328,7 @@ async function submitComplaint() {
   }
 
   try {
-    var d = await apiPost('/auth/complaints', { category, description, attachment }, state.token);
+    var d = await apiPost('/complaints', { category, description }, state.token);
     if (d.error) { fb.style.color='#ef4444'; fb.textContent='Erro: '+d.error; return; }
     fb.style.color='#34d399'; fb.textContent='✅ Reclamação registrada! Protocolo: '+d.complaint.id.substring(0,8).toUpperCase();
     document.getElementById('complaintCategory').value = '';
@@ -1279,7 +1343,7 @@ async function loadComplaints() {
   if (!el) return;
   el.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;padding:10px">Carregando...</div>';
   try {
-    var d = await apiGet('/auth/complaints/my', state.token);
+    var d = await apiGet('/complaints/my', state.token);
     var list = d.complaints || [];
     if (!list.length) {
       el.innerHTML = '<div class="empty" style="padding:20px"><div class="empty-icon" style="font-size:1.5rem">📭</div>Nenhuma reclamação registrada.</div>';
@@ -1348,7 +1412,7 @@ async function loadComplaints() {
 }
 
 async function downloadUserAttachment(complaintId, attId, filename, mimeType) {
-  var url = (window.API || API) + '/auth/complaints/' + complaintId + '/attachment/' + attId;
+  var url = (window.API || API) + '/complaints/' + complaintId + '/attachment/' + attId;
   try {
     var r = await fetch(url, { headers: state.token ? { Authorization: 'Bearer ' + state.token } : {} });
     if (!r.ok) { alert('Erro ao baixar anexo (' + r.status + ')'); return; }
@@ -1379,7 +1443,7 @@ async function sendComplaintReply(id) {
   }
 
   try {
-    var d = await apiPost('/auth/complaints/' + id + '/messages', { message: msg, attachment }, state.token);
+    var d = await apiPost('/complaints/' + id + '/messages', { message: msg }, state.token);
     if (d.error) { fb.style.color='#f87171'; fb.textContent='Erro: ' + d.error; return; }
     ta.value = '';
     if (fileInput) fileInput.value = '';

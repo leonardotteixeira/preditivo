@@ -1,6 +1,7 @@
 /**
- * Extrai <style> de terms.html e gera public-pages.css com seletores prefixados .public-root
- * e .public-head, para conviver com app.css (.section = hidden na home).
+ * (Opcional) Extrai <style> de um HTML legado e regenera trechos de public-pages.css.
+ * Hoje o CSS oficial está em src/styles/pages/public-pages.css (editar direto).
+ * Se terms.html não tiver mais bloco <style>, o script apenas avisa e encerra sem erro.
  */
 import fs from 'fs';
 import path from 'path';
@@ -11,7 +12,12 @@ const root = path.join(__dirname, '..');
 const termsPath = path.join(root, 'terms.html');
 const html = fs.readFileSync(termsPath, 'utf8');
 const m = html.match(/<style>\r?\n([\s\S]*?)\r?\n<\/style>/);
-if (!m) throw new Error('no style in terms.html');
+if (!m) {
+  console.log(
+    '[build-public-pages-css] terms.html não contém <style>. Mantenha e edite src/styles/pages/public-pages.css manualmente.'
+  );
+  process.exit(0);
+}
 
 let css = m[1];
 
@@ -130,6 +136,6 @@ css = css.replace(/font-family:'Space Grotesk', sans-serif/g, 'font-family: inhe
 const outPath = path.join(root, 'src/styles/pages/public-pages.css');
 fs.writeFileSync(
   outPath,
-  `/* Auto-built from terms.html + header; scope .public-root — run: node scripts/build-public-pages-css.mjs */\n${css}\n`
+  `/* Fonte histórica: extração de terms.html — hoje edite este arquivo ou rode npm run build:public-css se voltar <style> no HTML */\n${css}\n`
 );
 console.log('Wrote', outPath, fs.statSync(outPath).size);

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -34,6 +34,17 @@
       cursor: pointer;
     }
     button:active { opacity: 0.85; }
+    .off-links {
+      margin-top: 40px;
+      padding-top: 24px;
+      border-top: 1px solid #27272a;
+      font-size: 0.8rem;
+      color: #71717a;
+      line-height: 1.8;
+      max-width: 360px;
+    }
+    .off-links a { color: #a1a1aa; text-decoration: none; }
+    .off-links a:hover { color: #10b981; text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -42,6 +53,11 @@
   <h1>Sem conexão com a internet</h1>
   <p>Verifique sua conexão e tente novamente. Seus dados e saldo estão seguros.</p>
   <button onclick="window.location.reload()">Tentar novamente</button>
-  <script type="module" src="/src/styles-only.js"></script>
+  <nav class="off-links" aria-label="Links legais">
+    <a href="/">Início</a> ·
+    <a href="/terms.html">Termos de uso</a> ·
+    <a href="/privacidade.html">Privacidade</a> ·
+    <a href="/protecao-investidor.html">Proteção ao investidor</a>
+  </nav>
 </body>
 </html>

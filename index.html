@@ -873,7 +873,7 @@
       <div class="method-info">
         Gera um <strong>QR Code PIX</strong> instantaneamente. Escaneie pelo app do seu banco e o saldo é creditado de forma automática.
       </div>
-      <input class="modal-input" type="number" id="gatewayAmount" placeholder="Valor (R$)" min="1">
+      <input class="modal-input" type="number" id="gatewayAmount" placeholder="Valor (R$) — mínimo R$5" min="5">
       <button class="btn-primary" style="width:100%;font-size:1rem;background:var(--blue);box-shadow:0 4px 12px rgba(59,130,246,0.25)" id="btnAsaas" onclick="window.depositGateway()">
         Gerar QR Code PIX
       </button>
@@ -1886,7 +1886,7 @@ window.copyPixKey = () => {
 /* ===== DEPOSIT: GATEWAY ASAAS (PIX QR Code inline) ===== */
 window.depositGateway = async () => {
   const amt = document.getElementById('gatewayAmount').value;
-  if (!amt || parseFloat(amt) < 1) return window.showToast('⚠️', 'Atenção', 'Informe um valor.');
+  if (!amt || parseFloat(amt) < 5) return window.showToast('⚠️', 'Atenção', 'Valor mínimo é R$5.');
   const token = localStorage.getItem('preditivo_token');
   if (!token) { window.closeModal('depositModal'); return window.openModal('loginModal'); }
 

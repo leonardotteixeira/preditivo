@@ -1,0 +1,522 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Design tokens: institucional / terminal-adjacent (Bloomberg + fintech) ── */
+@layer base {
+  .skip-link {
+    @apply absolute left-[-9999px] top-4 z-[2001] rounded-md bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-950 no-underline;
+  }
+
+  .skip-link:focus {
+    @apply left-4 outline outline-2 outline-offset-2 outline-bubuya-accent;
+  }
+
+  :root {
+    --bg: #09090b;
+    --surface: #18181b;
+    --surface2: #1f1f23;
+    --border: #27272a;
+    --text: #fafafa;
+    --muted: #a1a1aa;
+    --green: #16a34a;
+    --red: #dc2626;
+    --blue: #5b9bd5;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply min-h-screen bg-bubuya-void font-sans text-zinc-100 antialiased;
+  }
+
+  :focus-visible {
+    @apply outline outline-2 outline-offset-2 outline-bubuya-accent;
+  }
+}
+
+@layer components {
+  /* Footer */
+  footer {
+    @apply relative z-10 mt-16 border-t border-bubuya-line bg-bubuya-void px-6 py-16 md:px-8 md:py-20;
+  }
+
+  .footer-inner {
+    @apply mx-auto grid max-w-[1440px] gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-12;
+  }
+
+  .footer-col h4 {
+    @apply mb-4 text-xs font-semibold uppercase tracking-wider text-zinc-400;
+  }
+
+  .footer-col ul {
+    @apply list-none space-y-2;
+  }
+
+  .footer-col a {
+    @apply text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-200;
+  }
+
+  .footer-legal {
+    @apply mx-auto mt-12 max-w-[1440px] border-t border-bubuya-line pt-8 text-sm leading-relaxed text-zinc-500;
+  }
+
+  .footer-disclaimer {
+    @apply mt-6 rounded-md border border-bubuya-line bg-bubuya-surface/50 p-4 text-zinc-400;
+  }
+
+  /* Header */
+  header {
+    @apply sticky top-0 z-[100] border-b border-bubuya-line bg-bubuya-void/95 backdrop-blur-sm;
+  }
+
+  .header-inner {
+    @apply mx-auto flex h-14 max-w-[1440px] items-center gap-6 px-4 md:h-16 md:px-6;
+  }
+
+  .logo {
+    @apply cursor-pointer text-base font-semibold tracking-tight text-zinc-100 md:text-lg;
+  }
+
+  .header-search {
+    @apply mx-auto flex max-w-md flex-1 items-center gap-2 rounded-md border border-bubuya-line bg-bubuya-surface px-3 py-2 transition-colors focus-within:border-zinc-600;
+  }
+
+  .header-search input {
+    @apply w-full border-0 bg-transparent text-sm text-zinc-100 placeholder:text-zinc-500 focus:ring-0;
+  }
+
+  .header-right {
+    @apply flex items-center gap-3 md:gap-4;
+  }
+
+  nav {
+    @apply hidden items-center gap-1 md:flex;
+  }
+
+  nav a {
+    @apply cursor-pointer rounded-md px-3 py-2 text-sm font-medium text-zinc-500 no-underline transition-colors hover:bg-bubuya-raised hover:text-zinc-200;
+  }
+
+  nav a.active {
+    @apply bg-bubuya-raised text-zinc-100;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    @apply inline-flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-zinc-100 px-4 py-2.5 text-sm font-semibold text-zinc-950 shadow-sm transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 focus-visible:ring-offset-bubuya-void;
+  }
+
+  .btn-outline {
+    @apply inline-flex cursor-pointer items-center justify-center rounded-md border border-bubuya-line bg-transparent px-3 py-2 text-sm font-medium text-zinc-200 transition hover:border-zinc-600 hover:bg-bubuya-raised;
+  }
+
+  .btn-finance {
+    @apply inline-flex cursor-pointer items-center justify-center rounded-md border px-3 py-2 text-xs font-semibold transition md:text-sm;
+  }
+
+  .btn-deposit {
+    @apply border-emerald-900/40 bg-emerald-950/25 text-emerald-400 hover:border-emerald-800/60 hover:bg-emerald-950/40;
+  }
+
+  .btn-withdraw {
+    @apply border-bubuya-line bg-bubuya-surface text-zinc-300 hover:border-zinc-600 hover:bg-bubuya-raised;
+  }
+
+  /* Hero */
+  .hero {
+    @apply relative z-10 mx-auto grid max-w-[1440px] items-center gap-12 px-4 py-12 md:grid-cols-[1.05fr_0.95fr] md:gap-16 md:px-6 md:py-16 lg:py-20;
+  }
+
+  .hero-tag {
+    @apply mb-6 inline-flex items-center gap-2 rounded border border-bubuya-line bg-bubuya-surface px-3 py-1.5 text-xs font-medium uppercase tracking-wide text-zinc-400;
+  }
+
+  .hero h1,
+  .hero-content h1 {
+    @apply mb-6 text-3xl font-semibold leading-tight tracking-tight text-zinc-50 md:text-4xl lg:text-5xl;
+  }
+
+  .hero h1 span,
+  .hero-content h1 span {
+    @apply text-bubuya-accent;
+  }
+
+  .hero-sub {
+    @apply mb-8 max-w-xl text-base leading-relaxed text-zinc-400 md:text-lg;
+  }
+
+  .hero-actions {
+    @apply mb-10 flex flex-col gap-3 sm:flex-row sm:items-center;
+  }
+
+  .hero-stats {
+    @apply flex flex-wrap gap-8 border-t border-bubuya-line pt-8 md:gap-14;
+  }
+
+  .hero-stat-item {
+    @apply flex flex-col gap-1;
+  }
+
+  .hero-stat-val {
+    @apply font-mono text-2xl font-semibold tabular-nums text-zinc-100 md:text-3xl;
+  }
+
+  .hero-stat-lbl {
+    @apply text-xs font-medium uppercase tracking-wider text-zinc-500;
+  }
+
+  .hero-image-wrapper {
+    @apply hidden md:block;
+  }
+
+  .hero-image-main {
+    @apply w-full rounded-lg border border-bubuya-line shadow-lift;
+  }
+
+  /* Sections */
+  .section {
+    @apply relative z-10 mx-auto hidden max-w-[1440px] px-4 pb-20 pt-8 md:px-6;
+  }
+
+  .section.active {
+    @apply block animate-[fadeIn_0.25s_ease-out];
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Topic tags */
+  .topic-tags {
+    @apply mb-6 flex gap-2 overflow-x-auto pb-1 scrollbar-none md:mb-8 md:gap-2;
+  }
+
+  .topic-tag {
+    @apply shrink-0 cursor-pointer rounded-md border border-bubuya-line bg-bubuya-surface px-3 py-2 text-sm font-medium text-zinc-500 transition hover:border-zinc-600 hover:text-zinc-200;
+  }
+
+  button.topic-tag {
+    @apply text-left;
+  }
+
+  .topic-tag.active {
+    @apply border-zinc-500 bg-bubuya-raised text-zinc-100;
+  }
+
+  /* Market grid & cards — sem glow / sem borda animada */
+  .markets-grid {
+    @apply grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 xl:gap-5;
+  }
+
+  .market-card {
+    @apply flex cursor-pointer flex-col gap-4 rounded-lg border border-bubuya-line bg-bubuya-surface p-5 shadow-panel transition hover:border-zinc-600 hover:shadow-lift;
+  }
+
+  .mc-title {
+    @apply text-base font-semibold leading-snug text-zinc-100;
+  }
+
+  .mc-category {
+    @apply mb-1 text-[10px] font-semibold uppercase tracking-widest text-zinc-500;
+  }
+
+  .mc-sentiment {
+    @apply flex h-2 overflow-hidden rounded-sm border border-bubuya-line bg-bubuya-void;
+  }
+
+  .mc-sentiment-yes {
+    @apply h-full bg-emerald-600 transition-[width] duration-500 ease-out;
+  }
+
+  .mc-sentiment-no {
+    @apply h-full bg-rose-700 transition-[width] duration-500 ease-out;
+  }
+
+  .mc-footer {
+    @apply mt-auto flex flex-col gap-3 border-t border-bubuya-line pt-4 sm:flex-row sm:items-center sm:justify-between;
+  }
+
+  .mc-stat {
+    @apply text-sm text-zinc-500;
+  }
+
+  .mc-stat strong {
+    @apply font-mono font-medium tabular-nums text-zinc-200;
+  }
+
+  .mc-odds {
+    @apply flex gap-2;
+  }
+
+  .mc-odd {
+    @apply min-w-[3.5rem] rounded-md border px-3 py-1.5 text-center font-mono text-sm font-semibold tabular-nums;
+  }
+
+  .mc-odd.yes {
+    @apply border-emerald-900/50 bg-emerald-950/30 text-emerald-400;
+  }
+
+  .mc-odd.no {
+    @apply border-rose-900/50 bg-rose-950/30 text-rose-400;
+  }
+
+  .market-card:hover .mc-odd.yes {
+    @apply border-emerald-700/60 bg-emerald-900/40;
+  }
+
+  .market-card:hover .mc-odd.no {
+    @apply border-rose-700/60 bg-rose-900/40;
+  }
+
+  /* Ranking */
+  .ranking-list {
+    @apply flex flex-col gap-2;
+  }
+
+  .ranking-card {
+    @apply flex items-center gap-4 rounded-lg border border-bubuya-line bg-bubuya-surface p-4 transition hover:border-zinc-600;
+  }
+
+  .rank-pos {
+    @apply w-8 text-center font-mono text-lg font-semibold text-zinc-500;
+  }
+
+  .rank-pos.gold {
+    @apply text-amber-600;
+  }
+
+  .rank-pos.silver {
+    @apply text-zinc-400;
+  }
+
+  .rank-pos.bronze {
+    @apply text-amber-800;
+  }
+
+  .rank-avatar {
+    @apply flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-bubuya-line bg-bubuya-void text-sm font-semibold;
+  }
+
+  .rank-name {
+    @apply flex-1 text-sm font-semibold text-zinc-100;
+  }
+
+  .rank-profit {
+    @apply font-mono text-sm font-semibold text-emerald-500;
+  }
+
+  /* Portfolio */
+  .portfolio-grid {
+    @apply grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3;
+  }
+
+  .portfolio-card {
+    @apply rounded-lg border border-bubuya-line bg-bubuya-surface p-5;
+  }
+
+  .port-profit {
+    @apply my-2 font-mono text-xl font-semibold tabular-nums;
+  }
+
+  .pnl-tab {
+    @apply cursor-pointer rounded border border-transparent px-2 py-1 text-xs font-medium text-zinc-500 transition hover:text-zinc-300;
+  }
+
+  .pnl-tab.active {
+    @apply border-bubuya-line bg-bubuya-raised text-zinc-100;
+  }
+
+  /* Modals */
+  .modal-overlay {
+    @apply fixed inset-0 z-[1000] hidden items-center justify-end bg-black/70 sm:items-center sm:justify-center md:bg-black/60;
+  }
+
+  .modal-overlay.active {
+    @apply flex;
+  }
+
+  .modal {
+    @apply relative max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-t-lg border border-bubuya-line bg-bubuya-surface p-6 shadow-lift sm:rounded-lg md:p-8;
+  }
+
+  .modal-close {
+    @apply absolute right-4 top-4 border-0 bg-transparent text-xl leading-none text-zinc-500 hover:text-zinc-300;
+  }
+
+  .modal-title {
+    @apply mb-2 text-xl font-semibold tracking-tight text-zinc-50 md:text-2xl;
+  }
+
+  .modal-sub {
+    @apply mb-6 text-sm leading-relaxed text-zinc-500;
+  }
+
+  .modal-input {
+    @apply mb-3 w-full rounded-md border border-bubuya-line bg-bubuya-void px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600;
+  }
+
+  /* Deposit tabs */
+  .deposit-tabs {
+    @apply mb-6 flex gap-1 rounded-md border border-bubuya-line bg-bubuya-void p-1;
+  }
+
+  .deposit-tab {
+    @apply flex flex-1 cursor-pointer items-center justify-center gap-1 rounded border-0 bg-transparent px-2 py-2 text-xs font-medium text-zinc-500 transition hover:text-zinc-300;
+  }
+
+  .deposit-tab.active {
+    @apply bg-bubuya-surface text-zinc-100 shadow-sm;
+  }
+
+  .deposit-panel {
+    @apply hidden;
+  }
+
+  .deposit-panel.active {
+    @apply block;
+  }
+
+  .pix-qr-box {
+    @apply my-4 flex flex-col items-center gap-3 rounded-md border border-bubuya-line bg-white p-4;
+  }
+
+  .pix-key-box {
+    @apply my-4 flex items-center justify-between gap-3 rounded-md border border-bubuya-line bg-bubuya-void px-4 py-3;
+  }
+
+  .pix-key-val {
+    @apply break-all font-mono text-xs text-zinc-200;
+  }
+
+  .btn-copy {
+    @apply shrink-0 cursor-pointer rounded-md border border-bubuya-line bg-bubuya-surface px-3 py-1.5 text-xs font-medium text-zinc-200 hover:bg-bubuya-raised;
+  }
+
+  .wallet-chip {
+    @apply mb-4 flex items-center gap-3 rounded-md border border-bubuya-line bg-bubuya-void px-4 py-3;
+  }
+
+  .wallet-dot {
+    @apply h-2 w-2 shrink-0 rounded-full bg-emerald-600;
+  }
+
+  .wallet-addr {
+    @apply font-mono text-xs text-zinc-500;
+  }
+
+  .method-info {
+    @apply mb-4 rounded-md border border-bubuya-line bg-bubuya-void p-4 text-sm leading-relaxed text-zinc-500;
+  }
+
+  .method-info strong {
+    @apply font-medium text-zinc-300;
+  }
+
+  /* Toast */
+  .toast {
+    @apply fixed bottom-4 right-4 z-[2000] flex translate-y-full items-center gap-4 rounded-md border border-bubuya-line bg-bubuya-surface px-5 py-4 opacity-0 shadow-lift transition duration-300;
+  }
+
+  .toast.show {
+    @apply translate-y-0 opacity-100;
+  }
+
+  /* Mobile */
+  .mobile-menu-btn {
+    @apply ml-auto flex hidden flex-col gap-1.5 border-0 bg-transparent p-2 text-inherit md:ml-0;
+  }
+
+  @media (max-width: 768px) {
+    .mobile-menu-btn {
+      @apply flex;
+    }
+
+    .header-search {
+      @apply hidden;
+    }
+
+    nav {
+      @apply hidden;
+    }
+
+    #authArea {
+      @apply hidden;
+    }
+
+    .modal-overlay {
+      @apply items-end;
+    }
+
+    .modal {
+      @apply max-h-[min(92vh,720px)] rounded-b-none rounded-t-lg;
+    }
+  }
+
+  .mobile-menu-btn span {
+    @apply block h-0.5 w-5 rounded-sm bg-zinc-300 transition;
+  }
+
+  .mobile-menu-btn.open span:nth-child(1) {
+    @apply translate-y-2 rotate-45;
+  }
+
+  .mobile-menu-btn.open span:nth-child(2) {
+    @apply opacity-0;
+  }
+
+  .mobile-menu-btn.open span:nth-child(3) {
+    @apply -translate-y-2 -rotate-45;
+  }
+
+  .mobile-nav {
+    @apply fixed inset-x-0 bottom-0 top-14 z-[98] hidden flex-col gap-1 overflow-y-auto border-t border-bubuya-line bg-bubuya-void p-4;
+  }
+
+  .mobile-nav.open {
+    @apply flex;
+  }
+
+  .mobile-nav-search {
+    @apply mb-2 flex items-center gap-2 rounded-md border border-bubuya-line bg-bubuya-surface px-3 py-2.5;
+  }
+
+  .mobile-nav-search input {
+    @apply w-full border-0 bg-transparent text-sm text-zinc-100 focus:ring-0;
+  }
+
+  .mobile-nav a {
+    @apply block cursor-pointer rounded-md border border-bubuya-line bg-bubuya-surface px-4 py-3 text-sm font-medium text-zinc-200 no-underline hover:bg-bubuya-raised;
+  }
+
+  .mobile-nav a.active {
+    @apply border-zinc-600 bg-bubuya-raised text-zinc-50;
+  }
+
+  .mobile-nav-divider {
+    @apply my-2 h-px bg-bubuya-line;
+  }
+
+  .mobile-nav-auth {
+    @apply mt-2 flex gap-2;
+  }
+}
+
+@layer utilities {
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}

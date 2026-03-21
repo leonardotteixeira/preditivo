@@ -67,6 +67,35 @@
     @apply mt-6 rounded-md border border-bubuya-line bg-bubuya-surface/50 p-4 text-zinc-400;
   }
 
+  .footer-disclaimer strong {
+    @apply font-semibold text-zinc-300;
+  }
+
+  /* Bloco de marca (evita estilos inline no rodapé) */
+  .footer-brand {
+    @apply lg:pr-6;
+  }
+
+  .footer-wordmark {
+    @apply mb-3 text-2xl font-semibold tracking-tight text-zinc-50 md:text-3xl;
+  }
+
+  .footer-tagline {
+    @apply max-w-sm text-sm leading-relaxed text-zinc-500;
+  }
+
+  .footer-contact {
+    @apply mt-5 text-sm text-zinc-500;
+  }
+
+  .footer-contact a {
+    @apply font-medium text-zinc-400 underline-offset-2 transition-colors hover:text-zinc-200 hover:underline;
+  }
+
+  .footer-copyright {
+    @apply mt-8 text-sm text-zinc-600;
+  }
+
   /* Header */
   header {
     @apply sticky top-0 z-[100] border-b border-bubuya-line bg-bubuya-void/95 backdrop-blur-sm;

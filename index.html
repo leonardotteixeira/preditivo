@@ -839,7 +839,7 @@
         <span>💚</span> PIX Direto
       </button>
       <button class="deposit-tab gw" onclick="window.switchDepositTab('gw',this)">
-        <span>⚡</span> Gateway
+        <span>⚡</span> PIX Asaas
       </button>
       <button class="deposit-tab eth" onclick="window.switchDepositTab('eth',this)">
         <span>🦊</span> Cripto
@@ -868,15 +868,32 @@
       </div>
     </div>
 
-    <!-- PAINEL: GATEWAY INFINITEPAY -->
+    <!-- PAINEL: GATEWAY ASAAS (PIX QR Code inline) -->
     <div class="deposit-panel" id="panel-gw">
       <div class="method-info">
-        Redireciona para o checkout seguro da <strong>InfinitePay</strong>. Aceita cartão de crédito, débito e PIX com confirmação instantânea.
+        Gera um <strong>QR Code PIX</strong> instantaneamente. Escaneie pelo app do seu banco e o saldo é creditado de forma automática.
       </div>
       <input class="modal-input" type="number" id="gatewayAmount" placeholder="Valor (R$) — mínimo R$10" min="10">
-      <button class="btn-primary" style="width:100%;font-size:1rem;background:var(--blue);box-shadow:0 4px 12px rgba(59,130,246,0.25)" onclick="window.depositGateway()">
-        Ir para o Checkout InfinitePay →
+      <button class="btn-primary" style="width:100%;font-size:1rem;background:var(--blue);box-shadow:0 4px 12px rgba(59,130,246,0.25)" id="btnAsaas" onclick="window.depositGateway()">
+        Gerar QR Code PIX
       </button>
+
+      <!-- QR Code exibido após gerar a cobrança -->
+      <div id="asaasQrSection" style="display:none;margin-top:20px;text-align:center">
+        <img id="asaasQrImage" src="" alt="QR Code PIX"
+          style="width:200px;height:200px;border-radius:12px;border:1px solid var(--border);display:block;margin:0 auto">
+        <div style="margin-top:14px">
+          <div style="font-size:0.78rem;color:var(--muted);margin-bottom:6px">PIX copia e cola:</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input id="asaasPixCode" type="text" readonly
+              style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:0.72rem;color:var(--text);font-family:'DM Mono',monospace;min-width:0">
+            <button class="btn-secondary" style="white-space:nowrap;padding:8px 14px;font-size:0.85rem" onclick="window.copyAsaasPixCode()">Copiar</button>
+          </div>
+        </div>
+        <p style="font-size:0.8rem;color:var(--muted);margin-top:12px;line-height:1.5">
+          Aguarde a confirmação automática.<br>O saldo aparece em segundos após o pagamento.
+        </p>
+      </div>
     </div>
 
     <!-- PAINEL: CRIPTO / METAMASK -->
@@ -1071,6 +1088,14 @@ window.openModal = (id) => {
     if (pixPanel) pixPanel.classList.add('active');
     const pixOut = document.getElementById('pixDirectOutput');
     if (pixOut) pixOut.style.display = 'none';
+    const qrSection = document.getElementById('asaasQrSection');
+    if (qrSection) { qrSection.style.display = 'none'; }
+    const qrImg = document.getElementById('asaasQrImage');
+    if (qrImg) qrImg.src = '';
+    const pixCode = document.getElementById('asaasPixCode');
+    if (pixCode) pixCode.value = '';
+    const gwInput = document.getElementById('gatewayAmount');
+    if (gwInput) gwInput.value = '';
     window.refreshEthPanel();
   }
   if (id === 'withdrawModal') {
@@ -1858,54 +1883,56 @@ window.copyPixKey = () => {
   });
 };
 
-/* ===== DEPOSIT: GATEWAY INFINITEPAY ===== */
+/* ===== DEPOSIT: GATEWAY ASAAS (PIX QR Code inline) ===== */
 window.depositGateway = async () => {
   const amt = document.getElementById('gatewayAmount').value;
   if (!amt || parseFloat(amt) < 10) return window.showToast('⚠️', 'Atenção', 'Valor mínimo é R$10.');
   const token = localStorage.getItem('preditivo_token');
   if (!token) { window.closeModal('depositModal'); return window.openModal('loginModal'); }
 
-  const btn = document.querySelector('#panel-gw .btn-primary');
-  btn.textContent = 'Conectando...'; btn.disabled = true;
+  const btn = document.getElementById('btnAsaas');
+  btn.textContent = 'Gerando PIX...'; btn.disabled = true;
+  document.getElementById('asaasQrSection').style.display = 'none';
 
   try {
-    const res = await fetch(window.API + '/deposits/infinitepay/checkout', {
+    const res = await fetch(window.API + '/deposits/asaas/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({ amount: parseFloat(amt) })
     });
+    const data = await res.json().catch(() => ({}));
 
-    // Tenta parsear como JSON; se falhar, lê como texto para diagnóstico
-    let data;
-    const contentType = res.headers.get('content-type') || '';
-    if (contentType.includes('application/json')) {
-      data = await res.json();
-    } else {
-      const text = await res.text();
-      console.error('InfinitePay resposta não-JSON:', text);
-      window.showToast('❌', 'Erro', 'Resposta inválida do gateway. Verifique o console.');
+    if (!res.ok || data.error) {
+      return window.showToast('❌', 'Erro', data.message || data.error || `Status ${res.status}`);
+    }
+
+    if (data.warning) {
+      window.showToast('⚠️', 'PIX criado', data.warning);
       return;
     }
 
-    if (!res.ok || data.error || data.message?.toLowerCase().includes('erro')) {
-      return window.showToast('❌', 'Erro Gateway', data.error || data.message || `Status ${res.status}`);
-    }
-
-    // Aceita qualquer campo de URL que o backend possa retornar
-    const redirectUrl = data.url || data.checkout_url || data.redirect_url || data.payment_url || data.link;
-    if (redirectUrl) {
-      window.showToast('🚀', 'Redirecionando', 'Levando você ao checkout InfinitePay...');
-      setTimeout(() => window.location.href = redirectUrl, 1200);
+    if (data.pix?.qr_code_image) {
+      document.getElementById('asaasQrImage').src = 'data:image/png;base64,' + data.pix.qr_code_image;
+      document.getElementById('asaasPixCode').value = data.pix.qr_code || '';
+      document.getElementById('asaasQrSection').style.display = 'block';
+      window.showToast('✅', 'PIX gerado!', 'Escaneie o QR Code ou copie o código PIX.');
     } else {
-      console.error('InfinitePay resposta sem URL:', data);
-      window.showToast('❌', 'Erro', 'Gateway não retornou URL. Tente o PIX Direto.');
+      window.showToast('❌', 'Erro', 'QR Code não disponível. Tente o PIX Direto.');
     }
   } catch(e) {
-    console.error('InfinitePay fetch error:', e);
-    window.showToast('❌', 'Erro', 'Falha de conexão com o gateway. Tente o PIX Direto.');
+    console.error('Asaas fetch error:', e);
+    window.showToast('❌', 'Erro', 'Falha de conexão. Tente novamente.');
   } finally {
-    btn.textContent = 'Ir para o Checkout InfinitePay →'; btn.disabled = false;
+    btn.textContent = 'Gerar QR Code PIX'; btn.disabled = false;
   }
+};
+
+window.copyAsaasPixCode = () => {
+  const code = document.getElementById('asaasPixCode').value;
+  if (!code) return;
+  navigator.clipboard.writeText(code).then(() => {
+    window.showToast('📋', 'Copiado!', 'Código PIX copiado para a área de transferência.');
+  });
 };
 
 /* ===== WALLET: CONNECT ===== */

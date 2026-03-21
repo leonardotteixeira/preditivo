@@ -556,8 +556,11 @@ async function loadComments() {
     list.innerHTML = data.map(function(c) {
       var initial = (c.name || c.username || '?')[0].toUpperCase();
       var displayName = c.name || c.username || 'Usuário';
+      var avatarHtml = c.avatar_url
+        ? '<img src="' + c.avatar_url + '" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid rgba(255,255,255,0.08)">'
+        : '<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;flex-shrink:0">' + initial + '</div>';
       return '<div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.05)">' +
-        '<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;flex-shrink:0">' + initial + '</div>' +
+        avatarHtml +
         '<div style="flex:1;min-width:0">' +
           '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px">' +
             '<span style="font-weight:600;font-size:0.88rem">' + escapeHtml(displayName) + '</span>' +
@@ -718,9 +721,12 @@ function updateAuthUI() {
   var area = document.getElementById('authArea');
   if (!area) return;
   if (state.user) {
+    var avatarEl = state.user.avatar_url
+      ? '<img src="' + state.user.avatar_url + '" style="width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0">'
+      : '<div class="user-avatar">' + state.user.name.slice(0,2).toUpperCase() + '</div>';
     area.innerHTML =
       '<div class="user-chip">' +
-        '<div class="user-avatar">' + state.user.name.slice(0,2).toUpperCase() + '</div>' +
+        avatarEl +
         '<span>' + state.user.name + '</span>' +
         '<span style="color:var(--green);font-family:IBM Plex Mono,ui-monospace,monospace;font-size:0.82rem;font-weight:700">R$' + state.balance.toFixed(0) + '</span>' +
       '</div>' +

@@ -22,6 +22,7 @@
   border-radius: 10px;
   border: 1px solid var(--border);
   transition: all 0.2s;
+  margin-right: auto; /* push auth area to the right */
 }
 .back-btn:hover {
   color: var(--text);

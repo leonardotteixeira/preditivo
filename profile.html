@@ -11,215 +11,12 @@
   <meta name="apple-mobile-web-app-title" content="Bubuya">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <title>Bubuya — Meu Perfil</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --bg:#030303;--surface:#0a0a0a;--surface2:#121212;
-  --border:rgba(255,255,255,0.06);--green:#10b981;--red:#f43f5e;
-  --blue:#3b82f6;--gold:#f59e0b;--text:#ffffff;--muted:#888888;
-  --green-dim:rgba(16,185,129,0.1);
-  --glow-blue:rgba(59,130,246,0.12);--glow-green:rgba(16,185,129,0.08);
-}
-body{
-  font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;
-}
-/* Noise texture — igual à home */
-body::before{
-  content:'';position:fixed;inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events:none;z-index:0;opacity:0.3;
-}
-/* Orbs de glow — cópia exata da home */
-.glow-container{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.glow{position:absolute;border-radius:50%;filter:blur(120px);opacity:0.6}
-.glow-1{top:-10%;left:10%;width:600px;height:600px;background:radial-gradient(circle,var(--glow-blue) 0%,transparent 70%)}
-.glow-2{bottom:10%;right:-10%;width:800px;height:800px;background:radial-gradient(circle,var(--glow-green) 0%,transparent 70%)}
-
-/* ── HEADER ── */
-header{position:sticky;top:0;z-index:100;background:rgba(5,5,5,0.85);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:0 24px}
-.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:16px;height:64px}
-.logo{font-size:1.3rem;font-weight:700;letter-spacing:-0.5px;background:linear-gradient(135deg,var(--green),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none}
-nav{display:flex;gap:4px;margin-left:12px}
-nav a{color:var(--muted);font-size:0.9rem;font-weight:500;padding:6px 14px;border-radius:10px;cursor:pointer;text-decoration:none;transition:all .2s}
-nav a:hover{color:var(--text);background:var(--surface2)}
-nav a.active{color:var(--green);background:rgba(0,230,118,0.08)}
-.header-right{margin-left:auto;display:flex;align-items:center;gap:12px}
-.btn-outline{padding:8px 16px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--text);cursor:pointer;font-family:inherit;font-size:0.85rem;font-weight:600;transition:all .2s}
-.btn-outline:hover{border-color:rgba(255,255,255,0.2);color:#fff}
-.btn-primary{padding:10px 20px;background:var(--green);color:#080c10;font-weight:700;font-size:0.9rem;border:none;border-radius:10px;cursor:pointer;font-family:inherit;transition:opacity .2s}
-.btn-primary:hover{opacity:.88}
-.btn-finance{padding:8px 14px;border-radius:10px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;border:none;transition:all .2s}
-.btn-deposit{background:rgba(0,230,118,0.12);color:var(--green)}
-.btn-deposit:hover{background:rgba(0,230,118,0.2)}
-.btn-withdraw{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
-.btn-withdraw:hover{color:var(--text)}
-
-/* ── PAGE ── */
-.page{max-width:1100px;margin:0 auto;padding:40px 24px 80px;position:relative;z-index:1}
-
-/* ── AVATAR COM FOTO ── */
-.avatar-wrap{position:relative;flex-shrink:0;cursor:pointer}
-.avatar-wrap:hover .avatar-overlay{opacity:1}
-.avatar-overlay{
-  position:absolute;inset:0;border-radius:50%;
-  background:rgba(0,0,0,0.55);display:flex;align-items:center;
-  justify-content:center;opacity:0;transition:opacity .2s;font-size:1.3rem
-}
-#avatarFileInput{display:none}
-
-/* ── PROFILE HEADER ── */
-.profile-hero{
-  background:var(--surface);border:1px solid var(--border);border-radius:24px;
-  padding:36px;margin-bottom:24px;display:flex;align-items:center;gap:28px;
-  position:relative;overflow:hidden;isolation:isolate
-}
-.profile-hero::before{
-  content:'';position:absolute;top:-60px;right:-60px;width:280px;height:280px;
-  border-radius:50%;background:radial-gradient(circle,rgba(0,230,118,0.08) 0%,transparent 70%)
-}
-.profile-avatar{
-  width:88px;height:88px;border-radius:50%;
-  background:linear-gradient(135deg,var(--green),var(--blue));
-  display:flex;align-items:center;justify-content:center;
-  font-size:2rem;font-weight:700;color:#080c10;flex-shrink:0;
-  box-shadow:0 0 0 3px rgba(0,230,118,0.2)
-}
-.profile-info{flex:1}
-.profile-name{font-size:1.8rem;font-weight:700;margin-bottom:4px}
-.profile-email{font-size:0.85rem;color:var(--muted);margin-bottom:14px}
-.profile-badges{display:flex;gap:8px;flex-wrap:wrap}
-.badge{padding:4px 12px;border-radius:100px;font-size:0.73rem;font-weight:700;background:rgba(0,230,118,0.1);color:var(--green);border:1px solid rgba(0,230,118,0.2)}
-.badge-gold{background:rgba(255,193,7,0.1);color:var(--gold);border-color:rgba(255,193,7,0.2)}
-.badge-blue{background:rgba(0,180,255,0.1);color:var(--blue);border-color:rgba(0,180,255,0.2)}
-
-/* ── STATS GRID ── */
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
-@media(max-width:700px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
-.stat-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px
-}
-.stat-label{font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
-.stat-value{font-size:1.5rem;font-weight:700;font-family:'DM Mono',monospace}
-
-/* ── TABS ── */
-.tab-row{display:flex;gap:4px;margin-bottom:28px;overflow-x:auto;scrollbar-width:none;padding:4px;background:var(--surface);border:1px solid var(--border);border-radius:14px}
-.tab-btn{
-  padding:9px 18px;background:transparent;border:none;color:var(--muted);
-  cursor:pointer;font-family:inherit;font-size:0.88rem;font-weight:600;
-  border-radius:10px;white-space:nowrap;transition:all .2s
-}
-.tab-btn.active{background:var(--surface2);color:var(--green)}
-.tab-btn:hover:not(.active){color:var(--text)}
-.tab-content{display:none}
-.tab-content.active{display:block}
-
-/* ── BET CARDS (mesma aparência que portfolio-card) ── */
-.bets-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-.bet-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:20px;
-  padding:22px;transition:border-color .2s
-}
-.bet-card:hover{border-color:rgba(255,255,255,0.14)}
-.bet-market{font-size:0.78rem;color:var(--muted);text-transform:uppercase;margin-bottom:10px;line-height:1.4}
-.bet-pnl{font-size:1.5rem;font-weight:800;margin-bottom:12px}
-.bet-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.bet-field-label{font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
-.bet-field-val{font-size:0.9rem;font-weight:700}
-.pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.72rem;font-weight:800}
-.pill-yes{background:rgba(0,230,118,0.15);color:var(--green)}
-.pill-no{background:rgba(255,71,87,0.15);color:var(--red)}
-.pill-won{background:rgba(0,230,118,0.15);color:#10b981}
-.pill-lost{background:rgba(239,68,68,0.12);color:#ef4444}
-.pill-open{background:rgba(0,180,255,0.12);color:var(--blue)}
-
-/* ── PNL CARDS ── */
-.pnl-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:16px;
-  padding:20px;margin-bottom:12px;display:flex;align-items:center;gap:16px
-}
-.pnl-market{flex:1;font-size:0.9rem;font-weight:600}
-.pnl-meta{font-size:0.78rem;color:var(--muted);margin-top:4px}
-.pnl-value{font-family:'DM Mono',monospace;font-size:1.05rem;font-weight:700;text-align:right;white-space:nowrap}
-
-/* ── DEPOSITS ── */
-.dep-list{}
-.dep-row{display:flex;align-items:center;gap:16px;padding:16px;margin-bottom:8px;background:var(--surface);border:1px solid var(--border);border-radius:14px}
-.dep-code{font-family:'DM Mono',monospace;font-size:0.82rem;color:var(--blue)}
-.dep-amount{font-family:'DM Mono',monospace;font-size:1rem;font-weight:700;color:var(--green);margin-left:auto}
-.dep-status{padding:3px 10px;border-radius:100px;font-size:0.72rem;font-weight:700;white-space:nowrap}
-.dep-pending{background:rgba(255,193,7,0.12);color:var(--gold)}
-.dep-confirmed{background:rgba(0,230,118,0.12);color:var(--green)}
-.dep-rejected{background:rgba(255,71,87,0.12);color:var(--red)}
-
-/* ── EDIT / SECURITY CARDS ── */
-.edit-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:520px}
-.form-label{display:block;font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;margin-top:16px}
-.form-input{
-  width:100%;background:var(--surface2);border:1px solid var(--border);
-  border-radius:10px;padding:12px 16px;color:var(--text);font-family:inherit;font-size:0.95rem;outline:none;transition:border-color .2s
-}
-.form-input:focus{border-color:var(--green)}
-.form-input:disabled{opacity:.4}
-.btn-save{padding:12px 28px;background:var(--green);color:#080c10;font-weight:700;font-size:0.95rem;border:none;border-radius:10px;cursor:pointer;font-family:inherit;transition:opacity .2s;margin-top:16px}
-.btn-save:hover{opacity:.85}
-.btn-danger{background:#ef4444;color:#fff}
-.form-feedback{margin-top:10px;font-size:0.85rem}
-
-/* ── EMPTY STATE ── */
-.empty{text-align:center;padding:64px;color:var(--muted)}
-.empty-icon{font-size:3rem;margin-bottom:16px}
-
-/* ── MODAL ── */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);z-index:1000;align-items:center;justify-content:center}
-.modal-overlay.active{display:flex}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px;width:90%;max-width:420px}
-.modal h3{margin-bottom:8px;font-size:1.2rem}
-.modal p{color:var(--muted);font-size:0.9rem;margin-bottom:20px}
-.modal-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--text);font-size:1rem;font-family:inherit;outline:none;margin-bottom:12px;transition:border-color .2s}
-.modal-input:focus{border-color:var(--green)}
-.modal-btn{width:100%;padding:14px;font-weight:700;font-size:1rem;border:none;border-radius:10px;cursor:pointer;font-family:inherit;transition:opacity .2s}
-.modal-btn-primary{background:var(--green);color:#080c10}
-.modal-btn-secondary{background:transparent;color:var(--muted);border:1px solid var(--border);margin-top:8px}
-
-/* ── TOAST ── */
-.toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:14px 20px;font-size:0.9rem;z-index:9999;transform:translateY(100px);opacity:0;transition:all .3s;max-width:320px}
-.toast.show{transform:translateY(0);opacity:1}
-
-/* ── FOOTER ── */
-footer{background:rgba(5,5,5,0.5);border-top:1px solid var(--border);padding:60px 24px 32px;margin-top:80px;position:relative;z-index:1}
-.footer-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px}
-.footer-col h4{color:var(--text);margin-bottom:20px;font-size:0.85rem;font-weight:700;text-transform:uppercase;letter-spacing:1px}
-.footer-col ul{list-style:none}
-.footer-col li{margin-bottom:10px}
-.footer-col a{color:var(--muted);text-decoration:none;font-size:0.9rem;cursor:pointer;transition:color .2s}
-.footer-col a:hover{color:var(--text)}
-.footer-legal{max-width:1100px;margin:40px auto 0;padding-top:28px;border-top:1px solid var(--border);color:var(--muted);font-size:0.82rem}
-@media(max-width:768px){.footer-inner{grid-template-columns:1fr;gap:32px}}
-
-/* ── REFERRAL CARD ── */
-.ref-hero{background:linear-gradient(135deg,rgba(0,153,116,0.12),rgba(0,200,110,0.04));border:1px solid rgba(0,230,118,0.2);border-radius:20px;padding:28px;margin-bottom:20px}
-.ref-link-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0}
-.ref-link-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-size:0.83rem;font-family:monospace;outline:none;min-width:0}
-.ref-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
-.ref-stat-card{background:var(--surface2);border-radius:14px;padding:20px;text-align:center}
-
-@media(max-width:600px){
-  .profile-hero{flex-direction:column;text-align:center}
-  .bets-grid{grid-template-columns:1fr}
-  .stats-grid{grid-template-columns:repeat(2,1fr)}
-  .tab-row{flex-wrap:nowrap}
-  .ref-stats{grid-template-columns:1fr}
-}
-</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 </head>
-<body>
-
-<!-- Fundo glow igual à home -->
-<div class="glow-container">
-  <div class="glow glow-1"></div>
-  <div class="glow glow-2"></div>
-</div>
+<body class="profile-page min-h-screen bg-bubuya-void text-zinc-100 antialiased">
+<a href="#pageContent" class="skip-link">Ir para o conteúdo</a>
 
 <header>
   <div class="header-inner">
@@ -243,37 +40,41 @@ footer{background:rgba(5,5,5,0.5);border-top:1px solid var(--border);padding:60p
 <div class="modal-overlay" id="loginModal">
   <div class="modal">
     <div id="loginStep1">
-      <h3>Entrar na Bubuya</h3>
-      <p>Acesse sua conta para ver o perfil</p>
+      <h3 class="modal-title">Entrar na Bubuya</h3>
+      <p class="modal-sub">Acesse sua conta para ver o perfil</p>
       <input class="modal-input" type="email" placeholder="Email" id="loginEmail">
       <input class="modal-input" type="password" placeholder="Senha" id="loginPass" onkeydown="if(event.key==='Enter')doLogin()">
-      <button class="modal-btn modal-btn-primary" onclick="doLogin()">Entrar</button>
-      <button class="modal-btn modal-btn-secondary" onclick="window.location.href='/'">Voltar ao início</button>
+      <button type="button" class="btn-primary w-full justify-center" onclick="doLogin()">Entrar</button>
+      <button type="button" class="btn-outline mt-3 w-full justify-center" onclick="window.location.href='/'">Voltar ao início</button>
     </div>
     <div id="loginStep2" style="display:none">
-      <h3>Verificação em 2 etapas</h3>
-      <p>Código enviado para seu email.</p>
+      <h3 class="modal-title">Verificação em 2 etapas</h3>
+      <p class="modal-sub">Código enviado para seu email.</p>
       <input class="modal-input" type="text" placeholder="Código de 6 dígitos" id="login2faCode" maxlength="6" inputmode="numeric" autocomplete="one-time-code" onkeydown="if(event.key==='Enter')doLogin2fa()">
-      <button class="modal-btn modal-btn-primary" onclick="doLogin2fa()">Verificar</button>
-      <button class="modal-btn modal-btn-secondary" onclick="document.getElementById('loginStep1').style.display='';document.getElementById('loginStep2').style.display='none'">← Voltar</button>
+      <button type="button" class="btn-primary w-full justify-center" onclick="doLogin2fa()">Verificar</button>
+      <button type="button" class="btn-outline mt-3 w-full justify-center" onclick="document.getElementById('loginStep1').style.display='';document.getElementById('loginStep2').style.display='none'">← Voltar</button>
     </div>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <span class="font-mono text-zinc-500" aria-hidden="true">•</span>
+  <span id="toastMsg" class="text-sm text-zinc-200"></span>
+</div>
 
-<script src="./config.js?v=20260321"></script>
-<script src="./security.js?v=20260322"></script>
+<script src="/config.js"></script>
+<script src="/security.js?v=20260322"></script>
 <script>
 var API = window.PREDITIVO_CONFIG.API_BASE;
 var state = { user: null, token: null, bets: [], deposits: [], withdrawals: [] };
 
 /* ── UTILS ── */
 function showToast(msg) {
-  var t = document.getElementById('toast');
+  var t = document.getElementById('toastMsg');
+  if (!t) return;
   t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(function(){ t.classList.remove('show'); }, 3200);
+  document.getElementById('toast').classList.add('show');
+  setTimeout(function(){ document.getElementById('toast').classList.remove('show'); }, 3200);
 }
 function openModal(id)  { document.getElementById(id).classList.add('active'); }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
@@ -1495,6 +1296,6 @@ async function sendComplaintReply(id) {
     });
   }
 </script>
-  <script type="module" src="/src/styles-only.js"></script>
+  <script type="module" src="/src/profile.js"></script>
 </body>
 </html>

@@ -19,14 +19,14 @@ export default {
     extend: {
       colors: {
         bubuya: {
-          void: '#09090b',
-          surface: '#18181b',
-          raised: '#1f1f23',
-          border: '#27272a',
-          line: '#3f3f46',
-          muted: '#a1a1aa',
-          subtle: '#71717a',
-          accent: '#5b9bd5',
+          void:     '#080c14',   /* deep navy-black — replaces zinc-950 */
+          surface:  '#0d1221',   /* card background  */
+          raised:   '#121929',   /* hover / elevated state */
+          border:   '#1a2538',   /* subtle blue-tinted border */
+          line:     '#1e2d42',   /* dividers */
+          muted:    '#94a3b8',   /* secondary text (slate-400) */
+          subtle:   '#64748b',   /* tertiary text (slate-500) */
+          accent:   '#60a5fa',   /* blue-400 — focus rings & highlights */
           positive: '#16a34a',
           negative: '#dc2626'
         }
@@ -36,8 +36,8 @@ export default {
         mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace']
       },
       boxShadow: {
-        panel: '0 1px 0 0 rgba(255,255,255,0.06) inset, 0 1px 2px rgba(0,0,0,0.45)',
-        lift: '0 4px 12px rgba(0,0,0,0.35)'
+        panel: '0 1px 0 0 rgba(255,255,255,0.05) inset, 0 1px 3px rgba(0,0,0,0.5)',
+        lift:  '0 6px 20px rgba(0,0,0,0.45), 0 0 0 1px rgba(96,165,250,0.06) inset'
       },
       borderRadius: {
         inherit: 'inherit'

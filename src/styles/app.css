@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Design tokens: institucional / terminal-adjacent (Bloomberg + fintech) ── */
+/* ── Design tokens — institutional dark-navy (Kalshi / Polymarket aesthetic) ── */
 @layer base {
   .skip-link {
     @apply absolute left-[-9999px] top-4 z-[2001] rounded-md bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-950 no-underline;
@@ -13,23 +13,41 @@
   }
 
   :root {
-    --bg: #09090b;
-    --surface: #18181b;
-    --surface2: #1f1f23;
-    --border: #27272a;
-    --text: #fafafa;
-    --muted: #a1a1aa;
+    /* Base palette — navy-tinted dark */
+    --bg:       #080c14;
+    --surface:  #0d1221;
+    --surface2: #121929;
+    --border:   #1a2538;
+    --text:     #f1f5f9;
+    --muted:    #94a3b8;
+
+    /* Semantic */
     --green: #16a34a;
-    --red: #dc2626;
-    --blue: #5b9bd5;
+    --red:   #dc2626;
+    --blue:  #60a5fa;
+    --gold:  #d97706;
+
+    /* Dim tints — used in badges, highlights, backgrounds */
+    --green-dim: rgba(22,  163,  74, 0.10);
+    --blue-dim:  rgba(96,  165, 250, 0.10);
+    --red-dim:   rgba(220,  38,  38, 0.10);
+    --gold-dim:  rgba(217, 119,   6, 0.10);
   }
 
   html {
     @apply scroll-smooth;
+    background-color: var(--bg);
   }
 
   body {
-    @apply min-h-screen bg-bubuya-void font-sans text-zinc-100 antialiased;
+    @apply min-h-screen font-sans antialiased;
+    color: var(--text);
+    background-color: var(--bg);
+    /* ── Ambient blue lighting: subtle top-center glow, green bottom-right trace ── */
+    background-image:
+      radial-gradient(ellipse 110% 60% at 50% -8%,  rgba(96, 165, 250, 0.09) 0%, transparent 55%),
+      radial-gradient(ellipse  55% 40% at 90% 105%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+    background-attachment: fixed;
   }
 
   :focus-visible {
@@ -38,9 +56,10 @@
 }
 
 @layer components {
-  /* Footer */
+  /* ── Footer ── */
   footer {
-    @apply relative z-10 mt-16 border-t border-bubuya-line bg-bubuya-void px-6 py-16 md:px-8 md:py-20;
+    @apply relative z-10 mt-16 border-t border-bubuya-line px-6 py-16 md:px-8 md:py-20;
+    background-color: var(--bg);
   }
 
   .footer-inner {
@@ -71,7 +90,6 @@
     @apply font-semibold text-zinc-300;
   }
 
-  /* Bloco de marca (evita estilos inline no rodapé) */
   .footer-brand {
     @apply lg:pr-6;
   }
@@ -96,9 +114,12 @@
     @apply mt-8 text-sm text-zinc-600;
   }
 
-  /* Header */
+  /* ── Header ── */
   header {
-    @apply sticky top-0 z-[100] border-b border-bubuya-line bg-bubuya-void/95 backdrop-blur-sm;
+    @apply sticky top-0 z-[100] border-b border-bubuya-line backdrop-blur-sm;
+    background-color: rgba(8, 12, 20, 0.94);
+    /* Subtle depth line below header */
+    box-shadow: 0 1px 0 0 rgba(96, 165, 250, 0.06);
   }
 
   .header-inner {
@@ -110,7 +131,7 @@
   }
 
   .header-search {
-    @apply mx-auto flex max-w-md flex-1 items-center gap-2 rounded-md border border-bubuya-line bg-bubuya-surface px-3 py-2 transition-colors focus-within:border-zinc-600;
+    @apply mx-auto flex max-w-md flex-1 items-center gap-2 rounded-md border border-bubuya-line bg-bubuya-surface px-3 py-2 transition-colors focus-within:border-bubuya-accent/40;
   }
 
   .header-search input {
@@ -133,9 +154,10 @@
     @apply bg-bubuya-raised text-zinc-100;
   }
 
-  /* Buttons */
+  /* ── Buttons ── */
   .btn-primary {
-    @apply inline-flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-zinc-100 px-4 py-2.5 text-sm font-semibold text-zinc-950 shadow-sm transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 focus-visible:ring-offset-bubuya-void;
+    @apply inline-flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-zinc-100 px-4 py-2.5 text-sm font-semibold text-zinc-950 shadow-sm transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2;
+    focus-visible:ring-offset-color: var(--bg);
   }
 
   .btn-outline {
@@ -154,7 +176,7 @@
     @apply border-bubuya-line bg-bubuya-surface text-zinc-300 hover:border-zinc-600 hover:bg-bubuya-raised;
   }
 
-  /* Hero */
+  /* ── Hero ── */
   .hero {
     @apply relative z-10 mx-auto grid max-w-[1440px] items-center gap-12 px-4 py-12 md:grid-cols-[1.05fr_0.95fr] md:gap-16 md:px-6 md:py-16 lg:py-20;
   }
@@ -201,11 +223,24 @@
     @apply hidden md:block;
   }
 
+  /* ── Hero image — smooth hover lift with blue ambient glow ── */
   .hero-image-main {
-    @apply w-full rounded-lg border border-bubuya-line shadow-lift;
+    @apply w-full rounded-lg border border-bubuya-line;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(96, 165, 250, 0.06) inset;
+    transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                box-shadow 0.45s ease;
+    will-change: transform;
   }
 
-  /* Sections */
+  .hero-image-wrapper:hover .hero-image-main {
+    transform: translateY(-6px) scale(1.012);
+    box-shadow:
+      0 24px 60px rgba(0, 0, 0, 0.55),
+      0 0 40px rgba(96, 165, 250, 0.10),
+      0 0 0 1px rgba(96, 165, 250, 0.15) inset;
+  }
+
+  /* ── Sections ── */
   .section {
     @apply relative z-10 mx-auto hidden max-w-[1440px] px-4 pb-20 pt-8 md:px-6;
   }
@@ -225,7 +260,7 @@
     }
   }
 
-  /* Topic tags */
+  /* ── Topic tags ── */
   .topic-tags {
     @apply mb-6 flex gap-2 overflow-x-auto pb-1 scrollbar-none md:mb-8 md:gap-2;
   }
@@ -239,16 +274,26 @@
   }
 
   .topic-tag.active {
-    @apply border-zinc-500 bg-bubuya-raised text-zinc-100;
+    @apply border-bubuya-accent/40 bg-bubuya-raised text-zinc-100;
   }
 
-  /* Market grid & cards — sem glow / sem borda animada */
+  /* ── Market grid & cards ── */
   .markets-grid {
     @apply grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 xl:gap-5;
   }
 
   .market-card {
-    @apply flex cursor-pointer flex-col gap-4 rounded-lg border border-bubuya-line bg-bubuya-surface p-5 shadow-panel transition hover:border-zinc-600 hover:shadow-lift;
+    @apply flex cursor-pointer flex-col gap-4 rounded-lg border border-bubuya-line bg-bubuya-surface p-5;
+    box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.05) inset, 0 1px 3px rgba(0, 0, 0, 0.5);
+    transition: border-color 0.2s ease, box-shadow 0.22s ease, transform 0.22s ease;
+  }
+
+  .market-card:hover {
+    border-color: rgba(96, 165, 250, 0.35);
+    box-shadow:
+      0 10px 36px rgba(0, 0, 0, 0.38),
+      0 0 0 1px rgba(96, 165, 250, 0.08) inset;
+    transform: translateY(-2px);
   }
 
   .mc-title {
@@ -260,7 +305,7 @@
   }
 
   .mc-sentiment {
-    @apply flex h-2 overflow-hidden rounded-sm border border-bubuya-line bg-bubuya-void;
+    @apply flex h-1.5 overflow-hidden rounded-sm border border-bubuya-line bg-bubuya-void;
   }
 
   .mc-sentiment-yes {
@@ -289,6 +334,7 @@
 
   .mc-odd {
     @apply min-w-[3.5rem] rounded-md border px-3 py-1.5 text-center font-mono text-sm font-semibold tabular-nums;
+    transition: border-color 0.2s, background-color 0.2s;
   }
 
   .mc-odd.yes {
@@ -307,30 +353,28 @@
     @apply border-rose-700/60 bg-rose-900/40;
   }
 
-  /* Ranking */
+  /* ── Ranking ── */
   .ranking-list {
     @apply flex flex-col gap-2;
   }
 
   .ranking-card {
-    @apply flex items-center gap-4 rounded-lg border border-bubuya-line bg-bubuya-surface p-4 transition hover:border-zinc-600;
+    @apply flex items-center gap-4 rounded-lg border border-bubuya-line bg-bubuya-surface p-4;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .ranking-card:hover {
+    border-color: rgba(96, 165, 250, 0.3);
+    transform: translateX(3px);
   }
 
   .rank-pos {
     @apply w-8 text-center font-mono text-lg font-semibold text-zinc-500;
   }
 
-  .rank-pos.gold {
-    @apply text-amber-600;
-  }
-
-  .rank-pos.silver {
-    @apply text-zinc-400;
-  }
-
-  .rank-pos.bronze {
-    @apply text-amber-800;
-  }
+  .rank-pos.gold   { @apply text-amber-500; }
+  .rank-pos.silver { @apply text-zinc-400; }
+  .rank-pos.bronze { @apply text-amber-700; }
 
   .rank-avatar {
     @apply flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-bubuya-line bg-bubuya-void text-sm font-semibold;
@@ -341,16 +385,21 @@
   }
 
   .rank-profit {
-    @apply font-mono text-sm font-semibold text-emerald-500;
+    @apply font-mono text-sm font-semibold text-emerald-400;
   }
 
-  /* Portfolio */
+  /* ── Portfolio ── */
   .portfolio-grid {
     @apply grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3;
   }
 
   .portfolio-card {
     @apply rounded-lg border border-bubuya-line bg-bubuya-surface p-5;
+    transition: border-color 0.2s ease;
+  }
+
+  .portfolio-card:hover {
+    border-color: rgba(96, 165, 250, 0.25);
   }
 
   .port-profit {
@@ -365,9 +414,10 @@
     @apply border-bubuya-line bg-bubuya-raised text-zinc-100;
   }
 
-  /* Modals */
+  /* ── Modals ── */
   .modal-overlay {
-    @apply fixed inset-0 z-[1000] hidden items-center justify-end bg-black/70 sm:items-center sm:justify-center md:bg-black/60;
+    @apply fixed inset-0 z-[1000] hidden items-center justify-end bg-black/75 sm:items-center sm:justify-center md:bg-black/65;
+    backdrop-filter: blur(2px);
   }
 
   .modal-overlay.active {
@@ -375,7 +425,8 @@
   }
 
   .modal {
-    @apply relative max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-t-lg border border-bubuya-line bg-bubuya-surface p-6 shadow-lift sm:rounded-lg md:p-8;
+    @apply relative max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-t-lg border border-bubuya-line bg-bubuya-surface p-6 sm:rounded-lg md:p-8;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(96, 165, 250, 0.07) inset;
   }
 
   .modal-close {
@@ -391,10 +442,11 @@
   }
 
   .modal-input {
-    @apply mb-3 w-full rounded-md border border-bubuya-line bg-bubuya-void px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600;
+    @apply mb-3 w-full rounded-md border border-bubuya-line bg-bubuya-void px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-bubuya-accent/50 focus:outline-none focus:ring-1;
+    focus:ring-color: rgba(96, 165, 250, 0.3);
   }
 
-  /* Deposit tabs */
+  /* ── Deposit tabs ── */
   .deposit-tabs {
     @apply mb-6 flex gap-1 rounded-md border border-bubuya-line bg-bubuya-void p-1;
   }
@@ -451,16 +503,17 @@
     @apply font-medium text-zinc-300;
   }
 
-  /* Toast */
+  /* ── Toast ── */
   .toast {
-    @apply fixed bottom-4 right-4 z-[2000] flex translate-y-full items-center gap-4 rounded-md border border-bubuya-line bg-bubuya-surface px-5 py-4 opacity-0 shadow-lift transition duration-300;
+    @apply fixed bottom-4 right-4 z-[2000] flex translate-y-full items-center gap-4 rounded-md border border-bubuya-line bg-bubuya-raised px-5 py-4 opacity-0 transition duration-300;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(96, 165, 250, 0.08) inset;
   }
 
   .toast.show {
     @apply translate-y-0 opacity-100;
   }
 
-  /* Mobile */
+  /* ── Mobile ── */
   .mobile-menu-btn {
     @apply ml-auto flex hidden flex-col gap-1.5 border-0 bg-transparent p-2 text-inherit md:ml-0;
   }
@@ -508,7 +561,8 @@
   }
 
   .mobile-nav {
-    @apply fixed inset-x-0 bottom-0 top-14 z-[98] hidden flex-col gap-1 overflow-y-auto border-t border-bubuya-line bg-bubuya-void p-4;
+    @apply fixed inset-x-0 bottom-0 top-14 z-[98] hidden flex-col gap-1 overflow-y-auto border-t border-bubuya-line p-4;
+    background-color: var(--bg);
   }
 
   .mobile-nav.open {
@@ -524,7 +578,13 @@
   }
 
   .mobile-nav a {
-    @apply block cursor-pointer rounded-md border border-bubuya-line bg-bubuya-surface px-4 py-3 text-sm font-medium text-zinc-200 no-underline hover:bg-bubuya-raised;
+    @apply block cursor-pointer rounded-md border border-bubuya-line bg-bubuya-surface px-4 py-3 text-sm font-medium text-zinc-200 no-underline;
+    transition: background-color 0.18s, border-color 0.18s;
+  }
+
+  .mobile-nav a:hover {
+    background-color: var(--surface2);
+    border-color: rgba(96, 165, 250, 0.25);
   }
 
   .mobile-nav a.active {

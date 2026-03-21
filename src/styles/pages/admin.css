@@ -18,7 +18,7 @@
 .btn-primary:hover { opacity:0.9; transform:translateY(-1px); }
 
 /* ── HEADER ── */
-.header { background:rgba(24,24,27,0.92); border-bottom:1px solid var(--border); padding:0 1.5rem; display:flex; align-items:center; min-height:4rem; gap:1rem; position:sticky; top:0; z-index:50; backdrop-filter:blur(8px); }
+.header { background:rgba(8,12,20,0.94); border-bottom:1px solid var(--border); padding:0 1.5rem; display:flex; align-items:center; min-height:4rem; gap:1rem; position:sticky; top:0; z-index:50; backdrop-filter:blur(10px); box-shadow:0 1px 0 0 rgba(96,165,250,0.06); }
 .logo { font-family:inherit; font-weight:700; color:var(--green); font-size:1.2rem; letter-spacing:-0.5px; }
 .stat-pills { display:flex; gap:8px; margin-left:auto; flex-wrap:wrap; }
 .stat-pill { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:6px 14px; font-size:0.79rem; color:var(--muted); }
@@ -32,7 +32,7 @@
 /* ── TABS ── */
 .tabs { display:flex; gap:5px; margin-bottom:32px; flex-wrap:wrap; background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:6px; width:fit-content; max-width:100%; }
 .tab { padding:9px 18px; background:transparent; border:none; border-radius:12px; color:var(--muted); cursor:pointer; font-family:inherit; font-size:0.85rem; font-weight:600; transition:all 0.2s; white-space:nowrap; }
-.tab:hover { color:var(--text); background:rgba(255,255,255,0.04); }
+.tab:hover { color:var(--text); background:rgba(96,165,250,0.07); }
 .tab.active { background:var(--surface2); color:var(--green); box-shadow:0 2px 8px rgba(0,0,0,0.5); }
 .admin-panel { display:none; }
 .admin-panel.active { display:block; }
@@ -45,7 +45,7 @@
 table { width:100%; border-collapse:collapse; }
 th { text-align:left; padding:10px 14px; font-size:0.72rem; text-transform:uppercase; letter-spacing:1.2px; color:var(--muted); border-bottom:1px solid var(--border); font-weight:600; }
 td { padding:13px 14px; font-size:0.88rem; border-bottom:1px solid rgba(255,255,255,0.03); vertical-align:middle; }
-tr:hover td { background:rgba(255,255,255,0.015); }
+tr:hover td { background:rgba(96,165,250,0.025); }
 
 /* ── BUTTONS ── */
 .btn { padding:7px 16px; border:1px solid var(--border); border-radius:10px; cursor:pointer; font-family:inherit; font-size:0.83rem; font-weight:600; background:var(--surface2); color:var(--text); transition:all 0.2s; }

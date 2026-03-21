@@ -1975,6 +1975,45 @@ function confirmKycReject() {
   .catch(function(e){ showToast('Erro: ' + e.message); });
 }
 
+// ── KYC / SUITABILITY RESET ──────────────────────────────────────────────────
+
+function resetKyc(userId, name) {
+  var reason = prompt('Motivo do reset de KYC para "' + name + '"?\n\nO usuário terá que reenviar todos os dados de verificação (CPF, nome, documento).');
+  if (!reason || !reason.trim()) return;
+
+  fetch(API + '/kyc/admin/' + userId + '/reset', {
+    method: 'POST',
+    headers: adminHeaders(),
+    body: JSON.stringify({ reason: reason.trim() })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d) {
+    if (d.error) { showToast('Erro: ' + d.error); return; }
+    showToast('↺ KYC de ' + name + ' resetado com sucesso');
+    closeUserDrawer();
+    loadComplianceKyc();
+  })
+  .catch(function(e){ showToast('Erro: ' + e.message); });
+}
+
+function resetSuitability(userId, name) {
+  var reason = prompt('Motivo do reset de Suitability para "' + name + '"?\n\nO usuário terá que refazer o questionário de perfil de investidor.');
+  if (!reason || !reason.trim()) return;
+
+  fetch(API + '/suitability/admin/' + userId + '/reset', {
+    method: 'POST',
+    headers: adminHeaders(),
+    body: JSON.stringify({ reason: reason.trim() })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d) {
+    if (d.error) { showToast('Erro: ' + d.error); return; }
+    showToast('↺ Suitability de ' + name + ' resetado com sucesso');
+    closeUserDrawer();
+  })
+  .catch(function(e){ showToast('Erro: ' + e.message); });
+}
+
 // ── COAF ACTIONS ─────────────────────────────────────────────────────────────
 
 function resolveCoaf(flagId, action) {
@@ -2711,6 +2750,12 @@ function renderDrawer(data) {
   if (u.kyc_status === 'submitted') {
     html += '<button class="btn btn-confirm" onclick="approveKyc(\'' + u.id + '\',\'' + (u.username||'').replace(/'/g,'') + '\');closeUserDrawer()" style="font-size:0.8rem">✓ Aprovar KYC</button>';
     html += '<button class="btn btn-reject" onclick="openKycReject(\'' + u.id + '\',\'' + (u.username||'').replace(/'/g,'') + '\')" style="font-size:0.8rem">✕ Rejeitar KYC</button>';
+  }
+  if (u.kyc_status) {
+    html += '<button class="btn" onclick="resetKyc(\'' + u.id + '\',\'' + (u.username||'').replace(/'/g,'') + '\')" style="font-size:0.8rem;background:rgba(251,191,36,0.1);color:#f59e0b;border-color:rgba(251,191,36,0.3)">↺ Resetar KYC</button>';
+  }
+  if (u.suitability_profile) {
+    html += '<button class="btn" onclick="resetSuitability(\'' + u.id + '\',\'' + (u.username||'').replace(/'/g,'') + '\')" style="font-size:0.8rem;background:rgba(139,92,246,0.1);color:#a78bfa;border-color:rgba(139,92,246,0.3)">↺ Resetar Suitability</button>';
   }
   html += '<button class="btn" onclick="manualCoafFlag(\'' + u.id + '\')" style="font-size:0.8rem;background:rgba(244,63,94,0.1);color:var(--red);border-color:rgba(244,63,94,0.25)">🚨 Flag COAF manual</button>';
   html += '</div>';

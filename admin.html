@@ -6,218 +6,14 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <title>Bubuya — Admin</title>
 <meta name="robots" content="noindex,nofollow">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<style>
-:root {
-  --bg:        #030303;
-  --surface:   #0a0a0a;
-  --surface2:  #111111;
-  --border:    rgba(255,255,255,0.07);
-  --green:     #10b981;
-  --green-dim: rgba(16,185,129,0.12);
-  --red:       #f43f5e;
-  --red-dim:   rgba(244,63,94,0.12);
-  --blue:      #3b82f6;
-  --gold:      #f59e0b;
-  --text:      #ffffff;
-  --muted:     #777777;
-}
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
-
-/* ── LOGIN ── */
-.login-screen { min-height:100vh; display:flex; align-items:center; justify-content:center; }
-.login-card { background:var(--surface); border:1px solid var(--border); border-radius:28px; padding:48px 40px; width:380px; text-align:center; box-shadow:0 40px 120px rgba(0,0,0,0.8); }
-.login-card h2 { font-family:'Space Grotesk',sans-serif; font-size:1.8rem; font-weight:700; margin-bottom:8px; }
-.login-card p { color:var(--muted); margin-bottom:28px; font-size:0.95rem; }
-.input { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:14px; padding:14px 18px; color:var(--text); font-family:'Inter',sans-serif; font-size:0.95rem; outline:none; margin-bottom:12px; transition:border-color 0.2s,box-shadow 0.2s; }
-.input:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(59,130,246,0.12); }
-.btn-primary { width:100%; padding:14px; background:var(--green); color:#000; font-weight:800; border:none; border-radius:14px; cursor:pointer; font-size:1rem; font-family:'Inter',sans-serif; transition:all 0.2s; box-shadow:0 4px 14px rgba(16,185,129,0.25); }
-.btn-primary:hover { opacity:0.9; transform:translateY(-1px); }
-
-/* ── HEADER ── */
-.header { background:var(--surface); border-bottom:1px solid var(--border); padding:0 32px; display:flex; align-items:center; height:64px; gap:16px; position:sticky; top:0; z-index:50; }
-.logo { font-family:'Space Grotesk',sans-serif; font-weight:700; color:var(--green); font-size:1.2rem; letter-spacing:-0.5px; }
-.stat-pills { display:flex; gap:8px; margin-left:auto; flex-wrap:wrap; }
-.stat-pill { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:6px 14px; font-size:0.79rem; color:var(--muted); }
-.stat-pill span { color:var(--text); font-weight:700; margin-left:4px; font-family:'DM Mono',monospace; }
-.btn-logout { padding:7px 16px; background:transparent; border:1px solid var(--border); border-radius:10px; color:var(--muted); cursor:pointer; font-family:'Inter',sans-serif; font-size:0.85rem; transition:all 0.2s; }
-.btn-logout:hover { border-color:var(--muted); color:var(--text); }
-
-/* ── LAYOUT ── */
-.container { max-width:1140px; margin:0 auto; padding:36px 24px; }
-
-/* ── TABS ── */
-.tabs { display:flex; gap:5px; margin-bottom:32px; flex-wrap:wrap; background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:6px; width:fit-content; max-width:100%; }
-.tab { padding:9px 18px; background:transparent; border:none; border-radius:12px; color:var(--muted); cursor:pointer; font-family:'Inter',sans-serif; font-size:0.85rem; font-weight:600; transition:all 0.2s; white-space:nowrap; }
-.tab:hover { color:var(--text); background:rgba(255,255,255,0.04); }
-.tab.active { background:var(--surface2); color:var(--green); box-shadow:0 2px 8px rgba(0,0,0,0.5); }
-.section { display:none; }
-.section.active { display:block; }
-
-/* ── SECTION TITLES ── */
-.section-title { font-family:'Space Grotesk',sans-serif; font-size:1.1rem; font-weight:700; margin-bottom:18px; display:flex; align-items:center; gap:10px; }
-.badge { background:var(--red); color:#fff; border-radius:100px; padding:2px 10px; font-size:0.72rem; font-weight:700; }
-
-/* ── TABLES ── */
-table { width:100%; border-collapse:collapse; }
-th { text-align:left; padding:10px 14px; font-size:0.72rem; text-transform:uppercase; letter-spacing:1.2px; color:var(--muted); border-bottom:1px solid var(--border); font-weight:600; }
-td { padding:13px 14px; font-size:0.88rem; border-bottom:1px solid rgba(255,255,255,0.03); vertical-align:middle; }
-tr:hover td { background:rgba(255,255,255,0.015); }
-
-/* ── BUTTONS ── */
-.btn { padding:7px 16px; border:1px solid var(--border); border-radius:10px; cursor:pointer; font-family:'Inter',sans-serif; font-size:0.83rem; font-weight:600; background:var(--surface2); color:var(--text); transition:all 0.2s; }
-.btn:hover { border-color:var(--muted); }
-.btn-green   { background:var(--green-dim); color:var(--green); border-color:rgba(16,185,129,0.25); }
-.btn-resolve { background:rgba(59,130,246,0.12); color:var(--blue); border-color:rgba(59,130,246,0.25); }
-.btn-confirm { background:var(--green-dim); color:var(--green); border-color:rgba(16,185,129,0.25); }
-.btn-reject  { background:var(--red-dim); color:var(--red); border-color:rgba(244,63,94,0.25); }
-
-/* ── MODAIS ── */
-.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(16px); z-index:100; align-items:center; justify-content:center; }
-.modal-overlay.active { display:flex; }
-.modal { background:var(--surface); border:1px solid var(--border); border-radius:28px; padding:36px; width:90%; max-width:460px; animation:modalIn 0.4s cubic-bezier(0.2,0,0,1); box-shadow:0 40px 100px rgba(0,0,0,0.9); }
-@keyframes modalIn { from{opacity:0;transform:scale(0.88) translateY(32px)} to{opacity:1;transform:scale(1) translateY(0)} }
-.modal h3 { font-family:'Space Grotesk',sans-serif; font-size:1.4rem; font-weight:700; margin-bottom:16px; }
-.btn-yes    { width:100%; padding:13px; background:var(--green-dim); color:var(--green); border:1px solid rgba(16,185,129,0.3); border-radius:12px; cursor:pointer; font-family:'Inter',sans-serif; font-weight:700; font-size:1rem; margin-bottom:8px; transition:all 0.2s; }
-.btn-yes:hover { background:var(--green); color:#000; }
-.btn-no     { width:100%; padding:13px; background:var(--red-dim); color:var(--red); border:1px solid rgba(244,63,94,0.3); border-radius:12px; cursor:pointer; font-family:'Inter',sans-serif; font-weight:700; font-size:1rem; margin-bottom:8px; transition:all 0.2s; }
-.btn-no:hover { background:var(--red); color:#fff; }
-.btn-cancel { width:100%; padding:11px; background:transparent; color:var(--muted); border:1px solid var(--border); border-radius:12px; cursor:pointer; font-family:'Inter',sans-serif; font-size:0.95rem; margin-top:4px; transition:all 0.2s; }
-.btn-cancel:hover { color:var(--text); border-color:var(--muted); }
-
-/* ── RECEITA / BOT CARDS ── */
-.receita-grid, .bot-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; margin-bottom:28px; }
-.receita-card, .bot-card { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:22px; transition:border-color 0.2s; }
-.receita-card:hover, .bot-card:hover { border-color:rgba(255,255,255,0.12); }
-.receita-label, .bot-label { font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:1.2px; margin-bottom:10px; }
-.receita-val, .bot-val { font-size:clamp(0.85rem,2.5vw,1.4rem); font-weight:800; font-family:'DM Mono',monospace; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-
-/* ── STATUS BOTS ── */
-.bot-status-on  { display:inline-block; background:var(--green-dim); color:var(--green); border:1px solid rgba(16,185,129,0.3); border-radius:8px; padding:4px 12px; font-size:0.8rem; font-weight:700; }
-.bot-status-off { display:inline-block; background:var(--red-dim);   color:var(--red);   border:1px solid rgba(244,63,94,0.3);  border-radius:8px; padding:4px 12px; font-size:0.8rem; font-weight:700; }
-
-/* ── CHART ── */
-.chart-box { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:22px; margin-bottom:24px; position:relative; height:260px; }
-
-/* ── SIMULATE ROW ── */
-.simulate-row { display:flex; gap:10px; align-items:center; margin-bottom:24px; flex-wrap:wrap; }
-.simulate-row input { background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:10px 16px; color:var(--text); font-family:'Inter',sans-serif; font-size:0.9rem; outline:none; width:130px; transition:border-color 0.2s; }
-.simulate-row input:focus { border-color:var(--blue); }
-#botSimResult { font-size:0.85rem; color:var(--muted); }
-
-/* ── TOAST ── */
-.toast { position:fixed; bottom:28px; right:28px; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px 22px; font-size:0.9rem; z-index:200; opacity:0; transition:opacity 0.3s; pointer-events:none; box-shadow:0 8px 32px rgba(0,0,0,0.7); }
-.toast.show { opacity:1; }
-
-/* ── FORMS ── */
-.form-group { margin-bottom:18px; }
-.form-label { display:block; font-size:0.75rem; color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:1.2px; font-weight:600; }
-.form-input  { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:14px; padding:14px 18px; color:var(--text); font-family:'Inter',sans-serif; font-size:0.95rem; outline:none; transition:border-color 0.2s,box-shadow 0.2s; }
-.form-input:focus  { border-color:var(--blue); box-shadow:0 0 0 3px rgba(59,130,246,0.12); }
-.form-textarea { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:14px; padding:14px 18px; color:var(--text); font-family:'Inter',sans-serif; font-size:0.9rem; resize:vertical; min-height:110px; outline:none; transition:border-color 0.2s; }
-.form-textarea:focus { border-color:var(--blue); }
-.form-select { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:14px; padding:14px 18px; color:var(--text); font-family:'Inter',sans-serif; font-size:0.95rem; outline:none; cursor:pointer; }
-.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-
-/* ── INFO BOX ── */
-.info-box { background:var(--surface2); border:1px solid var(--border); border-radius:14px; padding:16px 20px; margin-bottom:20px; font-size:0.85rem; color:var(--muted); line-height:1.75; }
-.info-box strong { color:var(--text); }
-
-/* ── COMPLIANCE BADGES ── */
-.sts { display:inline-flex; align-items:center; gap:5px; border-radius:8px; padding:3px 10px; font-size:0.78rem; font-weight:700; white-space:nowrap; }
-.sts-submitted  { background:rgba(245,158,11,0.12); color:#f59e0b; border:1px solid rgba(245,158,11,0.3); }
-.sts-approved   { background:rgba(16,185,129,0.12); color:#10b981; border:1px solid rgba(16,185,129,0.3); }
-.sts-rejected   { background:rgba(244,63,94,0.12);  color:#f43f5e; border:1px solid rgba(244,63,94,0.3); }
-.sts-flagged    { background:rgba(245,158,11,0.12); color:#f59e0b; border:1px solid rgba(245,158,11,0.3); }
-.sts-sanctioned { background:rgba(244,63,94,0.12);  color:#f43f5e; border:1px solid rgba(244,63,94,0.3); }
-.sts-clear      { background:rgba(16,185,129,0.08); color:#6ee7b7; border:1px solid rgba(16,185,129,0.15); }
-.sts-open       { background:rgba(244,63,94,0.12);  color:#f43f5e; border:1px solid rgba(244,63,94,0.3); }
-.sts-resolved   { background:rgba(16,185,129,0.08); color:#6ee7b7; border:1px solid rgba(16,185,129,0.15); }
-.sts-conservador{ background:rgba(59,130,246,0.12); color:#93c5fd; border:1px solid rgba(59,130,246,0.25); }
-.sts-moderado   { background:rgba(245,158,11,0.12); color:#fcd34d; border:1px solid rgba(245,158,11,0.25); }
-.sts-arrojado   { background:rgba(16,185,129,0.12); color:#6ee7b7; border:1px solid rgba(16,185,129,0.25); }
-
-/* ── COMPLIANCE STAT CARDS ── */
-.comp-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:28px; }
-.comp-card { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:18px 20px; }
-.comp-label { font-size:0.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:1.1px; margin-bottom:8px; }
-.comp-val { font-size:1.35rem; font-weight:800; font-family:'DM Mono',monospace; }
-
-/* ── COMPLIANCE SUB-SECTION ── */
-.comp-sub { margin-top:36px; }
-.comp-sub:first-child { margin-top:0; }
-.comp-divider { height:1px; background:var(--border); margin:32px 0; }
-
-/* ── USER DRAWER ── */
-.drawer-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); z-index:200; }
-.drawer-backdrop.open { display:block; }
-.user-drawer {
-  position:fixed; top:0; right:0; height:100vh; width:640px; max-width:95vw;
-  background:var(--surface); border-left:1px solid var(--border);
-  z-index:201; display:flex; flex-direction:column;
-  transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.2,0,0,1);
-  box-shadow:-40px 0 80px rgba(0,0,0,0.6);
-}
-.user-drawer.open { transform:translateX(0); }
-.drawer-header {
-  padding:20px 24px; border-bottom:1px solid var(--border);
-  display:flex; align-items:center; gap:14px; flex-shrink:0;
-}
-.drawer-avatar {
-  width:44px; height:44px; border-radius:50%; flex-shrink:0;
-  background:linear-gradient(135deg,var(--green),var(--blue));
-  display:flex; align-items:center; justify-content:center;
-  font-weight:800; font-size:1.1rem; color:#030303;
-}
-.drawer-name { font-size:1.05rem; font-weight:700; }
-.drawer-email { font-size:0.8rem; color:var(--muted); margin-top:2px; }
-.drawer-close {
-  margin-left:auto; background:none; border:none; color:var(--muted);
-  font-size:1.6rem; cursor:pointer; padding:4px 8px; border-radius:8px;
-  transition:background 0.15s,color 0.15s; line-height:1;
-}
-.drawer-close:hover { background:var(--surface2); color:var(--text); }
-.drawer-body { overflow-y:auto; flex:1; padding:0 24px 32px; }
-.drawer-section { margin-top:24px; }
-.drawer-section-title {
-  font-size:0.7rem; text-transform:uppercase; letter-spacing:1.5px;
-  color:var(--muted); font-weight:700; margin-bottom:12px;
-  display:flex; align-items:center; gap:8px;
-}
-.drawer-section-title::after { content:''; flex:1; height:1px; background:var(--border); }
-.drawer-field { display:flex; gap:8px; margin-bottom:8px; align-items:baseline; }
-.drawer-field-label { font-size:0.75rem; color:var(--muted); min-width:130px; flex-shrink:0; }
-.drawer-field-val { font-size:0.88rem; font-weight:600; }
-.drawer-timeline { list-style:none; margin-top:8px; }
-.drawer-timeline li {
-  padding:8px 0 8px 18px; border-left:2px solid var(--border);
-  margin-left:6px; position:relative; font-size:0.82rem; color:var(--muted);
-}
-.drawer-timeline li::before {
-  content:''; position:absolute; left:-5px; top:12px;
-  width:8px; height:8px; border-radius:50%;
-  background:var(--surface2); border:2px solid var(--muted);
-}
-.drawer-timeline li strong { display:block; color:var(--text); font-size:0.84rem; }
-.drawer-qa { background:var(--surface2); border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-top:8px; }
-.drawer-qa-row { padding:10px 14px; border-bottom:1px solid var(--border); display:flex; gap:12px; }
-.drawer-qa-row:last-child { border-bottom:none; }
-.drawer-qa-q { font-size:0.78rem; color:var(--muted); flex:1; }
-.drawer-qa-a { font-size:0.82rem; font-weight:700; color:var(--green); flex-shrink:0; text-align:right; max-width:200px; }
-.risk-sel { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:8px 12px; color:var(--text); font-family:'Inter',sans-serif; font-size:0.88rem; outline:none; cursor:pointer; }
-.risk-sel:focus { border-color:var(--blue); }
-.drawer-notes { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:12px 14px; color:var(--text); font-family:'Inter',sans-serif; font-size:0.88rem; resize:vertical; min-height:90px; outline:none; transition:border-color 0.2s; }
-.drawer-notes:focus { border-color:var(--blue); }
-.drawer-save-btn { width:100%; padding:11px; background:var(--green-dim); color:var(--green); border:1px solid rgba(16,185,129,0.3); border-radius:11px; cursor:pointer; font-family:'Inter',sans-serif; font-weight:700; font-size:0.9rem; margin-top:10px; transition:all 0.2s; }
-.drawer-save-btn:hover { background:var(--green); color:#000; }
-.risk-low      { color:#6ee7b7; } .risk-medium { color:#fcd34d; }
-.risk-high     { color:#fb923c; } .risk-critical { color:#f43f5e; }
-.risk-normal   { color:var(--muted); }
-</style>
 </head>
-<body>
+<body class="admin-page min-h-screen bg-bubuya-void text-zinc-100 antialiased">
+<a href="#dashboard" class="skip-link">Ir para o painel</a>
+
 
 <!-- LOGIN -->
 <div id="loginScreen" class="login-screen">
@@ -257,8 +53,8 @@ tr:hover td { background:rgba(255,255,255,0.015); }
     </div>
 
     <!-- DEPOSITOS -->
-    <div id="sec-deposits" class="section active">
-      <div class="section-title">Depositos Pendentes <span class="badge" id="pendingCount">0</span></div>
+    <div id="sec-deposits" class="admin-panel active">
+      <div class="admin-section-title">Depositos Pendentes <span class="badge" id="pendingCount">0</span></div>
       <table>
         <thead><tr><th>Codigo</th><th>Usuario</th><th>Valor</th><th>Horario</th><th>Status</th><th>Acoes</th></tr></thead>
         <tbody id="depositsTbody"><tr><td colspan="6" style="text-align:center;padding:40px;color:#5a6878">Carregando...</td></tr></tbody>
@@ -266,9 +62,9 @@ tr:hover td { background:rgba(255,255,255,0.015); }
     </div>
 
     <!-- MERCADOS -->
-    <div id="sec-markets" class="section">
+    <div id="sec-markets" class="admin-panel">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
-        <div class="section-title" style="margin-bottom:0">Mercados</div>
+        <div class="admin-section-title" style="margin-bottom:0">Mercados</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn btn-resolve" onclick="curateOpenMarkets()">Ajustar regras & datas</button>
           <button class="btn btn-green" onclick="seedTechBrasil()">🇧🇷 Seed Tech Brasil</button>
@@ -282,8 +78,8 @@ tr:hover td { background:rgba(255,255,255,0.015); }
     </div>
 
     <!-- USUARIOS -->
-    <div id="sec-users" class="section">
-      <div class="section-title">Usuarios</div>
+    <div id="sec-users" class="admin-panel">
+      <div class="admin-section-title">Usuarios</div>
       <table>
         <thead><tr><th>Nome</th><th>Email</th><th>Saldo</th><th>Bonus Locked</th><th>Apostas Bonus</th><th>Cadastro</th><th>Acao</th></tr></thead>
         <tbody id="usersTbody"><tr><td colspan="7" style="text-align:center;padding:40px;color:#5a6878">Carregando...</td></tr></tbody>
@@ -291,14 +87,14 @@ tr:hover td { background:rgba(255,255,255,0.015); }
     </div>
 
     <!-- RECEITA -->
-    <div id="sec-receita" class="section">
-      <div class="section-title">Receita da Casa</div>
+    <div id="sec-receita" class="admin-panel">
+      <div class="admin-section-title">Receita da Casa</div>
       <div id="receitaContent">Carregando...</div>
     </div>
 
     <!-- SAQUES -->
-    <div id="sec-saques" class="section">
-      <div class="section-title">Saques Pendentes <span class="badge" id="saquesCount">0</span></div>
+    <div id="sec-saques" class="admin-panel">
+      <div class="admin-section-title">Saques Pendentes <span class="badge" id="saquesCount">0</span></div>
       <table>
         <thead><tr><th>Usuario</th><th>Valor</th><th>Chave PIX</th><th>Tipo</th><th>Solicitado</th><th>Status</th><th>Acao</th></tr></thead>
         <tbody id="saquesTbody"><tr><td colspan="7" style="text-align:center;padding:40px;color:#5a6878">Carregando...</td></tr></tbody>
@@ -306,8 +102,8 @@ tr:hover td { background:rgba(255,255,255,0.015); }
     </div>
 
     <!-- BOTS -->
-    <div id="sec-bots" class="section">
-      <div class="section-title">🤖 Monitor de Bots</div>
+    <div id="sec-bots" class="admin-panel">
+      <div class="admin-section-title">🤖 Monitor de Bots</div>
 
       <div class="bot-grid" id="botStatsGrid">
         <div class="bot-card"><div class="bot-label">Status Automático</div><div id="botStatusBadge" style="margin-top:4px">—</div></div>
@@ -322,7 +118,7 @@ tr:hover td { background:rgba(255,255,255,0.015); }
         <button class="btn btn-reject" onclick="disableBot()">⏹ Desativar bot automático</button>
       </div>
 
-      <div class="section-title" style="font-size:0.95rem">Simular apostas agora</div>
+      <div class="admin-section-title" style="font-size:0.95rem">Simular apostas agora</div>
       <div class="simulate-row">
         <input id="simRounds" type="number" value="50" min="1" max="500" placeholder="Rounds">
         <button class="btn btn-green" onclick="runTechSimulation()">Simular Tech</button>
@@ -330,23 +126,23 @@ tr:hover td { background:rgba(255,255,255,0.015); }
         <span id="botSimResult"></span>
       </div>
 
-      <div class="section-title" style="font-size:0.95rem;margin-bottom:12px">Atividade por hora (últimas 48h)</div>
+      <div class="admin-section-title" style="font-size:0.95rem;margin-bottom:12px">Atividade por hora (últimas 48h)</div>
       <div class="chart-box"><canvas id="botActivityChart"></canvas></div>
 
-      <div class="section-title" style="font-size:0.95rem;margin-bottom:12px">Reação dos mercados</div>
+      <div class="admin-section-title" style="font-size:0.95rem;margin-bottom:12px">Reação dos mercados</div>
       <table>
         <thead><tr><th>Mercado</th><th>Categoria</th><th>Apostas Bots</th><th>Volume Bots</th><th>Prob SIM atual</th></tr></thead>
         <tbody id="botMarketsTbody"><tr><td colspan="5" style="text-align:center;padding:30px;color:#5a6878">Carregando...</td></tr></tbody>
       </table>
 
-      <div class="section-title" style="font-size:0.95rem;margin-top:24px;margin-bottom:12px">Saldo dos bots</div>
+      <div class="admin-section-title" style="font-size:0.95rem;margin-top:24px;margin-bottom:12px">Saldo dos bots</div>
       <table>
         <thead><tr><th>Bot</th><th>Saldo</th></tr></thead>
         <tbody id="botBalancesTbody"><tr><td colspan="2" style="text-align:center;padding:20px;color:#5a6878">Carregando...</td></tr></tbody>
       </table>
 
       <!-- GESTÃO DE BOTS -->
-      <div class="section-title" style="font-size:0.95rem;margin-top:32px;margin-bottom:12px">💰 Gestão de Bots</div>
+      <div class="admin-section-title" style="font-size:0.95rem;margin-top:32px;margin-bottom:12px">💰 Gestão de Bots</div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px;max-width:520px">
         <p style="color:var(--muted);font-size:0.85rem;margin-bottom:18px">Define o saldo de todos os usuários marcados como bots (<code style="background:rgba(255,255,255,0.06);padding:2px 7px;border-radius:6px;font-family:'DM Mono',monospace;font-size:0.82rem">is_bot = true</code>).</p>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
@@ -363,8 +159,8 @@ tr:hover td { background:rgba(255,255,255,0.015); }
     </div>
 
     <!-- NOVO MERCADO -->
-    <div id="sec-novo" class="section">
-      <div class="section-title">Criar Novo Mercado</div>
+    <div id="sec-novo" class="admin-panel">
+      <div class="admin-section-title">Criar Novo Mercado</div>
       <div style="max-width:600px">
         <div class="form-group">
           <label class="form-label">Titulo</label>
@@ -404,7 +200,7 @@ tr:hover td { background:rgba(255,255,255,0.015); }
     </div>
 
     <!-- COMPLIANCE -->
-    <div id="sec-compliance" class="section">
+    <div id="sec-compliance" class="admin-panel">
 
       <!-- KPI Summary row -->
       <div class="comp-grid" id="complianceSummary">
@@ -418,7 +214,7 @@ tr:hover td { background:rgba(255,255,255,0.015); }
 
       <!-- ── 1. FILA KYC ─────────────────────────────────────────────────────── -->
       <div class="comp-sub">
-        <div class="section-title">
+        <div class="admin-section-title">
           🔍 Fila KYC — Aguardando Análise
           <span class="badge" id="kycQueueBadge">0</span>
           <button class="btn btn-resolve" style="margin-left:auto;font-size:0.78rem" onclick="loadComplianceKyc()">↻ Atualizar</button>
@@ -436,7 +232,7 @@ tr:hover td { background:rgba(255,255,255,0.015); }
 
       <!-- ── 1b. KYC APROVADOS ──────────────────────────────────────────────── -->
       <div class="comp-sub">
-        <div class="section-title">
+        <div class="admin-section-title">
           ✅ KYC Aprovados
           <span class="badge" id="kycApprovedBadge" style="background:rgba(16,185,129,0.15);color:#10b981">0</span>
           <button class="btn btn-resolve" style="margin-left:auto;font-size:0.78rem" onclick="loadComplianceKycApproved()">↻ Atualizar</button>
@@ -451,7 +247,7 @@ tr:hover td { background:rgba(255,255,255,0.015); }
 
       <!-- ── 2. PEP IDENTIFICADOS ──────────────────────────────────────────── -->
       <div class="comp-sub">
-        <div class="section-title">
+        <div class="admin-section-title">
           🏛️ Pessoas Politicamente Expostas (PEP)
           <span class="badge" id="pepBadge">0</span>
           <button class="btn btn-resolve" style="margin-left:auto;font-size:0.78rem" onclick="loadCompliancePep()">↻ Atualizar</button>
@@ -469,7 +265,7 @@ tr:hover td { background:rgba(255,255,255,0.015); }
 
       <!-- ── 3. ALERTAS COAF ───────────────────────────────────────────────── -->
       <div class="comp-sub">
-        <div class="section-title">
+        <div class="admin-section-title">
           🚨 Alertas COAF — Monitoramento PLD/FT
           <span class="badge" id="coafBadge">0</span>
           <button class="btn btn-resolve" style="margin-left:auto;font-size:0.78rem" onclick="loadComplianceCoaf()">↻ Atualizar</button>
@@ -487,7 +283,7 @@ tr:hover td { background:rgba(255,255,255,0.015); }
 
       <!-- ── 4. SUITABILITY ─────────────────────────────────────────────────── -->
       <div class="comp-sub">
-        <div class="section-title">
+        <div class="admin-section-title">
           📊 Suitability — Perfil de Investidor
           <button class="btn btn-resolve" style="margin-left:auto;font-size:0.78rem" onclick="loadComplianceSuitability()">↻ Atualizar</button>
         </div>
@@ -512,7 +308,7 @@ tr:hover td { background:rgba(255,255,255,0.015); }
 
       <!-- ── 5. OUVIDORIA ───────────────────────────────────────────────────── -->
       <div class="comp-sub">
-        <div class="section-title">
+        <div class="admin-section-title">
           📣 Ouvidoria — Reclamações de Usuários
           <span class="badge" id="complaintsBadge">0</span>
           <button class="btn btn-resolve" style="margin-left:auto;font-size:0.78rem" onclick="loadAdminComplaints()">↻ Atualizar</button>
@@ -536,7 +332,7 @@ tr:hover td { background:rgba(255,255,255,0.015); }
 
       <!-- ── 6. AUDITORIA ADMIN ─────────────────────────────────────────────── -->
       <div class="comp-sub">
-        <div class="section-title">
+        <div class="admin-section-title">
           🔍 Auditoria — Ações Administrativas
           <button class="btn btn-resolve" style="margin-left:auto;font-size:0.78rem" onclick="loadAuditLogs()">↻ Atualizar</button>
         </div>
@@ -552,12 +348,12 @@ tr:hover td { background:rgba(255,255,255,0.015); }
     </div>
 
     <!-- RELATÓRIOS CVM / SISCOAF -->
-    <div id="sec-reports" class="section">
-      <div class="section-title">📊 Relatórios Regulatórios</div>
+    <div id="sec-reports" class="admin-panel">
+      <div class="admin-section-title">📊 Relatórios Regulatórios</div>
 
       <!-- ── BLOCO 11: CVM Sandbox ─────────────────────────────────────────── -->
       <div class="comp-sub">
-        <div class="section-title" style="font-size:1rem">
+        <div class="admin-section-title" style="font-size:1rem">
           📄 Relatório Operacional — CVM Sandbox
         </div>
         <div class="info-box" style="margin-bottom:20px">
@@ -581,7 +377,7 @@ tr:hover td { background:rgba(255,255,255,0.015); }
 
       <!-- ── BLOCO 10: SISCOAF ──────────────────────────────────────────────── -->
       <div class="comp-sub">
-        <div class="section-title" style="font-size:1rem">
+        <div class="admin-section-title" style="font-size:1rem">
           🔴 SISCOAF — Comunicações ao COAF
           <button class="btn btn-resolve" style="margin-left:auto;font-size:0.78rem" onclick="loadSiscoafReported()">↻ Atualizar</button>
         </div>
@@ -600,8 +396,8 @@ tr:hover td { background:rgba(255,255,255,0.015); }
     </div>
 
     <!-- SANDBOX DE TESTES -->
-    <div id="sec-sandbox" class="section">
-      <div class="section-title">🧪 Sandbox de Testes</div>
+    <div id="sec-sandbox" class="admin-panel">
+      <div class="admin-section-title">🧪 Sandbox de Testes</div>
       <div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.3);border-radius:12px;padding:14px 18px;margin-bottom:24px;font-size:0.85rem;color:#fbbf24">
         ⚠️ <strong>Ambiente de testes:</strong> Simule o fluxo KYC e Suitability para qualquer usuário sem precisar logar na conta. Com "Aplicar ao usuário" OFF, nenhum dado é salvo no banco.
       </div>
@@ -753,11 +549,11 @@ tr:hover td { background:rgba(255,255,255,0.015); }
     </div>
 
     <!-- CONFIGURAÇÕES -->
-    <div id="sec-config" class="section">
-      <div class="section-title">Configurações do Site</div>
+    <div id="sec-config" class="admin-panel">
+      <div class="admin-section-title">Configurações do Site</div>
       <div style="max-width:600px">
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px;margin-bottom:24px">
-          <div class="section-title" style="font-size:0.95rem;margin-bottom:12px">🖼️ Imagem de Capa (Hero)</div>
+          <div class="admin-section-title" style="font-size:0.95rem;margin-bottom:12px">🖼️ Imagem de Capa (Hero)</div>
           <p style="color:#5a6878;font-size:0.85rem;margin-bottom:16px">Defina a URL da imagem principal que aparece no topo da página inicial.</p>
           <div class="form-group">
             <label class="form-label">URL da Imagem</label>
@@ -772,7 +568,7 @@ tr:hover td { background:rgba(255,255,255,0.015); }
 
         <!-- ── LIMITES OPERACIONAIS ── -->
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px;margin-bottom:24px">
-          <div class="section-title" style="font-size:0.95rem;margin-bottom:4px">⚖️ Limites Operacionais por Perfil</div>
+          <div class="admin-section-title" style="font-size:0.95rem;margin-bottom:4px">⚖️ Limites Operacionais por Perfil</div>
           <p style="color:var(--muted);font-size:0.82rem;margin-bottom:20px">CVM Resolução 30/2021 — Alterações aplicadas imediatamente sem necessidade de deploy.</p>
           <div id="limitsEditor"><p style="color:var(--muted);font-size:0.85rem">Carregando...</p></div>
           <div id="limitsFeedback" style="margin-top:10px;font-size:0.82rem;text-align:center"></div>
@@ -945,11 +741,14 @@ tr:hover td { background:rgba(255,255,255,0.015); }
   </div>
 </div>
 
-<div id="toast" class="toast"></div>
+<div id="toast" class="toast" role="status" aria-live="polite">
+  <span class="font-mono text-zinc-500" aria-hidden="true">•</span>
+  <span id="toastMsg" class="text-sm text-zinc-200"></span>
+</div>
 
-<script src="./config.js?v=20260317"></script>
-<script src="./security.js?v=20260322"></script>
-<script src="./admin-enhancements.js?v=20260317"></script>
+<script src="/config.js"></script>
+<script src="/security.js?v=20260322"></script>
+<script src="/admin-enhancements.js?v=20260317"></script>
 <script>
 var API = window.PREDITIVO_CONFIG.API_BASE;
 // Nota: ADMIN_SECRET foi removido por segurança. Usar sessionStorage para token JWT
@@ -1032,7 +831,7 @@ function logout() {
 
 function switchTab(name, el) {
   document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
-  document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
+  document.querySelectorAll('.admin-panel').forEach(function(s){ s.classList.remove('active'); });
   el.classList.add('active');
   document.getElementById('sec-' + name).classList.add('active');
   if (name === 'deposits') loadDeposits();
@@ -1051,10 +850,11 @@ function openModal(id) { document.getElementById(id).classList.add('active'); }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
 function showToast(msg) {
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(function(){ t.classList.remove('show'); }, 3000);
+  var el = document.getElementById('toastMsg');
+  if (!el) return;
+  el.textContent = msg;
+  document.getElementById('toast').classList.add('show');
+  setTimeout(function(){ document.getElementById('toast').classList.remove('show'); }, 3000);
 }
 
 function loadAll() {
@@ -1254,7 +1054,7 @@ function loadReceita() {
 
       // ── Tabela por mercado ─────────────────────────────────────────────────
       if (mkts.length) {
-        html += '<div class="section-title" style="margin-top:0">Por Mercado</div>';
+        html += '<div class="admin-section-title" style="margin-top:0">Por Mercado</div>';
         html += '<table><thead><tr><th>Mercado</th><th>Apostado</th><th>Taxa 2%</th><th>Status</th></tr></thead><tbody>';
         mkts.forEach(function(m) {
           html += '<tr>' +
@@ -3196,6 +2996,6 @@ function loadComplianceDashboard() {
     .catch(function(){});
 }
 </script>
-  <script type="module" src="/src/styles-only.js"></script>
+  <script type="module" src="/src/admin.js"></script>
 </body>
 </html>

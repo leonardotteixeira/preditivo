@@ -1916,6 +1916,7 @@ window.depositGateway = async () => {
       document.getElementById('asaasPixCode').value = data.pix.qr_code || '';
       document.getElementById('asaasQrSection').style.display = 'block';
       window.showToast('✅', 'PIX gerado!', 'Escaneie o QR Code ou copie o código PIX.');
+      window._pollAsaasDeposit(data.deposit.id, token);
     } else {
       window.showToast('❌', 'Erro', 'QR Code não disponível. Tente o PIX Direto.');
     }
@@ -1925,6 +1926,39 @@ window.depositGateway = async () => {
   } finally {
     btn.textContent = 'Gerar QR Code PIX'; btn.disabled = false;
   }
+};
+
+// Verifica a cada 5s se o depósito foi confirmado (máx. 10 min)
+window._pollAsaasDeposit = (depositId, token) => {
+  let attempts = 0;
+  const MAX = 120; // 120 × 5s = 10 min
+  const interval = setInterval(async () => {
+    attempts++;
+    if (attempts > MAX) { clearInterval(interval); return; }
+
+    // Para o polling se o modal foi fechado
+    if (!document.getElementById('depositModal').classList.contains('active')) {
+      clearInterval(interval);
+      return;
+    }
+
+    try {
+      const res = await fetch(window.API + '/deposits/my', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      if (!res.ok) return;
+      const deposits = await res.json();
+      const dep = deposits.find(d => d.id === depositId);
+      if (dep?.status === 'confirmed') {
+        clearInterval(interval);
+        document.getElementById('asaasQrSection').style.display = 'none';
+        window.showToast('🎉', 'Depósito confirmado!', `R$${parseFloat(dep.amount).toFixed(2)} adicionado ao seu saldo.`);
+        // Atualiza o saldo exibido na tela
+        if (window.loadUserData) window.loadUserData();
+        if (window.renderUserArea) window.renderUserArea();
+      }
+    } catch { /* silencioso */ }
+  }, 5000);
 };
 
 window.copyAsaasPixCode = () => {

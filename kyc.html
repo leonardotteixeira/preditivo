@@ -431,7 +431,11 @@ async function init() {
   showScreen('loading');
 
   try {
-    const r = await fetch(API + '/auth/me');
+    const token = typeof getToken === 'function' ? getToken() : null;
+    const r = await fetch(API + '/auth/me', {
+      headers: token ? { Authorization: 'Bearer ' + token } : {},
+      credentials: 'include'
+    });
     if (!r.ok) { window.location.href = '/?login=1'; return; }
     userData = await r.json();
 

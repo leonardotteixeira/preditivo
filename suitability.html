@@ -451,9 +451,13 @@ async function submitSuitability() {
   arr.style.display = 'none';
 
   try {
+    const _suitToken = localStorage.getItem('preditivo_token');
     const r = await fetch(API + '/suitability/submit', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + getToken() },
+      headers: Object.assign(
+        { 'Content-Type': 'application/json' },
+        _suitToken ? { Authorization: 'Bearer ' + _suitToken } : {}
+      ),
       body: JSON.stringify({ answers })
     });
     const data = await r.json();

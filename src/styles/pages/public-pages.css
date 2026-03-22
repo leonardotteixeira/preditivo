@@ -678,3 +678,51 @@
   color: var(--gold);
 }
 
+/* ── LEGAL LINKS ── */
+.legal-link-green {
+  color: var(--green);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(16, 185, 129, 0.35);
+}
+.legal-link-green:hover {
+  text-decoration: underline;
+}
+
+/* ── SPACING UTILITIES ── */
+.mt-24 { margin-top: 24px !important; }
+.mt-28 { margin-top: 28px !important; }
+.mt-20 { margin-top: 20px !important; }
+.mt-16 { margin-top: 16px !important; }
+
+/* ── TEXT COLOR UTILITIES ── */
+.text-green-strong { color: var(--green); font-weight: 700; }
+.text-text-strong { color: var(--text); font-weight: 700; }
+.text-blue-strong { color: var(--blue); font-weight: 600; }
+.text-gold-strong { color: var(--gold); }
+.text-green-underline { color: var(--green); font-weight: 800; text-decoration: underline; }
+.text-blue { color: var(--blue); }
+.text-green { color: var(--green); }
+.text-gold { color: var(--gold); }
+
+/* ── PAGE LEAD VARIANT ── */
+.page-lead-small {
+  font-size: 0.9rem;
+  margin-bottom: 2.5rem;
+}
+
+/* ── TABLE CELL STYLES ── */
+.td-gold-bold {
+  vertical-align: middle;
+  color: var(--gold);
+  font-weight: 700;
+}
+
+/* ── FOOTER LEGAL STYLES ── */
+.footer-legal-text {
+  margin-top: 24px;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+

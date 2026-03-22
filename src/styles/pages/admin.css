@@ -123,6 +123,15 @@ tr:hover td { background:rgba(96,165,250,0.025); }
 .comp-card { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:18px 20px; }
 .comp-label { font-size:0.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:1.1px; margin-bottom:8px; }
 .comp-val { font-size:1.35rem; font-weight:800; font-family:'IBM Plex Mono', ui-monospace, monospace; }
+.comp-val-warning { color:#f59e0b; }
+.comp-val-success { color:#10b981; }
+.comp-val-danger { color:#f43f5e; }
+.comp-val-info { color:#6ee7b7; }
+.comp-val-gold { color:var(--gold); }
+.comp-val-suit-conservador { color:#93c5fd; }
+.comp-val-suit-moderado { color:#fcd34d; }
+.comp-val-suit-arrojado { color:#6ee7b7; }
+.comp-val-neutral { color:var(--text); }
 
 /* ── COMPLIANCE SUB-SECTION ── */
 .comp-sub { margin-top:36px; }
@@ -194,3 +203,39 @@ tr:hover td { background:rgba(96,165,250,0.025); }
 .risk-low      { color:#6ee7b7; } .risk-medium { color:#fcd34d; }
 .risk-high     { color:#fb923c; } .risk-critical { color:#f43f5e; }
 .risk-normal   { color:var(--muted); }
+
+/* ── SANDBOX CARDS ── */
+.sb-alert-warning { background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.3); border-radius:12px; padding:14px 18px; margin-bottom:24px; font-size:0.85rem; color:#fbbf24; }
+.sb-cards-wrap { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.sb-card { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:24px; }
+.sb-title { font-size:1rem; font-weight:700; margin-bottom:16px; color:var(--text); }
+.sb-label { font-size:0.78rem; color:var(--muted); display:block; margin-bottom:4px; }
+.sb-label-group { font-size:0.72rem; color:var(--muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:.04em; }
+.sb-input, .sb-select { width:100%; box-sizing:border-box; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:8px 12px; color:var(--text); font-size:0.85rem; outline:none; transition:border-color 0.2s; }
+.sb-input:focus, .sb-select:focus { border-color:var(--blue); }
+.sb-button-small { font-size:0.72rem; padding:4px 10px; border-radius:8px; border:1px solid; cursor:pointer; background-color:rgba(16,185,129,0.15); color:#10b981; border-color:rgba(16,185,129,0.3); transition:all 0.2s; }
+.sb-button-small:hover { opacity:0.9; }
+.sb-button-small.pep { background-color:rgba(251,191,36,0.15); color:#fbbf24; border-color:rgba(251,191,36,0.3); }
+.sb-button-small.sanction { background-color:rgba(239,68,68,0.15); color:#ef4444; border-color:rgba(239,68,68,0.3); }
+.sb-button-small.mismatch { background-color:rgba(251,146,60,0.15); color:#fb923c; border-color:rgba(251,146,60,0.3); }
+.sb-checkbox-row { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+.sb-result { display:none; margin-top:18px; border-top:1px solid var(--border); padding-top:16px; }
+.sb-result.active { display:block; }
+.sb-result-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.sb-result-label { font-size:0.8rem; color:var(--muted); }
+.sb-badge { display:inline-block; padding:3px 12px; border-radius:20px; font-size:0.8rem; font-weight:700; }
+.sb-details { font-size:0.8rem; color:var(--muted); line-height:1.8; }
+.sb-question-item { margin-top:10px; }
+.sb-question-item:first-child { margin-top:0; }
+.sb-question-label { font-size:0.78rem; font-weight:600; color:var(--text); margin-bottom:6px; }
+.sb-radio-wrap { display:flex; flex-direction:column; gap:4px; }
+.sb-radio-row { font-size:0.78rem; color:var(--muted); display:flex; align-items:center; gap:6px; cursor:pointer; }
+
+/* ── NEW MARKET ── */
+.nm-btn-create { background:#00e676; color:#080c10; font-weight:700; font-size:1rem; padding:14px 32px; border:none; border-radius:10px; cursor:pointer; transition:all 0.2s; }
+.nm-btn-create:hover { opacity:0.9; transform:translateY(-1px); }
+.nm-feedback { margin-top:12px; font-size:0.85rem; }
+
+/* ── BOT INPUT ── */
+.bot-input { background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:10px 16px; color:var(--text); font-size:0.95rem; width:170px; outline:none; font-family:'DM Mono',monospace; transition:border-color 0.2s; }
+.bot-input:focus { border-color:var(--blue); }

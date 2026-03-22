@@ -219,6 +219,326 @@
     @apply border-bubuya-line bg-bubuya-surface text-zinc-300 hover:border-zinc-600 hover:bg-bubuya-raised;
   }
 
+  .market-share-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .market-share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .market-share-btn:focus-visible {
+    outline: 2px solid rgba(96, 165, 250, 0.75);
+    outline-offset: 2px;
+  }
+
+  .market-share-btn-wa {
+    background: rgba(37, 211, 102, 0.12);
+    color: #25d366;
+    border: 1px solid rgba(37, 211, 102, 0.2);
+  }
+
+  .market-share-btn-wa:hover {
+    background: rgba(37, 211, 102, 0.2);
+  }
+
+  .market-share-btn-x {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .market-share-btn-x:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .market-share-btn-copy {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--blue);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+  }
+
+  .market-share-btn-copy:hover {
+    background: rgba(59, 130, 246, 0.18);
+  }
+
+  .chart-mode-btn {
+    padding: 5px 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-family: inherit;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .chart-mode-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .chart-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .chart-canvas-wrap {
+    position: relative;
+    height: 230px;
+    width: 100%;
+  }
+
+  .chart-empty-sub {
+    font-size: 0.78rem;
+  }
+
+  .comments-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .comments-title {
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .comments-count {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--muted);
+  }
+
+  .comments-meta {
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .comments-input-area {
+    display: none;
+    margin-bottom: 16px;
+  }
+
+  .comments-textarea {
+    width: 100%;
+    box-sizing: border-box;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.88rem;
+    padding: 12px 14px;
+    resize: vertical;
+    min-height: 80px;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+
+  .comments-textarea:focus {
+    border-color: rgba(59, 130, 246, 0.5);
+  }
+
+  .comments-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+  }
+
+  .comments-charcount {
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .comments-submit {
+    padding: 8px 20px;
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: opacity 0.2s ease;
+  }
+
+  .comments-submit:hover {
+    opacity: 0.85;
+  }
+
+  .comments-submit:focus-visible {
+    outline: 2px solid rgba(96, 165, 250, 0.8);
+    outline-offset: 2px;
+  }
+
+  .comments-loading {
+    text-align: center;
+    padding: 32px 0;
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+
+  .resolved-meta {
+    margin-top: 14px;
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .bet-currency-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .bet-tab-price {
+    font-family: IBM Plex Mono, ui-monospace, monospace;
+    font-size: 0.9rem;
+  }
+
+  .k-prob-value {
+    font-family: IBM Plex Mono, ui-monospace, monospace;
+    font-size: 1.7rem;
+    font-weight: 700;
+  }
+
+  .stat-chip-value-gold {
+    color: var(--gold);
+  }
+
+  .stat-chip-value-blue {
+    color: var(--blue);
+  }
+
+  .stat-chip-value-date {
+    font-size: 0.88rem;
+    font-family: Inter, sans-serif;
+    font-weight: 700;
+  }
+
+  .stat-chip-value-status {
+    font-size: 0.9rem;
+    font-family: Inter, sans-serif;
+  }
+
+  .stat-chip-value-status.is-resolved {
+    color: var(--muted);
+  }
+
+  .stat-chip-value-status.is-expired {
+    color: var(--gold);
+  }
+
+  .stat-chip-value-status.is-open {
+    color: var(--green);
+  }
+
+  .market-page-message {
+    text-align: center;
+    padding: 80px;
+    color: var(--muted);
+  }
+
+  .comments-empty {
+    text-align: center;
+    padding: 32px 0;
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+
+  .comment-item {
+    display: flex;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .comment-avatar-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .comment-avatar-fallback {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+
+  .comment-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .comment-meta-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .comment-author {
+    font-weight: 600;
+    font-size: 0.88rem;
+  }
+
+  .comment-time {
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .comment-content {
+    font-size: 0.88rem;
+    color: rgba(255, 255, 255, 0.82);
+    line-height: 1.5;
+    word-break: break-word;
+  }
+
+  .user-chip-avatar-img {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .user-chip-balance {
+    color: var(--green);
+    font-family: IBM Plex Mono, ui-monospace, monospace;
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
   /* ── Hero ── */
   .hero {
     @apply relative z-10 mx-auto grid max-w-[1440px] items-center gap-12 px-4 py-12 md:grid-cols-[1.05fr_0.95fr] md:gap-16 md:px-6 md:py-16 lg:py-20;
@@ -1679,6 +1999,19 @@
     font-size: 0.95rem;
     font-weight: 700;
   }
+
+/* ── HOW-IT-WORKS PAGE ── */
+.howkm-category-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-top:24px; }
+.howkm-category-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:20px 24px; }
+.howkm-category-icon { font-size:1.5rem; margin-bottom:10px; }
+.howkm-category-title { font-weight:700; color:var(--text); }
+.howkm-category-desc { font-size:0.88rem; color:var(--muted); margin-top:6px; line-height:1.6; }
+.howkm-resolution-grid { display:flex; flex-direction:column; gap:12px; margin-top:20px; }
+.howkm-resolution-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px 20px; display:flex; gap:16px; align-items:center; }
+.howkm-resolution-emoji { font-size:1.2rem; flex-shrink:0; }
+.howkm-resolution-text { font-size:0.92rem; color:var(--muted); }
+.howkm-resolution-source { font-weight:700; color:var(--text); }
+.howkm-calc-val-positive { color:var(--green); }
 
   .mobile-auth-logout {
     padding: 14px;

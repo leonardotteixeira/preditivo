@@ -32,6 +32,11 @@ body.profile-page nav a.active {
   background: rgba(22, 163, 74, 0.1);
 }
 
+.profile-auth-row { display:flex; align-items:center; gap:10px; }
+.profile-auth-user { text-align:right; }
+.profile-auth-name { font-weight:800; font-size:0.95rem; }
+.profile-auth-balance { color:var(--green); font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:0.85rem; font-weight:700; }
+
 
 /* ── PAGE ── */
 .page{max-width:1100px;margin:0 auto;padding:40px 24px 80px;position:relative;z-index:1}
@@ -64,6 +69,10 @@ body.profile-page nav a.active {
   font-size:2rem;font-weight:700;color:#080c10;flex-shrink:0;
   box-shadow:0 0 0 3px rgba(0,230,118,0.2)
 }
+.profile-avatar-img{
+  width:88px;height:88px;border-radius:50%;object-fit:cover;
+  box-shadow:0 0 0 3px rgba(16,185,129,0.3);display:block;
+}
 .profile-info{flex:1}
 .profile-name{font-size:1.8rem;font-weight:700;margin-bottom:4px}
 .profile-email{font-size:0.85rem;color:var(--muted);margin-bottom:14px}
@@ -82,6 +91,8 @@ body.profile-page nav a.active {
 .stat-card:hover { border-color: rgba(96,165,250,0.25); }
 .stat-label{font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
 .stat-value{font-size:1.5rem;font-weight:700;font-family:'IBM Plex Mono', ui-monospace, monospace}
+.stat-value-positive{color:var(--green)}
+.stat-value-negative{color:#ef4444}
 
 /* ── TABS ── */
 .tab-row{display:flex;gap:4px;margin-bottom:28px;overflow-x:auto;scrollbar-width:none;padding:4px;background:var(--surface);border:1px solid var(--border);border-radius:14px}
@@ -103,10 +114,20 @@ body.profile-page nav a.active {
 }
 .bet-card:hover{border-color:rgba(96,165,250,0.28)}
 .bet-market{font-size:0.78rem;color:var(--muted);text-transform:uppercase;margin-bottom:10px;line-height:1.4}
+.bet-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.bet-market-main{flex:1;padding-right:8px}
 .bet-pnl{font-size:1.5rem;font-weight:800;margin-bottom:12px}
+.bet-pnl-open{color:var(--muted)}
+.bet-pnl-positive{color:var(--green)}
+.bet-pnl-negative{color:#ef4444}
 .bet-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .bet-field-label{font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
 .bet-field-val{font-size:0.9rem;font-weight:700}
+.bet-field-val-success{color:var(--green)}
+.bet-field-val-info{color:var(--blue)}
+.bet-field-val-muted{color:var(--muted)}
+.bet-status{margin-bottom:10px;display:inline-block}
+.bet-date{margin-top:10px;font-size:0.7rem;color:var(--muted)}
 .pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.72rem;font-weight:800}
 .pill-yes{background:rgba(0,230,118,0.15);color:var(--green)}
 .pill-no{background:rgba(255,71,87,0.15);color:var(--red)}
@@ -122,6 +143,10 @@ body.profile-page nav a.active {
 .pnl-market{flex:1;font-size:0.9rem;font-weight:600}
 .pnl-meta{font-size:0.78rem;color:var(--muted);margin-top:4px}
 .pnl-value{font-family:'IBM Plex Mono', ui-monospace, monospace;font-size:1.05rem;font-weight:700;text-align:right;white-space:nowrap}
+.pnl-main{flex:1}
+.pnl-value-pos{color:var(--green)}
+.pnl-value-neg{color:#ef4444}
+.pnl-value-zero{color:var(--muted)}
 
 /* ── DEPOSITS ── */
 .dep-row{display:flex;align-items:center;gap:16px;padding:16px;margin-bottom:8px;background:var(--surface);border:1px solid var(--border);border-radius:14px}
@@ -149,6 +174,9 @@ body.profile-page nav a.active {
 /* ── EMPTY STATE ── */
 .empty{text-align:center;padding:64px;color:var(--muted)}
 .empty-icon{font-size:3rem;margin-bottom:16px}
+.empty-link{color:var(--green);font-size:0.9rem;margin-top:8px;display:inline-block}
+
+.profile-edit-btn{align-self:flex-start}
 
 /* ── REFERRAL CARD ── */
 .ref-hero{background:linear-gradient(135deg,rgba(0,153,116,0.12),rgba(0,200,110,0.04));border:1px solid rgba(0,230,118,0.2);border-radius:20px;padding:28px;margin-bottom:20px}

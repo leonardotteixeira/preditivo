@@ -168,6 +168,17 @@ header{position:sticky;top:0;z-index:100;background:rgba(3,3,3,0.9);backdrop-fil
 
 /* ── HIDDEN ── */
 .hidden{display:none!important}
+
+/* ── KYC LOADING & SPINNERS ── */
+.kyc-loading-center { text-align:center; padding:48px 0; }
+.kyc-spinner-sm { width:28px; height:28px; border-top-color:var(--green); margin:0 auto 16px; }
+.kyc-spinner-redirect { width:24px; height:24px; border-top-color:var(--green); margin:16px auto 0; }
+.kyc-alert-full { text-align:left; max-width:440px; margin:0 auto 24px; }
+.kyc-back-link { display:inline-flex; margin:0 auto; text-decoration:none; }
+.kyc-field-no-margin { margin-bottom:0; }
+.kyc-retry-btn { margin:0 auto; max-width:240px; }
+.kyc-review-full { grid-column:span 2; }
+.kyc-review-name { font-family:inherit; font-size:1rem; }
 </style>
 </head>
 <body>
@@ -213,9 +224,11 @@ header{position:sticky;top:0;z-index:100;background:rgba(3,3,3,0.9);backdrop-fil
 
   <!-- ─── TELA: LOADING ─── -->
   <div id="screen-loading">
-    <div class="card" style="text-align:center;padding:48px">
-      <div class="spinner" style="margin:0 auto 16px;width:28px;height:28px;border-top-color:var(--green)"></div>
-      <p style="color:var(--muted);font-size:0.9rem">Verificando status da conta...</p>
+    <div class="card">
+      <div class="kyc-loading-center">
+        <div class="spinner kyc-spinner-sm"></div>
+        <p class="kyc-loading-text">Verificando status da conta...</p>
+      </div>
     </div>
   </div>
 
@@ -226,7 +239,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(3,3,3,0.9);backdrop-fil
         <span class="status-icon">✅</span>
         <h2>Identidade Verificada</h2>
         <p>Sua identidade já foi verificada com sucesso. Redirecionando para o próximo passo...</p>
-        <div class="spinner" style="margin:16px auto 0;width:24px;height:24px;border-top-color:var(--green)"></div>
+        <div class="kyc-spinner-redirect"></div>
       </div>
     </div>
   </div>
@@ -239,14 +252,14 @@ header{position:sticky;top:0;z-index:100;background:rgba(3,3,3,0.9);backdrop-fil
         <h2>Análise em Andamento</h2>
         <div class="timer-badge">⏱ Prazo: até 24 horas úteis</div>
         <p>Seus dados foram enviados e estão sendo verificados pela nossa equipe de compliance. Você receberá uma notificação por e-mail assim que o processo for concluído.</p>
-        <div class="alert alert-info" style="text-align:left;max-width:440px;margin:0 auto 24px">
+        <div class="alert alert-info kyc-alert-full">
           <span class="alert-icon">ℹ️</span>
           <div class="alert-content">
             <div class="alert-title">O que acontece durante a análise?</div>
             <div class="alert-text">Nossa equipe verifica seus dados junto às bases cadastrais autorizadas pelo Banco Central do Brasil. O processo é confidencial e seguro.</div>
           </div>
         </div>
-        <a href="/" class="btn btn-outline" style="display:inline-flex;margin:0 auto;text-decoration:none">Voltar ao início</a>
+        <a href="/" class="btn btn-outline kyc-back-link">Voltar ao início</a>
       </div>
     </div>
   </div>
@@ -258,7 +271,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(3,3,3,0.9);backdrop-fil
         <span class="status-icon">❌</span>
         <h2>Verificação Não Aprovada</h2>
         <p id="rejected-msg">Sua verificação de identidade não foi aprovada. Você pode tentar novamente com as informações corretas.</p>
-        <button class="btn btn-primary" onclick="showStep1()" style="margin:0 auto;max-width:240px">Tentar novamente</button>
+        <button class="btn btn-primary kyc-retry-btn" onclick="showStep1()">Tentar novamente</button>
       </div>
     </div>
     <div class="alert alert-warning">
@@ -299,12 +312,12 @@ header{position:sticky;top:0;z-index:100;background:rgba(3,3,3,0.9);backdrop-fil
       </div>
 
       <div class="fields-row">
-        <div class="field" style="margin-bottom:0">
+        <div class="field kyc-field-no-margin">
           <label>Data de nascimento <span class="req">*</span></label>
           <input type="date" id="dob-input" max="" autocomplete="bday">
           <div class="field-error" id="dob-error"></div>
         </div>
-        <div class="field" style="margin-bottom:0">
+        <div class="field kyc-field-no-margin">
           <label>E-mail cadastrado</label>
           <input type="email" id="email-display" readonly>
           <div class="field-hint">Usado para notificações de compliance</div>
@@ -351,9 +364,9 @@ header{position:sticky;top:0;z-index:100;background:rgba(3,3,3,0.9);backdrop-fil
           <div class="review-label">Data de Nascimento</div>
           <div class="review-value" id="review-dob">—</div>
         </div>
-        <div class="review-item" style="grid-column:span 2">
+        <div class="review-item kyc-review-full">
           <div class="review-label">Nome Completo</div>
-          <div class="review-value" id="review-name" style="font-family:inherit;font-size:1rem">—</div>
+          <div class="review-value kyc-review-name" id="review-name">—</div>
         </div>
       </div>
 

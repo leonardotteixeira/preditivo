@@ -115,11 +115,11 @@ function updateAuthUI() {
   if (!area) return;
   if (state.user) {
     area.innerHTML =
-      '<div style="display:flex;align-items:center;gap:10px">' +
+      '<div class="profile-auth-row">' +
         '<button class="btn-finance btn-deposit" onclick="window.location.href=\'/\'">Depositar</button>' +
-        '<div style="text-align:right">' +
-          '<div style="font-weight:800;font-size:0.95rem">' + state.user.name + '</div>' +
-          '<div style="color:var(--green);font-family:DM Mono,monospace;font-size:0.85rem;font-weight:700">R$' + fmtR(state.user.balance) + '</div>' +
+        '<div class="profile-auth-user">' +
+          '<div class="profile-auth-name">' + state.user.name + '</div>' +
+          '<div class="profile-auth-balance">R$' + fmtR(state.user.balance) + '</div>' +
         '</div>' +
         '<button class="btn-outline" onclick="doLogout()">Sair</button>' +
       '</div>';
@@ -153,35 +153,35 @@ function renderPage() {
 
   /* Bet cards */
   var betCards = bets.length === 0
-    ? '<div class="empty"><div class="empty-icon">🎯</div>Nenhuma aposta ainda.<br><a href="/" style="color:var(--green);font-size:0.9rem;margin-top:8px;display:inline-block">Ver mercados →</a></div>'
+    ? '<div class="empty"><div class="empty-icon">🎯</div>Nenhuma aposta ainda.<br><a href="/" class="empty-link">Ver mercados →</a></div>'
     : '<div class="bets-grid">' + bets.map(function(b){
         var won_ = b.status==='won', lost_=b.status==='lost', open_=b.status==='open';
         var pnlVal = won_ ? parseFloat(b.payout||b.potential_payout||0)-parseFloat(b.amount||0)
                    : lost_ ? -parseFloat(b.amount||0) : null;
         var pnlStr = pnlVal===null
-          ? '<span style="color:var(--muted)">Em aberto</span>'
+          ? '<span class="bet-pnl-open">Em aberto</span>'
           : pnlVal>=0
-            ? '<span style="color:var(--green)">+R$'+fmtR(Math.abs(pnlVal))+'</span>'
-            : '<span style="color:#ef4444">-R$'+fmtR(Math.abs(pnlVal))+'</span>';
+            ? '<span class="bet-pnl-positive">+R$'+fmtR(Math.abs(pnlVal))+'</span>'
+            : '<span class="bet-pnl-negative">-R$'+fmtR(Math.abs(pnlVal))+'</span>';
         var statusClass = won_?'pill-won':lost_?'pill-lost':'pill-open';
         var statusLabel = won_?'✓ GANHOU':lost_?'✗ PERDEU':'EM ABERTO';
         return '<div class="bet-card">' +
-          '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">' +
-            '<div class="bet-market" style="flex:1;padding-right:8px">'+(b.market_title||b.market_id)+'</div>' +
+          '<div class="bet-head">' +
+            '<div class="bet-market bet-market-main">'+(b.market_title||b.market_id)+'</div>' +
             '<span class="pill '+(b.side==='yes'?'pill-yes':'pill-no')+'">'+(b.side==='yes'?'SIM':'NÃO')+'</span>' +
           '</div>' +
-          '<span class="pill '+statusClass+'" style="margin-bottom:10px;display:inline-block">'+statusLabel+'</span>' +
+          '<span class="pill bet-status '+statusClass+'">'+statusLabel+'</span>' +
           '<div class="bet-pnl">'+pnlStr+'</div>' +
           '<div class="bet-grid">' +
             '<div><div class="bet-field-label">Investido</div><div class="bet-field-val">R$'+fmtR(b.amount)+'</div></div>' +
             (won_
-              ? '<div><div class="bet-field-label">Recebido</div><div class="bet-field-val" style="color:var(--green)">R$'+fmtR(b.payout||0)+'</div></div>'
+              ? '<div><div class="bet-field-label">Recebido</div><div class="bet-field-val bet-field-val-success">R$'+fmtR(b.payout||0)+'</div></div>'
               : open_
-                ? '<div><div class="bet-field-label">Payout pot.</div><div class="bet-field-val" style="color:var(--blue)">R$'+fmtR(b.potential_payout||0)+'</div></div>'
-                : '<div><div class="bet-field-label">Recebido</div><div class="bet-field-val" style="color:var(--muted)">R$0,00</div></div>'
+                ? '<div><div class="bet-field-label">Payout pot.</div><div class="bet-field-val bet-field-val-info">R$'+fmtR(b.potential_payout||0)+'</div></div>'
+                : '<div><div class="bet-field-label">Recebido</div><div class="bet-field-val bet-field-val-muted">R$0,00</div></div>'
             ) +
           '</div>' +
-          '<div style="margin-top:10px;font-size:0.7rem;color:var(--muted)">'+fmtDate(b.created_at)+'</div>' +
+          '<div class="bet-date">'+fmtDate(b.created_at)+'</div>' +
         '</div>';
       }).join('') + '</div>';
 
@@ -198,14 +198,13 @@ function renderPage() {
     ? '<div class="empty"><div class="empty-icon">📊</div>Nenhuma aposta ainda.</div>'
     : Object.values(mMap).map(function(m){
         var mp=m.returned-m.invested;
-        var color=mp>0?'var(--green)':mp<0?'#ef4444':'var(--muted)';
         var sign=mp>=0?'+':'';
         return '<div class="pnl-card">' +
-          '<div style="flex:1">' +
+          '<div class="pnl-main">' +
             '<div class="pnl-market">'+m.title+'</div>' +
             '<div class="pnl-meta">'+m.count+' aposta(s) · investido R$'+fmtR(m.invested)+'</div>' +
           '</div>' +
-          '<div class="pnl-value" style="color:'+color+'">'+sign+'R$'+fmtR(mp)+'</div>' +
+          '<div class="pnl-value '+(mp>0?'pnl-value-pos':mp<0?'pnl-value-neg':'pnl-value-zero')+'">'+sign+'R$'+fmtR(mp)+'</div>' +
         '</div>';
       }).join('');
 
@@ -217,7 +216,7 @@ function renderPage() {
     '<div class="profile-hero">' +
       '<div class="avatar-wrap" onclick="document.getElementById(\'avatarFileInput\').click()" title="Clique para mudar a foto">' +
         (u.avatar_url
-          ? '<img src="'+u.avatar_url+'" style="width:88px;height:88px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 3px rgba(16,185,129,0.3);display:block">'
+          ? '<img src="'+u.avatar_url+'" class="profile-avatar-img">'
           : '<div class="profile-avatar">'+u.name.slice(0,2).toUpperCase()+'</div>'
         ) +
         '<div class="avatar-overlay">📷</div>' +
@@ -232,15 +231,15 @@ function renderPage() {
           (u.two_fa_enabled?'<span class="badge badge-blue">🔒 2FA Ativo</span>':'') +
         '</div>' +
       '</div>' +
-      '<button class="btn-outline" onclick="switchTab(\'editar\')" style="align-self:flex-start">Editar perfil</button>' +
+      '<button class="btn-outline profile-edit-btn" onclick="switchTab(\'editar\')">Editar perfil</button>' +
     '</div>' +
 
     /* Stats */
     '<div class="stats-grid">' +
-      '<div class="stat-card"><div class="stat-label">Saldo</div><div class="stat-value" style="color:var(--green)">R$'+fmtR(u.balance)+'</div></div>' +
+      '<div class="stat-card"><div class="stat-label">Saldo</div><div class="stat-value stat-value-positive">R$'+fmtR(u.balance)+'</div></div>' +
       '<div class="stat-card"><div class="stat-label">Apostas</div><div class="stat-value">'+totalBets+'</div></div>' +
-      '<div class="stat-card"><div class="stat-label">Taxa de acerto</div><div class="stat-value" style="color:'+(winRate>=50?'var(--green)':'#ef4444')+'">'+winRate+'%</div></div>' +
-      '<div class="stat-card"><div class="stat-label">P&L Total</div><div class="stat-value" style="color:'+(pnl>=0?'var(--green)':'#ef4444')+'">'+(pnl>=0?'+':'')+'R$'+fmtR(pnl)+'</div></div>' +
+      '<div class="stat-card"><div class="stat-label">Taxa de acerto</div><div class="stat-value '+(winRate>=50?'stat-value-positive':'stat-value-negative')+'">'+winRate+'%</div></div>' +
+      '<div class="stat-card"><div class="stat-label">P&L Total</div><div class="stat-value '+(pnl>=0?'stat-value-positive':'stat-value-negative')+'">'+(pnl>=0?'+':'')+'R$'+fmtR(pnl)+'</div></div>' +
     '</div>' +
 
     /* Tabs */

@@ -527,32 +527,38 @@
 <script src="/config.js?v=20260326"></script>
 <script src="/security.js?v=20260326"></script>
 <script>
-window.__bubuyaStart = function() {
-window.state = { markets: [], user: null, balance: 0, catFilter: 'all', searchQuery: '', walletAddress: null };
-window.API = window.PREDITIVO_CONFIG.API_BASE;
+// Swap hero CTA immediately if user is authenticated (prevents flash of "Abrir conta")
+if (localStorage.getItem('preditivo_token')) {
+  var _ha = document.getElementById('heroActions');
+  if (_ha) _ha.innerHTML = '<button type="button" class="btn-primary px-8 py-3 text-base" onclick="window.openModal(\'depositModal\')">Depositar</button><button type="button" class="btn-outline px-6 py-3 text-base" onclick="window.showSection(\'portfolio\')">Meu Portfólio</button>';
+}
 
-// ---- MOBILE MENU ----
-function toggleMobileMenu() {
+// ---- MOBILE MENU (global — must be on window for inline onclick handlers) ----
+window.toggleMobileMenu = function() {
   const nav = document.getElementById('mobileNav');
   const btn = document.getElementById('mobileMenuBtn');
   const isOpen = nav.classList.contains('open');
   nav.classList.toggle('open', !isOpen);
   btn.classList.toggle('open', !isOpen);
   document.body.style.overflow = isOpen ? '' : 'hidden';
-}
-function closeMobileMenu() {
+};
+window.closeMobileMenu = function() {
   document.getElementById('mobileNav').classList.remove('open');
   document.getElementById('mobileMenuBtn').classList.remove('open');
   document.body.style.overflow = '';
-}
+};
 // Fechar menu ao clicar fora
 document.addEventListener('click', function(e) {
   const nav = document.getElementById('mobileNav');
   const btn = document.getElementById('mobileMenuBtn');
-  if (nav.classList.contains('open') && !nav.contains(e.target) && !btn.contains(e.target)) {
-    closeMobileMenu();
+  if (nav && nav.classList.contains('open') && !nav.contains(e.target) && !btn.contains(e.target)) {
+    window.closeMobileMenu();
   }
 });
+
+window.__bubuyaStart = function() {
+window.state = { markets: [], user: null, balance: 0, catFilter: 'all', searchQuery: '', walletAddress: null };
+window.API = window.PREDITIVO_CONFIG.API_BASE;
 
 const CAT_COLORS = {
   politica: '#5b9bd5',

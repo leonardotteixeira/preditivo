@@ -1,5 +1,5 @@
-// ── Bubuya Service Worker v2.0 ────────────────────────────────────────────────
-const CACHE_NAME = 'bubuya-v2';
+// ── Bubuya Service Worker v3.0 ────────────────────────────────────────────────
+const CACHE_NAME = 'bubuya-v3';
 const OFFLINE_URL = '/offline.html';
 
 // Assets estáticos que sempre ficam em cache (cache-first)

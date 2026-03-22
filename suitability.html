@@ -525,7 +525,11 @@ async function init() {
 
   try {
     // Verifica KYC primeiro
-    const r = await fetch(API + '/auth/me');
+    const token = typeof getToken === 'function' ? getToken() : null;
+    const r = await fetch(API + '/auth/me', {
+      headers: token ? { Authorization: 'Bearer ' + token } : {},
+      credentials: 'include'
+    });
     if (!r.ok) { window.location.href = '/?login=1'; return; }
     const me = await r.json();
 
@@ -535,12 +539,12 @@ async function init() {
       return;
     }
 
-    // Verifica se já tem perfil ativo
+    // Verifica se já tem perfil ativo — não redireciona, só mostra tela de conclusão
     const now = new Date();
     const exp = me.suitability_expires_at ? new Date(me.suitability_expires_at) : null;
     if (me.suitability_profile && exp && exp > now) {
       showScreen('active');
-      setTimeout(() => window.location.href = '/', 2000);
+      // Não redireciona automaticamente — usuário pode fechar a aba manualmente
       return;
     }
 

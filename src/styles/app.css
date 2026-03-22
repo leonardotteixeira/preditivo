@@ -540,6 +540,68 @@
     .modal {
       @apply max-h-[min(92vh,720px)] rounded-b-none rounded-t-lg;
     }
+
+    /* Hero: menor padding e tipografia ajustada para mobile */
+    .hero {
+      @apply py-8 gap-6;
+    }
+
+    .hero h1,
+    .hero-content h1 {
+      @apply text-2xl;
+    }
+
+    .hero-sub {
+      @apply text-sm mb-6;
+    }
+
+    .hero-actions {
+      @apply mb-6;
+    }
+
+    .hero-stats {
+      @apply gap-6 pt-6;
+    }
+
+    .hero-stat-val {
+      @apply text-xl;
+    }
+
+    /* Filtros: topic tags + sort toolbar empilhados com espaçamento menor */
+    .topic-tags {
+      @apply mb-0 pb-2;
+    }
+
+    /* Cards de mercado: odds buttons maiores para touch */
+    .mc-odd {
+      @apply min-w-[4rem] py-2 text-sm;
+    }
+
+    /* Seção: padding lateral confortável */
+    .section {
+      @apply px-3 pt-6 pb-16;
+    }
+
+    /* Portfolio summary: coluna única no mobile */
+    #portfolioSummary {
+      grid-template-columns: 1fr !important;
+    }
+  }
+
+  /* Telas muito pequenas (< 400px) */
+  @media (max-width: 400px) {
+    .hero h1,
+    .hero-content h1 {
+      @apply text-xl;
+    }
+
+    .hero-stat-val {
+      @apply text-lg;
+    }
+
+    .hero-stats {
+      @apply gap-4;
+    }
   }
 
   .mobile-menu-btn span {

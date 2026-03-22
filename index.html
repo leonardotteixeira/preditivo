@@ -1021,6 +1021,14 @@ window.updateAuthUI = () => {
     if(h1) h1.innerHTML = `Olá, <span>${window.state.user.name.split(' ')[0]}</span>.`;
     const sub = document.getElementById('heroSub');
     if(sub) sub.textContent = "Seu portfólio está esperando. Vamos lucrar hoje?";
+    // Atualiza botões do hero — esconde "Abrir conta" para usuários logados
+    const heroActions = document.getElementById('heroActions');
+    if (heroActions) {
+      heroActions.innerHTML = `
+        <button type="button" class="btn-primary px-8 py-3 text-base" onclick="window.openModal('depositModal')">Depositar</button>
+        <button type="button" class="btn-outline px-6 py-3 text-base" onclick="window.showSection('portfolio')">Meu Portfólio</button>
+      `;
+    }
     // Se o portfólio já estava aberto quando o auth completou, recarregar
     const portSection = document.getElementById('section-portfolio');
     if(portSection && portSection.classList.contains('active')) window.loadPortfolio();

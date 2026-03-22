@@ -97,8 +97,10 @@
 
 /* LAYOUT */
 .market-layout { display: grid; grid-template-columns: 1fr 380px; gap: 28px; align-items: start; }
-@media(max-width:1100px) { .market-layout { grid-template-columns: 1fr; } }
-@media(max-width:900px) { .market-layout { grid-template-columns: 1fr !important; } .bet-widget { position: static !important; } }
+@media(max-width:1100px) {
+  .market-layout { grid-template-columns: 1fr; }
+  .bet-widget { position: static; }
+}
 
 /* MOBILE BET CTA */
 .mobile-bet-cta { display: none; }
@@ -123,7 +125,7 @@
   .mbc-yes:hover { background: rgba(16,185,129,0.2); }
   .mbc-no { background: var(--red-dim); color: var(--red); border-color: rgba(244,63,94,0.25); }
   .mbc-no:hover { background: rgba(244,63,94,0.2); }
-  .page { padding-bottom: 24px !important; }
+  .page { padding-bottom: 24px; }
 }
 
 /* CATEGORY BADGE */
@@ -425,7 +427,6 @@
   top: 5.5rem;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
 }
-@media(max-width:1100px) { .bet-widget { position: static; } }
 
 .bet-direction-tabs {
   display: flex;

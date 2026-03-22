@@ -3,6 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Bubuya é a plataforma brasileira de mercados preditivos. Opere eventos de política, economia, esportes e tecnologia com pagamentos via PIX.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://www.bubuya.com.br/">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Bubuya — Mercados de Previsão">
+  <meta property="og:description" content="Mercados preditivos no Brasil com liquidação em reais e pagamentos via PIX.">
+  <meta property="og:url" content="https://www.bubuya.com.br/">
+  <meta property="og:site_name" content="Bubuya">
+  <meta property="og:image" content="https://www.bubuya.com.br/hero-bg.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Bubuya — Mercados de Previsão">
+  <meta name="twitter:description" content="Mercados preditivos no Brasil com pagamentos via PIX.">
+  <meta name="twitter:image" content="https://www.bubuya.com.br/hero-bg.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#030303">
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
@@ -11,10 +25,25 @@
   <meta name="apple-mobile-web-app-title" content="Bubuya">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <title>Bubuya — Mercados de Previsão</title>
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<link rel="preload" href="./hero-bg.png" as="image" fetchpriority="high">
+<link rel="preload" href="/src/main.js" as="script">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FinancialService",
+  "name": "Bubuya",
+  "url": "https://www.bubuya.com.br/",
+  "description": "Plataforma brasileira de mercados preditivos com pagamentos via PIX.",
+  "areaServed": "BR",
+  "currenciesAccepted": "BRL",
+  "paymentAccepted": "PIX"
+}
+</script>
 </head>
 <body class="min-h-screen bg-bubuya-void text-zinc-100 antialiased">
 <a href="#main-content" class="skip-link">Ir para o conteúdo</a>
@@ -31,48 +60,48 @@
 <!-- HEADER -->
 <header>
   <div class="header-inner">
-    <div class="logo" onclick="window.showSection('home');closeMobileMenu()">Bubuya.</div>
+    <a class="logo" href="#section-home" onclick="event.preventDefault();window.showSection('home');closeMobileMenu()" aria-label="Ir para Explorar">Bubuya.</a>
 
     <div class="header-search">
       <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="searchInput" placeholder="O que vai acontecer?" oninput="window.onSearchInput(this.value)">
+      <input type="text" id="searchInput" placeholder="O que vai acontecer?" aria-label="Buscar mercados" oninput="window.onSearchInput(this.value)">
     </div>
 
     <div class="header-right">
-      <nav>
-        <a onclick="window.showSection('home')" id="nav-home" class="active">Explorar</a>
-        <a onclick="window.showSection('portfolio')" id="nav-portfolio">Portfólio</a>
-        <a onclick="window.showSection('ranking')" id="nav-ranking">Ranking</a>
+      <nav aria-label="Navegação principal">
+        <a href="#section-home" onclick="event.preventDefault();window.showSection('home')" id="nav-home" class="active">Explorar</a>
+        <a href="#section-portfolio" onclick="event.preventDefault();window.showSection('portfolio')" id="nav-portfolio">Portfólio</a>
+        <a href="#section-ranking" onclick="event.preventDefault();window.showSection('ranking')" id="nav-ranking">Ranking</a>
       </nav>
       <div id="authArea">
         <button class="btn-outline" onclick="window.connectWallet()" id="btnConnectWallet">Conectar Carteira</button>
-        <button class="btn-outline" onclick="window.openModal('registerModal')" style="color:var(--green);border-color:rgba(16,185,129,0.35)">Criar conta</button>
+        <button class="btn-outline btn-outline-green" onclick="window.openModal('registerModal')">Criar conta</button>
         <button class="btn-primary" onclick="window.openModal('loginModal')">Entrar</button>
       </div>
     </div>
 
     <!-- Hamburger (mobile only) -->
-    <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()" aria-label="Menu">
+    <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()" aria-label="Menu" aria-controls="mobileNav" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
   </div>
 </header>
 
 <!-- MOBILE NAV -->
-<div class="mobile-nav" id="mobileNav">
+<nav class="mobile-nav" id="mobileNav" aria-label="Navegação mobile">
   <div class="mobile-nav-search">
     <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-    <input type="text" placeholder="O que vai acontecer?" oninput="window.onSearchInput(this.value);closeMobileMenu()">
+    <input type="text" placeholder="O que vai acontecer?" aria-label="Buscar mercados no menu" oninput="window.onSearchInput(this.value);closeMobileMenu()">
   </div>
-  <a onclick="window.showSection('home');closeMobileMenu()" id="mnav-home" class="active" href="#" role="button">Explorar</a>
-  <a onclick="window.showSection('portfolio');closeMobileMenu()" id="mnav-portfolio" href="#" role="button">Portfólio</a>
-  <a onclick="window.showSection('ranking');closeMobileMenu()" id="mnav-ranking" href="#" role="button">Ranking</a>
+  <a onclick="event.preventDefault();window.showSection('home');closeMobileMenu()" id="mnav-home" class="active" href="#section-home">Explorar</a>
+  <a onclick="event.preventDefault();window.showSection('portfolio');closeMobileMenu()" id="mnav-portfolio" href="#section-portfolio">Portfólio</a>
+  <a onclick="event.preventDefault();window.showSection('ranking');closeMobileMenu()" id="mnav-ranking" href="#section-ranking">Ranking</a>
   <div class="mobile-nav-divider"></div>
   <div class="mobile-nav-auth" id="mobileAuthArea">
     <button class="btn-primary" onclick="window.openModal('loginModal');closeMobileMenu()">Entrar</button>
     <button class="btn-outline" onclick="window.openModal('registerModal');closeMobileMenu()">Cadastrar</button>
   </div>
-</div>
+</nav>
 
 <!-- SECTION: HOME -->
 <main id="main-content">
@@ -105,7 +134,7 @@
     </div>
 
     <div class="hero-image-wrapper">
-      <img src="./hero-bg.png" alt="Futuro do Brasil" class="hero-image-main" id="heroImg">
+      <img src="./hero-bg.png" alt="Ilustração da plataforma Bubuya com foco em mercados preditivos no Brasil" class="hero-image-main" id="heroImg" decoding="async" fetchpriority="high">
     </div>
   </div>
 
@@ -132,58 +161,56 @@
 
 <!-- SECTION: PORTFOLIO -->
 <div class="section" id="section-portfolio">
-  <div style="max-width: 1000px; margin: 0 auto;">
+  <div class="section-shell">
     <h2 class="modal-title">Portfólio Ativo</h2>
     <p class="modal-sub">Gerencie seus ativos e posições em tempo real.</p>
     <!-- RESUMO: CARTEIRA + P&L -->
-    <div id="portfolioSummary" style="display:none;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px">
+    <div id="portfolioSummary" class="portfolio-summary">
       <!-- CARTEIRA -->
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px">
-        <div style="margin-bottom:4px"><span style="font-size:0.78rem;font-weight:600;color:var(--muted);letter-spacing:.06em">CARTEIRA</span></div>
-        <div id="pnlPortfolioValue" style="font-size:2rem;font-weight:800;color:var(--text);margin-bottom:2px">R$ —</div>
-        <div id="pnlPortfolioChange" style="font-size:0.82rem;color:var(--muted);margin-bottom:16px"></div>
-        <div style="display:flex;gap:12px">
-          <div style="flex:1;background:var(--bg);border-radius:12px;padding:12px">
-            <div style="font-size:0.7rem;color:var(--muted);margin-bottom:4px">DISPONÍVEL</div>
-            <div id="pnlAvailable" style="font-size:1rem;font-weight:700;color:var(--green)">R$ —</div>
+      <div class="summary-card">
+        <div><span class="summary-label">CARTEIRA</span></div>
+        <div id="pnlPortfolioValue" class="summary-value">R$ —</div>
+        <div id="pnlPortfolioChange" class="summary-change"></div>
+        <div class="summary-metrics">
+          <div class="summary-metric-card">
+            <div class="summary-metric-title">DISPONÍVEL</div>
+            <div id="pnlAvailable" class="summary-metric-value positive">R$ —</div>
           </div>
-          <div style="flex:1;background:var(--bg);border-radius:12px;padding:12px">
-            <div style="font-size:0.7rem;color:var(--muted);margin-bottom:4px">EM POSIÇÕES</div>
-            <div id="pnlInvested" style="font-size:1rem;font-weight:700;color:var(--text)">R$ —</div>
+          <div class="summary-metric-card">
+            <div class="summary-metric-title">EM POSIÇÕES</div>
+            <div id="pnlInvested" class="summary-metric-value">R$ —</div>
           </div>
         </div>
       </div>
       <!-- LUCRO / PREJUÍZO -->
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-          <span style="font-size:0.78rem;font-weight:600;color:var(--muted);letter-spacing:.06em">LUCRO / PREJUÍZO</span>
-          <div style="display:flex;gap:4px">
+      <div class="summary-card">
+        <div class="summary-head">
+          <span class="summary-label">LUCRO / PREJUÍZO</span>
+          <div class="summary-period-tabs">
             <button onclick="window.loadPnl('day')"   class="pnl-tab" data-p="day">1D</button>
             <button onclick="window.loadPnl('week')"  class="pnl-tab" data-p="week">1S</button>
             <button onclick="window.loadPnl('month')" class="pnl-tab" data-p="month">1M</button>
             <button onclick="window.loadPnl('all')"   class="pnl-tab active" data-p="all">ALL</button>
           </div>
         </div>
-        <div id="pnlTotal" style="font-size:2rem;font-weight:800;margin-bottom:2px;color:var(--text)">R$ —</div>
-        <div id="pnlMeta" style="font-size:0.82rem;color:var(--muted);margin-bottom:12px"></div>
-        <canvas id="pnlChart" height="60" style="width:100%;display:block"></canvas>
+        <div id="pnlTotal" class="summary-value">R$ —</div>
+        <div id="pnlMeta" class="summary-meta"></div>
+        <canvas id="pnlChart" height="60" class="summary-chart"></canvas>
       </div>
     </div>
 
     <!-- TABS: Ativas / Encerradas -->
-    <div style="display:flex;gap:8px;margin-bottom:20px">
-      <button id="tabAtivas" onclick="window.switchPortfolioTab('ativas')"
-        style="padding:8px 20px;border-radius:12px;border:none;font-weight:700;font-size:0.85rem;cursor:pointer;background:var(--green);color:#000;transition:all .2s">
+    <div class="portfolio-tabs">
+      <button id="tabAtivas" onclick="window.switchPortfolioTab('ativas')" class="portfolio-tab active">
         Ativas
       </button>
-      <button id="tabEncerradas" onclick="window.switchPortfolioTab('encerradas')"
-        style="padding:8px 20px;border-radius:12px;border:1px solid var(--border);font-weight:700;font-size:0.85rem;cursor:pointer;background:var(--surface);color:var(--muted);transition:all .2s">
+      <button id="tabEncerradas" onclick="window.switchPortfolioTab('encerradas')" class="portfolio-tab">
         Encerradas
       </button>
     </div>
 
     <div id="portfolioContent" class="portfolio-grid">
-      <div style="grid-column: 1/-1; padding:100px; text-align:center; background: var(--surface2); border: 1px solid var(--border); border-radius: 32px; color:var(--muted);">
+      <div class="status-message panel">
         Conecte-se para visualizar suas previsões e lucros acumulados.
       </div>
     </div>
@@ -192,30 +219,30 @@
 
 <!-- SECTION: RANKING -->
 <div class="section" id="section-ranking">
-  <div style="max-width: 800px; margin: 0 auto;">
+  <div class="section-shell narrow">
     <h2 class="modal-title">Hall da Fama</h2>
     <p class="modal-sub">Os traders mais lucrativos da plataforma.</p>
     <div id="rankingList" class="ranking-list">
-      <div style="padding:80px; text-align:center; color:var(--muted)">Calculando posições...</div>
+      <div class="status-message rank-loading">Calculando posições...</div>
     </div>
   </div>
 </div>
 </main>
 
 <!-- MODALS -->
-<div class="modal-overlay" id="loginModal">
+<div class="modal-overlay" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="loginModalTitle">
   <div class="modal">
-    <button class="modal-close" onclick="window.closeModal('loginModal')">&times;</button>
+    <button class="modal-close" onclick="window.closeModal('loginModal')" aria-label="Fechar modal de login">&times;</button>
 
     <!-- Step 1: Email + Senha -->
     <div id="loginStep1">
-      <h2 class="modal-title">Entrar</h2>
+      <h2 class="modal-title" id="loginModalTitle">Entrar</h2>
       <p class="modal-sub">Bem-vindo de volta Ã  Bubuya.</p>
-      <input class="modal-input" type="email" id="loginEmail" placeholder="Email" onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()">
-      <input class="modal-input" type="password" id="loginPass" placeholder="Senha" onkeydown="if(event.key==='Enter')window.doLogin()">
-      <button class="btn-primary" style="width:100%" onclick="window.doLogin()">Acessar Conta</button>
-      <p style="text-align:center;margin-top:16px;font-size:0.9rem">
-        <a href="#" style="color:var(--muted);text-decoration:underline;cursor:pointer"
+      <input class="modal-input" type="email" id="loginEmail" placeholder="Email" aria-label="Email" autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()">
+      <input class="modal-input" type="password" id="loginPass" placeholder="Senha" aria-label="Senha" autocomplete="current-password" onkeydown="if(event.key==='Enter')window.doLogin()">
+      <button class="btn-primary btn-block" onclick="window.doLogin()">Acessar Conta</button>
+      <p class="modal-link-row">
+        <a href="#" class="modal-link-muted"
            onclick="event.preventDefault();window.closeModal('loginModal');window.openModal('forgotModal')">
           Esqueceu a senha?
         </a>
@@ -223,16 +250,16 @@
     </div>
 
     <!-- Step 2: Código 2FA TOTP (oculto por padrão) -->
-    <div id="loginStep2" style="display:none">
+    <div id="loginStep2" class="modal-step">
       <h2 class="modal-title">Verificação em 2 Etapas</h2>
-      <p class="modal-sub" style="text-align:center">Abra o Google Authenticator ou Authy e digite o código de 6 dígitos.</p>
-      <input class="modal-input" id="login2faCode" type="text" inputmode="numeric"
+      <p class="modal-sub modal-sub-center">Abra o Google Authenticator ou Authy e digite o código de 6 dígitos.</p>
+      <input class="modal-input" id="login2faCode" type="text" inputmode="numeric" aria-label="Código de verificação em 2 etapas"
         placeholder="Código de 6 dígitos" maxlength="6" autocomplete="one-time-code"
         onkeydown="if(event.key==='Enter')window.doLogin2fa()">
-      <div id="login2faMsg" style="display:none;padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:0.88rem;background:rgba(244,63,94,0.1);color:#f43f5e;border:1px solid rgba(244,63,94,0.2)"></div>
-      <button class="btn-primary" style="width:100%;margin-top:4px" onclick="window.doLogin2fa()">Verificar</button>
+      <div id="login2faMsg" class="form-feedback compact error"></div>
+      <button class="btn-primary btn-block btn-mt-4" onclick="window.doLogin2fa()">Verificar</button>
       <button onclick="window.backToLoginStep1()"
-        style="width:100%;margin-top:10px;background:none;border:none;color:var(--muted);font-size:0.85rem;cursor:pointer;padding:8px">
+        class="btn-link-muted">
         â† Voltar
       </button>
     </div>
@@ -240,19 +267,19 @@
 </div>
 
 <!-- MODAL: Recuperação de Senha -->
-<div class="modal-overlay" id="forgotModal">
+<div class="modal-overlay" id="forgotModal" role="dialog" aria-modal="true" aria-labelledby="forgotModalTitle">
   <div class="modal">
-    <button class="modal-close" onclick="window.closeModal('forgotModal')">&times;</button>
+    <button class="modal-close" onclick="window.closeModal('forgotModal')" aria-label="Fechar modal de recuperação de senha">&times;</button>
 
     <!-- Step 1: Email -->
     <div id="forgotStep1">
-      <h2 class="modal-title">Recuperar Senha</h2>
+      <h2 class="modal-title" id="forgotModalTitle">Recuperar Senha</h2>
       <p class="modal-sub">Informe seu email e enviaremos um código de verificação.</p>
-      <input class="modal-input" type="email" id="forgotEmail" placeholder="Seu email">
-      <div id="forgotMsg1" style="display:none;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:0.9rem"></div>
-      <button class="btn-primary" style="width:100%" onclick="window.doForgotPassword()">Enviar Código</button>
-      <p style="text-align:center;margin-top:16px;font-size:0.9rem">
-        <a href="#" style="color:var(--muted);text-decoration:underline;cursor:pointer"
+      <input class="modal-input" type="email" id="forgotEmail" placeholder="Seu email" aria-label="Email para recuperação" autocomplete="email">
+      <div id="forgotMsg1" class="form-feedback"></div>
+      <button class="btn-primary btn-block" onclick="window.doForgotPassword()">Enviar Código</button>
+      <p class="modal-link-row">
+        <a href="#" class="modal-link-muted"
            onclick="event.preventDefault();window.closeModal('forgotModal');window.openModal('loginModal')">
           Voltar ao login
         </a>
@@ -260,17 +287,17 @@
     </div>
 
     <!-- Step 2: Código + Nova Senha -->
-    <div id="forgotStep2" style="display:none">
+    <div id="forgotStep2" class="modal-step">
       <h2 class="modal-title">Nova Senha</h2>
       <p class="modal-sub">Insira o código recebido no email e escolha sua nova senha.</p>
-      <input class="modal-input" id="forgotCode" placeholder="Código de verificação" maxlength="10">
-      <input class="modal-input" type="password" id="forgotNewPass" placeholder="Nova senha (mín. 6 caracteres)">
-      <input class="modal-input" type="password" id="forgotConfirmPass" placeholder="Confirmar nova senha">
-      <div id="forgotMsg2" style="display:none;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:0.9rem"></div>
-      <button class="btn-primary" style="width:100%" onclick="window.doResetPassword()">Redefinir Senha</button>
-      <p style="text-align:center;margin-top:16px;font-size:0.9rem">
-        <a href="#" style="color:var(--muted);text-decoration:underline;cursor:pointer"
-           onclick="event.preventDefault();document.getElementById('forgotStep2').style.display='none';document.getElementById('forgotStep1').style.display='block'">
+      <input class="modal-input" id="forgotCode" placeholder="Código de verificação" aria-label="Código de verificação" maxlength="10">
+      <input class="modal-input" type="password" id="forgotNewPass" placeholder="Nova senha (mín. 6 caracteres)" aria-label="Nova senha" autocomplete="new-password">
+      <input class="modal-input" type="password" id="forgotConfirmPass" placeholder="Confirmar nova senha" aria-label="Confirmar nova senha" autocomplete="new-password">
+      <div id="forgotMsg2" class="form-feedback"></div>
+      <button class="btn-primary btn-block" onclick="window.doResetPassword()">Redefinir Senha</button>
+      <p class="modal-link-row">
+        <a href="#" class="modal-link-muted"
+           onclick="event.preventDefault();window.backToForgotStep1()">
           Reenviar código
         </a>
       </p>
@@ -278,57 +305,57 @@
   </div>
 </div>
 
-<div class="modal-overlay" id="registerModal">
+<div class="modal-overlay" id="registerModal" role="dialog" aria-modal="true" aria-labelledby="registerModalTitle">
   <div class="modal">
-    <button class="modal-close" onclick="window.closeModal('registerModal')">&times;</button>
+    <button class="modal-close" onclick="window.closeModal('registerModal')" aria-label="Fechar modal de cadastro">&times;</button>
 
     <!-- Step 1: Dados de cadastro -->
     <div id="regStep1">
-      <h2 class="modal-title">Começar Agora</h2>
+      <h2 class="modal-title" id="registerModalTitle">Começar Agora</h2>
       <p class="modal-sub">Dê seu primeiro palpite com R$100 de bônus.</p>
-      <input class="modal-input" id="regUser" placeholder="Nome completo"
+      <input class="modal-input" id="regUser" placeholder="Nome completo" aria-label="Nome completo" autocomplete="name"
         onkeydown="if(event.key==='Enter')document.getElementById('regEmail').focus()">
-      <input class="modal-input" type="email" id="regEmail" placeholder="E-mail"
+      <input class="modal-input" type="email" id="regEmail" placeholder="E-mail" aria-label="E-mail" autocomplete="email"
         onkeydown="if(event.key==='Enter')document.getElementById('regPass').focus()">
-      <input class="modal-input" type="password" id="regPass" placeholder="Sua senha (mín. 6 caracteres)"
+      <input class="modal-input" type="password" id="regPass" placeholder="Sua senha (mín. 6 caracteres)" aria-label="Senha" autocomplete="new-password"
         onkeydown="if(event.key==='Enter')document.getElementById('regRef').focus()">
-      <input class="modal-input" id="regRef" placeholder="Código de convite (opcional)"
-        style="text-transform:uppercase"
+      <input class="modal-input" id="regRef" placeholder="Código de convite (opcional)" aria-label="Código de convite opcional"
+        class="reg-ref-input"
         oninput="this.value=this.value.toUpperCase()"
         onkeydown="if(event.key==='Enter')window.doRegister()">
-      <label style="display:flex;align-items:flex-start;gap:10px;margin:12px 0 4px;cursor:pointer">
-        <input type="checkbox" id="regLgpd" style="margin-top:3px;accent-color:var(--green);flex-shrink:0;width:16px;height:16px">
-        <span style="font-size:0.82rem;color:var(--muted);line-height:1.5">
-          Li e aceito a <a href="./privacidade.html" target="_blank" style="color:var(--green)">Política de Privacidade</a>
-          e consinto com o tratamento dos meus dados conforme a Lei 13.709/2018 (LGPD). <span style="color:var(--red)">*</span>
+      <label class="reg-consent">
+        <input type="checkbox" id="regLgpd" class="reg-consent-check">
+        <span class="reg-consent-text">
+          Li e aceito a <a href="./privacidade.html" target="_blank" class="modal-link-green">Política de Privacidade</a>
+          e consinto com o tratamento dos meus dados conforme a Lei 13.709/2018 (LGPD). <span class="text-danger">*</span>
         </span>
       </label>
-      <button class="btn-primary" style="width:100%;margin-top:8px" onclick="window.doRegister()">Criar Conta e Ganhar</button>
-      <p style="text-align:center;margin-top:12px;font-size:0.82rem;color:var(--muted)">
+      <button class="btn-primary btn-block btn-mt-8" onclick="window.doRegister()">Criar Conta e Ganhar</button>
+      <p class="modal-link-row compact">
         Ao criar uma conta você concorda com os
-        <a href="./terms.html" target="_blank" style="color:var(--green)">Termos de Uso</a>.
+        <a href="./terms.html" target="_blank" class="modal-link-green">Termos de Uso</a>.
       </p>
     </div>
 
     <!-- Step 2: Verificação de email -->
-    <div id="regStep2" style="display:none">
+    <div id="regStep2" class="modal-step">
       <h2 class="modal-title">Confirme seu email</h2>
       <p class="modal-sub" id="regStep2Sub">Enviamos um código para o seu email.</p>
-      <input class="modal-input" id="regCode" placeholder="Código de verificação"
+      <input class="modal-input" id="regCode" placeholder="Código de verificação" aria-label="Código de verificação"
         maxlength="10" onkeydown="if(event.key==='Enter')window.doRegisterVerify()">
-      <button class="btn-primary" style="width:100%" onclick="window.doRegisterVerify()">Confirmar e Entrar</button>
+      <button class="btn-primary btn-block" onclick="window.doRegisterVerify()">Confirmar e Entrar</button>
       <button onclick="window.backToRegStep1()"
-        style="width:100%;margin-top:10px;background:none;border:none;color:var(--muted);font-size:0.85rem;cursor:pointer;padding:8px">
+        class="btn-link-muted">
         â† Voltar
       </button>
     </div>
   </div>
 </div>
 
-<div class="modal-overlay" id="depositModal">
-  <div class="modal" style="max-width:560px">
-    <button class="modal-close" onclick="window.closeModal('depositModal')">&times;</button>
-    <h2 class="modal-title">Depositar</h2>
+<div class="modal-overlay" id="depositModal" role="dialog" aria-modal="true" aria-labelledby="depositModalTitle">
+  <div class="modal modal-wide">
+    <button class="modal-close" onclick="window.closeModal('depositModal')" aria-label="Fechar modal de depósito">&times;</button>
+    <h2 class="modal-title" id="depositModalTitle">Depositar</h2>
     <p class="modal-sub">Escolha como prefere adicionar saldo.</p>
 
     <!-- TABS -->
@@ -350,17 +377,17 @@
         Transfira o valor diretamente para a chave PIX da plataforma. <strong>Envie o comprovante</strong> para nosso suporte após o pagamento.
       </div>
       <input class="modal-input" type="number" id="pixDirectAmount" placeholder="Valor (R$) — mínimo R$10" min="10">
-      <button class="btn-primary" style="width:100%;font-size:1rem" onclick="window.depositPIXDireto()">Ver Chave PIX</button>
-      <div id="pixDirectOutput" style="display:none; margin-top:20px;">
+      <button class="btn-primary btn-block btn-lg" onclick="window.depositPIXDireto()">Ver Chave PIX</button>
+      <div id="pixDirectOutput" class="is-hidden mt-20">
         <div class="pix-qr-box">
-          <img id="pixDirectQR" src="" alt="QR Code PIX" style="width:160px;height:160px;border-radius:8px;">
-          <p style="font-size:0.85rem; color:#333; font-weight:700">Escaneie com qualquer app bancário</p>
+          <img id="pixDirectQR" src="" alt="QR Code PIX para depósito na Bubuya" loading="lazy" decoding="async" class="pix-direct-qr">
+          <p class="pix-direct-help">Escaneie com qualquer app bancário</p>
         </div>
         <div class="pix-key-box">
           <span class="pix-key-val" id="pixDirectKey">—</span>
           <button class="btn-copy" onclick="window.copyPixKey()">Copiar</button>
         </div>
-        <p id="pixDirectInstr" style="text-align:center; color:var(--muted); font-size:0.85rem; margin-top:8px; line-height:1.6">
+        <p id="pixDirectInstr" class="pix-direct-instr">
           Após transferir, envie o comprovante para nosso suporte.
         </p>
       </div>
@@ -372,23 +399,24 @@
         Gera um <strong>QR Code PIX</strong> instantaneamente. Escaneie pelo app do seu banco e o saldo é creditado de forma automática.
       </div>
       <input class="modal-input" type="number" id="gatewayAmount" placeholder="Valor (R$) — mínimo R$5" min="5">
-      <button class="btn-primary" style="width:100%;font-size:1rem;background:var(--blue);box-shadow:0 4px 12px rgba(59,130,246,0.25)" id="btnAsaas" onclick="window.depositGateway()">
+      <button class="btn-primary btn-block btn-lg btn-primary-blue" id="btnAsaas" onclick="window.depositGateway()">
         Gerar QR Code PIX
       </button>
 
       <!-- QR Code exibido após gerar a cobrança -->
-      <div id="asaasQrSection" style="display:none;margin-top:20px;text-align:center">
-        <img id="asaasQrImage" src="" alt="QR Code PIX"
-          style="width:200px;height:200px;border-radius:12px;border:1px solid var(--border);display:block;margin:0 auto">
-        <div style="margin-top:14px">
-          <div style="font-size:0.78rem;color:var(--muted);margin-bottom:6px">PIX copia e cola:</div>
-          <div style="display:flex;gap:8px;align-items:center">
+      <div id="asaasQrSection" class="is-hidden mt-20 text-center">
+        <img id="asaasQrImage" src="" alt="QR Code PIX gerado para pagamento"
+          loading="lazy" decoding="async"
+          class="asaas-qr-img">
+        <div class="mt-14">
+          <div class="asaas-copy-label">PIX copia e cola:</div>
+          <div class="asaas-copy-row">
             <input id="asaasPixCode" type="text" readonly
-              style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:0.72rem;color:var(--text);font-family:'DM Mono',monospace;min-width:0">
-            <button class="btn-secondary" style="white-space:nowrap;padding:8px 14px;font-size:0.85rem" onclick="window.copyAsaasPixCode()">Copiar</button>
+              class="asaas-pix-code">
+            <button class="btn-secondary btn-secondary-compact" onclick="window.copyAsaasPixCode()">Copiar</button>
           </div>
         </div>
-        <p style="font-size:0.8rem;color:var(--muted);margin-top:12px;line-height:1.5">
+        <p class="asaas-help">
           Aguarde a confirmação automática.<br>O saldo aparece em segundos após o pagamento.
         </p>
       </div>
@@ -396,11 +424,11 @@
 
     <!-- PAINEL: CRIPTO / METAMASK -->
     <div class="deposit-panel" id="panel-eth">
-      <div id="ethNoWallet" style="display:none">
-        <div class="method-info" style="border-color:rgba(249,115,22,0.2)">
+      <div id="ethNoWallet" class="is-hidden">
+        <div class="method-info method-info-crypto">
           Você precisa conectar sua carteira MetaMask para usar essa opção.
         </div>
-        <button class="btn-primary" style="width:100%;background:#f97316;box-shadow:0 4px 12px rgba(249,115,22,0.25)" onclick="window.connectWalletAndDeposit()">
+        <button class="btn-primary btn-block btn-wallet" onclick="window.connectWalletAndDeposit()">
           ðŸ¦Š Conectar MetaMask
         </button>
       </div>
@@ -413,10 +441,10 @@
           Envie <strong>ETH ou MATIC</strong> para a carteira da plataforma. O equivalente em reais é creditado após 1 confirmação na rede.
         </div>
         <input class="modal-input" type="number" id="ethAmount" placeholder="Valor em ETH" step="0.001" min="0.001">
-        <div style="font-size:0.82rem; color:var(--muted); margin:-8px 0 16px; padding:0 4px">
+        <div class="eth-gas-note">
           Taxa de rede (gas) cobrada pela MetaMask, não pela Bubuya.
         </div>
-        <button class="btn-primary" style="width:100%;font-size:1rem;background:#f97316;box-shadow:0 4px 12px rgba(249,115,22,0.25)" onclick="window.depositCripto()">
+        <button class="btn-primary btn-block btn-wallet btn-wallet-lg" onclick="window.depositCripto()">
           ðŸ¦Š Enviar via MetaMask
         </button>
       </div>
@@ -425,14 +453,14 @@
   </div>
 </div>
 
-<div class="modal-overlay" id="withdrawModal">
+<div class="modal-overlay" id="withdrawModal" role="dialog" aria-modal="true" aria-labelledby="withdrawModalTitle">
   <div class="modal">
-    <button class="modal-close" onclick="window.closeModal('withdrawModal')">&times;</button>
-    <h2 class="modal-title">Sacar Lucros</h2>
+    <button class="modal-close" onclick="window.closeModal('withdrawModal')" aria-label="Fechar modal de saque">&times;</button>
+    <h2 class="modal-title" id="withdrawModalTitle">Sacar Lucros</h2>
 
     <!-- PASSO 1: escolha do método -->
     <div id="withdrawStep1">
-      <div class="deposit-tabs" style="margin-bottom:20px">
+      <div class="deposit-tabs deposit-tabs-tight">
         <button class="deposit-tab pix active" id="wtab-pix" onclick="window.switchWithdrawTab('pix',this)">
           <span>ðŸ’¸</span> PIX
         </button>
@@ -447,7 +475,7 @@
           Solicite o saque via PIX. Um <strong>código de confirmação</strong> será enviado ao seu e-mail.
         </div>
         <input class="modal-input" type="number" id="wAmountPix" placeholder="Valor (R$) — mínimo R$20" min="20">
-        <select class="modal-input" id="wPixType" style="background:var(--surface2);color:var(--text);cursor:pointer">
+        <select class="modal-input select-styled" id="wPixType">
           <option value="">Tipo de chave PIX</option>
           <option value="cpf">CPF</option>
           <option value="email">E-mail</option>
@@ -455,31 +483,31 @@
           <option value="aleatoria">Chave aleatória</option>
         </select>
         <input class="modal-input" id="wPixKey" placeholder="Sua chave PIX">
-        <button class="btn-primary" style="width:100%" onclick="window.requestWithdraw('pix')">Solicitar Saque via PIX</button>
+        <button class="btn-primary btn-block" onclick="window.requestWithdraw('pix')">Solicitar Saque via PIX</button>
       </div>
 
       <!-- CRIPTO / METAMASK -->
       <div id="wpanel-eth" class="deposit-panel">
         <!-- sem wallet conectada -->
         <div id="wEthNoWallet">
-          <div class="method-info" style="border-color:rgba(249,115,22,0.2)">
+          <div class="method-info method-info-crypto">
             Conecte sua carteira MetaMask. O valor em <strong>ETH</strong> será enviado ao seu endereço após aprovação.
           </div>
-          <button class="btn-primary" style="width:100%;background:#f97316;box-shadow:0 4px 12px rgba(249,115,22,0.25)" onclick="window.connectWalletAndWithdraw()">
+          <button class="btn-primary btn-block btn-wallet" onclick="window.connectWalletAndWithdraw()">
             ðŸ¦Š Conectar MetaMask
           </button>
         </div>
         <!-- com wallet conectada -->
-        <div id="wEthReady" style="display:none">
-          <div class="wallet-chip" style="margin-bottom:16px">
+        <div id="wEthReady" class="is-hidden">
+          <div class="wallet-chip wallet-chip-tight">
             <div class="wallet-dot"></div>
             <span class="wallet-addr" id="wEthAddr">—</span>
           </div>
-          <div class="method-info" style="border-color:rgba(249,115,22,0.2)">
+          <div class="method-info method-info-crypto">
             O saque será processado manualmente em até <strong>24h</strong>. Um código de confirmação será enviado ao seu e-mail.
           </div>
           <input class="modal-input" type="number" id="wAmountEth" placeholder="Valor (R$) — mínimo R$20" min="20">
-          <button class="btn-primary" style="width:100%;background:#f97316;box-shadow:0 4px 12px rgba(249,115,22,0.25)" onclick="window.requestWithdraw('eth')">
+          <button class="btn-primary btn-block btn-wallet" onclick="window.requestWithdraw('eth')">
             ðŸ¦Š Solicitar Saque em Cripto
           </button>
         </div>
@@ -487,40 +515,40 @@
     </div>
 
     <!-- PASSO 2: confirmação por e-mail -->
-    <div id="withdrawStep2" style="display:none">
-      <div class="method-info" style="text-align:center">
+    <div id="withdrawStep2" class="is-hidden">
+      <div class="method-info method-info-center">
         Enviamos um código para o seu e-mail. <br>Digite abaixo para confirmar o saque.
       </div>
-      <input class="modal-input" id="wVerifyCode" placeholder="Código de verificação" maxlength="6" style="text-align:center;letter-spacing:6px;font-size:1.4rem;font-weight:800">
-      <button class="btn-primary" style="width:100%" onclick="window.confirmWithdraw()">Confirmar Saque</button>
-      <button class="btn-outline" style="width:100%;margin-top:8px" onclick="window.withdrawBackToStep1()">Voltar</button>
+      <input class="modal-input verify-code-input" id="wVerifyCode" placeholder="Código de verificação" maxlength="6">
+      <button class="btn-primary btn-block" onclick="window.confirmWithdraw()">Confirmar Saque</button>
+      <button class="btn-outline btn-block btn-mt-8" onclick="window.withdrawBackToStep1()">Voltar</button>
     </div>
   </div>
 </div>
 
 <!-- RISK TERM MODAL (BLOCO 5) — não pode ser fechado sem aceitar -->
-<div id="riskTermModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);align-items:center;justify-content:center">
-  <div style="background:#0f0f0f;border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:36px;max-width:560px;width:90%;max-height:90vh;overflow-y:auto;position:relative">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
-      <div style="width:40px;height:40px;background:rgba(245,158,11,0.15);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">âš ï¸</div>
-      <h3 style="font-size:1.15rem;font-weight:700;color:#fff">Termo de Ciência de Riscos</h3>
+<div id="riskTermModal" class="risk-term-modal" role="dialog" aria-modal="true" aria-labelledby="riskTermModalTitle">
+  <div class="risk-term-dialog">
+    <div class="risk-term-header">
+      <div class="risk-term-icon">âš ï¸</div>
+      <h3 id="riskTermModalTitle" class="risk-term-title">Termo de Ciência de Riscos</h3>
     </div>
-    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px;margin-bottom:20px;font-size:0.875rem;color:rgba(255,255,255,0.75);line-height:1.7;max-height:280px;overflow-y:auto">
-      <p style="font-weight:600;color:#fff;margin-bottom:12px">Antes de operar, leia atentamente:</p>
-      <p style="margin-bottom:10px"><strong style="color:rgba(255,255,255,0.9)">1. Natureza do produto:</strong> Mercados de previsão envolvem risco de perda total do capital investido. Não há garantia de retorno.</p>
-      <p style="margin-bottom:10px"><strong style="color:rgba(255,255,255,0.9)">2. Risco de liquidez:</strong> Posições abertas podem não ter compradores disponíveis ao preço desejado, podendo resultar em perdas.</p>
-      <p style="margin-bottom:10px"><strong style="color:rgba(255,255,255,0.9)">3. Volatilidade:</strong> Os preços das posições podem variar significativamente em curtos períodos de tempo.</p>
-      <p style="margin-bottom:10px"><strong style="color:rgba(255,255,255,0.9)">4. Limitações do perfil:</strong> Seu perfil de investidor (suitability) determina os limites máximos de operação. Esses limites visam proteger seu patrimônio.</p>
-      <p style="margin-bottom:10px"><strong style="color:rgba(255,255,255,0.9)">5. Responsabilidade:</strong> As decisões de investimento são de sua exclusiva responsabilidade. A Bubuya não presta aconselhamento financeiro.</p>
-      <p style="margin-bottom:10px"><strong style="color:rgba(255,255,255,0.9)">6. Regulamentação:</strong> Esta plataforma opera em conformidade com a Resolução CVM 30/2021 e demais normas aplicáveis.</p>
-      <p><strong style="color:rgba(255,255,255,0.9)">7. Público adequado:</strong> Este produto é destinado apenas a investidores que compreenderam e aceitam os riscos envolvidos.</p>
+    <div class="risk-term-body">
+      <p class="risk-term-lead">Antes de operar, leia atentamente:</p>
+      <p class="risk-term-item"><strong>1. Natureza do produto:</strong> Mercados de previsão envolvem risco de perda total do capital investido. Não há garantia de retorno.</p>
+      <p class="risk-term-item"><strong>2. Risco de liquidez:</strong> Posições abertas podem não ter compradores disponíveis ao preço desejado, podendo resultar em perdas.</p>
+      <p class="risk-term-item"><strong>3. Volatilidade:</strong> Os preços das posições podem variar significativamente em curtos períodos de tempo.</p>
+      <p class="risk-term-item"><strong>4. Limitações do perfil:</strong> Seu perfil de investidor (suitability) determina os limites máximos de operação. Esses limites visam proteger seu patrimônio.</p>
+      <p class="risk-term-item"><strong>5. Responsabilidade:</strong> As decisões de investimento são de sua exclusiva responsabilidade. A Bubuya não presta aconselhamento financeiro.</p>
+      <p class="risk-term-item"><strong>6. Regulamentação:</strong> Esta plataforma opera em conformidade com a Resolução CVM 30/2021 e demais normas aplicáveis.</p>
+      <p class="risk-term-item"><strong>7. Público adequado:</strong> Este produto é destinado apenas a investidores que compreenderam e aceitam os riscos envolvidos.</p>
     </div>
-    <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-bottom:20px;padding:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px">
-      <input type="checkbox" id="riskTermCheck" onchange="window.toggleRiskTermBtn()" style="width:18px;height:18px;margin-top:2px;flex-shrink:0;accent-color:#10b981;cursor:pointer">
-      <span style="font-size:0.875rem;color:rgba(255,255,255,0.8);line-height:1.5">Li e compreendi os riscos descritos acima. Declaro que estou ciente de que posso perder o capital investido e que as decisões de operação são de minha exclusiva responsabilidade.</span>
+    <label class="risk-term-consent">
+      <input type="checkbox" id="riskTermCheck" class="risk-term-check" onchange="window.toggleRiskTermBtn()">
+      <span class="risk-term-consent-text">Li e compreendi os riscos descritos acima. Declaro que estou ciente de que posso perder o capital investido e que as decisões de operação são de minha exclusiva responsabilidade.</span>
     </label>
-    <button id="riskTermAcceptBtn" onclick="window.acceptRiskTerm()" disabled style="width:100%;padding:14px;background:#10b981;color:#000;font-weight:700;font-size:0.95rem;border:none;border-radius:12px;cursor:not-allowed;opacity:0.4;transition:all .2s;font-family:inherit">Aceitar e Continuar</button>
-    <p style="text-align:center;margin-top:12px;font-size:0.78rem;color:#888">Versão v1.0 — Este aceite fica registrado conforme Resolução CVM 30/2021</p>
+    <button id="riskTermAcceptBtn" class="risk-term-accept-btn" onclick="window.acceptRiskTerm()" disabled>Aceitar e Continuar</button>
+    <p class="risk-term-footnote">Versão v1.0 — Este aceite fica registrado conforme Resolução CVM 30/2021</p>
   </div>
 </div>
 
@@ -538,13 +566,17 @@ window.toggleMobileMenu = function() {
   const nav = document.getElementById('mobileNav');
   const btn = document.getElementById('mobileMenuBtn');
   const isOpen = nav.classList.contains('open');
-  nav.classList.toggle('open', !isOpen);
-  btn.classList.toggle('open', !isOpen);
+  const nextOpen = !isOpen;
+  nav.classList.toggle('open', nextOpen);
+  btn.classList.toggle('open', nextOpen);
+  btn.setAttribute('aria-expanded', nextOpen ? 'true' : 'false');
   document.body.style.overflow = isOpen ? '' : 'hidden';
 };
 window.closeMobileMenu = function() {
   document.getElementById('mobileNav').classList.remove('open');
-  document.getElementById('mobileMenuBtn').classList.remove('open');
+  const btn = document.getElementById('mobileMenuBtn');
+  btn.classList.remove('open');
+  btn.setAttribute('aria-expanded', 'false');
   document.body.style.overflow = '';
 };
 // Fechar menu ao clicar fora
@@ -620,7 +652,7 @@ window.closeModal = (id) => { document.getElementById(id).classList.remove('acti
 window.showSection = (name) => {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
-  document.querySelectorAll('.mobile-nav a[role="button"]').forEach(a => a.classList.remove('active'));
+  document.querySelectorAll('.mobile-nav a[id^="mnav-"]').forEach(a => a.classList.remove('active'));
   const target = document.getElementById('section-' + name);
   const nav = document.getElementById('nav-' + name);
   const mnav = document.getElementById('mnav-' + name);
@@ -668,6 +700,19 @@ window.renderMarkets = () => {
 
 let _login2faTempToken = null;
 
+function showFormMessage(el, text, isError) {
+  if (!el) return;
+  el.textContent = text;
+  el.classList.add('show');
+  el.classList.toggle('error', !!isError);
+  el.classList.toggle('success', !isError);
+}
+
+function hideFormMessage(el) {
+  if (!el) return;
+  el.classList.remove('show', 'error', 'success');
+}
+
 window.doLogin = async () => {
   const email    = document.getElementById('loginEmail').value;
   const password = document.getElementById('loginPass').value;
@@ -684,11 +729,11 @@ window.doLogin = async () => {
     if (d.requires_2fa) {
       _login2faTempToken = d.temp_token;
       localStorage.setItem('preditivo_temp_token', d.temp_token);
-      document.getElementById('loginStep1').style.display = 'none';
-      document.getElementById('loginStep2').style.display = 'block';
+      document.getElementById('loginStep1').classList.remove('active');
+      document.getElementById('loginStep2').classList.add('active');
       document.getElementById('login2faCode').value = '';
       var msgEl = document.getElementById('login2faMsg');
-      if (msgEl) msgEl.style.display = 'none';
+      hideFormMessage(msgEl);
       document.getElementById('login2faCode').focus();
       return;
     }
@@ -711,7 +756,7 @@ window.doLogin2fa = async () => {
     const d = await res.json();
     if (d.error) {
       var msgEl = document.getElementById('login2faMsg');
-      if (msgEl) { msgEl.textContent = 'Código inválido. Tente novamente.'; msgEl.style.display = 'block'; }
+      showFormMessage(msgEl, 'Código inválido. Tente novamente.', true);
       return;
     }
     localStorage.removeItem('preditivo_temp_token');
@@ -771,10 +816,10 @@ window.backToLoginStep1 = function() {
   localStorage.removeItem('preditivo_temp_token');
   const s1 = document.getElementById('loginStep1');
   const s2 = document.getElementById('loginStep2');
-  if (s1) s1.style.display = 'block';
-  if (s2) s2.style.display = 'none';
+  if (s1) s1.classList.add('active');
+  if (s2) s2.classList.remove('active');
   var msgEl = document.getElementById('login2faMsg');
-  if (msgEl) msgEl.style.display = 'none';
+  hideFormMessage(msgEl);
 };
 
 // ---- REGISTRO ----
@@ -806,8 +851,8 @@ window.doRegister = async () => {
     if (d.error) return window.showToast('âŒ', 'Erro', d.error);
     _regEmail = email;
     document.getElementById('regStep2Sub').textContent = `Enviamos um código para ${email}.`;
-    document.getElementById('regStep1').style.display = 'none';
-    document.getElementById('regStep2').style.display = 'block';
+    document.getElementById('regStep1').classList.remove('active');
+    document.getElementById('regStep2').classList.add('active');
     document.getElementById('regCode').value = '';
     document.getElementById('regCode').focus();
   } catch(e) {
@@ -858,8 +903,8 @@ window.backToRegStep1 = function() {
   _regEmail = null;
   const s1 = document.getElementById('regStep1');
   const s2 = document.getElementById('regStep2');
-  if (s1) s1.style.display = 'block';
-  if (s2) s2.style.display = 'none';
+  if (s1) s1.classList.add('active');
+  if (s2) s2.classList.remove('active');
 };
 
 // ---- RECUPERAÇÃƒO DE SENHA ----
@@ -867,13 +912,7 @@ window.doForgotPassword = async () => {
   const email = document.getElementById('forgotEmail').value.trim();
   const msgEl = document.getElementById('forgotMsg1');
 
-  const showMsg = (text, isError) => {
-    msgEl.textContent = text;
-    msgEl.style.display = 'block';
-    msgEl.style.background = isError ? 'rgba(244,63,94,0.12)' : 'rgba(16,185,129,0.12)';
-    msgEl.style.color = isError ? 'var(--red)' : 'var(--green)';
-    msgEl.style.border = `1px solid ${isError ? 'rgba(244,63,94,0.3)' : 'rgba(16,185,129,0.3)'}`;
-  };
+  const showMsg = (text, isError) => showFormMessage(msgEl, text, isError);
 
   if (!email) return showMsg('Informe seu email.', true);
 
@@ -889,13 +928,19 @@ window.doForgotPassword = async () => {
     // Independente de o email existir ou não, exibe step 2
     showMsg(d.message || 'Se o email existir, enviaremos um código.', false);
     setTimeout(() => {
-      document.getElementById('forgotStep1').style.display = 'none';
-      document.getElementById('forgotStep2').style.display = 'block';
-      document.getElementById('forgotMsg2').style.display = 'none';
+      document.getElementById('forgotStep1').classList.remove('active');
+      document.getElementById('forgotStep2').classList.add('active');
+      hideFormMessage(document.getElementById('forgotMsg2'));
     }, 1200);
   } catch(e) {
     showMsg('Falha na conexão com o servidor.', true);
   }
+};
+
+window.backToForgotStep1 = function() {
+  document.getElementById('forgotStep1').classList.add('active');
+  document.getElementById('forgotStep2').classList.remove('active');
+  hideFormMessage(document.getElementById('forgotMsg2'));
 };
 
 window.doResetPassword = async () => {
@@ -905,13 +950,7 @@ window.doResetPassword = async () => {
   const confirm = document.getElementById('forgotConfirmPass').value;
   const msgEl = document.getElementById('forgotMsg2');
 
-  const showMsg = (text, isError) => {
-    msgEl.textContent = text;
-    msgEl.style.display = 'block';
-    msgEl.style.background = isError ? 'rgba(244,63,94,0.12)' : 'rgba(16,185,129,0.12)';
-    msgEl.style.color = isError ? 'var(--red)' : 'var(--green)';
-    msgEl.style.border = `1px solid ${isError ? 'rgba(244,63,94,0.3)' : 'rgba(16,185,129,0.3)'}`;
-  };
+  const showMsg = (text, isError) => showFormMessage(msgEl, text, isError);
 
   if (!code) return showMsg('Informe o código recebido no email.', true);
   if (password.length < 6) return showMsg('A senha deve ter no mínimo 6 caracteres.', true);
@@ -930,14 +969,14 @@ window.doResetPassword = async () => {
     setTimeout(() => {
       // Reseta o modal e abre o login
       window.closeModal('forgotModal');
-      document.getElementById('forgotStep1').style.display = 'block';
-      document.getElementById('forgotStep2').style.display = 'none';
+      document.getElementById('forgotStep1').classList.add('active');
+      document.getElementById('forgotStep2').classList.remove('active');
       document.getElementById('forgotEmail').value = '';
       document.getElementById('forgotCode').value = '';
       document.getElementById('forgotNewPass').value = '';
       document.getElementById('forgotConfirmPass').value = '';
-      document.getElementById('forgotMsg1').style.display = 'none';
-      document.getElementById('forgotMsg2').style.display = 'none';
+      hideFormMessage(document.getElementById('forgotMsg1'));
+      hideFormMessage(document.getElementById('forgotMsg2'));
       window.openModal('loginModal');
       window.showToast('âœ…', 'Senha redefinida', 'Faça login com sua nova senha.');
     }, 1500);
@@ -951,77 +990,75 @@ window.updateAuthUI = () => {
   if (window.state.user && area) {
     const firstName = window.state.user.name.split(' ')[0];
     const avatarEl  = window.state.user.avatar_url
-      ? `<img src="${window.state.user.avatar_url}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0">`
-      : `<div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--blue));display:flex;align-items:center;justify-content:center;font-weight:800;color:#030303;font-size:0.85rem;flex-shrink:0">${window.state.user.name[0].toUpperCase()}</div>`;
+      ? `<img src="${window.state.user.avatar_url}" alt="Avatar de ${window.state.user.name}" loading="lazy" decoding="async" class="avatar-sm">`
+      : `<div class="avatar-fallback">${window.state.user.name[0].toUpperCase()}</div>`;
     area.innerHTML = `
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="display:flex;gap:8px">
+      <div class="auth-controls">
+        <div class="auth-actions">
           <button class="btn-finance btn-deposit" onclick="window.openModal('depositModal')">Depositar</button>
           <button class="btn-finance btn-withdraw" onclick="window.openModal('withdrawModal')">Sacar</button>
         </div>
 
         <!-- â”€â”€ Sino de notificações â”€â”€ -->
-        <div style="position:relative">
+        <div class="notif-wrap">
           <button id="bellBtn" onclick="window.toggleNotifPanel()" title="Notificações"
-            style="position:relative;background:transparent;border:none;cursor:pointer;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:10px;color:var(--muted);transition:background .2s,color .2s"
-            onmouseenter="this.style.background='var(--surface2)';this.style.color='var(--text)'" onmouseleave="this.style.background='transparent';this.style.color='var(--muted)'">
+            class="notif-bell-btn">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
               <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
             </svg>
-            <span id="notifBadge" style="display:none;position:absolute;top:3px;right:3px;background:#ef4444;color:#fff;border-radius:50%;min-width:16px;height:16px;font-size:0.6rem;font-weight:800;align-items:center;justify-content:center;padding:0 3px;line-height:1;border:2px solid var(--bg)">0</span>
+            <span id="notifBadge" class="notif-badge">0</span>
           </button>
           <!-- Painel de notificações -->
-          <div id="notifPanel" style="display:none;position:absolute;top:46px;right:-8px;width:340px;max-height:460px;overflow-y:auto;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,0.5);z-index:1000">
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1;border-radius:16px 16px 0 0">
-              <span style="font-weight:700;font-size:0.92rem">Notificações</span>
-              <button onclick="window.markAllRead()" style="background:none;border:none;color:var(--muted);font-size:0.75rem;cursor:pointer;font-family:inherit;transition:color .2s" onmouseenter="this.style.color='var(--text)'" onmouseleave="this.style.color='var(--muted)'">Marcar lidas</button>
+          <div id="notifPanel" class="notif-panel">
+            <div class="notif-panel-header">
+              <span class="notif-panel-title">Notificações</span>
+              <button onclick="window.markAllRead()" class="notif-mark-read-btn">Marcar lidas</button>
             </div>
             <div id="notifList">
-              <div style="padding:28px;text-align:center;color:var(--muted);font-size:0.85rem">Carregando...</div>
+              <div class="notif-empty">Carregando...</div>
             </div>
           </div>
         </div>
 
         <!-- â”€â”€ Perfil (dropdown) â”€â”€ -->
-        <div style="position:relative">
+        <div class="profile-wrap">
           <button id="profileBtn" onclick="window.toggleProfileMenu()" title="Minha conta"
-            style="display:flex;align-items:center;gap:9px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:6px 10px 6px 7px;cursor:pointer;font-family:inherit;transition:border-color .2s"
-            onmouseenter="this.style.borderColor='rgba(255,255,255,0.18)'" onmouseleave="this.style.borderColor='var(--border)'">
+            class="profile-btn">
             ${avatarEl}
-            <div style="text-align:left;line-height:1.15">
-              <div style="font-weight:700;font-size:0.87rem;color:var(--text)">${firstName}</div>
-              <div style="color:var(--green);font-family:'DM Mono',monospace;font-weight:800;font-size:0.78rem">R$${window.state.balance.toFixed(2)}</div>
+            <div class="profile-meta">
+              <div class="profile-name">${firstName}</div>
+              <div class="profile-balance">R$${window.state.balance.toFixed(2)}</div>
             </div>
-            <svg id="profileChevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted);transition:transform .25s;flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>
+            <svg id="profileChevron" class="profile-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <!-- Menu dropdown do perfil -->
-          <div id="profileMenu" style="display:none;position:absolute;top:calc(100% + 8px);right:0;width:210px;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,0.45);z-index:1001;overflow:hidden">
-            <div style="padding:14px 16px;border-bottom:1px solid var(--border)">
-              <div style="font-weight:700;font-size:0.88rem">${window.state.user.name}</div>
-              <div style="color:var(--muted);font-size:0.75rem;margin-top:2px">${window.state.user.email || ''}</div>
+          <div id="profileMenu" class="profile-menu">
+            <div class="profile-menu-head">
+              <div class="profile-menu-user">${window.state.user.name}</div>
+              <div class="profile-menu-email">${window.state.user.email || ''}</div>
             </div>
-            <a href="./profile.html" style="display:flex;align-items:center;gap:10px;padding:11px 16px;color:var(--text);text-decoration:none;font-size:0.86rem;font-weight:600;transition:background .15s" onmouseenter="this.style.background='rgba(255,255,255,0.05)'" onmouseleave="this.style.background='transparent'">
+            <a href="./profile.html" class="profile-menu-link">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
               Meu Perfil
             </a>
-            <a href="./profile.html" onclick="sessionStorage.setItem('profileTab','security')" style="display:flex;align-items:center;gap:10px;padding:11px 16px;color:var(--text);text-decoration:none;font-size:0.86rem;font-weight:600;transition:background .15s" onmouseenter="this.style.background='rgba(255,255,255,0.05)'" onmouseleave="this.style.background='transparent'">
+            <a href="./profile.html" onclick="sessionStorage.setItem('profileTab','security')" class="profile-menu-link">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
               Segurança
             </a>
-            <a href="./profile.html" onclick="sessionStorage.setItem('profileTab','referrals')" style="display:flex;align-items:center;gap:10px;padding:11px 16px;color:var(--text);text-decoration:none;font-size:0.86rem;font-weight:600;transition:background .15s" onmouseenter="this.style.background='rgba(255,255,255,0.05)'" onmouseleave="this.style.background='transparent'">
+            <a href="./profile.html" onclick="sessionStorage.setItem('profileTab','referrals')" class="profile-menu-link">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
               Indicações
             </a>
-            <div style="border-top:1px solid var(--border);margin:4px 0"></div>
-            <button onclick="window.logoutUser(window.API)" style="display:flex;align-items:center;gap:10px;padding:11px 16px;color:#f43f5e;background:none;border:none;font-size:0.86rem;font-weight:600;cursor:pointer;width:100%;font-family:inherit;transition:background .15s" onmouseenter="this.style.background='rgba(244,63,94,0.08)'" onmouseleave="this.style.background='transparent'">
+            <div class="profile-menu-sep"></div>
+            <button onclick="window.logoutUser(window.API)" class="profile-menu-logout">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
               Sair
             </button>
           </div>
         </div>
 
-        ${window.state.walletAddress ? `<div style="font-size:0.72rem;color:var(--muted);background:var(--surface2);padding:4px 8px;border-radius:8px;border:1px solid var(--border)">${window.state.walletAddress.slice(0,6)}...${window.state.walletAddress.slice(-4)}</div>` : ''}
+        ${window.state.walletAddress ? `<div class="wallet-mini">${window.state.walletAddress.slice(0,6)}...${window.state.walletAddress.slice(-4)}</div>` : ''}
       </div>`;
     const h1 = document.getElementById('heroH1');
     if(h1) h1.innerHTML = `Olá, <span>${window.state.user.name.split(' ')[0]}</span>.`;
@@ -1044,20 +1081,20 @@ window.updateAuthUI = () => {
     const mobileAuth = document.getElementById('mobileAuthArea');
     if (mobileAuth) {
       mobileAuth.innerHTML = `
-        <div style="display:flex;flex-direction:column;gap:8px;width:100%">
-          <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:14px">
-            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--blue));display:flex;align-items:center;justify-content:center;font-weight:800;color:#030303;flex-shrink:0">${window.state.user.name[0].toUpperCase()}</div>
+        <div class="mobile-auth-wrap">
+          <div class="mobile-auth-user">
+            <div class="avatar-fallback-mobile">${window.state.user.name[0].toUpperCase()}</div>
             <div>
-              <div style="font-weight:700;font-size:0.9rem">${firstName}</div>
-              <div style="color:var(--green);font-family:'DM Mono',monospace;font-size:0.8rem;font-weight:700">R$${window.state.balance.toFixed(2)}</div>
+              <div class="mobile-auth-name">${firstName}</div>
+              <div class="mobile-auth-balance">R$${window.state.balance.toFixed(2)}</div>
             </div>
           </div>
-          <div style="display:flex;gap:8px">
-            <button class="btn-finance btn-deposit" style="flex:1;padding:12px" onclick="window.openModal('depositModal');closeMobileMenu()">Depositar</button>
-            <button class="btn-finance btn-withdraw" style="flex:1;padding:12px" onclick="window.openModal('withdrawModal');closeMobileMenu()">Sacar</button>
+          <div class="mobile-auth-actions">
+            <button class="btn-finance btn-deposit mobile-auth-btn" onclick="window.openModal('depositModal');closeMobileMenu()">Depositar</button>
+            <button class="btn-finance btn-withdraw mobile-auth-btn" onclick="window.openModal('withdrawModal');closeMobileMenu()">Sacar</button>
           </div>
-          <a href="./profile.html" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:14px;color:var(--text);text-decoration:none;font-size:0.95rem;font-weight:700">Meu Perfil</a>
-          <button onclick="window.logoutUser(window.API)" style="padding:14px;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.2);border-radius:14px;color:#f43f5e;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:inherit">Sair</button>
+          <a href="./profile.html" class="mobile-auth-link">Meu Perfil</a>
+          <button onclick="window.logoutUser(window.API)" class="mobile-auth-logout">Sair</button>
         </div>`;
     }
   }
@@ -1075,15 +1112,15 @@ window.loadRanking = async () => {
       const winRate = parseFloat(u.win_rate || 0).toFixed(1);
       const totalBets = parseInt(u.total_bets || 0);
       const avatarHtml = u.avatar_url
-        ? `<img src="${u.avatar_url}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid var(--border)">`
+        ? `<img src="${u.avatar_url}" alt="Avatar de ${u.name}" loading="lazy" decoding="async" class="avatar-lg">`
         : `<div class="rank-avatar">${(u.name||'?')[0].toUpperCase()}</div>`;
       return `
         <div class="ranking-card">
           <div class="rank-pos ${medal}">${i + 1}</div>
           ${avatarHtml}
-          <div style="flex:1;min-width:0">
+          <div class="rank-main">
             <div class="rank-name">${u.name}</div>
-            <div style="font-size:0.73rem;color:var(--muted);margin-top:2px">${winRate}% acerto · ${totalBets} apostas</div>
+            <div class="rank-meta">${winRate}% acerto · ${totalBets} apostas</div>
           </div>
           <div class="rank-profit">R$${profit.toLocaleString('pt-BR', {minimumFractionDigits:2})}</div>
         </div>`;
@@ -1101,7 +1138,7 @@ window.loadPortfolio = async () => {
   const grid = document.getElementById('portfolioContent');
   const token = localStorage.getItem('preditivo_token');
   if(!token) {
-    grid.innerHTML = '<div style="grid-column:1/-1; padding:60px; text-align:center; color:var(--muted)">Conecte-se para visualizar suas previsões.</div>';
+    grid.innerHTML = '<div class="status-message">Conecte-se para visualizar suas previsões.</div>';
     return;
   }
   const apiBase = (window.PREDITIVO_CONFIG && window.PREDITIVO_CONFIG.API_BASE)
@@ -1110,28 +1147,28 @@ window.loadPortfolio = async () => {
   const headers = { 'Authorization': 'Bearer ' + token };
   const renderCards = (positions) => {
     if(!positions.length) {
-      grid.innerHTML = '<div style="grid-column:1/-1; padding:60px; text-align:center; color:var(--muted)">Você ainda não possui investimentos ativos.</div>';
+      grid.innerHTML = '<div class="status-message">Você ainda não possui investimentos ativos.</div>';
       return;
     }
     grid.innerHTML = positions.map(p => `
       <div class="portfolio-card">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
-          <div style="font-size:0.78rem;color:var(--muted);text-transform:uppercase;flex:1;padding-right:8px">${p.market_title}</div>
-          <div style="background:${p.side==='yes'?'var(--green)':'var(--red)'};color:#000;border-radius:20px;padding:2px 10px;font-size:0.72rem;font-weight:800;white-space:nowrap">${p.side.toUpperCase()}</div>
+        <div class="portfolio-head">
+          <div class="portfolio-market-title">${p.market_title}</div>
+          <div class="portfolio-side-badge ${p.side==='yes'?'yes':'no'}">${p.side.toUpperCase()}</div>
         </div>
-        <div class="port-profit" style="color:var(--green);margin:8px 0">+${parseFloat(p.potential||0).toFixed(1)}%</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:0.87rem;margin-top:10px">
+        <div class="port-profit port-profit-positive">+${parseFloat(p.potential||0).toFixed(1)}%</div>
+        <div class="portfolio-metrics-grid top-gap">
           <div>
-            <div style="color:var(--muted);font-size:0.72rem;margin-bottom:2px">INVESTIDO</div>
-            <div style="font-weight:700">R$${parseFloat(p.amount).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
+            <div class="portfolio-metric-label">INVESTIDO</div>
+            <div class="portfolio-metric-value">R$${parseFloat(p.amount).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
           </div>
           <div>
-            <div style="color:var(--muted);font-size:0.72rem;margin-bottom:2px">PAYOUT SE GANHAR</div>
-            <div style="font-weight:700;color:var(--green)">R$${parseFloat(p.potential_payout).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
+            <div class="portfolio-metric-label">PAYOUT SE GANHAR</div>
+            <div class="portfolio-metric-value positive">R$${parseFloat(p.potential_payout).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
           </div>
           ${p.prob_side != null ? `<div>
-            <div style="color:var(--muted);font-size:0.72rem;margin-bottom:2px">PROB. ATUAL</div>
-            <div style="font-weight:700">${p.prob_side}%</div>
+            <div class="portfolio-metric-label">PROB. ATUAL</div>
+            <div class="portfolio-metric-value">${p.prob_side}%</div>
           </div>` : ''}
         </div>
       </div>`).join('');
@@ -1148,7 +1185,7 @@ window.loadPortfolio = async () => {
     const inEl = document.getElementById('pnlInvested');
     if (inEl) inEl.textContent = 'R$ ' + fmt(invested);
     const sumEl = document.getElementById('portfolioSummary');
-    if (sumEl) sumEl.style.display = 'grid';
+    if (sumEl) sumEl.classList.add('show');
     // P&L: carrega async
     window.loadPnl('all');
   }
@@ -1184,7 +1221,7 @@ window.loadPortfolio = async () => {
     renderCards(positions);
     showSummaryNow(positions);
   } catch(e) {
-    grid.innerHTML = '<div style="grid-column:1/-1; padding:60px; text-align:center; color:var(--muted)">Erro ao carregar portfólio. Tente novamente.</div>';
+    grid.innerHTML = '<div class="status-message">Erro ao carregar portfólio. Tente novamente.</div>';
   }
 };
 
@@ -1239,7 +1276,11 @@ window.loadPnl = async function(period) {
     const fmt = v => parseFloat(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2});
     const pnl = parseFloat(d.total_pnl);
     const pnlEl = document.getElementById('pnlTotal');
-    if (pnlEl) { pnlEl.textContent = (pnl >= 0 ? '+' : '') + 'R$ ' + fmt(d.total_pnl); pnlEl.style.color = pnl >= 0 ? 'var(--green)' : '#ef4444'; }
+    if (pnlEl) {
+      pnlEl.textContent = (pnl >= 0 ? '+' : '') + 'R$ ' + fmt(d.total_pnl);
+      pnlEl.classList.toggle('positive', pnl >= 0);
+      pnlEl.classList.toggle('negative', pnl < 0);
+    }
     const metaEl = document.getElementById('pnlMeta');
     if (metaEl) metaEl.textContent = d.win_count + ' vitórias Â· ' + d.loss_count + ' derrotas Â· ' + d.win_rate + '% de acerto';
     // Atualiza carteira com dados precisos do endpoint PnL
@@ -1255,7 +1296,8 @@ window.loadPnl = async function(period) {
     if (chEl && invested2 > 0) {
       const unrealized = parseFloat(d.open_value) - invested2;
       chEl.textContent = (unrealized >= 0 ? '+' : '') + 'R$ ' + fmt(unrealized) + ' não realizado';
-      chEl.style.color = unrealized >= 0 ? 'var(--green)' : '#ef4444';
+      chEl.classList.toggle('positive', unrealized >= 0);
+      chEl.classList.toggle('negative', unrealized < 0);
     }
     drawSparkline(d.history);
   } catch(e) { console.error('PnL error:', e); }
@@ -1267,12 +1309,12 @@ window.switchPortfolioTab = function(tab) {
   const encBtn    = document.getElementById('tabEncerradas');
   if (!ativasBtn || !encBtn) return;
   if (tab === 'ativas') {
-    ativasBtn.style.background = 'var(--green)'; ativasBtn.style.color = '#000'; ativasBtn.style.border = 'none';
-    encBtn.style.background = 'var(--surface)'; encBtn.style.color = 'var(--muted)'; encBtn.style.border = '1px solid var(--border)';
+    ativasBtn.classList.add('active');
+    encBtn.classList.remove('active');
     window.loadPortfolio();
   } else {
-    encBtn.style.background = 'var(--green)'; encBtn.style.color = '#000'; encBtn.style.border = 'none';
-    ativasBtn.style.background = 'var(--surface)'; ativasBtn.style.color = 'var(--muted)'; ativasBtn.style.border = '1px solid var(--border)';
+    encBtn.classList.add('active');
+    ativasBtn.classList.remove('active');
     window.loadEncerradas();
   }
 };
@@ -1281,18 +1323,18 @@ window.loadEncerradas = async function() {
   const grid  = document.getElementById('portfolioContent');
   const token = localStorage.getItem('preditivo_token');
   if (!token) {
-    grid.innerHTML = '<div style="grid-column:1/-1;padding:60px;text-align:center;color:var(--muted)">Conecte-se para visualizar o histórico.</div>';
+    grid.innerHTML = '<div class="status-message">Conecte-se para visualizar o histórico.</div>';
     return;
   }
   const apiBase = (window.PREDITIVO_CONFIG && window.PREDITIVO_CONFIG.API_BASE)
     || 'https://preditivo-backend-production.up.railway.app';
-  grid.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted)">Carregando...</div>';
+  grid.innerHTML = '<div class="status-message loading">Carregando...</div>';
   try {
     const r = await fetch(apiBase + '/bets/my', { headers: { 'Authorization': 'Bearer ' + token } });
     const bets = await r.json();
     const closed = Array.isArray(bets) ? bets.filter(b => b.status === 'won' || b.status === 'lost') : [];
     if (!closed.length) {
-      grid.innerHTML = '<div style="grid-column:1/-1;padding:60px;text-align:center;color:var(--muted)">Nenhuma posição encerrada ainda.</div>';
+      grid.innerHTML = '<div class="status-message">Nenhuma posição encerrada ainda.</div>';
       return;
     }
     const fmt = v => parseFloat(v||0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
@@ -1303,30 +1345,30 @@ window.loadEncerradas = async function() {
       const pnl = parseFloat(b.payout||0) - parseFloat(b.amount||0);
       const pnlStr = (pnl >= 0 ? '+' : '') + 'R$ ' + fmt(pnl);
       const date = new Date(b.created_at).toLocaleDateString('pt-BR');
-      return `<div class="portfolio-card" style="opacity:0.9">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
-          <div style="font-size:0.78rem;color:var(--muted);text-transform:uppercase;flex:1;padding-right:8px">${b.market_title}</div>
-          <div style="background:${b.side==='yes'?'var(--green)':'var(--red)'};color:#000;border-radius:20px;padding:2px 10px;font-size:0.72rem;font-weight:800;white-space:nowrap">${b.side.toUpperCase()}</div>
+      return `<div class="portfolio-card portfolio-card-closed">
+        <div class="portfolio-head portfolio-head-tight">
+          <div class="portfolio-market-title">${b.market_title}</div>
+          <div class="portfolio-side-badge ${b.side==='yes'?'yes':'no'}">${b.side.toUpperCase()}</div>
         </div>
-        <div style="display:inline-block;padding:3px 12px;border-radius:20px;font-size:0.75rem;font-weight:800;margin-bottom:10px;background:${won?'rgba(16,185,129,0.15)':'rgba(239,68,68,0.12)'};color:${won?'#10b981':'#ef4444'}">
+        <div class="portfolio-result-badge ${won ? 'won' : 'lost'}">
           ${won ? 'âœ“ GANHOU' : 'âœ— PERDEU'}
         </div>
-        <div style="font-size:1.5rem;font-weight:800;color:${pnl>=0?'var(--green)':'#ef4444'};margin-bottom:12px">${pnlStr}</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:0.87rem">
+        <div class="portfolio-pnl ${pnl>=0 ? 'positive' : 'negative'}">${pnlStr}</div>
+        <div class="portfolio-metrics-grid">
           <div>
-            <div style="color:var(--muted);font-size:0.7rem;margin-bottom:2px">INVESTIDO</div>
-            <div style="font-weight:700">R$ ${fmt(b.amount)}</div>
+            <div class="portfolio-metric-label compact">INVESTIDO</div>
+            <div class="portfolio-metric-value">R$ ${fmt(b.amount)}</div>
           </div>
           <div>
-            <div style="color:var(--muted);font-size:0.7rem;margin-bottom:2px">RECEBIDO</div>
-            <div style="font-weight:700;color:${won?'var(--green)':'var(--muted)'}">R$ ${fmt(b.payout||0)}</div>
+            <div class="portfolio-metric-label compact">RECEBIDO</div>
+            <div class="portfolio-metric-value ${won ? 'positive' : 'muted'}">R$ ${fmt(b.payout||0)}</div>
           </div>
         </div>
-        <div style="margin-top:10px;font-size:0.72rem;color:var(--muted)">${date}</div>
+        <div class="portfolio-date">${date}</div>
       </div>`;
     }).join('');
   } catch(e) {
-    grid.innerHTML = '<div style="grid-column:1/-1;padding:60px;text-align:center;color:var(--muted)">Erro ao carregar histórico.</div>';
+    grid.innerHTML = '<div class="status-message">Erro ao carregar histórico.</div>';
   }
 };
 
@@ -1696,8 +1738,6 @@ window.toggleRiskTermBtn = function() {
   var btn = document.getElementById('riskTermAcceptBtn');
   if (!chk || !btn) return;
   btn.disabled = !chk.checked;
-  btn.style.opacity = chk.checked ? '1' : '0.4';
-  btn.style.cursor = chk.checked ? 'pointer' : 'not-allowed';
 };
 
 window.acceptRiskTerm = async function() {
@@ -1716,7 +1756,7 @@ window.acceptRiskTerm = async function() {
       return;
     }
     var modal = document.getElementById('riskTermModal');
-    if (modal) modal.style.display = 'none';
+    if (modal) modal.classList.remove('active');
     window.showToast('âœ…', 'Pronto!', 'Termo aceito. Você já pode operar na Bubuya.');
   } catch(e) {
     window.showToast('âŒ', 'Erro', 'Falha de conexão ao registrar termo.');
@@ -1735,7 +1775,7 @@ window.checkRiskTermStatus = async function() {
     var data = await res.json();
     if (!data.accepted) {
       var modal = document.getElementById('riskTermModal');
-      if (modal) modal.style.display = 'flex';
+      if (modal) modal.classList.add('active');
     }
   } catch(e) { /* silencioso */ }
 };
@@ -1760,13 +1800,7 @@ function checkComplianceGate(user) {
 
     const banner = document.createElement('div');
     banner.id = 'compliance-banner';
-    banner.style.cssText = [
-      'position:fixed;top:64px;left:0;right:0;z-index:9999',
-      'background:linear-gradient(90deg,rgba(245,158,11,0.95),rgba(234,130,0,0.95))',
-      'backdrop-filter:blur(12px);padding:12px 24px',
-      'display:flex;align-items:center;justify-content:space-between;gap:16px',
-      'box-shadow:0 4px 24px rgba(0,0,0,0.4);flex-wrap:wrap'
-    ].join(';');
+    banner.className = 'compliance-banner';
 
     const targetUrl = !kycOk ? '/kyc.html' : '/suitability.html';
     const msg       = !kycOk
@@ -1775,13 +1809,8 @@ function checkComplianceGate(user) {
     const btnLabel  = !kycOk ? 'Verificar identidade' : 'Definir perfil';
 
     banner.innerHTML = `
-      <span style="font-size:0.88rem;font-weight:600;color:#000;flex:1">${msg}</span>
-      <a href="${targetUrl}" style="
-        padding:8px 20px;background:#000;color:#f59e0b;
-        border-radius:10px;font-size:0.83rem;font-weight:800;
-        text-decoration:none;white-space:nowrap;flex-shrink:0;
-        transition:opacity .2s
-      " onmouseenter="this.style.opacity='.8'" onmouseleave="this.style.opacity='1'">${btnLabel} â†’</a>
+      <span class="compliance-banner-message">${msg}</span>
+      <a href="${targetUrl}" class="compliance-banner-cta">${btnLabel} â†’</a>
     `;
     document.body.appendChild(banner);
   }
@@ -1806,7 +1835,7 @@ async function init() {
       setTimeout(tourStart, 800);
     } else {
       const grid = document.getElementById('marketsGrid');
-      if (grid) grid.innerHTML = '<div style="text-align:center;grid-column:1/-1;padding:80px;color:var(--muted)">âš ï¸ Erro ao carregar mercados. <button onclick="init()" style="padding:8px 20px;border-radius:10px;background:var(--green);color:#000;border:none;cursor:pointer;font-weight:600;margin-left:8px">Recarregar</button></div>';
+      if (grid) grid.innerHTML = '<div class="market-status">âš ï¸ Erro ao carregar mercados. <button onclick="init()" class="btn-inline-retry">Recarregar</button></div>';
     }
 
     const token = localStorage.getItem('preditivo_token');
@@ -1820,7 +1849,7 @@ async function init() {
         window.updateAuthUI();
         if(window.state.isAdmin) {
           const tag = document.querySelector('.hero-tag');
-          if(tag) tag.innerHTML += ' <span style="color:var(--blue); cursor:pointer; margin-left:10px" onclick="window.changeHeroImage()">[Trocar Foto]</span>';
+          if(tag) tag.innerHTML += ' <span class="hero-admin-link" onclick="window.changeHeroImage()">[Trocar Foto]</span>';
         }
         // Tentar registrar push se ainda não estiver inscrito
         setTimeout(function(){ window.registerPush(token); }, 3000);
@@ -1836,7 +1865,7 @@ async function init() {
   } catch(e) {
     console.error('Init failure:', e);
     const grid = document.getElementById('marketsGrid');
-    if (grid) grid.innerHTML = '<div style="text-align:center;grid-column:1/-1;padding:80px;color:var(--muted)">âš ï¸ Não foi possível carregar os mercados.<br><span style="font-size:0.85rem;opacity:0.6">' + e.message + '</span><br><br><button onclick="init()" style="padding:10px 24px;border-radius:12px;background:var(--green);color:#000;border:none;cursor:pointer;font-weight:600">Tentar novamente</button></div>';
+    if (grid) grid.innerHTML = '<div class="market-status">âš ï¸ Não foi possível carregar os mercados.<br><span class="market-status-sub">' + e.message + '</span><br><br><button onclick="init()" class="btn-inline-retry large">Tentar novamente</button></div>';
   }
 }
 
@@ -1856,54 +1885,53 @@ window.loadNotifications = async function() {
     if (!badge || !list) return;
 
     if (data.unread_count > 0) {
-      badge.style.display = 'flex';
+      badge.classList.add('show');
       badge.textContent = data.unread_count > 99 ? '99+' : data.unread_count;
     } else {
-      badge.style.display = 'none';
+      badge.classList.remove('show');
     }
 
     if (!data.notifications || !data.notifications.length) {
-      list.innerHTML = '<div style="padding:36px;text-align:center;color:var(--muted);font-size:0.85rem">Nenhuma notificação ainda.</div>';
+      list.innerHTML = '<div class="notif-empty">Nenhuma notificação ainda.</div>';
       return;
     }
 
     const fmt = dt => new Date(dt).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
-    const iconBg = { market_won:'rgba(16,185,129,0.12)', market_lost:'rgba(244,63,94,0.09)' };
-    const chevronSvg = (id) => `<svg id="nChev${id}" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted);flex-shrink:0;transition:transform .22s"><polyline points="6 9 12 15 18 9"/></svg>`;
+    const chevronSvg = (id) => `<svg id="nChev${id}" class="notif-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
 
     list.innerHTML = data.notifications.map((n, i) => {
       const meta   = (typeof n.meta === 'object' && n.meta) ? n.meta : {};
       const icon   = n.type === 'market_won' ? 'ðŸŽ‰' : n.type === 'market_lost' ? 'ðŸ“Š' : 'ðŸ””';
-      const bg     = iconBg[n.type] || 'rgba(59,130,246,0.1)';
+      const iconType = n.type === 'market_won' || n.type === 'market_lost' ? n.type : '';
       const unread = !n.is_read;
 
       const detailHtml = (meta.market_title || n.type === 'market_won' || n.type === 'market_lost') ? `
-        <div id="nDetail${i}" style="display:none;padding:0 16px 14px 60px">
-          <div style="background:var(--surface2);border-radius:10px;padding:12px 14px;font-size:0.78rem;border:1px solid var(--border)">
+        <div id="nDetail${i}" class="notif-detail">
+          <div class="notif-detail-card">
             ${meta.market_title ? `
-              <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:5px">Mercado</div>
-              <div style="font-weight:600;line-height:1.4;margin-bottom:10px">${meta.market_title}</div>` : ''}
+              <div class="notif-detail-label">Mercado</div>
+              <div class="notif-detail-market">${meta.market_title}</div>` : ''}
             ${n.type === 'market_won' ? `
-              <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border)">
-                <span style="color:var(--muted);font-size:0.76rem">Prêmio recebido</span>
-                <span style="color:var(--green);font-weight:800;font-family:'DM Mono',monospace">+R$${(parseFloat(meta.payout)||0).toFixed(2)}</span>
+              <div class="notif-detail-summary">
+                <span class="notif-detail-caption">Prêmio recebido</span>
+                <span class="notif-detail-amount">+R$${(parseFloat(meta.payout)||0).toFixed(2)}</span>
               </div>` : ''}
             ${n.type === 'market_lost' ? `
-              <div style="color:var(--muted);font-size:0.76rem;padding-top:8px;border-top:1px solid var(--border)">Resultado: ${meta.market_title ? 'mercado encerrado sem prêmio' : 'sem prêmio'}</div>` : ''}
+              <div class="notif-detail-loss">Resultado: ${meta.market_title ? 'mercado encerrado sem prêmio' : 'sem prêmio'}</div>` : ''}
           </div>
         </div>` : '';
 
       return `
-        <div style="border-bottom:1px solid var(--border);background:${unread ? 'rgba(16,185,129,0.03)' : 'transparent'}">
-          <div onclick="window.toggleNotifItem(${i})" style="padding:13px 16px;cursor:pointer;display:flex;align-items:flex-start;gap:12px;transition:background .15s" onmouseenter="this.style.background='rgba(255,255,255,0.025)'" onmouseleave="this.style.background='transparent'">
-            <div style="width:34px;height:34px;border-radius:10px;background:${bg};display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;margin-top:1px">${icon}</div>
-            <div style="flex:1;min-width:0">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
-                <span style="font-weight:700;font-size:0.84rem">${n.title}</span>
-                ${unread ? '<span style="width:6px;height:6px;background:var(--green);border-radius:50%;display:inline-block;flex-shrink:0"></span>' : ''}
+        <div class="notif-item ${unread ? 'unread' : ''}">
+          <div onclick="window.toggleNotifItem(${i})" class="notif-row">
+            <div class="notif-icon ${iconType}">${icon}</div>
+            <div class="notif-content">
+              <div class="notif-title-row">
+                <span class="notif-title">${n.title}</span>
+                ${unread ? '<span class="notif-unread-dot"></span>' : ''}
               </div>
-              <div style="color:var(--muted);font-size:0.77rem;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px">${n.body}</div>
-              <div style="color:var(--muted);font-size:0.67rem;margin-top:4px;opacity:.65">${fmt(n.created_at)}</div>
+              <div class="notif-body">${n.body}</div>
+              <div class="notif-time">${fmt(n.created_at)}</div>
             </div>
             ${detailHtml ? chevronSvg(i) : ''}
           </div>
@@ -1917,16 +1945,16 @@ window.toggleNotifItem = function(i) {
   const detail  = document.getElementById('nDetail' + i);
   const chevron = document.getElementById('nChev' + i);
   if (!detail) return;
-  const open = detail.style.display !== 'none';
-  detail.style.display = open ? 'none' : 'block';
-  if (chevron) chevron.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
+  const open = detail.classList.contains('open');
+  detail.classList.toggle('open', !open);
+  if (chevron) chevron.classList.toggle('open', !open);
 };
 
 window.toggleNotifPanel = function() {
   const panel = document.getElementById('notifPanel');
   if (!panel) return;
   _notifPanelOpen = !_notifPanelOpen;
-  panel.style.display = _notifPanelOpen ? 'block' : 'none';
+  panel.classList.toggle('open', _notifPanelOpen);
   if (_notifPanelOpen) window.loadNotifications();
 };
 
@@ -1944,8 +1972,8 @@ window.toggleProfileMenu = function() {
   const chevron = document.getElementById('profileChevron');
   if (!menu) return;
   _profileMenuOpen = !_profileMenuOpen;
-  menu.style.display = _profileMenuOpen ? 'block' : 'none';
-  if (chevron) chevron.style.transform = _profileMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+  menu.classList.toggle('open', _profileMenuOpen);
+  if (chevron) chevron.classList.toggle('open', _profileMenuOpen);
 };
 
 // Fechar painéis ao clicar fora
@@ -1953,16 +1981,16 @@ document.addEventListener('click', function(e) {
   const panel = document.getElementById('notifPanel');
   const bell  = document.getElementById('bellBtn');
   if (panel && bell && !bell.contains(e.target) && !panel.contains(e.target)) {
-    panel.style.display = 'none';
+    panel.classList.remove('open');
     _notifPanelOpen = false;
   }
   const pmenu  = document.getElementById('profileMenu');
   const pbtn   = document.getElementById('profileBtn');
   const pchev  = document.getElementById('profileChevron');
   if (pmenu && pbtn && !pbtn.contains(e.target) && !pmenu.contains(e.target)) {
-    pmenu.style.display = 'none';
+    pmenu.classList.remove('open');
     _profileMenuOpen = false;
-    if (pchev) pchev.style.transform = 'rotate(0deg)';
+    if (pchev) pchev.classList.remove('open');
   }
 });
 
@@ -2041,9 +2069,9 @@ var _tourSteps = [
 function tourStart() {
   if (localStorage.getItem('bubuya_tour_done')) return;
   _tourStep = 0;
-  document.getElementById('tourOverlay').style.display = 'block';
-  document.getElementById('tourSpotlight').style.display = 'block';
-  document.getElementById('tourTooltip').style.display = 'block';
+  document.getElementById('tourOverlay').classList.add('active');
+  document.getElementById('tourSpotlight').classList.add('active');
+  document.getElementById('tourTooltip').classList.add('active');
   tourRender(_tourStep);
 }
 function tourNext() {
@@ -2054,9 +2082,9 @@ function tourNext() {
 function tourSkip()   { tourFinish(); }
 function tourFinish() {
   localStorage.setItem('bubuya_tour_done', '1');
-  document.getElementById('tourOverlay').style.display = 'none';
-  document.getElementById('tourSpotlight').style.display = 'none';
-  document.getElementById('tourTooltip').style.display = 'none';
+  document.getElementById('tourOverlay').classList.remove('active');
+  document.getElementById('tourSpotlight').classList.remove('active');
+  document.getElementById('tourTooltip').classList.remove('active');
 }
 
 function tourRender(i) {
@@ -2095,7 +2123,7 @@ function tourRender(i) {
     // Dots
     var dots = '';
     for (var d = 0; d < _tourSteps.length; d++) {
-      dots += '<div style="width:6px;height:6px;border-radius:50%;background:' + (d === i ? '#16a34a' : '#3f3f46') + '"></div>';
+      dots += '<div class="tour-dot ' + (d === i ? 'active' : '') + '"></div>';
     }
     document.getElementById('tourDots').innerHTML = dots;
   }, 350);
@@ -2103,17 +2131,17 @@ function tourRender(i) {
 </script>
 <script type="module" src="/src/main.js"></script>
 <!-- â”€â”€ ONBOARDING TOUR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-<div id="tourOverlay" style="display:none;position:fixed;inset:0;z-index:9997;pointer-events:none"></div>
-<div id="tourSpotlight" style="display:none;position:fixed;border-radius:14px;box-shadow:0 0 0 9999px rgba(0,0,0,0.72);z-index:9998;pointer-events:none;transition:top .3s,left .3s,width .3s,height .3s"></div>
-<div id="tourTooltip" style="display:none;position:fixed;z-index:9999;background:#0f1923;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:20px 22px;max-width:300px;width:300px;box-shadow:0 8px 32px rgba(0,0,0,0.6)">
-  <div style="font-size:0.7rem;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:700">Guia Rápido</div>
-  <div id="tourTitle" style="font-weight:800;font-size:1rem;margin-bottom:8px;color:#fff"></div>
-  <div id="tourText" style="font-size:0.85rem;color:#aaa;line-height:1.5;margin-bottom:16px"></div>
-  <div style="display:flex;align-items:center;justify-content:space-between">
-    <div id="tourDots" style="display:flex;gap:5px;align-items:center"></div>
-    <div style="display:flex;gap:8px">
-      <button onclick="tourSkip()" style="padding:7px 14px;background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#888;cursor:pointer;font-size:0.8rem;font-family:inherit;transition:border-color .2s" onmouseover="this.style.borderColor='rgba(255,255,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'">Pular</button>
-      <button id="tourBtn" onclick="tourNext()" style="padding:7px 16px;background:var(--green);color:#080c10;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:700;font-family:inherit;transition:opacity .2s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Próximo â†’</button>
+<div id="tourOverlay" class="tour-overlay"></div>
+<div id="tourSpotlight" class="tour-spotlight"></div>
+<div id="tourTooltip" class="tour-tooltip">
+  <div class="tour-kicker">Guia Rápido</div>
+  <div id="tourTitle" class="tour-title"></div>
+  <div id="tourText" class="tour-text"></div>
+  <div class="tour-footer">
+    <div id="tourDots" class="tour-dots"></div>
+    <div class="tour-actions">
+      <button onclick="tourSkip()" class="tour-btn-skip">Pular</button>
+      <button id="tourBtn" onclick="tourNext()" class="tour-btn-next">Próximo â†’</button>
     </div>
   </div>
 </div>
@@ -2160,5 +2188,27 @@ function tourRender(i) {
   </div>
 </footer>
 
-<div id="aboutModal" class="modal-overlay"><div class="modal" style="max-width: 600px"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px"><h2 style="font-size:1.5rem">Quem Somos</h2><button class="modal-close" onclick="window.closeModal('aboutModal')">x</button></div><div style="line-height:1.7; color:var(--muted)"><p>A Bubuya e a principal plataforma brasileira de mercados de previsao.</p></div></div></div><div id="howToBetModal" class="modal-overlay"><div class="modal" style="max-width: 600px"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px"><h2 style="font-size:1.5rem">Como Funciona</h2><button class="modal-close" onclick="window.closeModal('howToBetModal')">x</button></div><div style="line-height:1.7; color:var(--muted)"><p>Escolha um mercado, compre SIM ou NAO e lucre se estiver certo.</p></div></div></div></body>
+<div id="aboutModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="aboutModalTitle">
+  <div class="modal info-modal">
+    <div class="info-modal-head">
+      <h2 id="aboutModalTitle" class="info-modal-title">Quem Somos</h2>
+      <button class="modal-close" aria-label="Fechar" onclick="window.closeModal('aboutModal')">x</button>
+    </div>
+    <div class="info-modal-body">
+      <p>A Bubuya e a principal plataforma brasileira de mercados de previsao.</p>
+    </div>
+  </div>
+</div>
+<div id="howToBetModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="howToBetModalTitle">
+  <div class="modal info-modal">
+    <div class="info-modal-head">
+      <h2 id="howToBetModalTitle" class="info-modal-title">Como Funciona</h2>
+      <button class="modal-close" aria-label="Fechar" onclick="window.closeModal('howToBetModal')">x</button>
+    </div>
+    <div class="info-modal-body">
+      <p>Escolha um mercado, compre SIM ou NAO e lucre se estiver certo.</p>
+    </div>
+  </div>
+</div>
+</body>
 </html>

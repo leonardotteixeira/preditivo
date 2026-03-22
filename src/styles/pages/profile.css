@@ -124,7 +124,6 @@ body.profile-page nav a.active {
 .pnl-value{font-family:'IBM Plex Mono', ui-monospace, monospace;font-size:1.05rem;font-weight:700;text-align:right;white-space:nowrap}
 
 /* ── DEPOSITS ── */
-.dep-list{}
 .dep-row{display:flex;align-items:center;gap:16px;padding:16px;margin-bottom:8px;background:var(--surface);border:1px solid var(--border);border-radius:14px}
 .dep-code{font-family:'IBM Plex Mono', ui-monospace, monospace;font-size:0.82rem;color:var(--blue)}
 .dep-amount{font-family:'IBM Plex Mono', ui-monospace, monospace;font-size:1rem;font-weight:700;color:var(--green);margin-left:auto}
@@ -161,7 +160,6 @@ body.profile-page nav a.active {
 @media(max-width:600px){
   .profile-hero{flex-direction:column;text-align:center}
   .bets-grid{grid-template-columns:1fr}
-  .stats-grid{grid-template-columns:repeat(2,1fr)}
   .tab-row{flex-wrap:nowrap}
   .ref-stats{grid-template-columns:1fr}
 }

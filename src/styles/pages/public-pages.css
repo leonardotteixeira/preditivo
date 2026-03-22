@@ -193,7 +193,10 @@
   .public-root .btn-email:hover { opacity:0.9; transform:translateY(-2px); box-shadow:0 8px 24px rgba(16,185,129,0.3); }
 
   @media (max-width: 768px) {
-    .public-root .page-title { font-size:2.2rem; }
+    .public-root .page-title { font-size:2rem; }
+    .public-root .stats-row { grid-template-columns: 1fr; }
+    .public-root .card-grid { grid-template-columns: 1fr; }
+    .public-root .steps::before { display: none; }
     .public-root .toc-cols { grid-template-columns:1fr; }
     .public-root .info-grid { grid-template-columns:1fr; }
     .public-root .rights-grid { grid-template-columns:1fr; }
@@ -259,9 +262,6 @@
 /* Quem somos / Como funciona */
 .public-root .page-hero {
   margin-bottom: 3rem;
-}
-.public-root .page-title span {
-  color: var(--blue);
 }
 .public-root .stats-row {
   display: grid;
@@ -678,17 +678,3 @@
   color: var(--gold);
 }
 
-@media (max-width: 768px) {
-  .public-root .stats-row {
-    grid-template-columns: 1fr;
-  }
-  .public-root .card-grid {
-    grid-template-columns: 1fr;
-  }
-  .public-root .steps::before {
-    display: none;
-  }
-  .public-root .page-title {
-    font-size: 2rem;
-  }
-}

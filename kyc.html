@@ -431,7 +431,7 @@ async function init() {
   showScreen('loading');
 
   try {
-    const token = typeof getToken === 'function' ? getToken() : null;
+    const token = localStorage.getItem('preditivo_token');
     const r = await fetch(API + '/auth/me', {
       headers: token ? { Authorization: 'Bearer ' + token } : {},
       credentials: 'include'

@@ -37,6 +37,11 @@
 }
 .pos-sim strong { color: var(--green, #22c55e); }
 .pos-nao strong { color: #f87171; }
+.pos-none {
+  font-size: 12px;
+  color: var(--muted);
+  font-style: italic;
+}
 
 /* Header shell from app.css; market-specific controls below */
 .back-btn {
@@ -52,11 +57,17 @@
   border-radius: 10px;
   border: 1px solid var(--border);
   transition: all 0.2s;
-  margin-right: auto; /* push auth area to the right */
+  white-space: nowrap;
 }
 .back-btn:hover {
   color: var(--text);
   border-color: rgba(255, 255, 255, 0.15);
+}
+.mkt-auth {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .user-chip {

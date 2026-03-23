@@ -2708,7 +2708,7 @@ header {
   grid-template-columns: 58% 42%;
   gap: 40px;
   align-items: center;
-  padding: 40px 36px 32px;
+  padding: 40px max(24px, calc((100vw - 1280px) / 2)) 32px;
   position: relative;
   background-image:
     linear-gradient(rgba(96,165,250,0.025) 1px, transparent 1px),
@@ -2868,7 +2868,7 @@ header {
 }
 
 /* ── MARKETS SECTION ────────────────────────────────────────────────────── */
-.markets-section { padding: 24px 36px 48px; }
+.markets-section { padding: 24px max(24px, calc((100vw - 1280px) / 2)) 48px; }
 
 .market-filters {
   display: flex;
@@ -3202,7 +3202,7 @@ header {
   .h-search { max-width: none; flex: 1; }
   .hero { padding: 36px 16px 28px; }
   .hero-title { font-size: clamp(28px, 5vw, 48px); }
-  .hero-stats { flex-direction: column; gap: 16px; }
+  .hero-stats { flex-direction: row; flex-wrap: wrap; gap: 16px 24px; }
   .markets-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
   .howk-grid { grid-template-columns: 1fr; }
   .hero-btns { flex-direction: column; }

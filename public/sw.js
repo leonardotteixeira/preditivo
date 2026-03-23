@@ -1,5 +1,5 @@
 // ── Futoro Service Worker v2.0 ────────────────────────────────────────────────
-const CACHE_NAME = 'bubuya-v2';
+const CACHE_NAME = 'futoro-v3';
 const OFFLINE_URL = '/offline.html';
 
 // Assets estáticos que sempre ficam em cache (cache-first)

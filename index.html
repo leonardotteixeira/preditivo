@@ -2149,17 +2149,18 @@ window.setSortOrder = function(order, el) {
 window.changeHeroImage = () => {
   const url = prompt('URL da Imagem:', './hero-bg.png');
   if(url) {
-    document.getElementById('heroImg').src = url;
+    const img = document.getElementById('heroImg');
+    if(img) img.src = url;
     localStorage.setItem('custom_hero_image', url);
-    window.showToast('ðŸ–¼ï¸', 'Admin', 'Imagem atualizada com sucesso.');
+    window.showToast('🖼️', 'Admin', 'Imagem atualizada com sucesso.');
   }
 };
 
+// heroImg foi removido no redesign — ignorar se não existir
 const savedHero = localStorage.getItem('custom_hero_image');
-if(savedHero && savedHero.startsWith('http')) {
-  document.getElementById('heroImg').src = savedHero;
-} else {
-  document.getElementById('heroImg').src = './hero-bg.png';
+const _heroImgEl = document.getElementById('heroImg');
+if(_heroImgEl) {
+  _heroImgEl.src = (savedHero && savedHero.startsWith('http')) ? savedHero : './hero-bg.png';
 }
 
 // Auto-fill referral code from URL ?ref=XXX

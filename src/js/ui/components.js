@@ -25,48 +25,44 @@ export function probabilityBarHtml(yesPct) {
     </div>`;
 }
 
+const CAT_CLASS = { politica: 'cat-p', economia: 'cat-e', futebol: 'cat-s', esportes: 'cat-s', tech: 'cat-t' };
+const CAT_LABEL = { politica: 'Política', economia: 'Economia', futebol: 'Esportes', esportes: 'Esportes', tech: 'Tecnologia', geral: 'Geral' };
+
 /**
- * Card de mercado na listagem — <article> com dados escapados.
+ * Card de mercado — design system 2026 (.mcard)
  */
-export function buildMarketCard(m, catColors) {
+export function buildMarketCard(m) {
   const total = (parseFloat(m.q_yes) + parseFloat(m.q_no)) || 100;
   const yes = Math.round((parseFloat(m.q_yes) / total) * 100);
-  const cat = (m.category || 'Geral').toLowerCase();
-  const accent = catColors[cat] || catColors.geral || '#71717a';
+  const no  = 100 - yes;
+  const cat = (m.category || 'geral').toLowerCase();
+  const catClass = CAT_CLASS[cat] || '';
+  const catLabel = escapeHtml(CAT_LABEL[cat] || (m.category || 'Geral'));
   const title = escapeHtml(m.title);
-  const category = escapeHtml(m.category || 'Geral');
-  const vol = (parseFloat(m.volume) || 0).toLocaleString('pt-BR');
-  const id = escapeHtml(m.id);
+  const vol = (parseFloat(m.volume) || 0).toLocaleString('pt-BR', { maximumFractionDigits: 0 });
+  const id  = escapeHtml(m.id);
+  const q   = encodeURIComponent(m.id);
 
-  const q = encodeURIComponent(m.id);
   return `
-    <article class="market-card" style="border-left:3px solid ${accent}" data-market-id="${id}" onclick="window.location.href='market.html?id=${q}'">
-      <div>
-        <p class="mc-category">${category}</p>
-        <h3 class="mc-title">${title}</h3>
+    <article class="mcard ${catClass}" data-market-id="${id}" onclick="window.location.href='market.html?id=${q}'" role="button" tabindex="0">
+      <div class="mcard-cat">${catLabel}</div>
+      <div class="mcard-q">${title}</div>
+      <div class="mcard-bar">
+        <div class="mcard-bar-y" style="width:${yes}%"></div>
+        <div class="mcard-bar-n"></div>
       </div>
-      ${probabilityBarHtml(yes)}
-      <div class="mc-footer">
-        <p class="mc-stat">Volume <strong>R$${vol}</strong></p>
-        <div class="mc-odds" aria-label="Cotações">
-          <span class="mc-odd yes">${yes}%</span>
-          <span class="mc-odd no">${100 - yes}%</span>
+      <div class="mcard-footer">
+        <div class="mcard-vol">Vol <span>R$${vol}</span></div>
+        <div class="mcard-badges">
+          <span class="badge badge-y">${yes}%</span>
+          <span class="badge badge-n">${no}%</span>
         </div>
       </div>
     </article>`;
 }
 
 export function emptyMarketsHtml(isSearching) {
-  if (isSearching) {
-    return `
-      <div class="col-span-full rounded-lg border border-bubuya-line bg-bubuya-surface px-6 py-16 text-center">
-        <p class="mb-1 text-sm font-semibold text-zinc-200">Nenhum mercado encontrado</p>
-        <p class="text-sm text-zinc-500">Tente outra categoria ou ajuste a busca.</p>
-      </div>`;
-  }
-  return `
-    <div class="col-span-full rounded-lg border border-bubuya-line bg-bubuya-surface px-6 py-16 text-center">
-      <p class="mb-1 text-sm font-semibold text-zinc-200">Nenhum mercado ativo</p>
-      <p class="text-sm text-zinc-500">Novos mercados em breve.</p>
-    </div>`;
+  const msg = isSearching ? 'Nenhum mercado encontrado' : 'Nenhum mercado ativo';
+  const sub = isSearching ? 'Tente outra categoria ou ajuste a busca.' : 'Novos mercados em breve.';
+  return `<div class="mcard-empty"><p style="color:var(--t2);font-weight:600;margin-bottom:4px">${msg}</p><p>${sub}</p></div>`;
 }

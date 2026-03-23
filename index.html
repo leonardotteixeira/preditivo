@@ -27,11 +27,10 @@
 <title>Bubuya — Mercados de Previsão</title>
 <link rel="preload" href="./hero-bg.png" as="image" fetchpriority="high">
 <link rel="preload" href="/src/main.js" as="script">
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap">
 <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@300;400;500;600&family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -45,7 +44,7 @@
 }
 </script>
 </head>
-<body class="min-h-screen bg-bubuya-void text-zinc-100 antialiased">
+<body>
 <a href="#main-content" class="skip-link">Ir para o conteúdo</a>
 
 <!-- TOAST -->
@@ -57,34 +56,56 @@
   </div>
 </div>
 
+<!-- TICKER TAPE -->
+<div class="ticker-tape" id="tickerTape">
+  <div class="ticker" id="tickerInner">
+    <div class="ticker-item"><span class="ticker-name">Lula 2026?</span><span class="ticker-yes">SIM 68%</span><span class="ticker-no">NÃO 32%</span></div>
+    <div class="ticker-item"><span class="ticker-name">SELIC &lt; 10%?</span><span class="ticker-yes">SIM 45%</span><span class="ticker-no">NÃO 55%</span></div>
+    <div class="ticker-item"><span class="ticker-name">Dólar &gt; R$6?</span><span class="ticker-yes">SIM 72%</span><span class="ticker-no">NÃO 28%</span></div>
+    <div class="ticker-item"><span class="ticker-name">Flamengo campeão?</span><span class="ticker-yes">SIM 31%</span><span class="ticker-no">NÃO 69%</span></div>
+    <div class="ticker-item"><span class="ticker-name">Lula 2026?</span><span class="ticker-yes">SIM 68%</span><span class="ticker-no">NÃO 32%</span></div>
+    <div class="ticker-item"><span class="ticker-name">SELIC &lt; 10%?</span><span class="ticker-yes">SIM 45%</span><span class="ticker-no">NÃO 55%</span></div>
+    <div class="ticker-item"><span class="ticker-name">Dólar &gt; R$6?</span><span class="ticker-yes">SIM 72%</span><span class="ticker-no">NÃO 28%</span></div>
+    <div class="ticker-item"><span class="ticker-name">Flamengo campeão?</span><span class="ticker-yes">SIM 31%</span><span class="ticker-no">NÃO 69%</span></div>
+  </div>
+</div>
+
 <!-- HEADER -->
 <header>
-  <div class="header-inner">
-    <a class="logo" href="#section-home" onclick="event.preventDefault();window.showSection('home');closeMobileMenu()" aria-label="Ir para Explorar">Bubuya.</a>
+  <!-- Logo with bull SVG -->
+  <a class="logo" href="#" onclick="event.preventDefault();window.showSection('home');closeMobileMenu()" aria-label="Ir para Explorar">
+    <svg class="logo-bull" viewBox="155 335 145 165" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#60a5fa" d="M194.84 405L195.68 405.08C196.7 406.38 196.3 415.61 196.27 417.96C200.03 423.05 203.71 428.19 207.33 433.38C207.53 436.68 207.39 441.16 207.38 444.55C209.66 447.17 212.4 449.96 214.8 452.51C221.32 452.44 227.84 452.42 234.36 452.47C227.66 460.77 219.74 473.14 214.22 482.27L205.54 482.28L166.05 482.28L166.05 422.41C175.5 416.37 185.1 410.57 194.84 405Z"/>
+      <path fill="#60a5fa" opacity=".5" d="M288.71 348.73C288.79 351.74 282.18 373.44 280.92 377.59C276.02 380.86 260.84 387.9 255.13 390.45C254.71 386.87 254.95 379.55 254.99 375.72C277.63 367.32 274.5 366.65 288.71 348.73Z"/>
+      <path fill="#60a5fa" opacity=".5" d="M162.23 348.93C163.54 349.81 167.27 354.55 168.19 355.8C180.17 372.24 178.41 369.16 196.27 375.75L196.24 390.48C189.58 387.82 176.89 381.28 170.36 377.9C167.75 368.29 164.36 358.61 162.23 348.93Z"/>
+      <path fill="#60a5fa" opacity=".35" d="M221.11 373.9C230.81 373.07 240.8 374.98 250.48 376.24C250.54 382 250.55 387.76 250.5 393.52C246.21 396.85 242.18 399.7 237.91 403.22C236.49 408.95 235.45 421.4 233.55 426.25C232.5 426.91 231.88 426.71 230.5 426.76L217.66 426.74C216.13 419.92 214.84 410.75 213.7 403.77C209.51 399.96 205.19 396.79 200.68 393.39C200.65 387.68 200.68 381.96 200.75 376.25C207.39 375.27 214.42 374.57 221.11 373.9Z"/>
+    </svg>
+    <span class="logo-word">Bubuya<span class="logo-dot">.</span></span>
+  </a>
 
-    <div class="header-search">
-      <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="searchInput" placeholder="O que vai acontecer?" aria-label="Buscar mercados" oninput="window.onSearchInput(this.value)">
-    </div>
-
-    <div class="header-right">
-      <nav aria-label="Navegação principal">
-        <a href="#section-home" onclick="event.preventDefault();window.showSection('home')" id="nav-home" class="active">Explorar</a>
-        <a href="#section-portfolio" onclick="event.preventDefault();window.showSection('portfolio')" id="nav-portfolio">Portfólio</a>
-        <a href="#section-ranking" onclick="event.preventDefault();window.showSection('ranking')" id="nav-ranking">Ranking</a>
-      </nav>
-      <div id="authArea">
-        <button class="btn-outline" onclick="window.connectWallet()" id="btnConnectWallet">Conectar Carteira</button>
-        <button class="btn-outline btn-outline-green" onclick="window.openModal('registerModal')">Criar conta</button>
-        <button class="btn-primary" onclick="window.openModal('loginModal')">Entrar</button>
-      </div>
-    </div>
-
-    <!-- Hamburger (mobile only) -->
-    <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()" aria-label="Menu" aria-controls="mobileNav" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
+  <!-- Search -->
+  <div class="h-search">
+    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" id="searchInput" placeholder="O que vai acontecer?" aria-label="Buscar mercados" oninput="window.onSearchInput(this.value)">
   </div>
+
+  <!-- Nav tabs -->
+  <nav class="h-tabs" aria-label="Navegação principal">
+    <a href="#" class="h-tab active" id="nav-home" onclick="event.preventDefault();window.showSection('home')">Explorar</a>
+    <a href="#" class="h-tab" id="nav-portfolio" onclick="event.preventDefault();window.showSection('portfolio')">Portfólio</a>
+    <a href="#" class="h-tab" id="nav-ranking" onclick="event.preventDefault();window.showSection('ranking')">Ranking</a>
+  </nav>
+
+  <!-- Auth area (filled by JS) -->
+  <div class="h-right" id="authArea">
+    <button class="btn-g" onclick="window.openModal('loginModal')">Entrar</button>
+    <button class="btn-p" onclick="window.openModal('registerModal')">Abrir conta</button>
+  </div>
+
+  <!-- Hamburger (mobile only) -->
+  <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()" aria-label="Menu" aria-controls="mobileNav" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
 </header>
 
 <!-- MOBILE NAV -->
@@ -106,57 +127,133 @@
 <!-- SECTION: HOME -->
 <main id="main-content">
 <div class="section active" id="section-home">
-  <div class="hero">
-    <div class="hero-content">
-      <div class="hero-tag">Mercados de eventos · Brasil</div>
-      <h1 id="heroH1">A plataforma de<br><span>mercados preditivos</span><br>do Brasil.</h1>
-      <p class="hero-sub" id="heroSub">Aposte no que você acredita. Política, esportes, economia e entretenimento com pagamentos instantâneos via PIX.</p>
-      
-      <div class="hero-actions flex flex-col gap-3 sm:flex-row sm:items-center" id="heroActions">
-        <button type="button" class="btn-primary px-8 py-3 text-base" onclick="window.openModal('registerModal')">Abrir conta</button>
-        <button type="button" class="btn-outline px-6 py-3 text-base" onclick="document.getElementById('marketsGrid').scrollIntoView({behavior:'smooth'})">Ver mercados</button>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <div class="hero-eyebrow">Mercados preditivos · Brasil</div>
+      <h1 class="hero-title" id="heroH1">Opere<br><em>probabilidades</em><br>reais.</h1>
+      <p class="hero-sub" id="heroSub">Compre e venda eventos futuros com liquidação em reais. Deposite via PIX, saque em 24h.</p>
+
+      <div class="hero-btns" id="heroActions">
+        <button class="btn-hero" onclick="window.openModal('registerModal')">Criar conta grátis</button>
+        <button class="btn-hero-ol" onclick="document.getElementById('marketsGrid').scrollIntoView({behavior:'smooth'})">Explorar mercados →</button>
       </div>
 
       <div class="hero-stats">
-        <div class="hero-stat-item">
-          <span class="hero-stat-val" id="totalVolume">R$15.3M</span>
-          <span class="hero-stat-lbl">Volume Pago</span>
+        <div class="hstat">
+          <div class="hstat-n" id="totalVolume">R$15.3M</div>
+          <div class="hstat-l">Volume pago</div>
         </div>
-        <div class="hero-stat-item">
-          <span class="hero-stat-val" id="activeMarkets">37</span>
-          <span class="hero-stat-lbl">Mercados Ativos</span>
+        <div class="hstat">
+          <div class="hstat-n" id="activeMarkets">37</div>
+          <div class="hstat-l">Mercados ativos</div>
         </div>
-        <div class="hero-stat-item">
-          <span class="hero-stat-val" id="activePlayers">2.9K</span>
-          <span class="hero-stat-lbl">Traders Ativos</span>
+        <div class="hstat">
+          <div class="hstat-n" id="activePlayers">2.9K</div>
+          <div class="hstat-l">Traders ativos</div>
         </div>
       </div>
     </div>
 
-    <div class="hero-image-wrapper">
-      <img src="./hero-bg.png" alt="Ilustração da plataforma Bubuya com foco em mercados preditivos no Brasil" class="hero-image-main" id="heroImg" decoding="async" fetchpriority="high">
+    <div class="hero-right">
+      <div class="hero-preview-card">
+        <div class="hero-card-cat">Política</div>
+        <div class="hero-card-q">Lula completa o mandato até 2026?</div>
+        <div class="hero-card-prices">
+          <span class="hero-price-yes">68%</span>
+          <span class="hero-price-no">32%</span>
+        </div>
+      </div>
+      <div class="hero-preview-card">
+        <div class="hero-card-cat">Economia</div>
+        <div class="hero-card-q">SELIC abaixo de 10% em 2025?</div>
+        <div class="hero-card-prices">
+          <span class="hero-price-yes">45%</span>
+          <span class="hero-price-no">55%</span>
+        </div>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-    <div class="topic-tags mb-0 flex-1" id="topicTags" role="tablist" aria-label="Categorias">
-      <button type="button" class="topic-tag active" role="tab" aria-selected="true" onclick="window.setCatFilter('all', this)">Em alta</button>
-      <button type="button" class="topic-tag" role="tab" aria-selected="false" onclick="window.setCatFilter('politica', this)">Política</button>
-      <button type="button" class="topic-tag" role="tab" aria-selected="false" onclick="window.setCatFilter('economia', this)">Economia</button>
-      <button type="button" class="topic-tag" role="tab" aria-selected="false" onclick="window.setCatFilter('futebol', this)">Esportes</button>
-      <button type="button" class="topic-tag" role="tab" aria-selected="false" onclick="window.setCatFilter('tech', this)">Tecnologia</button>
+  <!-- MARKETS -->
+  <section class="markets-section">
+    <div class="market-filters">
+      <div class="filter-pills" id="topicTags" role="tablist" aria-label="Categorias">
+        <button type="button" class="filter-pill active" role="tab" aria-selected="true" onclick="window.setCatFilter('all', this)">Em alta</button>
+        <button type="button" class="filter-pill" role="tab" aria-selected="false" onclick="window.setCatFilter('politica', this)">Política</button>
+        <button type="button" class="filter-pill" role="tab" aria-selected="false" onclick="window.setCatFilter('economia', this)">Economia</button>
+        <button type="button" class="filter-pill" role="tab" aria-selected="false" onclick="window.setCatFilter('futebol', this)">Esportes</button>
+        <button type="button" class="filter-pill" role="tab" aria-selected="false" onclick="window.setCatFilter('tech', this)">Tecnologia</button>
+      </div>
+      <div class="sort-pills" role="group" aria-label="Ordenação">
+        <button type="button" class="sort-pill active" onclick="window.setSortOrder('hot',this)">Hot</button>
+        <button type="button" class="sort-pill" onclick="window.setSortOrder('recent',this)">Recentes</button>
+        <button type="button" class="sort-pill" onclick="window.setSortOrder('volume',this)">Volume</button>
+        <button type="button" class="sort-pill" onclick="window.setSortOrder('closing',this)">Encerra</button>
+      </div>
     </div>
-    <div class="sort-toolbar flex shrink-0 gap-0.5 rounded-md border border-bubuya-line bg-bubuya-surface p-1" role="group" aria-label="Ordenação">
-      <button type="button" class="sort-btn rounded px-3 py-1.5 text-xs font-semibold text-zinc-100 bg-bubuya-raised" onclick="window.setSortOrder('hot',this)">Hot</button>
-      <button type="button" class="sort-btn rounded px-3 py-1.5 text-xs font-semibold text-zinc-500 hover:text-zinc-300" onclick="window.setSortOrder('recent',this)">Recentes</button>
-      <button type="button" class="sort-btn rounded px-3 py-1.5 text-xs font-semibold text-zinc-500 hover:text-zinc-300" onclick="window.setSortOrder('volume',this)">Volume</button>
-      <button type="button" class="sort-btn rounded px-3 py-1.5 text-xs font-semibold text-zinc-500 hover:text-zinc-300" onclick="window.setSortOrder('closing',this)">Encerra</button>
-    </div>
-  </div>
 
-  <div class="markets-grid" id="marketsGrid">
-    <div class="col-span-full py-24 text-center text-sm text-zinc-500">Carregando mercados…</div>
-  </div>
+    <div class="markets-grid" id="marketsGrid">
+      <div class="mcard-empty">Carregando mercados…</div>
+    </div>
+  </section>
+
+  <!-- PIX SECTION -->
+  <section class="pix-section">
+    <div class="pix-eye">Pagamentos instantâneos</div>
+    <h2 class="pix-h">Deposite e saque <em>via PIX</em> na hora</h2>
+    <p class="pix-p">Sem taxas ocultas. Sem espera. Integração direta com o sistema financeiro brasileiro — depósito cai em segundos.</p>
+    <div class="pix-checks">
+      <span class="pix-check">Depósito mínimo R$10</span>
+      <span class="pix-check">Saque em 24h úteis</span>
+      <span class="pix-check">QR Code instantâneo</span>
+      <span class="pix-check">Histórico completo</span>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how-it-works">
+    <div class="howk-grid">
+      <div class="howk-step">
+        <div class="howk-num">01</div>
+        <div class="howk-title">Crie sua conta</div>
+        <div class="howk-desc">Cadastro em 2 minutos. KYC simples com CPF e selfie. Regulamentado pelo Banco Central.</div>
+      </div>
+      <div class="howk-step">
+        <div class="howk-num">02</div>
+        <div class="howk-title">Deposite via PIX</div>
+        <div class="howk-desc">PIX instantâneo. Seu saldo aparece em segundos, pronto para operar.</div>
+      </div>
+      <div class="howk-step">
+        <div class="howk-num">03</div>
+        <div class="howk-title">Compre SIM ou NÃO</div>
+        <div class="howk-desc">Compre posições em eventos reais. O preço reflete a probabilidade coletiva.</div>
+      </div>
+      <div class="howk-step">
+        <div class="howk-num">04</div>
+        <div class="howk-title">Lucre ou aprenda</div>
+        <div class="howk-desc">Acertou? Lucrou. Errou? Aprenda. Saque seus ganhos em 24h.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA SECTION -->
+  <section class="cta-section">
+    <div class="cta-bull-bg">
+      <svg viewBox="155 335 145 165" xmlns="http://www.w3.org/2000/svg">
+        <path fill="white" d="M194.84 405L195.68 405.08C196.7 406.38 196.3 415.61 196.27 417.96C200.03 423.05 203.71 428.19 207.33 433.38C207.53 436.68 207.39 441.16 207.38 444.55C209.66 447.17 212.4 449.96 214.8 452.51C221.32 452.44 227.84 452.42 234.36 452.47C227.66 460.77 219.74 473.14 214.22 482.27L205.54 482.28L166.05 482.28L166.05 422.41C175.5 416.37 185.1 410.57 194.84 405Z"/>
+        <path fill="white" opacity=".5" d="M288.71 348.73C288.79 351.74 282.18 373.44 280.92 377.59C276.02 380.86 260.84 387.9 255.13 390.45C254.71 386.87 254.95 379.55 254.99 375.72C277.63 367.32 274.5 366.65 288.71 348.73Z"/>
+        <path fill="white" opacity=".5" d="M162.23 348.93C163.54 349.81 167.27 354.55 168.19 355.8C180.17 372.24 178.41 369.16 196.27 375.75L196.24 390.48C189.58 387.82 176.89 381.28 170.36 377.9C167.75 368.29 164.36 358.61 162.23 348.93Z"/>
+        <path fill="white" opacity=".35" d="M221.11 373.9C230.81 373.07 240.8 374.98 250.48 376.24C250.54 382 250.55 387.76 250.5 393.52C246.21 396.85 242.18 399.7 237.91 403.22C236.49 408.95 235.45 421.4 233.55 426.25C232.5 426.91 231.88 426.71 230.5 426.76L217.66 426.74C216.13 419.92 214.84 410.75 213.7 403.77C209.51 399.96 205.19 396.79 200.68 393.39C200.65 387.68 200.68 381.96 200.75 376.25C207.39 375.27 214.42 374.57 221.11 373.9Z"/>
+      </svg>
+    </div>
+    <h2 class="cta-title">Comece a operar o <em>futuro</em> agora</h2>
+    <p class="cta-sub">Cadastro grátis em 2 minutos. Deposite via PIX e comece a comprar eventos reais do Brasil.</p>
+    <div class="cta-buttons">
+      <button class="btn-hero" onclick="window.openModal('registerModal')">Criar conta grátis</button>
+      <button class="btn-hero-ol" onclick="document.getElementById('marketsGrid').scrollIntoView({behavior:'smooth'})">Explorar mercados →</button>
+    </div>
+  </section>
 </div>
 
 <!-- SECTION: PORTFOLIO -->
@@ -228,6 +325,44 @@
   </div>
 </div>
 </main>
+
+<!-- SITE FOOTER -->
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-col">
+      <div class="footer-brand-logo">Bubuya<span class="footer-brand-dot">.</span></div>
+      <p>Plataforma brasileira de mercados preditivos. Opere eventos reais com liquidação em reais via PIX.</p>
+    </div>
+    <div class="footer-col">
+      <h3>Plataforma</h3>
+      <a href="#" onclick="event.preventDefault();window.showSection('home')">Explorar mercados</a>
+      <a href="how-it-works.html">Como funciona</a>
+      <a href="#" onclick="event.preventDefault();window.showSection('ranking')">Ranking</a>
+      <a href="#" onclick="event.preventDefault();window.showSection('portfolio')">Portfólio</a>
+    </div>
+    <div class="footer-col">
+      <h3>Legal</h3>
+      <a href="terms.html">Termos de uso</a>
+      <a href="privacidade.html">Privacidade</a>
+      <a href="protecao-investidor.html">Proteção ao investidor</a>
+      <a href="kyc.html">KYC / AML</a>
+    </div>
+    <div class="footer-col">
+      <h3>Suporte</h3>
+      <a href="how-it-works.html">Central de ajuda</a>
+      <a href="profile.html#ouvidoria">Ouvidoria</a>
+      <a href="about.html">Sobre</a>
+      <a href="mailto:suporte@bubuya.com.br">suporte@bubuya.com.br</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Bubuya. Todos os direitos reservados.</p>
+    <div class="footer-status">
+      <div class="status-dot"></div>
+      Todos os sistemas operacionais
+    </div>
+  </div>
+</footer>
 
 <!-- MODALS -->
 <div class="modal-overlay" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="loginModalTitle">
@@ -558,7 +693,7 @@
 // Swap hero CTA immediately if user is authenticated (prevents flash of "Abrir conta")
 if (localStorage.getItem('preditivo_token')) {
   var _ha = document.getElementById('heroActions');
-  if (_ha) _ha.innerHTML = '<button type="button" class="btn-primary px-8 py-3 text-base" onclick="window.openModal(\'depositModal\')">Depositar</button><button type="button" class="btn-outline px-6 py-3 text-base" onclick="window.showSection(\'portfolio\')">Meu Portfólio</button>';
+  if (_ha) _ha.innerHTML = '<button class="btn-hero" onclick="window.openModal(\'depositModal\')">Depositar via PIX</button><button class="btn-hero-ol" onclick="window.showSection(\'portfolio\')">Meu Portfólio →</button>';
 }
 
 // ---- MOBILE MENU (global — must be on window for inline onclick handlers) ----
@@ -692,7 +827,7 @@ window.renderMarkets = () => {
   grid.innerHTML = filtered
     .map((m) =>
       window.BubuyaComponents
-        ? window.BubuyaComponents.buildMarketCard(m, CAT_COLORS)
+        ? window.BubuyaComponents.buildMarketCard(m)
         : ''
     )
     .join('');
@@ -1717,7 +1852,7 @@ window.confirmWithdraw = async () => {
 
 window.setCatFilter = (cat, el) => {
   window.state.catFilter = cat.toLowerCase();
-  document.querySelectorAll('.topic-tag').forEach((t) => {
+  document.querySelectorAll('.filter-pill').forEach((t) => {
     t.classList.remove('active');
     t.setAttribute('aria-selected', 'false');
   });
@@ -2004,14 +2139,10 @@ window.state.sortOrder = 'hot'; // hot | recent | volume | closing
 
 window.setSortOrder = function(order, el) {
   window.state.sortOrder = order;
-  const active =
-    'sort-btn rounded px-3 py-1.5 text-xs font-semibold text-zinc-100 bg-bubuya-raised';
-  const idle =
-    'sort-btn rounded px-3 py-1.5 text-xs font-semibold text-zinc-500 hover:text-zinc-300';
-  document.querySelectorAll('.sort-toolbar .sort-btn').forEach((b) => {
-    b.className = idle;
+  document.querySelectorAll('.sort-pill').forEach((b) => {
+    b.classList.remove('active');
   });
-  if (el) el.className = active;
+  if (el) el.classList.add('active');
   window.renderMarkets();
 };
 

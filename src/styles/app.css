@@ -2709,6 +2709,9 @@ header {
   gap: 40px;
   align-items: center;
   padding: 40px 8px 32px;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
   position: relative;
   background-image:
     linear-gradient(rgba(96,165,250,0.025) 1px, transparent 1px),
@@ -2868,7 +2871,7 @@ header {
 }
 
 /* ── MARKETS SECTION ────────────────────────────────────────────────────── */
-.markets-section { padding: 24px 8px 48px; }
+.markets-section { padding: 24px 8px 48px; max-width: none; margin-left: 0; margin-right: 0; }
 
 .market-filters {
   display: flex;

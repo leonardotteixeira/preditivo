@@ -2374,8 +2374,10 @@
   }
 
   .mobile-nav {
-    @apply fixed inset-x-0 bottom-0 top-14 z-[98] hidden flex-col gap-1 overflow-y-auto border-t border-bubuya-line p-4;
+    @apply fixed inset-x-0 bottom-0 top-14 z-[98] hidden flex-col overflow-y-auto border-t border-bubuya-line;
     background-color: var(--bg);
+    padding: 16px;
+    gap: 6px;
   }
 
   .mobile-nav.open {
@@ -2383,25 +2385,63 @@
   }
 
   .mobile-nav-search {
-    @apply mb-2 flex items-center gap-2 rounded-md border border-bubuya-line bg-bubuya-surface px-3 py-2.5;
+    @apply mb-3 flex items-center gap-2 rounded-md border border-bubuya-line bg-bubuya-surface px-3 py-2.5;
   }
 
   .mobile-nav-search input {
     @apply w-full border-0 bg-transparent text-sm text-zinc-100 focus:ring-0;
   }
 
-  .mobile-nav a {
+  /* Nav links group */
+  .mobile-nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 4px;
+  }
+
+  .mnav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--t2);
+    text-decoration: none;
+    cursor: pointer;
+    background: transparent;
+    border: 1px solid transparent;
+    transition: background 0.15s, color 0.15s;
+    min-height: 44px;
+  }
+
+  .mnav-link svg { opacity: 0.6; flex-shrink: 0; }
+
+  .mnav-link:hover {
+    background: var(--bg-hover, rgba(255,255,255,0.05));
+    color: var(--t1);
+  }
+
+  .mnav-link.active {
+    background: rgba(96,165,250,0.08);
+    border-color: rgba(96,165,250,0.2);
+    color: var(--blue);
+  }
+
+  .mnav-link.active svg { opacity: 1; }
+
+  /* Legacy .mobile-nav a (for mobileAuthArea content injected by JS) */
+  .mobile-nav a:not(.mnav-link) {
     @apply flex cursor-pointer items-center rounded-md border border-bubuya-line bg-bubuya-surface px-4 py-3 text-sm font-medium text-zinc-200 no-underline;
     transition: background-color 0.18s, border-color 0.18s;
+    min-height: 44px;
   }
 
-  .mobile-nav a:hover {
+  .mobile-nav a:not(.mnav-link):hover {
     background-color: var(--surface2);
     border-color: rgba(96, 165, 250, 0.25);
-  }
-
-  .mobile-nav a.active {
-    @apply border-zinc-600 bg-bubuya-raised text-zinc-50;
   }
 
   .mobile-nav-divider {
@@ -2409,11 +2449,11 @@
   }
 
   .mobile-nav-auth {
-    @apply mt-2 flex gap-2;
+    @apply mt-1 flex gap-2;
   }
 
   /* Keep primary mobile interactions at recommended minimum touch size. */
-  :where(.mobile-nav a, .mobile-nav-auth button, .mobile-menu-btn, .hero-actions button, .topic-tag, .sort-btn) {
+  :where(.mobile-nav-auth button, .mobile-menu-btn, .hero-actions button, .topic-tag, .sort-btn) {
     min-height: 44px;
   }
 }
@@ -2668,7 +2708,7 @@ header {
   grid-template-columns: 58% 42%;
   gap: 40px;
   align-items: center;
-  padding: 64px 36px 52px;
+  padding: 40px 36px 32px;
   position: relative;
   background-image:
     linear-gradient(rgba(96,165,250,0.025) 1px, transparent 1px),
@@ -2750,7 +2790,8 @@ header {
   display: flex;
   gap: 32px;
   border-top: 1px solid rgba(255,255,255,0.08);
-  padding-top: 28px;
+  padding-top: 20px;
+  margin-top: 20px;
 }
 .hstat { min-width: fit-content; }
 .hstat-n {
@@ -2827,7 +2868,7 @@ header {
 }
 
 /* ── MARKETS SECTION ────────────────────────────────────────────────────── */
-.markets-section { padding: 48px 36px; }
+.markets-section { padding: 24px 36px 48px; }
 
 .market-filters {
   display: flex;
@@ -3162,7 +3203,7 @@ header {
   .hero { padding: 36px 16px 28px; }
   .hero-title { font-size: clamp(28px, 5vw, 48px); }
   .hero-stats { flex-direction: column; gap: 16px; }
-  .markets-grid { grid-template-columns: 1fr; }
+  .markets-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
   .howk-grid { grid-template-columns: 1fr; }
   .hero-btns { flex-direction: column; }
   .btn-hero, .btn-hero-ol { width: 100%; }

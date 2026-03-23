@@ -17,6 +17,7 @@ export default defineConfig({
         terms: resolve(__dirname, 'terms.html'),
         privacidade: resolve(__dirname, 'privacidade.html'),
         'protecao-investidor': resolve(__dirname, 'protecao-investidor.html'),
+        'futoro-preview': resolve(__dirname, 'futoro-preview.html'),
         offline: resolve(__dirname, 'offline.html')
       }
     }

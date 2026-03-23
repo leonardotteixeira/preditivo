@@ -2917,8 +2917,8 @@ header {
 
 .markets-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
 }
 
 /* ── MARKET CARD (new design) ─────────────────────────────────────────── */
@@ -3188,7 +3188,7 @@ header {
   .hero { grid-template-columns: 1fr; gap: 32px; padding: 48px 20px 40px; }
   .hero::before { display: none; }
   .hero-preview-card { display: none; }
-  .markets-grid { grid-template-columns: repeat(2, 1fr); }
+  .markets-grid { grid-template-columns: repeat(3, 1fr); }
   .howk-grid { grid-template-columns: repeat(2, 1fr); }
   .pix-section { margin: 32px 20px; }
   .footer-grid { grid-template-columns: repeat(2, 1fr); }

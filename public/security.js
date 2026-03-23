@@ -1,6 +1,6 @@
 (() => {
-  if (window.__BUBUYA_SECURITY_PATCHED__) return;
-  window.__BUBUYA_SECURITY_PATCHED__ = true;
+  if (window.__FUTORO_SECURITY_PATCHED__) return;
+  window.__FUTORO_SECURITY_PATCHED__ = true;
 
   const originalFetch = window.fetch.bind(window);
   window.fetch = function secureFetch(input, init) {
@@ -9,7 +9,7 @@
     return originalFetch(input, nextInit);
   };
 
-  window.BubuyaAuth = {
+  window.FutoroAuth = {
     async logout(apiBase) {
       const base = apiBase || window.API || '';
       const token = localStorage.getItem('preditivo_token');
@@ -27,7 +27,7 @@
   };
 
   window.logoutUser = function logoutUser(apiBase) {
-    window.BubuyaAuth.logout(apiBase).finally(() => {
+    window.FutoroAuth.logout(apiBase).finally(() => {
       window.location.reload();
     });
   };

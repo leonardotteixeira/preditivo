@@ -8,11 +8,11 @@
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Bubuya">
+  <meta name="apple-mobile-web-app-title" content="Futoro">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<title>Bubuya — Mercado de Previsão</title>
+<title>Futoro — Mercado de Previsão</title>
 <meta name="description" content="Aposte no resultado de eventos do mundo real com dinheiro real. Mercados de previsão sobre política, economia, futebol e tecnologia.">
-<meta property="og:title" content="Bubuya — Mercado de Previsão">
+<meta property="og:title" content="Futoro — Mercado de Previsão">
 <meta property="og:description" content="Aposte no resultado de eventos do mundo real. Plataforma brasileira de mercados de previsão.">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary">
@@ -26,7 +26,7 @@
 
 <header>
   <div class="header-inner">
-    <a class="logo" href="/">Bubuya.</a>
+    <a class="logo" href="/">Futoro.</a>
     <a class="back-btn" href="/">← Mercados</a>
     <div class="header-right" id="authArea">
       <button class="login-btn" onclick="openModal('loginModal')">Entrar</button>
@@ -106,7 +106,7 @@ function formatDate(d) {
 
 function shareWhatsApp() {
   var url = encodeURIComponent(location.href);
-  var text = encodeURIComponent('Você apostaria nessa? "' + market.title + '" — Bubuya');
+  var text = encodeURIComponent('Você apostaria nessa? "' + market.title + '" — Futoro');
   window.open('https://wa.me/?text=' + text + '%20' + url, '_blank');
 }
 function shareTwitter() {
@@ -138,7 +138,7 @@ function renderPage() {
   var isResolved = !!m.resolved_at;
   var isExpired = m.ends_at && new Date() > new Date(m.ends_at);
 
-  document.title = m.title + ' — Bubuya';
+  document.title = m.title + ' — Futoro';
   market.probYes = probYes;
   market.probNo = probNo;
 
@@ -891,7 +891,7 @@ init();
       <p class="risk-term-item"><strong>2. Risco de liquidez:</strong> Posições abertas podem não ter compradores disponíveis ao preço desejado, podendo resultar em perdas.</p>
       <p class="risk-term-item"><strong>3. Volatilidade:</strong> Os preços das posições podem variar significativamente em curtos períodos de tempo.</p>
       <p class="risk-term-item"><strong>4. Limitações do perfil:</strong> Seu perfil de investidor (suitability) determina os limites máximos de operação. Esses limites visam proteger seu patrimônio.</p>
-      <p class="risk-term-item"><strong>5. Responsabilidade:</strong> As decisões de investimento são de sua exclusiva responsabilidade. A Bubuya não presta aconselhamento financeiro.</p>
+      <p class="risk-term-item"><strong>5. Responsabilidade:</strong> As decisões de investimento são de sua exclusiva responsabilidade. A Futoro não presta aconselhamento financeiro.</p>
       <p class="risk-term-item"><strong>6. Regulamentação:</strong> Esta plataforma opera em conformidade com a Resolução CVM 30/2021 e demais normas aplicáveis.</p>
       <p class="risk-term-item"><strong>7. Público adequado:</strong> Este produto é destinado apenas a investidores que compreenderam e aceitam os riscos envolvidos.</p>
     </div>
@@ -908,7 +908,7 @@ init();
 <div id="aboutModal" class="modal-overlay">
   <div class="modal modal-wide">
     <h3>Quem Somos</h3>
-    <p>A <strong>Bubuya.</strong> é a principal plataforma brasileira de mercados de previsão. Diferente de casas de apostas, somos uma ferramenta de negociação de probabilidades baseada em eventos reais.</p>
+    <p>A <strong>Futoro.</strong> é a principal plataforma brasileira de mercados de previsão. Diferente de casas de apostas, somos uma ferramenta de negociação de probabilidades baseada em eventos reais.</p>
     <button type="button" class="btn-outline mt-4 w-full justify-center" onclick="closeModal('aboutModal')">Fechar</button>
   </div>
 </div>
@@ -925,10 +925,10 @@ init();
 <footer>
   <div class="footer-inner">
     <div class="footer-col footer-brand">
-      <p class="footer-wordmark">Bubuya.</p>
+      <p class="footer-wordmark">Futoro.</p>
       <p class="footer-tagline">A principal plataforma brasileira de mercados de previsão.</p>
       <p class="footer-contact">
-        <a href="mailto:suporte@bubuya.com.br">suporte@bubuya.com.br</a>
+        <a href="mailto:suporte@futoro.com.br">suporte@futoro.com.br</a>
       </p>
     </div>
     <div class="footer-col">
@@ -958,9 +958,9 @@ init();
   <div class="footer-legal">
     <div class="footer-disclaimer">
       <strong>Aviso legal importante:</strong>
-      As operações na Bubuya envolvem riscos. Nenhuma informação nesta plataforma constitui recomendação de investimento.
+      As operações na Futoro envolvem riscos. Nenhuma informação nesta plataforma constitui recomendação de investimento.
     </div>
-    <p class="footer-copyright">&copy; 2026 Bubuya · Todos os direitos reservados.</p>
+    <p class="footer-copyright">&copy; 2026 Futoro · Todos os direitos reservados.</p>
   </div>
 </footer>
 

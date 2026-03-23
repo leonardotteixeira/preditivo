@@ -1,4 +1,4 @@
-// ── Bubuya Service Worker v2.0 ────────────────────────────────────────────────
+// ── Futoro Service Worker v2.0 ────────────────────────────────────────────────
 const CACHE_NAME = 'bubuya-v2';
 const OFFLINE_URL = '/offline.html';
 
@@ -103,10 +103,10 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('push', (event) => {
   if (!event.data) return;
   let data = {};
-  try { data = event.data.json(); } catch { data = { title: 'Bubuya', body: event.data.text() }; }
+  try { data = event.data.json(); } catch { data = { title: 'Futoro', body: event.data.text() }; }
 
   event.waitUntil(
-    self.registration.showNotification(data.title || 'Bubuya', {
+    self.registration.showNotification(data.title || 'Futoro', {
       body: data.body || '',
       icon: '/icons/icon-192.png',
       badge: '/icons/icon-192.png',

@@ -1,6 +1,6 @@
 (() => {
-  if (window.__BUBUYA_SECURITY_PATCHED__) return;
-  window.__BUBUYA_SECURITY_PATCHED__ = true;
+  if (window.__FUTORO_SECURITY_PATCHED__) return;
+  window.__FUTORO_SECURITY_PATCHED__ = true;
 
   // ── Adiciona credentials: 'include' em todos os fetch ────────────────────────
   // Garante que os cookies HttpOnly sejam enviados em requisições cross-origin
@@ -12,7 +12,7 @@
   };
 
   // ── Logout seguro — invalida cookie HttpOnly no servidor ─────────────────────
-  window.BubuyaAuth = {
+  window.FutoroAuth = {
     async logout(apiBase) {
       const base = apiBase || window.API || '';
       const token = localStorage.getItem('preditivo_token');
@@ -30,7 +30,7 @@
   };
 
   window.logoutUser = function logoutUser(apiBase) {
-    window.BubuyaAuth.logout(apiBase).finally(() => {
+    window.FutoroAuth.logout(apiBase).finally(() => {
       window.location.reload();
     });
   };

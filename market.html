@@ -928,7 +928,7 @@ async function loadMarket() {
 }
 
 async function init() {
-  if (!marketId || marketId === 'market.html') {
+  if ((!marketId || marketId === 'market.html') && !marketSlug) {
     document.getElementById('pageContent').innerHTML =
       '<div class="market-page-message">ID do mercado não informado.</div>';
     return;

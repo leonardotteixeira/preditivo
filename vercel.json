@@ -2,7 +2,9 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
+    { "source": "/m/:id", "destination": "/api/og?id=:id" },
     { "source": "/market/:id", "destination": "/market.html" },
-    { "source": "/profile", "destination": "/profile.html" }
+    { "source": "/profile", "destination": "/profile.html" },
+    { "source": "/ranking", "destination": "/ranking.html" }
   ]
 }

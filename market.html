@@ -110,22 +110,26 @@ function formatDate(d) {
   return new Date(d).toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
 }
 
+function shareUrl() {
+  return 'https://futoro.com.br/m/' + encodeURIComponent(marketId);
+}
 function shareWhatsApp() {
-  var url = encodeURIComponent(location.href);
+  var url = encodeURIComponent(shareUrl());
   var text = encodeURIComponent('Você operaria nessa? "' + market.title + '" — Futoro');
   window.open('https://wa.me/?text=' + text + '%20' + url, '_blank');
 }
 function shareTwitter() {
-  var url = encodeURIComponent(location.href);
+  var url = encodeURIComponent(shareUrl());
   var text = encodeURIComponent('"' + market.title + '" — O que você acha que vai acontecer? @futoro_br');
   window.open('https://twitter.com/intent/tweet?text=' + text + '&url=' + url, '_blank');
 }
 function copyLink() {
+  var link = shareUrl();
   if (navigator.clipboard) {
-    navigator.clipboard.writeText(location.href).then(function(){ showToast('Link copiado!'); });
+    navigator.clipboard.writeText(link).then(function(){ showToast('Link copiado!'); });
   } else {
     var input = document.createElement('input');
-    input.value = location.href;
+    input.value = link;
     document.body.appendChild(input);
     input.select();
     document.execCommand('copy');

@@ -76,7 +76,14 @@ var chart = null;
 var allHistory = [];
 var chartMode = 'lines';
 
-var marketId = new URLSearchParams(window.location.search).get('id') || window.location.pathname.split('/').pop();
+var _qp = new URLSearchParams(window.location.search);
+var marketId = _qp.get('id') || null;
+var marketSlug = _qp.get('slug') || null;
+// /mercado/:slug path support — extract slug from pathname if present
+if (!marketId && !marketSlug) {
+  var _pathParts = window.location.pathname.split('/').filter(Boolean);
+  if (_pathParts[0] === 'mercado' && _pathParts[1]) marketSlug = _pathParts[1];
+}
 
 function showToast(msg) {
   var t = document.getElementById('toastMsg');
@@ -111,6 +118,8 @@ function formatDate(d) {
 }
 
 function shareUrl() {
+  var slug = (market && market.slug) ? market.slug : marketSlug;
+  if (slug) return 'https://futoro.com.br/mercado/' + encodeURIComponent(slug);
   return 'https://futoro.com.br/m/' + encodeURIComponent(marketId);
 }
 function shareWhatsApp() {
@@ -895,13 +904,18 @@ function updateAuthUI() {
 
 async function loadMarket() {
   try {
-    var data = await apiGet('/markets/' + marketId);
+    var endpoint = marketId
+      ? '/markets/' + marketId
+      : '/markets/by-slug/' + marketSlug;
+    var data = await apiGet(endpoint);
     if (data.error) {
       document.getElementById('pageContent').innerHTML =
         '<div class="market-page-message">Mercado não encontrado.</div>';
       return;
     }
     market = data;
+    // Sempre usar o UUID para operações subsequentes
+    if (!marketId) marketId = data.id;
     allHistory = data.history || [];
     renderPage();
     loadOrderBook();

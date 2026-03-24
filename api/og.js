@@ -1,5 +1,5 @@
 /**
- * Vercel Serverless Function — /api/og?id=MARKET_ID
+ * Vercel Serverless Function — /api/og?id=MARKET_ID or /api/og?slug=SLUG
  *
  * Returns a lightweight HTML page with Open Graph / Twitter Card meta tags
  * populated from real market data. Bots (WhatsApp, Twitter, Telegram, etc.)
@@ -25,19 +25,37 @@ function fmt(n) {
 }
 
 module.exports = async (req, res) => {
-  const id = req.query.id;
-  if (!id) {
+  const id   = req.query.id;
+  const slug = req.query.slug;
+
+  if (!id && !slug) {
     res.setHeader('Location', '/');
     return res.status(302).end();
   }
 
   let market = null;
+  let endpoint = id
+    ? `${API}/markets/${encodeURIComponent(id)}`
+    : `${API}/markets/by-slug/${encodeURIComponent(slug)}`;
+
   try {
-    const r = await fetch(`${API}/markets/${encodeURIComponent(id)}`);
+    const r = await fetch(endpoint);
     if (r.ok) market = await r.json();
   } catch (_) {}
 
-  const target = `/market.html?id=${encodeURIComponent(id)}`;
+  // Build the redirect target for real browsers
+  let target;
+  if (market && !market.error) {
+    // Prefer pretty slug URL for the redirect
+    const marketSlug = market.slug || null;
+    target = marketSlug
+      ? `/market.html?slug=${encodeURIComponent(marketSlug)}`
+      : `/market.html?id=${encodeURIComponent(market.id || id)}`;
+  } else {
+    target = id
+      ? `/market.html?id=${encodeURIComponent(id)}`
+      : `/market.html?slug=${encodeURIComponent(slug)}`;
+  }
 
   if (!market || market.error) {
     res.setHeader('Location', target);
@@ -51,7 +69,11 @@ module.exports = async (req, res) => {
   const title   = esc(market.title);
   const desc    = `SIM ${probYes}% · NÃO ${probNo}% · Volume R$${fmt(volume)} — Opere agora na Futoro`;
   const image   = market.image_url ? esc(market.image_url) : DEFAULT_IMAGE;
-  const url     = `${SITE}/m/${encodeURIComponent(id)}`;
+  // Canonical URL uses slug if available
+  const canonicalPath = market.slug
+    ? `/mercado/${encodeURIComponent(market.slug)}`
+    : `/m/${encodeURIComponent(market.id || id)}`;
+  const url = `${SITE}${canonicalPath}`;
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');

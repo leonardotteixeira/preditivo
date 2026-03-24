@@ -9,7 +9,7 @@
   }
 
   .skip-link:focus {
-    @apply left-4 outline outline-2 outline-offset-2 outline-bubuya-accent;
+    @apply left-4 outline outline-2 outline-offset-2 outline-futoro-accent;
   }
 
   :root {
@@ -51,7 +51,7 @@
   }
 
   :focus-visible {
-    @apply outline outline-2 outline-offset-2 outline-bubuya-accent;
+    @apply outline outline-2 outline-offset-2 outline-futoro-accent;
   }
 
   :where(a, button, input, select, textarea):focus-visible {
@@ -63,7 +63,7 @@
 @layer components {
   /* ── Footer ── */
   footer {
-    @apply relative z-10 mt-16 border-t border-bubuya-line px-6 py-16 md:px-8 md:py-20;
+    @apply relative z-10 mt-16 border-t border-futoro-line px-6 py-16 md:px-8 md:py-20;
     background-color: var(--bg);
   }
 
@@ -84,11 +84,11 @@
   }
 
   .footer-legal {
-    @apply mx-auto mt-12 max-w-[1440px] border-t border-bubuya-line pt-8 text-sm leading-relaxed text-zinc-500;
+    @apply mx-auto mt-12 max-w-[1440px] border-t border-futoro-line pt-8 text-sm leading-relaxed text-zinc-500;
   }
 
   .footer-disclaimer {
-    @apply mt-6 rounded-md border border-bubuya-line bg-bubuya-surface/50 p-4 text-zinc-400;
+    @apply mt-6 rounded-md border border-futoro-line bg-futoro-surface/50 p-4 text-zinc-400;
   }
 
   .footer-disclaimer strong {
@@ -121,7 +121,7 @@
 
   /* ── Header ── */
   header {
-    @apply sticky top-0 z-[100] border-b border-bubuya-line backdrop-blur-sm;
+    @apply sticky top-0 z-[100] border-b border-futoro-line backdrop-blur-sm;
     background-color: rgba(8, 12, 20, 0.94);
     /* Subtle depth line below header */
     box-shadow: 0 1px 0 0 rgba(96, 165, 250, 0.06);
@@ -136,7 +136,7 @@
   }
 
   .header-search {
-    @apply mx-auto flex max-w-md flex-1 items-center gap-2 rounded-md border border-bubuya-line bg-bubuya-surface px-3 py-2 transition-colors focus-within:border-bubuya-accent/40;
+    @apply mx-auto flex max-w-md flex-1 items-center gap-2 rounded-md border border-futoro-line bg-futoro-surface px-3 py-2 transition-colors focus-within:border-futoro-accent/40;
   }
 
   .header-search input {
@@ -163,11 +163,11 @@
   }
 
   nav a {
-    @apply cursor-pointer rounded-md px-3 py-2 text-sm font-medium text-zinc-500 no-underline transition-colors hover:bg-bubuya-raised hover:text-zinc-200;
+    @apply cursor-pointer rounded-md px-3 py-2 text-sm font-medium text-zinc-500 no-underline transition-colors hover:bg-futoro-raised hover:text-zinc-200;
   }
 
   nav a.active {
-    @apply bg-bubuya-raised text-zinc-100;
+    @apply bg-futoro-raised text-zinc-100;
   }
 
   /* ── Buttons ── */
@@ -176,7 +176,7 @@
   }
 
   .btn-outline {
-    @apply inline-flex cursor-pointer items-center justify-center rounded-md border border-bubuya-line bg-transparent px-3 py-2 text-sm font-medium text-zinc-200 transition hover:border-zinc-600 hover:bg-bubuya-raised;
+    @apply inline-flex cursor-pointer items-center justify-center rounded-md border border-futoro-line bg-transparent px-3 py-2 text-sm font-medium text-zinc-200 transition hover:border-zinc-600 hover:bg-futoro-raised;
   }
 
   .btn-finance {
@@ -216,7 +216,7 @@
   }
 
   .btn-withdraw {
-    @apply border-bubuya-line bg-bubuya-surface text-zinc-300 hover:border-zinc-600 hover:bg-bubuya-raised;
+    @apply border-futoro-line bg-futoro-surface text-zinc-300 hover:border-zinc-600 hover:bg-futoro-raised;
   }
 
   .market-share-row {
@@ -545,7 +545,7 @@
   }
 
   .hero-tag {
-    @apply mb-6 inline-flex items-center gap-2 rounded border border-bubuya-line bg-bubuya-surface px-3 py-1.5 text-xs font-medium uppercase tracking-wide text-zinc-400;
+    @apply mb-6 inline-flex items-center gap-2 rounded border border-futoro-line bg-futoro-surface px-3 py-1.5 text-xs font-medium uppercase tracking-wide text-zinc-400;
   }
 
   .hero h1,
@@ -555,7 +555,7 @@
 
   .hero h1 span,
   .hero-content h1 span {
-    @apply text-bubuya-accent;
+    @apply text-futoro-accent;
   }
 
   .hero-sub {
@@ -567,7 +567,7 @@
   }
 
   .hero-stats {
-    @apply flex flex-wrap gap-8 border-t border-bubuya-line pt-8 md:gap-14;
+    @apply flex flex-wrap gap-8 border-t border-futoro-line pt-8 md:gap-14;
   }
 
   .hero-stat-item {
@@ -588,7 +588,7 @@
 
   /* ── Hero image — smooth hover lift with blue ambient glow ── */
   .hero-image-main {
-    @apply w-full rounded-lg border border-bubuya-line;
+    @apply w-full rounded-lg border border-futoro-line;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(96, 165, 250, 0.06) inset;
     transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94),
                 box-shadow 0.45s ease;
@@ -629,7 +629,7 @@
   }
 
   .topic-tag {
-    @apply shrink-0 cursor-pointer rounded-md border border-bubuya-line bg-bubuya-surface px-3 py-2 text-sm font-medium text-zinc-500 transition hover:border-zinc-600 hover:text-zinc-200;
+    @apply shrink-0 cursor-pointer rounded-md border border-futoro-line bg-futoro-surface px-3 py-2 text-sm font-medium text-zinc-500 transition hover:border-zinc-600 hover:text-zinc-200;
   }
 
   button.topic-tag {
@@ -637,7 +637,7 @@
   }
 
   .topic-tag.active {
-    @apply border-bubuya-accent/40 bg-bubuya-raised text-zinc-100;
+    @apply border-futoro-accent/40 bg-futoro-raised text-zinc-100;
   }
 
   /* ── Market grid & cards ── */
@@ -646,7 +646,7 @@
   }
 
   .market-card {
-    @apply flex cursor-pointer flex-col gap-4 rounded-lg border border-bubuya-line bg-bubuya-surface p-5;
+    @apply flex cursor-pointer flex-col gap-4 rounded-lg border border-futoro-line bg-futoro-surface p-5;
     box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.05) inset, 0 1px 3px rgba(0, 0, 0, 0.5);
     transition: border-color 0.2s ease, box-shadow 0.22s ease, transform 0.22s ease;
   }
@@ -668,7 +668,7 @@
   }
 
   .mc-sentiment {
-    @apply flex h-1.5 overflow-hidden rounded-sm border border-bubuya-line bg-bubuya-void;
+    @apply flex h-1.5 overflow-hidden rounded-sm border border-futoro-line bg-futoro-void;
   }
 
   .mc-sentiment-yes {
@@ -680,7 +680,7 @@
   }
 
   .mc-footer {
-    @apply mt-auto flex flex-col gap-3 border-t border-bubuya-line pt-4 sm:flex-row sm:items-center sm:justify-between;
+    @apply mt-auto flex flex-col gap-3 border-t border-futoro-line pt-4 sm:flex-row sm:items-center sm:justify-between;
   }
 
   .mc-stat {
@@ -722,7 +722,7 @@
   }
 
   .ranking-card {
-    @apply flex items-center gap-4 rounded-lg border border-bubuya-line bg-bubuya-surface p-4;
+    @apply flex items-center gap-4 rounded-lg border border-futoro-line bg-futoro-surface p-4;
     transition: border-color 0.2s ease, transform 0.2s ease;
   }
 
@@ -740,7 +740,7 @@
   .rank-pos.bronze { @apply text-amber-700; }
 
   .rank-avatar {
-    @apply flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-bubuya-line bg-bubuya-void text-sm font-semibold;
+    @apply flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-futoro-line bg-futoro-void text-sm font-semibold;
   }
 
   .rank-name {
@@ -899,7 +899,7 @@
   }
 
   .portfolio-card {
-    @apply rounded-lg border border-bubuya-line bg-bubuya-surface p-5;
+    @apply rounded-lg border border-futoro-line bg-futoro-surface p-5;
     transition: border-color 0.2s ease;
   }
 
@@ -1044,7 +1044,7 @@
   }
 
   .pnl-tab.active {
-    @apply border-bubuya-line bg-bubuya-raised text-zinc-100;
+    @apply border-futoro-line bg-futoro-raised text-zinc-100;
   }
 
   /* ── Modals ── */
@@ -1058,7 +1058,7 @@
   }
 
   .modal {
-    @apply relative max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-t-lg border border-bubuya-line bg-bubuya-surface p-6 sm:rounded-lg md:p-8;
+    @apply relative max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-t-lg border border-futoro-line bg-futoro-surface p-6 sm:rounded-lg md:p-8;
     box-shadow: 0 24px 64px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(96, 165, 250, 0.07) inset;
   }
 
@@ -1075,7 +1075,7 @@
   }
 
   .modal-input {
-    @apply mb-3 w-full rounded-md border border-bubuya-line bg-bubuya-void px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-bubuya-accent/50 focus:outline-none focus:ring-1 focus:ring-blue-400/30;
+    @apply mb-3 w-full rounded-md border border-futoro-line bg-futoro-void px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-futoro-accent/50 focus:outline-none focus:ring-1 focus:ring-blue-400/30;
   }
 
   .modal-step {
@@ -1174,7 +1174,7 @@
 
   /* ── Deposit tabs ── */
   .deposit-tabs {
-    @apply mb-6 flex gap-1 rounded-md border border-bubuya-line bg-bubuya-void p-1;
+    @apply mb-6 flex gap-1 rounded-md border border-futoro-line bg-futoro-void p-1;
   }
 
   .deposit-tab {
@@ -1182,7 +1182,7 @@
   }
 
   .deposit-tab.active {
-    @apply bg-bubuya-surface text-zinc-100 shadow-sm;
+    @apply bg-futoro-surface text-zinc-100 shadow-sm;
   }
 
   .deposit-panel {
@@ -1194,11 +1194,11 @@
   }
 
   .pix-qr-box {
-    @apply my-4 flex flex-col items-center gap-3 rounded-md border border-bubuya-line bg-white p-4;
+    @apply my-4 flex flex-col items-center gap-3 rounded-md border border-futoro-line bg-white p-4;
   }
 
   .pix-key-box {
-    @apply my-4 flex items-center justify-between gap-3 rounded-md border border-bubuya-line bg-bubuya-void px-4 py-3;
+    @apply my-4 flex items-center justify-between gap-3 rounded-md border border-futoro-line bg-futoro-void px-4 py-3;
   }
 
   .pix-key-val {
@@ -1206,11 +1206,11 @@
   }
 
   .btn-copy {
-    @apply shrink-0 cursor-pointer rounded-md border border-bubuya-line bg-bubuya-surface px-3 py-1.5 text-xs font-medium text-zinc-200 hover:bg-bubuya-raised;
+    @apply shrink-0 cursor-pointer rounded-md border border-futoro-line bg-futoro-surface px-3 py-1.5 text-xs font-medium text-zinc-200 hover:bg-futoro-raised;
   }
 
   .wallet-chip {
-    @apply mb-4 flex items-center gap-3 rounded-md border border-bubuya-line bg-bubuya-void px-4 py-3;
+    @apply mb-4 flex items-center gap-3 rounded-md border border-futoro-line bg-futoro-void px-4 py-3;
   }
 
   .wallet-dot {
@@ -1222,7 +1222,7 @@
   }
 
   .method-info {
-    @apply mb-4 rounded-md border border-bubuya-line bg-bubuya-void p-4 text-sm leading-relaxed text-zinc-500;
+    @apply mb-4 rounded-md border border-futoro-line bg-futoro-void p-4 text-sm leading-relaxed text-zinc-500;
   }
 
   .method-info-crypto {
@@ -2256,7 +2256,7 @@
 
   /* ── Toast ── */
   .toast {
-    @apply fixed bottom-4 right-4 z-[2000] flex translate-y-full items-center gap-4 rounded-md border border-bubuya-line bg-bubuya-raised px-5 py-4 opacity-0 transition duration-300;
+    @apply fixed bottom-4 right-4 z-[2000] flex translate-y-full items-center gap-4 rounded-md border border-futoro-line bg-futoro-raised px-5 py-4 opacity-0 transition duration-300;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(96, 165, 250, 0.08) inset;
   }
 
@@ -2374,7 +2374,7 @@
   }
 
   .mobile-nav {
-    @apply fixed inset-x-0 bottom-0 top-14 z-[98] hidden flex-col overflow-y-auto border-t border-bubuya-line;
+    @apply fixed inset-x-0 bottom-0 top-14 z-[98] hidden flex-col overflow-y-auto border-t border-futoro-line;
     background-color: var(--bg);
     padding: 16px;
     gap: 6px;
@@ -2385,7 +2385,7 @@
   }
 
   .mobile-nav-search {
-    @apply mb-3 flex items-center gap-2 rounded-md border border-bubuya-line bg-bubuya-surface px-3 py-2.5;
+    @apply mb-3 flex items-center gap-2 rounded-md border border-futoro-line bg-futoro-surface px-3 py-2.5;
   }
 
   .mobile-nav-search input {
@@ -2434,7 +2434,7 @@
 
   /* Legacy .mobile-nav a (for mobileAuthArea content injected by JS) */
   .mobile-nav a:not(.mnav-link) {
-    @apply flex cursor-pointer items-center rounded-md border border-bubuya-line bg-bubuya-surface px-4 py-3 text-sm font-medium text-zinc-200 no-underline;
+    @apply flex cursor-pointer items-center rounded-md border border-futoro-line bg-futoro-surface px-4 py-3 text-sm font-medium text-zinc-200 no-underline;
     transition: background-color 0.18s, border-color 0.18s;
     min-height: 44px;
   }
@@ -2445,7 +2445,7 @@
   }
 
   .mobile-nav-divider {
-    @apply my-2 h-px bg-bubuya-line;
+    @apply my-2 h-px bg-futoro-line;
   }
 
   .mobile-nav-auth {

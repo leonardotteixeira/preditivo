@@ -698,6 +698,112 @@
   </div>
 </div>
 
+<!-- ── ONBOARDING OVERLAY ── -->
+<div id="onboardingOverlay" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(3,3,3,0.92);backdrop-filter:blur(8px);align-items:center;justify-content:center;">
+  <div id="onboardingCard" style="
+    background:#0a0a0a;border:1px solid rgba(255,255,255,0.08);border-radius:24px;
+    width:min(480px,calc(100vw - 32px));padding:40px 36px 32px;position:relative;
+    box-shadow:0 32px 80px rgba(0,0,0,0.7),0 0 0 1px rgba(96,165,250,0.07) inset;
+  ">
+    <!-- Skip -->
+    <button onclick="window.closeOnboarding()" style="
+      position:absolute;top:16px;right:16px;background:transparent;border:none;
+      color:#555;font-size:1rem;cursor:pointer;padding:6px 10px;border-radius:8px;
+      transition:color .2s;line-height:1;
+    " onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#555'">✕</button>
+
+    <!-- Steps container -->
+    <div id="ob-steps">
+
+      <!-- STEP 1: Bem-vindo -->
+      <div class="ob-step" id="ob-step-1" style="display:block;text-align:center;">
+        <div style="width:72px;height:72px;margin:0 auto 24px;border-radius:20px;background:linear-gradient(135deg,rgba(96,165,250,0.15),rgba(16,185,129,0.10));border:1px solid rgba(96,165,250,0.2);display:flex;align-items:center;justify-content:center;font-size:2rem;">🎉</div>
+        <h2 style="font-size:1.5rem;font-weight:700;color:#fff;margin-bottom:10px;letter-spacing:-0.3px;">Bem-vindo à Futoro!</h2>
+        <p style="color:#888;font-size:0.95rem;line-height:1.6;margin-bottom:0;">O primeiro mercado de previsão real do Brasil. Você vai operar eventos reais com dinheiro de verdade — via PIX.</p>
+      </div>
+
+      <!-- STEP 2: Como funciona -->
+      <div class="ob-step" id="ob-step-2" style="display:none;text-align:center;">
+        <div style="width:72px;height:72px;margin:0 auto 24px;border-radius:20px;background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.2);display:flex;align-items:center;justify-content:center;font-size:2rem;">📊</div>
+        <h2 style="font-size:1.5rem;font-weight:700;color:#fff;margin-bottom:10px;letter-spacing:-0.3px;">Como funciona?</h2>
+        <p style="color:#888;font-size:0.95rem;line-height:1.6;margin-bottom:20px;">Cada mercado tem uma pergunta com resultado binário — SIM ou NÃO. O preço reflete a probabilidade estimada pelo mercado.</p>
+        <div style="display:flex;gap:10px;justify-content:center;">
+          <div style="flex:1;max-width:140px;padding:14px 10px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:12px;">
+            <div style="font-size:1.5rem;margin-bottom:6px;">✅</div>
+            <div style="font-size:0.85rem;font-weight:700;color:#10b981;">SIM</div>
+            <div style="font-size:0.78rem;color:#888;margin-top:4px;">Evento vai acontecer</div>
+          </div>
+          <div style="flex:1;max-width:140px;padding:14px 10px;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.2);border-radius:12px;">
+            <div style="font-size:1.5rem;margin-bottom:6px;">❌</div>
+            <div style="font-size:0.85rem;font-weight:700;color:#f43f5e;">NÃO</div>
+            <div style="font-size:0.78rem;color:#888;margin-top:4px;">Evento não acontece</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: Depositar e operar -->
+      <div class="ob-step" id="ob-step-3" style="display:none;text-align:center;">
+        <div style="width:72px;height:72px;margin:0 auto 24px;border-radius:20px;background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.2);display:flex;align-items:center;justify-content:center;font-size:2rem;">💸</div>
+        <h2 style="font-size:1.5rem;font-weight:700;color:#fff;margin-bottom:10px;letter-spacing:-0.3px;">Deposite e comece</h2>
+        <p style="color:#888;font-size:0.95rem;line-height:1.6;margin-bottom:20px;">Deposite via PIX a partir de <strong style="color:#fff;">R$5</strong>. O saldo aparece em segundos. Se acertar a previsão, você recebe de volta com lucro.</p>
+        <div style="background:#121212;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:14px 16px;text-align:left;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <span style="font-size:1rem;">1️⃣</span>
+            <span style="font-size:0.85rem;color:#ccc;">Clique em <strong style="color:#60a5fa;">Depositar</strong> no menu</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <span style="font-size:1rem;">2️⃣</span>
+            <span style="font-size:0.85rem;color:#ccc;">Pague via <strong style="color:#fff;">PIX</strong> — saldo em segundos</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:1rem;">3️⃣</span>
+            <span style="font-size:0.85rem;color:#ccc;">Escolha um mercado e opere <strong style="color:#10b981;">SIM</strong> ou <strong style="color:#f43f5e;">NÃO</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4: Pronto! -->
+      <div class="ob-step" id="ob-step-4" style="display:none;text-align:center;">
+        <div style="width:72px;height:72px;margin:0 auto 24px;border-radius:20px;background:linear-gradient(135deg,rgba(96,165,250,0.15),rgba(16,185,129,0.10));border:1px solid rgba(96,165,250,0.2);display:flex;align-items:center;justify-content:center;">
+          <svg viewBox="155 335 145 165" xmlns="http://www.w3.org/2000/svg" width="40" height="40"><path fill="#60a5fa" d="M194.84 405L195.68 405.08C196.7 406.38 196.3 415.61 196.27 417.96C200.03 423.05 203.71 428.19 207.33 433.38C207.53 436.68 207.39 441.16 207.38 444.55C209.66 447.17 212.4 449.96 214.8 452.51C221.32 452.44 227.84 452.42 234.36 452.47C227.66 460.77 219.74 473.14 214.22 482.27L205.54 482.28L166.05 482.28L166.05 422.41C175.5 416.37 185.1 410.57 194.84 405Z"/><path fill="#60a5fa" opacity=".5" d="M288.71 348.73C288.79 351.74 282.18 373.44 280.92 377.59C276.02 380.86 260.84 387.9 255.13 390.45C254.71 386.87 254.95 379.55 254.99 375.72C277.63 367.32 274.5 366.65 288.71 348.73Z"/><path fill="#60a5fa" opacity=".5" d="M162.23 348.93C163.54 349.81 167.27 354.55 168.19 355.8C180.17 372.24 178.41 369.16 196.27 375.75L196.24 390.48C189.58 387.82 176.89 381.28 170.36 377.9C167.75 368.29 164.36 358.61 162.23 348.93Z"/><path fill="#60a5fa" opacity=".35" d="M221.11 373.9C230.81 373.07 240.8 374.98 250.48 376.24C250.54 382 250.55 387.76 250.5 393.52C246.21 396.85 242.18 399.7 237.91 403.22C236.49 408.95 235.45 421.4 233.55 426.25C232.5 426.91 231.88 426.71 230.5 426.76L217.66 426.74C216.13 419.92 214.84 410.75 213.7 403.77C209.51 399.96 205.19 396.79 200.68 393.39C200.65 387.68 200.68 381.96 200.75 376.25C207.39 375.27 214.42 374.57 221.11 373.9Z"/></svg>
+        </div>
+        <h2 style="font-size:1.5rem;font-weight:700;color:#fff;margin-bottom:10px;letter-spacing:-0.3px;">Tudo pronto!</h2>
+        <p style="color:#888;font-size:0.95rem;line-height:1.6;margin-bottom:0;">Explore os mercados disponíveis e faça sua primeira operação. Boa sorte — e boas previsões!</p>
+      </div>
+
+    </div><!-- /ob-steps -->
+
+    <!-- Progress dots -->
+    <div style="display:flex;justify-content:center;gap:6px;margin:28px 0 20px;">
+      <div class="ob-dot" id="ob-dot-1" style="width:8px;height:8px;border-radius:50%;background:#60a5fa;transition:all .3s;"></div>
+      <div class="ob-dot" id="ob-dot-2" style="width:8px;height:8px;border-radius:50%;background:#333;transition:all .3s;"></div>
+      <div class="ob-dot" id="ob-dot-3" style="width:8px;height:8px;border-radius:50%;background:#333;transition:all .3s;"></div>
+      <div class="ob-dot" id="ob-dot-4" style="width:8px;height:8px;border-radius:50%;background:#333;transition:all .3s;"></div>
+    </div>
+
+    <!-- Buttons -->
+    <div style="display:flex;gap:10px;align-items:center;">
+      <button id="ob-btn-back" onclick="window.obPrev()" style="
+        display:none;flex:0 0 auto;padding:12px 18px;border-radius:12px;
+        background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);
+        color:#888;font-size:0.9rem;cursor:pointer;font-family:inherit;
+        transition:all .2s;
+      " onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#888'">← Voltar</button>
+      <button id="ob-btn-next" onclick="window.obNext()" style="
+        flex:1;padding:14px;border-radius:12px;
+        background:linear-gradient(135deg,#3b82f6,#2563eb);border:none;
+        color:#fff;font-size:0.95rem;font-weight:600;cursor:pointer;font-family:inherit;
+        transition:all .2s;box-shadow:0 4px 16px rgba(59,130,246,0.3);
+      ">Próximo →</button>
+    </div>
+
+    <!-- Skip link -->
+    <p style="text-align:center;margin-top:14px;font-size:0.8rem;color:#444;">
+      <span onclick="window.closeOnboarding()" style="cursor:pointer;text-decoration:underline;transition:color .2s;" onmouseover="this.style.color='#888'" onmouseout="this.style.color='#444'">Pular introdução</span>
+    </p>
+  </div>
+</div>
+
 <script src="/config.js?v=20260326"></script>
 <script src="/security.js?v=20260326"></script>
 <script>
@@ -923,7 +1029,62 @@ window._finalizeLogin = function(d) {
   setTimeout(function(){ window.registerPush(d.token); }, 2000);
   // BLOCO 5: verificar termo de riscos após login manual
   setTimeout(function(){ window.checkRiskTermStatus(); }, 500);
+  // T3 — Onboarding para novos usuários
+  if (localStorage.getItem('futoro_onboarding_pending') && !localStorage.getItem('futoro_onboarding_done')) {
+    setTimeout(function(){ window.showOnboarding(); }, 1200);
+  }
 };
+
+// ---- ONBOARDING ----
+var _obStep = 1;
+var _obTotal = 4;
+
+window.showOnboarding = function() {
+  _obStep = 1;
+  _obRender();
+  var el = document.getElementById('onboardingOverlay');
+  el.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+};
+
+window.closeOnboarding = function() {
+  document.getElementById('onboardingOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+  localStorage.removeItem('futoro_onboarding_pending');
+  localStorage.setItem('futoro_onboarding_done', '1');
+};
+
+window.obNext = function() {
+  if (_obStep < _obTotal) { _obStep++; _obRender(); }
+  else { window.closeOnboarding(); window.openModal('depositModal'); }
+};
+
+window.obPrev = function() {
+  if (_obStep > 1) { _obStep--; _obRender(); }
+};
+
+function _obRender() {
+  for (var i = 1; i <= _obTotal; i++) {
+    var s = document.getElementById('ob-step-' + i);
+    var d = document.getElementById('ob-dot-' + i);
+    if (s) s.style.display = (i === _obStep) ? 'block' : 'none';
+    if (d) d.style.background = (i === _obStep) ? '#60a5fa' : '#333';
+    if (d) d.style.width = (i === _obStep) ? '20px' : '8px';
+    if (d) d.style.borderRadius = (i === _obStep) ? '4px' : '50%';
+  }
+  var backBtn = document.getElementById('ob-btn-back');
+  var nextBtn = document.getElementById('ob-btn-next');
+  if (backBtn) backBtn.style.display = (_obStep > 1) ? 'block' : 'none';
+  if (nextBtn) {
+    nextBtn.textContent = (_obStep === _obTotal) ? 'Começar a operar →' : 'Próximo →';
+    nextBtn.style.background = (_obStep === _obTotal)
+      ? 'linear-gradient(135deg,#10b981,#059669)'
+      : 'linear-gradient(135deg,#3b82f6,#2563eb)';
+    nextBtn.style.boxShadow = (_obStep === _obTotal)
+      ? '0 4px 16px rgba(16,185,129,0.3)'
+      : '0 4px 16px rgba(59,130,246,0.3)';
+  }
+}
 
 // ---- PUSH NOTIFICATIONS ----
 window.registerPush = async function(token) {
@@ -1031,6 +1192,7 @@ window.doRegisterVerify = async () => {
     window.closeModal('registerModal');
     window.backToRegStep1();
     if (loginData.token) {
+      localStorage.setItem('futoro_onboarding_pending', '1');
       window._finalizeLogin({ ...loginData, user: { ...loginData.user } });
       window.showToast('ðŸŽ‰', 'Conta criada!', 'Bem-vindo Ã  Futoro!');
     } else {

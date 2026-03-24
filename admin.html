@@ -659,6 +659,103 @@
       <div id="tkReplyFeedback" style="margin-top:8px;font-size:0.82rem;text-align:center"></div>
     </div>
   </div>
+
+    <!-- AMBIENTE DE TESTE -->
+    <div id="sec-teste" class="admin-panel">
+      <div class="admin-section-title">🧪 Ambiente de Teste</div>
+
+      <!-- Status Cards -->
+      <div id="testeStatusCards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center">
+          <div style="font-size:1.4rem;font-weight:700;color:#60a5fa" id="ts-real-users">-</div>
+          <div style="font-size:0.75rem;color:var(--muted);margin-top:4px">Usuários Reais</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center">
+          <div style="font-size:1.4rem;font-weight:700;color:#34d399" id="ts-total-balance">-</div>
+          <div style="font-size:0.75rem;color:var(--muted);margin-top:4px">Saldo Total</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center">
+          <div style="font-size:1.4rem;font-weight:700;color:#f59e0b" id="ts-real-bets">-</div>
+          <div style="font-size:0.75rem;color:var(--muted);margin-top:4px">Apostas Reais</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center">
+          <div style="font-size:1.4rem;font-weight:700;color:#a78bfa" id="ts-active-markets">-</div>
+          <div style="font-size:0.75rem;color:var(--muted);margin-top:4px">Mercados Ativos</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center">
+          <div style="font-size:1.4rem;font-weight:700;color:#fb923c" id="ts-bot-count">-</div>
+          <div style="font-size:0.75rem;color:var(--muted);margin-top:4px">Bots Ativos</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center">
+          <div style="font-size:1rem;font-weight:700;color:#34d399" id="ts-txotta">-</div>
+          <div style="font-size:0.75rem;color:var(--muted);margin-top:4px">txotta</div>
+        </div>
+      </div>
+
+      <!-- Reset Controls -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:24px">
+        <!-- Zerar Saldos -->
+        <div style="background:var(--surface);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:16px">
+          <div style="font-weight:600;margin-bottom:6px;color:#f87171">⚠️ Zerar Saldos Reais</div>
+          <p style="font-size:0.8rem;color:var(--muted);margin-bottom:12px">Define saldo de todos os usuários reais (não-bots) para R$0,00.</p>
+          <button class="btn btn-resolve" onclick="testeReset({zero_balances:true})" style="background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.4);color:#f87171;width:100%">Zerar Saldos</button>
+        </div>
+
+        <!-- Limpar Apostas -->
+        <div style="background:var(--surface);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:16px">
+          <div style="font-weight:600;margin-bottom:6px;color:#f87171">⚠️ Limpar Histórico de Apostas</div>
+          <p style="font-size:0.8rem;color:var(--muted);margin-bottom:12px">Remove todas as apostas de usuários reais (bots são preservados).</p>
+          <button class="btn btn-resolve" onclick="testeReset({clear_bets:true})" style="background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.4);color:#f87171;width:100%">Limpar Apostas</button>
+        </div>
+
+        <!-- Resetar Volumes -->
+        <div style="background:var(--surface);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:16px">
+          <div style="font-weight:600;margin-bottom:6px;color:#f87171">⚠️ Resetar Volumes dos Mercados</div>
+          <p style="font-size:0.8rem;color:var(--muted);margin-bottom:12px">Zera q_yes / q_no de todos os mercados ativos (volta para prob inicial).</p>
+          <button class="btn btn-resolve" onclick="testeReset({reset_markets:true})" style="background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.4);color:#f87171;width:100%">Resetar Volumes</button>
+        </div>
+
+        <!-- Reset Completo -->
+        <div style="background:var(--surface);border:1px solid rgba(239,68,68,0.6);border-radius:12px;padding:16px">
+          <div style="font-weight:700;margin-bottom:6px;color:#ef4444">💣 Reset Completo do Período</div>
+          <p style="font-size:0.8rem;color:var(--muted);margin-bottom:12px">Zera saldos + limpa apostas reais + reseta volumes. Configura txotta com R$1M.</p>
+          <button class="btn btn-resolve" onclick="testeReset({zero_balances:true,clear_bets:true,reset_markets:true,set_txotta:true})" style="background:rgba(239,68,68,0.25);border-color:#ef4444;color:#fca5a5;font-weight:700;width:100%">💣 RESET COMPLETO</button>
+        </div>
+      </div>
+
+      <!-- Configurar txotta -->
+      <div style="background:var(--surface);border:1px solid rgba(96,165,250,0.3);border-radius:12px;padding:16px;margin-bottom:16px">
+        <div style="font-weight:600;margin-bottom:6px;color:#60a5fa">💰 Configurar txotta</div>
+        <p style="font-size:0.8rem;color:var(--muted);margin-bottom:12px">Define saldo R$1.000.000 e remove trava de limite para a conta txotta.</p>
+        <button class="btn btn-green" onclick="testeReset({set_txotta:true})" style="width:100%">Aplicar Configuração txotta</button>
+      </div>
+
+      <!-- Configurar Usuário Custom -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px">
+        <div style="font-weight:600;margin-bottom:12px;color:var(--text)">🔧 Configurar Usuário</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end">
+          <div>
+            <label style="font-size:0.75rem;color:var(--muted);display:block;margin-bottom:4px">Username</label>
+            <input id="cfg-username" class="form-input" type="text" placeholder="ex: txotta">
+          </div>
+          <div>
+            <label style="font-size:0.75rem;color:var(--muted);display:block;margin-bottom:4px">Saldo (R$)</label>
+            <input id="cfg-balance" class="form-input" type="number" placeholder="ex: 1000000">
+          </div>
+          <div>
+            <label style="font-size:0.75rem;color:var(--muted);display:block;margin-bottom:4px">Sem Limite</label>
+            <select id="cfg-no-limit" class="form-input">
+              <option value="">-- manter --</option>
+              <option value="true">Sim (sem limite)</option>
+              <option value="false">Não (com limite)</option>
+            </select>
+          </div>
+          <button class="btn btn-green" onclick="testeConfigUser()">Aplicar</button>
+        </div>
+        <div id="cfg-user-feedback" style="margin-top:8px;font-size:0.82rem;color:#34d399"></div>
+      </div>
+    </div>
+
 </div>
 
 <!-- MODAL RESOLVER -->
@@ -872,6 +969,7 @@ function switchTab(name, el) {
   if (name === 'reports') loadSiscoafReported();
   if (name === 'sandbox') loadSandboxUsers();
   if (name === 'config') loadGlobalConfig();
+  if (name === 'teste') loadTesteStatus();
 }
 
 function openModal(id) { document.getElementById(id).classList.add('active'); }
@@ -3089,6 +3187,79 @@ function loadComplianceDashboard() {
       }
     })
     .catch(function(){});
+}
+
+// ── AMBIENTE DE TESTE ────────────────────────────────────────────────────────
+
+function loadTesteStatus() {
+  fetch(API + '/admin/test/status', { headers: adminHeaders() })
+    .then(function(r){ return r.json(); })
+    .then(function(d) {
+      if (d.error) return;
+      document.getElementById('ts-real-users').textContent = d.real_users ?? '-';
+      document.getElementById('ts-total-balance').textContent = 'R$' + parseFloat(d.total_real_balance || 0).toLocaleString('pt-BR', {maximumFractionDigits:0});
+      document.getElementById('ts-real-bets').textContent = d.real_bets ?? '-';
+      document.getElementById('ts-active-markets').textContent = d.active_markets ?? '-';
+      document.getElementById('ts-bot-count').textContent = d.bot_count ?? '-';
+      var txotta = d.txotta;
+      if (txotta) {
+        document.getElementById('ts-txotta').textContent = 'R$' + parseFloat(txotta.balance || 0).toLocaleString('pt-BR', {maximumFractionDigits:0}) + (txotta.no_bet_limit ? ' ✓' : '');
+      } else {
+        document.getElementById('ts-txotta').textContent = 'não encontrado';
+      }
+    })
+    .catch(function(){});
+}
+
+function testeReset(flags) {
+  var label = [];
+  if (flags.zero_balances) label.push('zerar saldos');
+  if (flags.clear_bets) label.push('limpar apostas');
+  if (flags.reset_markets) label.push('resetar volumes');
+  if (flags.set_txotta) label.push('configurar txotta');
+  if (!confirm('Confirma: ' + label.join(', ') + '?\n\nEsta ação não pode ser desfeita.')) return;
+  fetch(API + '/admin/test/reset-environment', {
+    method: 'POST',
+    headers: Object.assign({'Content-Type':'application/json'}, adminHeaders()),
+    body: JSON.stringify(flags)
+  })
+    .then(function(r){ return r.json(); })
+    .then(function(d) {
+      if (d.error) { showToast('Erro: ' + d.error); return; }
+      var msg = [];
+      if (d.balances_zeroed) msg.push('Saldos zerados: ' + d.balances_zeroed);
+      if (d.bets_cleared) msg.push('Apostas limpas: ' + d.bets_cleared);
+      if (d.markets_reset) msg.push('Mercados resetados: ' + d.markets_reset);
+      if (d.txotta_configured) msg.push('txotta configurado ✓');
+      showToast(msg.join(' | ') || 'Concluído');
+      loadTesteStatus();
+    })
+    .catch(function(){ showToast('Erro de conexão'); });
+}
+
+function testeConfigUser() {
+  var username = document.getElementById('cfg-username').value.trim();
+  var balance = document.getElementById('cfg-balance').value;
+  var noLimit = document.getElementById('cfg-no-limit').value;
+  if (!username) { showToast('Informe o username'); return; }
+  var body = { username: username };
+  if (balance !== '') body.balance = parseFloat(balance);
+  if (noLimit !== '') body.no_bet_limit = noLimit === 'true';
+  var fb = document.getElementById('cfg-user-feedback');
+  fb.textContent = 'Salvando...';
+  fetch(API + '/admin/test/configure-user', {
+    method: 'POST',
+    headers: Object.assign({'Content-Type':'application/json'}, adminHeaders()),
+    body: JSON.stringify(body)
+  })
+    .then(function(r){ return r.json(); })
+    .then(function(d) {
+      if (d.error) { fb.style.color = '#f87171'; fb.textContent = 'Erro: ' + d.error; return; }
+      fb.style.color = '#34d399';
+      fb.textContent = '✓ ' + d.username + ' — saldo R$' + parseFloat(d.balance).toLocaleString('pt-BR', {maximumFractionDigits:0}) + (d.no_bet_limit ? ' | sem limite' : '');
+      loadTesteStatus();
+    })
+    .catch(function(){ fb.style.color = '#f87171'; fb.textContent = 'Erro de conexão'; });
 }
 </script>
   <script type="module" src="/src/admin.js"></script>

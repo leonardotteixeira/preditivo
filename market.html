@@ -301,15 +301,32 @@ function renderPage() {
         '</div>' +
       '</div>' +
 
-      '<div class="section-card trades-card">' +
-        '<div class="card-title-row">' +
-          '<div class="card-title">Operações recentes</div>' +
+      '<div class="section-card hb-panel">' +
+        '<div class="hb-tabs">' +
+          '<button class="hb-tab active" onclick="hbTab(this,'book')" id="tab-book">Livro de Ofertas</button>' +
+          '<button class="hb-tab" onclick="hbTab(this,'tape')" id="tab-tape">Fita de Negócios</button>' +
+        '</div>' +
+
+        '<div class="hb-content" id="hb-book">' +
+          '<div class="hb-book-header">' +
+            '<span class="hb-col-qty">Qtd</span>' +
+            '<span class="hb-col-price">Preço</span>' +
+            '<span class="hb-col-qty" style="text-align:right">Qtd</span>' +
+          '</div>' +
+          '<div id="bookRows"></div>' +
+          '<div class="hb-spread-row" id="hbSpread"></div>' +
+        '</div>' +
+
+        '<div class="hb-content" id="hb-tape" style="display:none">' +
+          '<div class="hb-tape-header">' +
+            '<span>Hora</span><span>Operador</span><span>Lado</span><span>Preço</span><span>Valor</span>' +
+          '</div>' +
+          '<div id="tradesFeed"><div class="trades-loading">Carregando...</div></div>' +
+        '</div>' +
+
+        '<div class="hb-footer">' +
           '<div class="ob-live-badge"><div class="ob-live-dot"></div>Ao vivo · 15s</div>' +
         '</div>' +
-        '<div class="trades-header-row">' +
-          '<span>Usuário</span><span>Lado</span><span>Valor</span><span>Preço</span><span>Há</span>' +
-        '</div>' +
-        '<div id="tradesFeed"><div class="trades-loading">Carregando...</div></div>' +
       '</div>' +
 
       '<div class="section-card">' +
@@ -577,10 +594,100 @@ function _timeAgo(dateStr) {
   return Math.floor(diff/86400) + 'd';
 }
 
+// ---- HOME BROKER: TAB SWITCH ----
+function hbTab(btn, panel) {
+  document.querySelectorAll('.hb-tab').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById('hb-book').style.display = (panel === 'book') ? 'block' : 'none';
+  document.getElementById('hb-tape').style.display = (panel === 'tape') ? 'block' : 'none';
+}
+
+// ---- LIVRO DE OFERTAS (LMSR synthetic order book) ----
+function renderOrderBook(m) {
+  var bookEl = document.getElementById('bookRows');
+  var spreadEl = document.getElementById('hbSpread');
+  if (!bookEl || !m) return;
+
+  var qYes = parseFloat(m.q_yes) || 100;
+  var qNo  = parseFloat(m.q_no)  || 100;
+  var b    = parseFloat(m.b)     || 100;
+
+  // LMSR price: P(yes) = e^(qYes/b) / (e^(qYes/b) + e^(qNo/b))
+  function lmsrPrice(dy, dn) {
+    var ey = Math.exp((qYes + dy) / b);
+    var en = Math.exp((qNo  + dn) / b);
+    return Math.round((ey / (ey + en)) * 100);
+  }
+
+  // Current best bid/ask
+  var bestBid = lmsrPrice(0, 0);   // current SIM price (bid)
+  var bestAsk = 100 - bestBid;     // current NÃO price (ask)
+
+  // Generate 5 price levels each side
+  // ASK (venda/SIM) levels — higher prices where sellers would exit
+  var askLevels = [];
+  for (var i = 1; i <= 5; i++) {
+    var price = Math.min(99, bestBid + i * 2);
+    var qty = Math.round(b * Math.log((price/100) / (1 - price/100)) - qYes + qNo);
+    qty = Math.max(10, Math.abs(qty));
+    askLevels.push({ price: price, qty: qty });
+  }
+  askLevels.reverse(); // highest first
+
+  // BID (compra/SIM) levels — lower prices where buyers enter
+  var bidLevels = [];
+  for (var i = 1; i <= 5; i++) {
+    var price2 = Math.max(1, bestBid - i * 2);
+    var qty2 = Math.round(b * Math.log((price2/100) / (1 - price2/100)) - qYes + qNo);
+    qty2 = Math.max(10, Math.abs(qty2));
+    bidLevels.push({ price: price2, qty: qty2 });
+  }
+
+  var maxQty = Math.max.apply(null, askLevels.concat(bidLevels).map(function(l){ return l.qty; }));
+
+  function barW(qty) { return Math.round((qty / maxQty) * 100); }
+
+  var rows = '';
+  // ASK rows (red — venda)
+  askLevels.forEach(function(l) {
+    var w = barW(l.qty);
+    rows += '<div class="hb-row hb-ask">' +
+      '<span class="hb-qty">' + l.qty + '</span>' +
+      '<span class="hb-price hb-ask-price">' + l.price + '¢</span>' +
+      '<span class="hb-qty hb-right">' + l.qty + '</span>' +
+      '<div class="hb-depth-bar hb-ask-bar" style="width:' + w + '%"></div>' +
+    '</div>';
+  });
+
+  // Spread row
+  var spread = askLevels[askLevels.length-1].price - bestBid;
+  spreadEl.innerHTML = '<span class="hb-spread-label">Spread</span><span class="hb-spread-val">' + spread + '¢</span>' +
+    '<span class="hb-best-label">Melhor</span><span class="hb-best-bid">' + bestBid + '¢ SIM</span>' +
+    '<span class="hb-best-sep">·</span><span class="hb-best-ask">' + bestAsk + '¢ NÃO</span>';
+
+  // BID rows (green — compra)
+  bidLevels.forEach(function(l) {
+    var w = barW(l.qty);
+    rows += '<div class="hb-row hb-bid">' +
+      '<span class="hb-qty">' + l.qty + '</span>' +
+      '<span class="hb-price hb-bid-price">' + l.price + '¢</span>' +
+      '<span class="hb-qty hb-right">' + l.qty + '</span>' +
+      '<div class="hb-depth-bar hb-bid-bar" style="width:' + w + '%"></div>' +
+    '</div>';
+  });
+
+  bookEl.innerHTML = rows;
+}
+
+// ---- FITA DE NEGÓCIOS (Time & Sales) ----
 async function loadTrades() {
   try {
     var data = await apiGet('/bets/market/' + marketId + '/trades');
     if (!data || !Array.isArray(data)) return;
+
+    // Update order book with current market data
+    if (market) renderOrderBook(market);
+
     var feed = document.getElementById('tradesFeed');
     if (!feed) return;
     if (data.length === 0) {
@@ -589,12 +696,13 @@ async function loadTrades() {
     }
     feed.innerHTML = data.map(function(t) {
       var isYes = t.side === 'yes';
-      return '<div class="trade-row">' +
-        '<span class="trade-user">' + escapeHtml(t.display_name) + '</span>' +
-        '<span class="trade-side ' + (isYes ? 'yes' : 'no') + '">' + (isYes ? 'SIM' : 'NÃO') + '</span>' +
-        '<span class="trade-amt">R$' + parseFloat(t.amount).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}) + '</span>' +
-        '<span class="trade-price">' + t.price + '¢</span>' +
-        '<span class="trade-time">' + _timeAgo(t.created_at) + '</span>' +
+      var hora = new Date(t.created_at).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+      return '<div class="ts-row ' + (isYes ? 'ts-buy' : 'ts-sell') + '">' +
+        '<span class="ts-time">' + hora + '</span>' +
+        '<span class="ts-user">' + escapeHtml(t.display_name || '—') + '</span>' +
+        '<span class="ts-side ' + (isYes ? 'ts-yes' : 'ts-no') + '">' + (isYes ? 'SIM' : 'NÃO') + '</span>' +
+        '<span class="ts-price">' + t.price + '¢</span>' +
+        '<span class="ts-amt">R$' + parseFloat(t.amount).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}) + '</span>' +
       '</div>';
     }).join('');
   } catch(e) { console.error('Trades error:', e); }
@@ -921,6 +1029,7 @@ async function loadMarket() {
     renderPage();
     loadOrderBook();
     loadTrades();
+    if (market) renderOrderBook(market);
     initComments();
   } catch(e) {
     document.getElementById('pageContent').innerHTML =

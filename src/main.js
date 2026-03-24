@@ -4,8 +4,8 @@ import * as FutoroComponents from './js/ui/components.js';
 window.FutoroComponents = FutoroComponents;
 
 function start() {
-  if (typeof window.__bubuyaStart === 'function') {
-    window.__bubuyaStart();
+  if (typeof window.__futuroStart === 'function') {
+    window.__futuroStart();
   }
 }
 

@@ -3206,7 +3206,7 @@ header {
   .hero { padding: 36px 16px 28px; }
   .hero-title { font-size: clamp(28px, 5vw, 48px); }
   .hero-stats { flex-direction: row; flex-wrap: wrap; gap: 16px 24px; }
-  .markets-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .markets-grid { grid-template-columns: 1fr; gap: 10px; }
   .howk-grid { grid-template-columns: 1fr; }
   .hero-btns { flex-direction: column; }
   .btn-hero, .btn-hero-ol { width: 100%; }

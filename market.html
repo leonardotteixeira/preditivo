@@ -48,7 +48,7 @@
 <div class="modal-overlay" id="loginModal">
   <div class="modal">
     <h3 class="modal-title">Entrar</h3>
-    <p class="modal-sub">Acesse sua conta para apostar</p>
+    <p class="modal-sub">Acesse sua conta para operar</p>
     <input class="modal-input" type="email" placeholder="Email" id="loginEmail"
       onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     <input class="modal-input" type="password" placeholder="Senha" id="loginPass"
@@ -112,12 +112,12 @@ function formatDate(d) {
 
 function shareWhatsApp() {
   var url = encodeURIComponent(location.href);
-  var text = encodeURIComponent('Você apostaria nessa? "' + market.title + '" — Futoro');
+  var text = encodeURIComponent('Você operaria nessa? "' + market.title + '" — Futoro');
   window.open('https://wa.me/?text=' + text + '%20' + url, '_blank');
 }
 function shareTwitter() {
   var url = encodeURIComponent(location.href);
-  var text = encodeURIComponent('"' + market.title + '" — O que você acha que vai acontecer? @bubuya_br');
+  var text = encodeURIComponent('"' + market.title + '" — O que você acha que vai acontecer? @futoro_br');
   window.open('https://twitter.com/intent/tweet?text=' + text + '&url=' + url, '_blank');
 }
 function copyLink() {
@@ -192,7 +192,7 @@ function renderPage() {
         '<div class="bet-row"><span>Taxa (2%)</span><span id="sumTaxa">—</span></div>' +
         '<div class="bet-row"><span>Retorno potencial</span><span id="sumReturn">—</span></div>' +
       '</div>' +
-      '<button class="btn-bet" onclick="confirmBet()">Confirmar aposta</button>' +
+      '<button class="btn-bet" onclick="confirmBet()">Confirmar operação</button>' +
       '<div class="bet-balance">Saldo disponível: <span id="balDisplay">R$' + (state.balance||0).toFixed(2) + '</span></div>';
   }
 
@@ -202,7 +202,7 @@ function renderPage() {
     '<div class="market-main">' +
       (m.image_url ? '<img src="' + m.image_url + '" alt="" class="market-header-img">' : '') +
       '<div class="market-category cat-' + (m.category||'') + '">' + catLabel(m.category) + '</div>' +
-      '<h1 class="market-title">' + m.title + '</h1>' +
+      '<h1 class="market-title">' + fixEncoding(m.title) + '</h1>' +
 
       '<div class="kalshi-prob">' +
         '<div class="k-prob-block k-prob-yes">' +
@@ -264,7 +264,7 @@ function renderPage() {
         '</div>' +
         (allHistory.length > 0
           ? '<div class="chart-canvas-wrap"><canvas id="probChart"></canvas></div>'
-          : '<div class="chart-empty">Nenhuma aposta ainda<br><span class="chart-empty-sub">O gráfico aparece após a primeira aposta</span></div>') +
+          : '<div class="chart-empty">Nenhuma operação ainda<br><span class="chart-empty-sub">O gráfico aparece após a primeira aposta</span></div>') +
       '</div>' +
 
       '<!-- ORDER BOOK -->' +
@@ -296,7 +296,7 @@ function renderPage() {
           '</div>' +
           '<div class="tl-item">' +
             '<div class="tl-line"><div class="tl-dot ' + (isResolved || isExpired ? 'done' : '') + '"></div><div class="tl-connector"></div></div>' +
-            '<div class="tl-content"><div class="tl-label">Encerramento de apostas</div><div class="tl-date">' + formatDate(m.ends_at) + '</div></div>' +
+            '<div class="tl-content"><div class="tl-label">Encerramento de operações</div><div class="tl-date">' + formatDate(m.ends_at) + '</div></div>' +
           '</div>' +
           '<div class="tl-item">' +
             '<div class="tl-line"><div class="tl-dot ' + (isResolved ? 'done' : '') + '"></div></div>' +
@@ -515,7 +515,7 @@ function renderOrderBook(data) {
 
   function renderRows(levels, maxVol, side) {
     if (!levels.length) {
-      return '<div class="ob-empty"><strong>Sem ordens</strong>Seja o primeiro a apostar em ' + (side === 'yes' ? 'SIM' : 'NÃO') + '</div>';
+      return '<div class="ob-empty"><strong>Sem ordens</strong>Seja o primeiro a operar em ' + (side === 'yes' ? 'SIM' : 'NÃO') + '</div>';
     }
     return levels.map(function(level, i) {
       var pct = Math.max(4, Math.round((level.vol / maxVol) * 100));
@@ -590,6 +590,16 @@ function escapeHtml(str) {
   return String(str)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
     .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function fixEncoding(str) {
+  if (!str || !str.includes('\u2666')) return str;
+  return str
+    .replace(/(\d)\u2666(\s)/g,'$1\u00ba$2').replace(/(\d)\u2666$/g,'$1\u00ba')
+    .replace(/ei\u2666\u2666es/g,'eições').replace(/ei\u2666\u2666o\b/g,'eição')
+    .replace(/a\u2666\u2666es/g,'ações').replace(/a\u2666\u2666o\b/g,'ação')
+    .replace(/iza\u2666\u2666o/g,'ização').replace(/olu\u2666\u2666o/g,'olução')
+    .replace(/\u2666\u2666es\b/g,'ões').replace(/\u2666\u2666o\b/g,'ão')
+    .replace(/\u2666\u2666/g,'çõ').replace(/\u2666/g,'ã');
 }
 
 async function postComment() {
@@ -720,7 +730,7 @@ function setTradeAction(action) {
     var amtEl = document.getElementById('betAmt');
     if (amtEl) amtEl.removeAttribute('max');
     var btnBet = document.querySelector('.btn-bet');
-    if (btnBet) { btnBet.disabled = false; btnBet.textContent = 'Confirmar aposta'; btnBet.style.opacity = ''; }
+    if (btnBet) { btnBet.disabled = false; btnBet.textContent = 'Confirmar operação'; btnBet.style.opacity = ''; }
   }
 }
 

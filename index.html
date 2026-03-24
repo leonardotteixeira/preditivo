@@ -734,7 +734,7 @@ document.addEventListener('click', function(e) {
   }
 });
 
-window.__bubuyaStart = function() {
+window.__futuroStart = function() {
 window.state = { markets: [], user: null, balance: 0, catFilter: 'all', searchQuery: '', walletAddress: null };
 window.API = window.PREDITIVO_CONFIG.API_BASE;
 
@@ -1970,7 +1970,8 @@ function populateTicker(markets) {
     const total = (parseFloat(m.q_yes) + parseFloat(m.q_no)) || 100;
     const yes = Math.round((parseFloat(m.q_yes) / total) * 100);
     const no  = 100 - yes;
-    const name = m.title.length > 42 ? m.title.slice(0, 39) + '…' : m.title;
+    var rawTitle = m.title.replace(/\u2666(\d)/g,'º$1').replace(/(\d)\u2666/g,'$1º').replace(/\u2666\u2666es\b/g,'ões').replace(/\u2666\u2666o\b/g,'ão').replace(/ei\u2666\u2666es/g,'eições').replace(/ei\u2666\u2666o\b/g,'eição').replace(/\u2666\u2666/g,'çõ').replace(/\u2666/g,'ã');
+    const name = rawTitle.length > 42 ? rawTitle.slice(0, 39) + '…' : rawTitle;
     const safe = name.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     return '<div class="ticker-item"><span class="ticker-name">' + safe + '</span><span class="ticker-yes">SIM ' + yes + '%</span><span class="ticker-no">NÃO ' + no + '%</span></div>';
   }).join('');
@@ -2219,14 +2220,14 @@ init();
 var _tourStep = 0;
 var _tourSteps = [
   { target: '#marketsGrid',    title: 'Mercados preditivos',  text: 'Cada card é uma pergunta sobre o futuro. Você aposta SIM ou NÃƒO e ganha se estiver certo.' },
-  { target: '.market-card',   title: 'Probabilidade ao vivo', text: 'A barra mostra o que o mercado acha: quanto mais pessoas apostam SIM, maior fica a chance.' },
+  { target: '.market-card',   title: 'Probabilidade ao vivo', text: 'A barra mostra o que o mercado acha: quanto mais pessoas operam SIM, maior fica a chance.' },
   { target: '#searchInput',    title: 'Busca inteligente',    text: 'Encontre mercados por assunto: "Copa", "eleição", "Bitcoin", "Selic"...' },
   { target: '#topicTags',      title: 'Filtros por categoria', text: 'Filtre por Política, Economia, Esportes ou Tecnologia para ver só o que te interessa.' },
   { target: '#section-ranking',title: 'Ranking de traders',   text: 'Acerte previsões e suba no ranking! Os melhores traders ganham destaque na plataforma.' }
 ];
 
 function tourStart() {
-  if (localStorage.getItem('bubuya_tour_done')) return;
+  if (localStorage.getItem('futuro_tour_done')) return;
   _tourStep = 0;
   document.getElementById('tourOverlay').classList.add('active');
   document.getElementById('tourSpotlight').classList.add('active');
@@ -2240,7 +2241,7 @@ function tourNext() {
 }
 function tourSkip()   { tourFinish(); }
 function tourFinish() {
-  localStorage.setItem('bubuya_tour_done', '1');
+  localStorage.setItem('futuro_tour_done', '1');
   document.getElementById('tourOverlay').classList.remove('active');
   document.getElementById('tourSpotlight').classList.remove('active');
   document.getElementById('tourTooltip').classList.remove('active');

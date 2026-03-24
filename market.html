@@ -119,7 +119,8 @@ function formatDate(d) {
 
 function shareUrl() {
   var slug = (market && market.slug) ? market.slug : marketSlug;
-  if (slug) return 'https://futoro.com.br/mercado/' + encodeURIComponent(slug);
+  // Share via /m/slug so bots get OG tags; browsers are redirected to /mercado/slug
+  if (slug) return 'https://futoro.com.br/m/' + encodeURIComponent(slug);
   return 'https://futoro.com.br/m/' + encodeURIComponent(marketId);
 }
 function shareWhatsApp() {

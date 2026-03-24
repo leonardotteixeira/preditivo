@@ -33,28 +33,40 @@ module.exports = async (req, res) => {
     return res.status(302).end();
   }
 
+  // Determine if `id` is a UUID or a slug
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   let market = null;
-  let endpoint = id
-    ? `${API}/markets/${encodeURIComponent(id)}`
-    : `${API}/markets/by-slug/${encodeURIComponent(slug)}`;
 
-  try {
-    const r = await fetch(endpoint);
-    if (r.ok) market = await r.json();
-  } catch (_) {}
+  const tryFetch = async (url) => {
+    try { const r = await fetch(url); if (r.ok) return await r.json(); } catch (_) {}
+    return null;
+  };
+
+  if (slug) {
+    market = await tryFetch(`${API}/markets/by-slug/${encodeURIComponent(slug)}`);
+  } else if (id) {
+    if (UUID_RE.test(id)) {
+      market = await tryFetch(`${API}/markets/${encodeURIComponent(id)}`);
+    } else {
+      // id is actually a slug (from /m/slug share links)
+      market = await tryFetch(`${API}/markets/by-slug/${encodeURIComponent(id)}`);
+      if (!market || market.error) {
+        market = await tryFetch(`${API}/markets/${encodeURIComponent(id)}`);
+      }
+    }
+  }
 
   // Build the redirect target for real browsers
   let target;
   if (market && !market.error) {
-    // Prefer pretty slug URL for the redirect
     const marketSlug = market.slug || null;
     target = marketSlug
-      ? `/market.html?slug=${encodeURIComponent(marketSlug)}`
+      ? `/mercado/${encodeURIComponent(marketSlug)}`
       : `/market.html?id=${encodeURIComponent(market.id || id)}`;
   } else {
-    target = id
-      ? `/market.html?id=${encodeURIComponent(id)}`
-      : `/market.html?slug=${encodeURIComponent(slug)}`;
+    target = slug
+      ? `/mercado/${encodeURIComponent(slug)}`
+      : `/market.html?id=${encodeURIComponent(id)}`;
   }
 
   if (!market || market.error) {

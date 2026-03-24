@@ -3,7 +3,7 @@
   "outputDirectory": "dist",
   "rewrites": [
     { "source": "/m/:id", "destination": "/api/og?id=:id" },
-    { "source": "/mercado/:slug", "destination": "/api/og?slug=:slug" },
+    { "source": "/mercado/:slug", "destination": "/market.html" },
     { "source": "/market/:id", "destination": "/market.html" },
     { "source": "/profile", "destination": "/profile.html" },
     { "source": "/ranking", "destination": "/ranking.html" }

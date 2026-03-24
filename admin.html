@@ -159,41 +159,74 @@
     <!-- NOVO MERCADO -->
     <div id="sec-novo" class="admin-panel">
       <div class="admin-section-title">Criar Novo Mercado</div>
-      <div style="max-width:600px">
-        <div class="form-group">
-          <label class="form-label">Titulo</label>
-          <input id="nm-title" class="form-input" type="text" placeholder="Ex: Lula vence as eleicoes de 2026?">
-        </div>
-        <div class="form-grid" style="margin-bottom:16px">
-          <div class="form-group" style="margin-bottom:0">
-            <label class="form-label">Categoria</label>
-            <select id="nm-cat" class="form-select">
-              <option value="politica">Politica</option>
-              <option value="economia">Economia</option>
-              <option value="futebol">Futebol</option>
-              <option value="tech">Tech</option>
-            </select>
+      <div style="max-width:680px;display:grid;grid-template-columns:1fr 280px;gap:24px;align-items:start">
+        <div>
+          <div class="form-group">
+            <label class="form-label">Titulo</label>
+            <input id="nm-title" class="form-input" type="text" placeholder="Ex: Lula vence as eleicoes de 2026?" oninput="nmPreview()">
           </div>
-          <div class="form-group" style="margin-bottom:0">
-            <label class="form-label">Data de encerramento</label>
-            <input id="nm-date" class="form-input" type="date">
+          <div class="form-grid" style="margin-bottom:16px">
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">Categoria</label>
+              <select id="nm-cat" class="form-select" onchange="nmPreview()">
+                <option value="politica">Política</option>
+                <option value="economia">Economia</option>
+                <option value="futebol">Futebol / Esportes</option>
+                <option value="esportes">Esportes (geral)</option>
+                <option value="tech">Tecnologia</option>
+                <option value="entretenimento">Entretenimento</option>
+                <option value="mercado">Mercado financeiro</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">Data e hora de encerramento</label>
+              <input id="nm-date" class="form-input" type="datetime-local">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="display:flex;justify-content:space-between">
+              Probabilidade inicial SIM
+              <span id="nm-prob-label" style="color:#60a5fa;font-weight:700">50%</span>
+            </label>
+            <input id="nm-prob" class="form-input" type="range" min="5" max="95" value="50" step="5"
+              style="padding:0;height:6px;cursor:pointer;accent-color:#60a5fa"
+              oninput="document.getElementById('nm-prob-label').textContent=this.value+'%';nmPreview()">
+            <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:#5a6878;margin-top:4px">
+              <span>5% SIM</span><span>50/50</span><span>95% SIM</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Regras de resolucao</label>
+            <textarea id="nm-desc" class="form-textarea" placeholder="Descreva como este mercado sera resolvido..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">URL da Foto (opcional)</label>
+            <input id="nm-image" class="form-input" type="url" placeholder="Ex: https://.../foto-do-mercado.jpg">
+          </div>
+          <div class="info-box">
+            <strong>Liquidez inicial:</strong> R$100 automatico · Visivel imediatamente.
+          </div>
+          <button class="btn nm-btn-create" onclick="criarMercado()">Criar Mercado</button>
+          <div id="nm-feedback" class="nm-feedback"></div>
+        </div>
+        <!-- PREVIEW -->
+        <div>
+          <div class="form-label" style="margin-bottom:8px">Preview</div>
+          <div id="nm-preview-card" style="background:#0d1221;border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px;font-size:0.82rem">
+            <div id="pv-cat" style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#60a5fa;margin-bottom:8px">Política</div>
+            <div id="pv-title" style="font-weight:600;color:#e2e8f0;margin-bottom:12px;line-height:1.4">Título do mercado aparece aqui...</div>
+            <div style="height:6px;border-radius:3px;background:#1a2538;overflow:hidden;margin-bottom:10px">
+              <div id="pv-bar" style="height:100%;background:#10b981;border-radius:3px;transition:width 0.2s;width:50%"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between">
+              <span style="color:#5a6878;font-size:0.72rem">Vol <span>R$0</span></span>
+              <div style="display:flex;gap:6px">
+                <span id="pv-yes" style="background:rgba(16,185,129,0.15);color:#10b981;padding:2px 8px;border-radius:4px;font-weight:700;font-size:0.72rem">50%</span>
+                <span id="pv-no" style="background:rgba(244,63,94,0.12);color:#f43f5e;padding:2px 8px;border-radius:4px;font-weight:700;font-size:0.72rem">50%</span>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Regras de resolucao</label>
-          <textarea id="nm-desc" class="form-textarea" placeholder="Descreva como este mercado sera resolvido..."></textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label">URL da Foto (opcional)</label>
-          <input id="nm-image" class="form-input" type="url" placeholder="Ex: https://.../foto-do-mercado.jpg">
-        </div>
-        <div class="info-box">
-          <strong>Probabilidade inicial:</strong> 50% SIM / 50% NAO<br>
-          <strong>Liquidez inicial:</strong> R$100 automatico<br>
-          O mercado fica visivel imediatamente apos criar.
-        </div>
-        <button class="btn nm-btn-create" onclick="criarMercado()">Criar Mercado</button>
-        <div id="nm-feedback" class="nm-feedback"></div>
       </div>
     </div>
 
@@ -1600,34 +1633,56 @@ function reloadAllBotBalances() {
   });
 }
 
+function nmPreview() {
+  var title = (document.getElementById('nm-title').value.trim()) || 'Título do mercado aparece aqui...';
+  var prob = parseInt(document.getElementById('nm-prob').value) || 50;
+  var catVal = document.getElementById('nm-cat').value;
+  var catLabels = { politica:'Política', economia:'Economia', futebol:'Futebol', esportes:'Esportes', tech:'Tecnologia', entretenimento:'Entretenimento', mercado:'Mercado' };
+  var noProb = 100 - prob;
+  document.getElementById('pv-title').textContent = title.length > 80 ? title.slice(0,77)+'…' : title;
+  document.getElementById('pv-cat').textContent = catLabels[catVal] || catVal;
+  document.getElementById('pv-bar').style.width = prob + '%';
+  document.getElementById('pv-bar').style.background = prob >= 50 ? '#10b981' : '#f43f5e';
+  document.getElementById('pv-yes').textContent = prob + '%';
+  document.getElementById('pv-no').textContent = noProb + '%';
+}
+
 function criarMercado() {
   var title = document.getElementById('nm-title').value.trim();
-  var cat = document.getElementById('nm-cat').value;
-  var date = document.getElementById('nm-date').value;
-  var desc = document.getElementById('nm-desc').value.trim();
-  var img = document.getElementById('nm-image') ? document.getElementById('nm-image').value.trim() : '';
-  var fb = document.getElementById('nm-feedback');
+  var cat   = document.getElementById('nm-cat').value;
+  var date  = document.getElementById('nm-date').value;
+  var desc  = document.getElementById('nm-desc').value.trim();
+  var img   = document.getElementById('nm-image') ? document.getElementById('nm-image').value.trim() : '';
+  var prob  = parseInt(document.getElementById('nm-prob').value) || 50;
+  var fb    = document.getElementById('nm-feedback');
 
   if (!title) { fb.style.color = '#ff4757'; fb.textContent = 'Informe o titulo do mercado.'; return; }
-  if (!date) { fb.style.color = '#ff4757'; fb.textContent = 'Informe a data de encerramento.'; return; }
+  if (!date)  { fb.style.color = '#ff4757'; fb.textContent = 'Informe a data de encerramento.'; return; }
 
   fb.style.color = '#5a6878'; fb.textContent = 'Criando...';
+  var btn = document.querySelector('.nm-btn-create');
+  if (btn) btn.disabled = true;
 
   fetch(API + '/markets', {
     method: 'POST',
     headers: adminHeaders(),
-    body: JSON.stringify({ title: title, category: cat, ends_at: date, description: desc, image_url: img })
+    body: JSON.stringify({ title: title, category: cat, ends_at: date, description: desc, image_url: img, initial_prob: prob })
   })
   .then(function(r){ return r.json(); })
   .then(function(data) {
+    if (btn) btn.disabled = false;
     if (data.error) { fb.style.color = '#ff4757'; fb.textContent = 'Erro: ' + data.error; return; }
-    fb.style.color = '#00e676'; fb.textContent = 'Mercado criado com sucesso!';
+    fb.style.color = '#00e676';
+    fb.innerHTML = 'Mercado criado! <a href="/market.html?id=' + data.id + '" target="_blank" style="color:#60a5fa;text-decoration:underline">Ver mercado →</a>';
     document.getElementById('nm-title').value = '';
     document.getElementById('nm-date').value = '';
     document.getElementById('nm-desc').value = '';
+    document.getElementById('nm-prob').value = '50';
+    document.getElementById('nm-prob-label').textContent = '50%';
     if (document.getElementById('nm-image')) document.getElementById('nm-image').value = '';
+    nmPreview();
   })
-  .catch(function(){ fb.style.color = '#ff4757'; fb.textContent = 'Erro de conexao.'; });
+  .catch(function(){ if (btn) btn.disabled = false; fb.style.color = '#ff4757'; fb.textContent = 'Erro de conexao.'; });
 }
 
 function loadGlobalConfig() {

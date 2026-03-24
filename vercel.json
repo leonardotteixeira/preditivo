@@ -33,6 +33,7 @@
     }
   ],
   "rewrites": [
+    { "source": "/sitemap.xml", "destination": "/api/sitemap" },
     { "source": "/m/:id", "destination": "/api/og?id=:id" },
     { "source": "/mercado/:slug", "destination": "/market.html" },
     { "source": "/market/:id", "destination": "/market.html" },

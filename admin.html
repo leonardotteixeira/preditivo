@@ -114,9 +114,45 @@
         <div class="bot-card"><div class="bot-label">Volume hoje (24h)</div><div class="bot-val" id="botTodayVol" style="color:#ffc107">—</div></div>
       </div>
 
-      <div style="display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap">
+      <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
         <button class="btn btn-green" onclick="enableBot()">▶ Ativar bot automático</button>
         <button class="btn btn-reject" onclick="disableBot()">⏹ Desativar bot automático</button>
+        <div id="botLiveIndicator" style="font-size:0.82rem;color:#5a6878;padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:20px">⚪ Parado</div>
+      </div>
+
+      <!-- CONFIG AUTOMÁTICA DE BOTS -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;max-width:600px;margin-bottom:24px">
+        <div style="font-size:0.85rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px">Configuração do bot automático</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div>
+            <label style="font-size:0.8rem;color:var(--muted);display:block;margin-bottom:6px">Apostas por ciclo (30s): <span id="cfgRoundsVal" style="color:#00b4ff;font-weight:700">5</span></label>
+            <input id="cfgRounds" type="range" min="1" max="50" value="5" oninput="document.getElementById('cfgRoundsVal').textContent=this.value" style="width:100%;accent-color:#00b4ff">
+          </div>
+          <div>
+            <label style="font-size:0.8rem;color:var(--muted);display:block;margin-bottom:6px">Categoria preferida</label>
+            <select id="cfgCategory" class="form-select" style="font-size:0.85rem;padding:6px 10px">
+              <option value="">Todas</option>
+              <option value="politica">Política</option>
+              <option value="economia">Economia</option>
+              <option value="futebol">Futebol/Esportes</option>
+              <option value="tech">Tecnologia</option>
+              <option value="entretenimento">Entretenimento</option>
+              <option value="mercado">Mercado financeiro</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:0.8rem;color:var(--muted);display:block;margin-bottom:6px">Valor mínimo (R$): <span id="cfgMinVal" style="color:#00e676;font-weight:700">5</span></label>
+            <input id="cfgMin" type="range" min="1" max="500" value="5" oninput="document.getElementById('cfgMinVal').textContent=this.value" style="width:100%;accent-color:#00e676">
+          </div>
+          <div>
+            <label style="font-size:0.8rem;color:var(--muted);display:block;margin-bottom:6px">Valor máximo (R$): <span id="cfgMaxVal" style="color:#ffc107;font-weight:700">800</span></label>
+            <input id="cfgMax" type="range" min="10" max="5000" value="800" oninput="document.getElementById('cfgMaxVal').textContent=this.value" style="width:100%;accent-color:#ffc107">
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:16px;align-items:center">
+          <button class="btn btn-green" onclick="saveBotConfig()" style="padding:8px 18px;font-size:0.85rem">💾 Salvar configuração</button>
+          <span id="cfgSaveStatus" style="font-size:0.82rem;color:#5a6878"></span>
+        </div>
       </div>
 
       <div class="admin-section-title" style="font-size:0.95rem">Simular apostas agora</div>
@@ -762,12 +798,21 @@
 
 <!-- MODAL RESOLVER -->
 <div id="resolveModal" class="modal-overlay">
-  <div class="modal">
+  <div class="modal" style="max-width:460px;width:90%">
     <div id="resolveSuccess" style="display:none;text-align:center;padding:8px 0"></div>
     <h3 id="resolveModalHeading">Resolver Mercado</h3>
-    <p id="resolveMarketTitle" style="color:#5a6878;margin-bottom:16px;font-size:0.9rem"></p>
-    <button class="btn-yes" onclick="confirmResolve('yes')">SIM — Aconteceu</button>
-    <button class="btn-no" onclick="confirmResolve('no')">NAO — Nao aconteceu</button>
+    <p id="resolveMarketTitle" style="color:#5a6878;margin-bottom:12px;font-size:0.9rem"></p>
+    <div id="resolveBetStats" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;font-size:0.85rem">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div><div style="color:#5a6878;font-size:0.75rem;margin-bottom:3px">Apostas SIM</div><div id="rsBetsYes" style="color:#00e676;font-weight:700">—</div></div>
+        <div><div style="color:#5a6878;font-size:0.75rem;margin-bottom:3px">Apostas NÃO</div><div id="rsBetsNo" style="color:#ff4757;font-weight:700">—</div></div>
+        <div><div style="color:#5a6878;font-size:0.75rem;margin-bottom:3px">Volume SIM</div><div id="rsVolYes" style="color:#00e676;font-weight:600">—</div></div>
+        <div><div style="color:#5a6878;font-size:0.75rem;margin-bottom:3px">Volume NÃO</div><div id="rsVolNo" style="color:#ff4757;font-weight:600">—</div></div>
+        <div style="grid-column:span 2"><div style="color:#5a6878;font-size:0.75rem;margin-bottom:3px">Total em jogo</div><div id="rsTotal" style="color:#00b4ff;font-weight:700;font-size:1rem">—</div></div>
+      </div>
+    </div>
+    <button class="btn-yes" onclick="confirmResolve('yes')">✅ SIM — Aconteceu</button>
+    <button class="btn-no" onclick="confirmResolve('no')">❌ NÃO — Não aconteceu</button>
     <button class="btn-cancel" onclick="closeModal('resolveModal')">Cancelar</button>
   </div>
 </div>
@@ -966,7 +1011,7 @@ function switchTab(name, el) {
   if (name === 'users') loadUsers();
   if (name === 'receita') loadReceita();
   if (name === 'saques') loadSaques();
-  if (name === 'bots') loadBotStats();
+  if (name === 'bots') { loadBotStats(); loadBotConfig(); }
   if (name === 'compliance') loadCompliance();
   if (name === 'reports') loadSiscoafReported();
   if (name === 'sandbox') loadSandboxUsers();
@@ -1254,7 +1299,25 @@ function loadReceita() {
 function openResolve(marketId, title) {
   resolveMarketId = marketId;
   document.getElementById('resolveMarketTitle').textContent = title || ('Mercado ' + marketId);
+  // Reset stats
+  var statsDiv = document.getElementById('resolveBetStats');
+  statsDiv.style.display = 'none';
   openModal('resolveModal');
+
+  // Load bet breakdown
+  fetch(API + '/admin/markets/' + marketId + '/bet-stats', { headers: adminHeaders() })
+  .then(function(r){ return r.ok ? r.json() : null; })
+  .then(function(d){
+    if (!d) return;
+    var fmt = function(n){ return 'R$' + parseFloat(n||0).toLocaleString('pt-BR', {minimumFractionDigits:2}); };
+    document.getElementById('rsBetsYes').textContent = parseInt(d.bets_yes||0).toLocaleString('pt-BR') + ' apostas';
+    document.getElementById('rsBetsNo').textContent  = parseInt(d.bets_no||0).toLocaleString('pt-BR')  + ' apostas';
+    document.getElementById('rsVolYes').textContent  = fmt(d.vol_yes);
+    document.getElementById('rsVolNo').textContent   = fmt(d.vol_no);
+    document.getElementById('rsTotal').textContent   = fmt(d.total_volume);
+    statsDiv.style.display = 'block';
+  })
+  .catch(function(){});
 }
 
 function confirmResolve(outcome) {
@@ -1667,6 +1730,55 @@ function disableBot() {
   .then(function(r){ return r.json(); })
   .then(function(d){ showToast(d.message || 'Bot desativado'); loadBotStats(); })
   .catch(function(){ showToast('Erro ao desativar bot'); });
+}
+
+function loadBotConfig() {
+  fetch(API + '/admin/bots/config', { headers: adminHeaders() })
+  .then(function(r){ return r.json(); })
+  .then(function(c){
+    if (c.error) return;
+    var rounds = c.rounds_per_cycle || 5;
+    var minA = c.min_amount || 5;
+    var maxA = c.max_amount || 800;
+    document.getElementById('cfgRounds').value = rounds;
+    document.getElementById('cfgRoundsVal').textContent = rounds;
+    document.getElementById('cfgMin').value = minA;
+    document.getElementById('cfgMinVal').textContent = minA;
+    document.getElementById('cfgMax').value = maxA;
+    document.getElementById('cfgMaxVal').textContent = maxA;
+    if (c.category) document.getElementById('cfgCategory').value = c.category;
+    // Update live indicator
+    var ind = document.getElementById('botLiveIndicator');
+    if (ind) ind.innerHTML = c.enabled
+      ? '🟢 ATIVO — ' + rounds + ' apostas/30s'
+      : '⚪ Parado';
+  })
+  .catch(function(){});
+}
+
+function saveBotConfig() {
+  var rounds = parseInt(document.getElementById('cfgRounds').value) || 5;
+  var minA = parseFloat(document.getElementById('cfgMin').value) || 5;
+  var maxA = parseFloat(document.getElementById('cfgMax').value) || 800;
+  var category = document.getElementById('cfgCategory').value || null;
+  var statusEl = document.getElementById('cfgSaveStatus');
+  statusEl.textContent = '⏳ Salvando...';
+  statusEl.style.color = '#5a6878';
+
+  fetch(API + '/admin/bots/config', {
+    method: 'POST',
+    headers: adminHeaders(),
+    body: JSON.stringify({ rounds_per_cycle: rounds, min_amount: minA, max_amount: maxA, category: category })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if (d.error) { statusEl.textContent = 'Erro: ' + d.error; statusEl.style.color = '#ef4444'; return; }
+    statusEl.textContent = '✅ Salvo!';
+    statusEl.style.color = '#10b981';
+    setTimeout(function(){ statusEl.textContent = ''; }, 3000);
+    loadBotStats();
+  })
+  .catch(function(){ statusEl.textContent = 'Erro de rede'; statusEl.style.color = '#ef4444'; });
 }
 
 function runSimulation() {

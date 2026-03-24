@@ -1962,6 +1962,26 @@ function checkComplianceGate(user) {
   }
 }
 
+function _tickerFix(str) {
+  if (!str) return str;
+  var S = '[\uFFFD\u2666\u25C6\u25CA\u25C7\u22C4\u2662]';
+  if (!new RegExp(S).test(str)) return str;
+  return str
+    .replace(new RegExp('(\\d)' + S, 'g'), '$1\u00ba')
+    .replace(new RegExp('ei' + S + S + 'es', 'g'), 'ei\u00e7\u00f5es')
+    .replace(new RegExp('ei' + S + S + 'o', 'g'),  'ei\u00e7\u00e3o')
+    .replace(new RegExp('ca' + S + S + 'o', 'g'),  'ca\u00e7\u00e3o')
+    .replace(new RegExp('ma' + S + S + 'o', 'g'),  'ma\u00e7\u00e3o')
+    .replace(new RegExp('na' + S + S + 'o', 'g'),  'na\u00e7\u00e3o')
+    .replace(new RegExp('iza' + S + S + 'o', 'g'), 'iza\u00e7\u00e3o')
+    .replace(new RegExp('olu' + S + S + 'o', 'g'), 'olu\u00e7\u00e3o')
+    .replace(new RegExp('osi' + S + S + 'o', 'g'), 'osi\u00e7\u00e3o')
+    .replace(new RegExp(S + S + 'es', 'g'), '\u00f5es')
+    .replace(new RegExp(S + S + 'o',  'g'), '\u00e3o')
+    .replace(new RegExp(S + S, 'g'), '\u00e7\u00f5')
+    .replace(new RegExp(S, 'g'), '\u00e3');
+}
+
 function populateTicker(markets) {
   const inner = document.getElementById('tickerInner');
   if (!inner || !markets || !markets.length) return;
@@ -1970,12 +1990,16 @@ function populateTicker(markets) {
     const total = (parseFloat(m.q_yes) + parseFloat(m.q_no)) || 100;
     const yes = Math.round((parseFloat(m.q_yes) / total) * 100);
     const no  = 100 - yes;
-    var rawTitle = m.title.replace(/\u2666(\d)/g,'º$1').replace(/(\d)\u2666/g,'$1º').replace(/\u2666\u2666es\b/g,'ões').replace(/\u2666\u2666o\b/g,'ão').replace(/ei\u2666\u2666es/g,'eições').replace(/ei\u2666\u2666o\b/g,'eição').replace(/\u2666\u2666/g,'çõ').replace(/\u2666/g,'ã');
+    const rawTitle = _tickerFix(m.title);
     const name = rawTitle.length > 42 ? rawTitle.slice(0, 39) + '…' : rawTitle;
     const safe = name.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     return '<div class="ticker-item"><span class="ticker-name">' + safe + '</span><span class="ticker-yes">SIM ' + yes + '%</span><span class="ticker-no">NÃO ' + no + '%</span></div>';
   }).join('');
   inner.innerHTML = items + items; // duplicar para loop contínuo
+  // Reinicia a animação do zero após troca de conteúdo
+  inner.style.animation = 'none';
+  inner.getBoundingClientRect(); // force reflow
+  inner.style.animation = '';
 }
 
 async function init() {

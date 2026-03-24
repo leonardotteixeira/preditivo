@@ -82,7 +82,7 @@ var marketSlug = _qp.get('slug') || null;
 // /mercado/:slug path support — extract slug from pathname if present
 if (!marketId && !marketSlug) {
   var _pathParts = window.location.pathname.split('/').filter(Boolean);
-  if (_pathParts[0] === 'mercado' && _pathParts[1]) marketSlug = _pathParts[1];
+  if (_pathParts[0] === 'mercado' && _pathParts[1]) marketSlug = decodeURIComponent(_pathParts[1]);
 }
 
 function showToast(msg) {
@@ -97,16 +97,25 @@ function openModal(id) { document.getElementById(id).classList.add('active'); }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
 async function apiGet(path, token) {
-  var res = await fetch(API + path, { headers: token ? { Authorization: 'Bearer ' + token } : {} });
-  return res.json();
+  var ctrl = new AbortController();
+  var timer = setTimeout(function(){ ctrl.abort(); }, 15000);
+  try {
+    var res = await fetch(API + path, { headers: token ? { Authorization: 'Bearer ' + token } : {}, signal: ctrl.signal });
+    return res.json();
+  } finally { clearTimeout(timer); }
 }
 async function apiPost(path, body, token) {
-  var res = await fetch(API + path, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
-    body: JSON.stringify(body)
-  });
-  return res.json();
+  var ctrl = new AbortController();
+  var timer = setTimeout(function(){ ctrl.abort(); }, 15000);
+  try {
+    var res = await fetch(API + path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+      body: JSON.stringify(body),
+      signal: ctrl.signal
+    });
+    return res.json();
+  } finally { clearTimeout(timer); }
 }
 
 function catLabel(c) {
@@ -1033,7 +1042,7 @@ async function loadMarket() {
     initComments();
   } catch(e) {
     document.getElementById('pageContent').innerHTML =
-      '<div class="market-page-message">Erro ao carregar mercado.</div>';
+      '<div class="market-page-message">Erro ao carregar mercado. <a href="javascript:location.reload()" style="color:#60a5fa;text-decoration:underline">Tentar novamente</a></div>';
   }
 }
 

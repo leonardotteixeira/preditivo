@@ -2341,6 +2341,26 @@
     }
   }
 
+  /* Telas pequenas (400-480px) */
+  @media (max-width: 480px) {
+    .hero h1,
+    .hero-content h1 {
+      @apply text-2xl;
+    }
+    .hero-stat-val {
+      @apply text-xl;
+    }
+    .mcard-q {
+      font-size: 0.85rem;
+    }
+    .mcard-footer {
+      font-size: 0.75rem;
+    }
+    .modal {
+      padding: 20px 16px;
+    }
+  }
+
   /* Telas muito pequenas (< 400px) */
   @media (max-width: 400px) {
     .hero h1,

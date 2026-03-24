@@ -74,7 +74,7 @@ export function buildMarketCard(m) {
     : '/market.html?id=' + encodeURIComponent(m.id);
 
   return `
-    <article class="mcard ${catClass}" data-market-id="${id}" onclick="window.location.href='${href}'" role="button" tabindex="0">
+    <a href="${href}" class="mcard ${catClass}" data-market-id="${id}" style="text-decoration:none;color:inherit;display:block">
       <div class="mcard-cat">${catLabel}</div>
       <div class="mcard-q">${title}</div>
       <div class="mcard-bar">
@@ -88,7 +88,7 @@ export function buildMarketCard(m) {
           <span class="badge badge-n">${no}%</span>
         </div>
       </div>
-    </article>`;
+    </a>`;
 }
 
 export function emptyMarketsHtml(isSearching) {

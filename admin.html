@@ -56,10 +56,10 @@
     <!-- DEPOSITOS -->
     <div id="sec-deposits" class="admin-panel active">
       <div class="admin-section-title">Depositos Pendentes <span class="badge" id="pendingCount">0</span></div>
-      <table>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table>
         <thead><tr><th>Codigo</th><th>Usuario</th><th>Valor</th><th>Horario</th><th>Status</th><th>Acoes</th></tr></thead>
         <tbody id="depositsTbody"><tr><td colspan="6" style="text-align:center;padding:40px;color:#5a6878">Carregando...</td></tr></tbody>
-      </table>
+      </table></div>
     </div>
 
     <!-- MERCADOS -->
@@ -72,19 +72,19 @@
           <button class="btn btn-green" onclick="seedTechGlobal()">🌐 Seed Tech Global</button>
         </div>
       </div>
-      <table>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table>
         <thead><tr><th>Titulo</th><th>Categoria</th><th>Prob SIM/NAO</th><th>Volume</th><th>Encerra</th><th>Acoes</th></tr></thead>
         <tbody id="marketsTbody"><tr><td colspan="6" style="text-align:center;padding:40px;color:#5a6878">Carregando...</td></tr></tbody>
-      </table>
+      </table></div>
     </div>
 
     <!-- USUARIOS -->
     <div id="sec-users" class="admin-panel">
       <div class="admin-section-title">Usuarios</div>
-      <table>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table>
         <thead><tr><th>Nome</th><th>Email</th><th>Saldo</th><th>Bonus Locked</th><th>Apostas Bonus</th><th>Cadastro</th><th>Acao</th></tr></thead>
         <tbody id="usersTbody"><tr><td colspan="7" style="text-align:center;padding:40px;color:#5a6878">Carregando...</td></tr></tbody>
-      </table>
+      </table></div>
     </div>
 
     <!-- RECEITA -->
@@ -96,10 +96,10 @@
     <!-- SAQUES -->
     <div id="sec-saques" class="admin-panel">
       <div class="admin-section-title">Saques Pendentes <span class="badge" id="saquesCount">0</span></div>
-      <table>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table>
         <thead><tr><th>Usuario</th><th>Valor</th><th>Chave PIX</th><th>Tipo</th><th>Solicitado</th><th>Status</th><th>Acao</th></tr></thead>
         <tbody id="saquesTbody"><tr><td colspan="7" style="text-align:center;padding:40px;color:#5a6878">Carregando...</td></tr></tbody>
-      </table>
+      </table></div>
     </div>
 
     <!-- BOTS -->
@@ -131,16 +131,16 @@
       <div class="chart-box"><canvas id="botActivityChart"></canvas></div>
 
       <div class="admin-section-title" style="font-size:0.95rem;margin-bottom:12px">Reação dos mercados</div>
-      <table>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table>
         <thead><tr><th>Mercado</th><th>Categoria</th><th>Apostas Bots</th><th>Volume Bots</th><th>Prob SIM atual</th></tr></thead>
         <tbody id="botMarketsTbody"><tr><td colspan="5" style="text-align:center;padding:30px;color:#5a6878">Carregando...</td></tr></tbody>
-      </table>
+      </table></div>
 
       <div class="admin-section-title" style="font-size:0.95rem;margin-top:24px;margin-bottom:12px">Saldo dos bots</div>
-      <table>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table>
         <thead><tr><th>Bot</th><th>Saldo</th></tr></thead>
         <tbody id="botBalancesTbody"><tr><td colspan="2" style="text-align:center;padding:20px;color:#5a6878">Carregando...</td></tr></tbody>
-      </table>
+      </table></div>
 
       <!-- GESTÃO DE BOTS -->
       <div class="admin-section-title" style="font-size:0.95rem;margin-top:32px;margin-bottom:12px">💰 Gestão de Bots</div>
@@ -254,10 +254,10 @@
         <div class="info-box" style="margin-bottom:16px">
           <strong>BACEN Circular 3.978/2020:</strong> Usuários com CPF verificado pelo bureau mas identificados como PEP ficam em <em>submitted</em> para revisão manual obrigatória antes de aprovação. Aprovações diretas aplicam-se apenas a usuários <em>clear</em> no resultado bureau.
         </div>
-        <table>
+        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table>
           <thead><tr><th>Usuário</th><th>Email</th><th>Nome Completo</th><th>CPF</th><th>Nasc.</th><th>Enviado em</th><th>PEP?</th><th>Ações</th></tr></thead>
           <tbody id="kycQueueTbody"><tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">Carregando...</td></tr></tbody>
-        </table>
+        </table></div>
       </div>
 
       <div class="comp-divider"></div>
@@ -269,10 +269,10 @@
           <span class="badge" id="kycApprovedBadge" style="background:rgba(16,185,129,0.15);color:#10b981">0</span>
           <button class="btn btn-resolve" style="margin-left:auto;font-size:0.78rem" onclick="loadComplianceKycApproved()">↻ Atualizar</button>
         </div>
-        <table>
+        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table>
           <thead><tr><th>Usuário</th><th>Email</th><th>Nome Completo</th><th>CPF</th><th>Nasc.</th><th>Aprovado em</th><th>Provider</th><th>PEP?</th></tr></thead>
           <tbody id="kycApprovedTbody"><tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">Carregando...</td></tr></tbody>
-        </table>
+        </table></div>
       </div>
 
       <div class="comp-divider"></div>
@@ -287,10 +287,10 @@
         <div class="info-box" style="margin-bottom:16px">
           <strong>Art. 27 BACEN 3.978/2020:</strong> PEPs identificados devem permanecer em <em>submitted</em> até revisão manual e aprovação explícita pelo Compliance Officer. Aprovação não é automática mesmo com bureau OK.
         </div>
-        <table>
+        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table>
           <thead><tr><th>Usuário</th><th>Email</th><th>Nome Completo</th><th>KYC Status</th><th>Confiança</th><th>Keywords</th><th>Verificado em</th><th>Ações</th></tr></thead>
           <tbody id="pepQueueTbody"><tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">Carregando...</td></tr></tbody>
-        </table>
+        </table></div>
       </div>
 
       <div class="comp-divider"></div>
@@ -305,10 +305,10 @@
         <div class="info-box" style="margin-bottom:16px">
           <strong>Lei 9.613/98 — Art. 11:</strong> Operações que atingem R$10.000/mês devem ser monitoradas. <em>Dismiss</em> = registro interno arquivado. <em>Reportar COAF</em> = obrigação legal de comunicação ao COAF dentro de 24h.
         </div>
-        <table>
+        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table>
           <thead><tr><th>Usuário</th><th>Email</th><th>Mês</th><th>Volume Mensal</th><th>Limiar</th><th>Status</th><th>Criado em</th><th>Ações</th></tr></thead>
           <tbody id="coafFlagsTbody"><tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">Carregando...</td></tr></tbody>
-        </table>
+        </table></div>
       </div>
 
       <div class="comp-divider"></div>
@@ -330,10 +330,10 @@
           <div class="comp-card"><div class="comp-label">Expirados</div><div class="comp-val comp-val-danger" id="suitExpired">—</div></div>
           <div class="comp-card"><div class="comp-label">Score Médio</div><div class="comp-val comp-val-gold" id="suitAvgScore">—</div></div>
         </div>
-        <table>
+        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table>
           <thead><tr><th>Usuário</th><th>Email</th><th>Perfil</th><th>Score</th><th>Respondido em</th><th>Expira em</th><th>Status</th></tr></thead>
           <tbody id="suitTbody"><tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">Carregando...</td></tr></tbody>
-        </table>
+        </table></div>
       </div>
 
       <div class="comp-divider"></div>
@@ -354,10 +354,10 @@
           <button class="btn" style="font-size:0.78rem;background:rgba(96,165,250,0.1);color:#60a5fa;border:1px solid rgba(96,165,250,0.3)" onclick="loadAdminComplaints('in_progress')">Em análise</button>
           <button class="btn" style="font-size:0.78rem;background:rgba(52,211,153,0.1);color:#34d399;border:1px solid rgba(52,211,153,0.3)" onclick="loadAdminComplaints('resolved')">Resolvidas</button>
         </div>
-        <table>
+        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table>
           <thead><tr><th>Usuário</th><th>Categoria</th><th>Descrição</th><th>Status</th><th>Data</th><th>Ações</th></tr></thead>
           <tbody id="complaintsTbody"><tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted)">Carregando...</td></tr></tbody>
-        </table>
+        </table></div>
       </div>
 
       <div class="comp-divider"></div>
@@ -371,10 +371,10 @@
         <div class="info-box" style="margin-bottom:16px">
           <strong>Rastreabilidade CVM:</strong> Registro de todas as ações administrativas — resolução de mercados, aprovação de KYC, alterações de compliance e limites. Retenção: 5 anos.
         </div>
-        <table>
+        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table>
           <thead><tr><th>Data/Hora</th><th>Ação</th><th>Tipo</th><th>ID Entidade</th><th>Detalhes</th><th>IP</th></tr></thead>
           <tbody id="auditTbody"><tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted)">Carregando...</td></tr></tbody>
-        </table>
+        </table></div>
       </div>
 
     </div>
@@ -420,10 +420,10 @@
           <a href="https://siscoaf.fazenda.gov.br/" target="_blank" style="color:var(--gold)">siscoaf.fazenda.gov.br</a>.
           Registre o número de protocolo e arquive por 5 anos.
         </div>
-        <table>
+        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table>
           <thead><tr><th>Usuário</th><th>Email</th><th>Mês</th><th>Volume</th><th>Status</th><th>Reportado em</th><th>Download SISCOAF</th></tr></thead>
           <tbody id="siscoafTbody"><tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">Carregando...</td></tr></tbody>
-        </table>
+        </table></div>
       </div>
     </div>
 

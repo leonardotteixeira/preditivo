@@ -45,9 +45,10 @@
 </div>
 
 <!-- LOGIN MODAL -->
-<div class="modal-overlay" id="loginModal">
+<div class="modal-overlay" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="mktLoginTitle">
   <div class="modal">
-    <h3 class="modal-title">Entrar</h3>
+    <button class="modal-close" onclick="closeModal('loginModal')" aria-label="Fechar modal de login">&times;</button>
+    <h3 class="modal-title" id="mktLoginTitle">Entrar</h3>
     <p class="modal-sub">Acesse sua conta para operar</p>
     <input class="modal-input" type="email" placeholder="Email" id="loginEmail"
       onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()">
@@ -95,6 +96,11 @@ function showToast(msg) {
 
 function openModal(id) { document.getElementById(id).classList.add('active'); }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.active').forEach(function(el) { el.classList.remove('active'); });
+  }
+});
 
 async function apiGet(path, token) {
   var ctrl = new AbortController();

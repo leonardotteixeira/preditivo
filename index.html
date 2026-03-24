@@ -900,6 +900,11 @@ window.openModal = (id) => {
   }
 };
 window.closeModal = (id) => { document.getElementById(id).classList.remove('active'); };
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.active').forEach(function(el) { el.classList.remove('active'); });
+  }
+});
 
 window.showSection = (name) => {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -2174,9 +2179,10 @@ async function init() {
       document.getElementById('activePlayers').textContent = (stats.active_traders || 2900 / 1000).toFixed(1) + 'K';
     }
     
-    const mktsResult = await fetch(window.API + '/markets');
-    const mkts = await mktsResult.json();
-    if(Array.isArray(mkts)) {
+    const mktsResult = await fetch(window.API + '/markets?limit=100');
+    const mktsData = await mktsResult.json();
+    const mkts = Array.isArray(mktsData) ? mktsData : (mktsData.markets || []);
+    if(mkts.length) {
       window.state.markets = mkts.filter(m => !m.resolved_at);
       window.renderMarkets();
       populateTicker(window.state.markets);

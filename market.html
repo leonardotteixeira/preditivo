@@ -591,23 +591,23 @@ function escapeHtml(str) {
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
     .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
-var _SUSPECT = /[\u2666\uFFFD\u25C6\u25CA\u25C7\u22C4\u2662\u25A0\u25AA\u2022]/g;
 function fixEncoding(str) {
   if (!str) return str;
-  _SUSPECT.lastIndex = 0;
-  if (!_SUSPECT.test(str)) return str;
-  _SUSPECT.lastIndex = 0;
-  return str.replace(_SUSPECT, function(ch, pos, s) {
-    var prev = s.slice(Math.max(0, pos - 4), pos);
-    var next = s.slice(pos + 1, pos + 6);
-    _SUSPECT.lastIndex = 0;
-    if (/\d$/.test(prev)) return '\u00ba';
-    if (/ei$/.test(prev) && _SUSPECT.test(next.charAt(0))) return '\u00e7';
-    if (/[\u00e7\u00c7]$/.test(prev)) return '\u00f5';
-    if (/ei$/.test(prev)) return '\u00e7';
-    if (/a$/.test(prev) && /^[oe]/.test(next)) return '\u00e7';
-    return '\u00e3';
-  });
+  var S = '[\uFFFD\u2666\u25C6\u25CA\u25C7\u22C4\u2662]';
+  if (!new RegExp(S).test(str)) return str;
+  return str
+    .replace(new RegExp('(\\d)' + S, 'g'), '$1\u00ba')
+    .replace(new RegExp('ei' + S + S + 'es', 'g'), 'ei\u00e7\u00f5es')
+    .replace(new RegExp('ei' + S + S + 'o', 'g'),  'ei\u00e7\u00e3o')
+    .replace(new RegExp('ca' + S + S + 'o', 'g'),  'ca\u00e7\u00e3o')
+    .replace(new RegExp('ma' + S + S + 'o', 'g'),  'ma\u00e7\u00e3o')
+    .replace(new RegExp('na' + S + S + 'o', 'g'),  'na\u00e7\u00e3o')
+    .replace(new RegExp('iza' + S + S + 'o', 'g'), 'iza\u00e7\u00e3o')
+    .replace(new RegExp('olu' + S + S + 'o', 'g'), 'olu\u00e7\u00e3o')
+    .replace(new RegExp(S + S + 'es', 'g'), '\u00f5es')
+    .replace(new RegExp(S + S + 'o', 'g'),  '\u00e3o')
+    .replace(new RegExp(S + S, 'g'), '\u00e7\u00f5')
+    .replace(new RegExp(S, 'g'), '\u00e3');
 }
 
 async function postComment() {

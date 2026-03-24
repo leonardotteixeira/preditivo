@@ -13,35 +13,32 @@ export function escapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
-// Repair Portuguese mojibake: any "suspect" non-Latin character replacing special chars.
-// Covers U+2666 ♦, U+FFFD ?, U+25C6 ◆, U+25CA ◊ and similar encoding artifacts.
-const _SUSPECT = /[\u2666\uFFFD\u25C6\u25CA\u25C7\u22C4\u2662\u25A0\u25AA\u2022]/g;
+// Repair Portuguese mojibake where U+FFFD (and similar) replace special chars.
+// Process pairs (♦♦) before singles to preserve word context.
 function fixEncoding(str) {
   if (!str) return str;
-  _SUSPECT.lastIndex = 0;
-  if (!_SUSPECT.test(str)) return str;
-  _SUSPECT.lastIndex = 0;
-  return str.replace(_SUSPECT, function(ch, pos, s) {
-    const prev = s.slice(Math.max(0, pos - 4), pos);
-    const next = s.slice(pos + 1, pos + 6);
-    const nextCh = next.charAt(0);
-
-    // After digit → ordinal indicator º
-    if (/\d$/.test(prev)) return 'º';
-
-    // Previous suspect char just before: double-artifact → handle pair
-    // Detect context for common word endings:
-    if (/ei$/.test(prev) && _SUSPECT.test(nextCh)) return 'ç'; // eleições (first of ♦♦)
-    if (/[çÇ]$/.test(prev)) return 'õ'; // second char of ç+õ pair
-    if (/ei$/.test(prev)) return 'ç';
-    if (/a$/.test(prev) && /^[oe]/.test(next)) return 'ç'; // ação/ações
-    if (/uni$/.test(prev)) return 'ã'; // União
-    if (/m$/.test(prev)) return 'ã'; // manifestação
-    if (/nci$/.test(prev)) return 'a'; // financiação fallback
-
-    // Generic: most common single-char artifact in PT is ã
-    return 'ã';
-  });
+  // S matches any common encoding-artifact "diamond" character
+  const S = '[\uFFFD\u2666\u25C6\u25CA\u25C7\u22C4\u2662]';
+  const hasSuspect = new RegExp(S);
+  if (!hasSuspect.test(str)) return str;
+  return str
+    // ordinal indicator after digit: "2♦" → "2º"
+    .replace(new RegExp('(\\d)' + S, 'g'), '$1\u00ba')
+    // specific double-artifact word patterns (must come before generic ♦♦ rule)
+    .replace(new RegExp('ei' + S + S + 'es', 'g'), 'ei\u00e7\u00f5es')   // eleições
+    .replace(new RegExp('ei' + S + S + 'o', 'g'),  'ei\u00e7\u00e3o')    // eleição
+    .replace(new RegExp('ca' + S + S + 'o', 'g'),  'ca\u00e7\u00e3o')    // ação/aplicação
+    .replace(new RegExp('ma' + S + S + 'o', 'g'),  'ma\u00e7\u00e3o')    // manifestação
+    .replace(new RegExp('na' + S + S + 'o', 'g'),  'na\u00e7\u00e3o')    // nação
+    .replace(new RegExp('iza' + S + S + 'o', 'g'), 'iza\u00e7\u00e3o')   // privatização
+    .replace(new RegExp('olu' + S + S + 'o', 'g'), 'olu\u00e7\u00e3o')   // resolução
+    .replace(new RegExp('osi' + S + S + 'o', 'g'), 'osi\u00e7\u00e3o')   // posição
+    // generic double: "♦♦es" → "ões", "♦♦o" → "ão", "♦♦" → "çõ"
+    .replace(new RegExp(S + S + 'es', 'g'), '\u00f5es')
+    .replace(new RegExp(S + S + 'o',  'g'), '\u00e3o')
+    .replace(new RegExp(S + S, 'g'), '\u00e7\u00f5')
+    // single artifact → ã (most common single special char in PT)
+    .replace(new RegExp(S, 'g'), '\u00e3');
 }
 
 /**

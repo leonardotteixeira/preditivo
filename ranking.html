@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#030303">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Futoro">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<title>Futoro — Ranking de Traders</title>
+<meta name="description" content="Os melhores traders da Futoro. Veja quem está no topo do ranking de lucro, acerto e volume de operações.">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+</head>
+<body class="min-h-screen bg-futoro-void text-zinc-100 antialiased">
+<a href="#ranking-main" class="skip-link">Ir para o conteúdo</a>
+<header class="public-head">
+  <a href="/" class="logo"><svg class="logo-bull" viewBox="155 335 145 165" xmlns="http://www.w3.org/2000/svg"><path fill="#60a5fa" d="M194.84 405L195.68 405.08C196.7 406.38 196.3 415.61 196.27 417.96C200.03 423.05 203.71 428.19 207.33 433.38C207.53 436.68 207.39 441.16 207.38 444.55C209.66 447.17 212.4 449.96 214.8 452.51C221.32 452.44 227.84 452.42 234.36 452.47C227.66 460.77 219.74 473.14 214.22 482.27L205.54 482.28L166.05 482.28L166.05 422.41C175.5 416.37 185.1 410.57 194.84 405Z"/><path fill="#60a5fa" opacity=".5" d="M288.71 348.73C288.79 351.74 282.18 373.44 280.92 377.59C276.02 380.86 260.84 387.9 255.13 390.45C254.71 386.87 254.95 379.55 254.99 375.72C277.63 367.32 274.5 366.65 288.71 348.73Z"/><path fill="#60a5fa" opacity=".5" d="M162.23 348.93C163.54 349.81 167.27 354.55 168.19 355.8C180.17 372.24 178.41 369.16 196.27 375.75L196.24 390.48C189.58 387.82 176.89 381.28 170.36 377.9C167.75 368.29 164.36 358.61 162.23 348.93Z"/><path fill="#60a5fa" opacity=".35" d="M221.11 373.9C230.81 373.07 240.8 374.98 250.48 376.24C250.54 382 250.55 387.76 250.5 393.52C246.21 396.85 242.18 399.7 237.91 403.22C236.49 408.95 235.45 421.4 233.55 426.25C232.5 426.91 231.88 426.71 230.5 426.76L217.66 426.74C216.13 419.92 214.84 410.75 213.7 403.77C209.51 399.96 205.19 396.79 200.68 393.39C200.65 387.68 200.68 381.96 200.75 376.25C207.39 375.27 214.42 374.57 221.11 373.9Z"/></svg><span class="logo-word">Futoro<span class="logo-dot">.</span></span></a>
+  <a href="/" class="public-head-back">← Voltar ao site</a>
+</header>
+
+<div class="public-root" id="ranking-main">
+<div class="page">
+
+  <!-- HERO -->
+  <div class="page-hero">
+    <div class="page-tag">🏆 Atualizado a cada minuto</div>
+    <h1 class="page-title">Hall da Fama.<br><span>Os melhores traders do Brasil.</span></h1>
+    <p class="page-lead">Classificação dos traders com maior lucro acumulado na Futoro. Toda operação conta — cada acerto te aproxima do topo.</p>
+  </div>
+
+  <!-- PÓDIO TOP 3 -->
+  <div id="podiumSection" style="display:none">
+    <div class="rank-podium" id="rankPodium"></div>
+  </div>
+
+  <!-- TABELA COMPLETA -->
+  <div class="rank-table-wrap">
+    <div class="rank-table-header">
+      <span class="rh-pos">#</span>
+      <span class="rh-name">Trader</span>
+      <span class="rh-ops">Operações</span>
+      <span class="rh-profit">Lucro</span>
+      <span class="rh-wr">Acerto</span>
+    </div>
+    <div id="rankList">
+      <div class="rank-loading">Carregando ranking...</div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="rank-cta">
+    <div class="rank-cta-icon">📈</div>
+    <div class="rank-cta-title">Você pode estar aqui</div>
+    <p class="rank-cta-body">Crie sua conta, deposite a partir de R$10 e comece a operar nos mercados de previsão do Brasil.</p>
+    <a href="/" class="rank-cta-btn">Explorar mercados →</a>
+  </div>
+
+</div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-col footer-brand">
+      <p class="footer-wordmark">Futoro.</p>
+      <p class="footer-tagline">A principal plataforma brasileira de mercados de previsão.</p>
+      <p class="footer-contact">
+        <a href="mailto:suporte@futoro.com.br">suporte@futoro.com.br</a>
+      </p>
+    </div>
+    <div class="footer-col">
+      <h4>Navegar</h4>
+      <ul>
+        <li><a href="/">Explorar mercados</a></li>
+        <li><a href="/ranking.html">Ranking</a></li>
+        <li><a href="/#section-portfolio">Portfólio</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Institucional</h4>
+      <ul>
+        <li><a href="/about.html">Quem somos</a></li>
+        <li><a href="/how-it-works.html">Como funciona</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <ul>
+        <li><a href="/privacidade.html">Política de privacidade</a></li>
+        <li><a href="/terms.html">Termos de uso</a></li>
+        <li><a href="/protecao-investidor.html">Proteção ao investidor</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-legal">
+    <div class="footer-disclaimer">
+      <strong>Aviso legal importante:</strong>
+      A Futoro é uma plataforma de tecnologia de mercados de previsão. Não constitui recomendação financeira. Operações envolvem risco de perda.
+    </div>
+    <p class="footer-copyright">&copy; 2026 Futoro · Todos os direitos reservados.</p>
+  </div>
+</footer>
+
+<script>
+(function() {
+  var API = (window.PREDITIVO_CONFIG && window.PREDITIVO_CONFIG.API_BASE)
+    || 'https://preditivo-backend-production.up.railway.app';
+
+  var MEDALS = ['🥇','🥈','🥉'];
+  var MEDAL_COLORS = ['#f59e0b','#94a3b8','#cd7c44'];
+
+  function fmt(n) {
+    return parseFloat(n).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function fmtInt(n) {
+    return parseInt(n).toLocaleString('pt-BR');
+  }
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function initials(name) {
+    if (!name) return '?';
+    var parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
+    return name[0].toUpperCase();
+  }
+  function avatarHtml(user, size) {
+    var sz = size || 40;
+    if (user.avatar_url) {
+      return '<img src="' + escHtml(user.avatar_url) + '" class="rank-avatar" width="' + sz + '" height="' + sz + '" alt="">';
+    }
+    return '<div class="rank-avatar rank-avatar-fallback" style="width:' + sz + 'px;height:' + sz + 'px;font-size:' + Math.round(sz * 0.38) + 'px">' + initials(user.name) + '</div>';
+  }
+
+  function renderPodium(top3) {
+    var order = [1, 0, 2]; // 2nd, 1st, 3rd visual order
+    var html = order.map(function(i) {
+      var u = top3[i];
+      if (!u) return '';
+      var pos = i + 1;
+      return '<div class="podium-slot podium-' + pos + '">' +
+        '<div class="podium-medal">' + MEDALS[i] + '</div>' +
+        avatarHtml(u, 56) +
+        '<div class="podium-name">' + escHtml(u.name || 'Trader') + '</div>' +
+        '<div class="podium-profit" style="color:' + MEDAL_COLORS[i] + '">R$' + fmt(u.total_profit) + '</div>' +
+        '<div class="podium-wr">' + parseFloat(u.win_rate).toFixed(1) + '% acerto</div>' +
+        '<div class="podium-base podium-base-' + pos + '"></div>' +
+      '</div>';
+    }).join('');
+    document.getElementById('rankPodium').innerHTML = html;
+    document.getElementById('podiumSection').style.display = '';
+  }
+
+  function renderList(data) {
+    if (!data.length) {
+      document.getElementById('rankList').innerHTML = '<div class="rank-empty">Nenhum trader no ranking ainda.</div>';
+      return;
+    }
+    // skip top 3 — already shown in podium
+    var rows = data.slice(3).map(function(u, idx) {
+      var pos = idx + 4;
+      return '<div class="rank-row">' +
+        '<span class="rank-pos">' + pos + '</span>' +
+        '<span class="rank-trader">' +
+          avatarHtml(u, 36) +
+          '<span class="rank-trader-name">' + escHtml(u.name || 'Trader') + '</span>' +
+        '</span>' +
+        '<span class="rank-ops">' + fmtInt(u.total_bets) + '</span>' +
+        '<span class="rank-profit">R$' + fmt(u.total_profit) + '</span>' +
+        '<span class="rank-wr">' + parseFloat(u.win_rate).toFixed(1) + '%</span>' +
+      '</div>';
+    }).join('');
+    document.getElementById('rankList').innerHTML = rows || '<div class="rank-empty">Apenas 3 traders no ranking.</div>';
+  }
+
+  fetch(API + '/ranking')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (!Array.isArray(data) || !data.length) {
+        document.getElementById('rankList').innerHTML = '<div class="rank-empty">Ranking indisponível no momento.</div>';
+        return;
+      }
+      renderPodium(data.slice(0, 3));
+      renderList(data);
+    })
+    .catch(function() {
+      document.getElementById('rankList').innerHTML = '<div class="rank-empty">Erro ao carregar ranking. Tente novamente.</div>';
+    });
+})();
+</script>
+
+<style>
+/* ── Pódio ───────────────────────────────────────────────── */
+.rank-podium {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 12px;
+  padding: 32px 0 0;
+  margin-bottom: 40px;
+}
+.podium-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  padding-bottom: 0;
+}
+.podium-1 { order: 2; }
+.podium-2 { order: 1; }
+.podium-3 { order: 3; }
+.podium-medal { font-size: 1.6rem; margin-bottom: 4px; }
+.rank-avatar {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.1);
+}
+.rank-avatar-fallback {
+  border-radius: 50%;
+  background: rgba(96,165,250,0.15);
+  color: #60a5fa;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(96,165,250,0.25);
+  flex-shrink: 0;
+}
+.podium-name { font-size: 0.82rem; font-weight: 600; color: #e2e8f0; max-width: 90px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.podium-profit { font-size: 0.9rem; font-weight: 700; font-family: 'IBM Plex Mono', monospace; }
+.podium-wr { font-size: 0.72rem; color: #64748b; }
+.podium-base {
+  width: 90px;
+  border-radius: 8px 8px 0 0;
+  margin-top: 12px;
+}
+.podium-base-1 { height: 80px; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.2); }
+.podium-base-2 { height: 56px; background: rgba(148,163,184,0.08); border: 1px solid rgba(148,163,184,0.15); }
+.podium-base-3 { height: 40px; background: rgba(205,124,68,0.08); border: 1px solid rgba(205,124,68,0.15); }
+
+/* ── Tabela ──────────────────────────────────────────────── */
+.rank-table-wrap {
+  background: var(--futoro-surface, #0d1221);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 40px;
+}
+.rank-table-header {
+  display: grid;
+  grid-template-columns: 40px 1fr 80px 100px 72px;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #64748b;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.rank-row {
+  display: grid;
+  grid-template-columns: 40px 1fr 80px 100px 72px;
+  gap: 8px;
+  padding: 12px 20px;
+  align-items: center;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background 0.15s;
+}
+.rank-row:last-child { border-bottom: none; }
+.rank-row:hover { background: rgba(255,255,255,0.02); }
+.rank-pos { color: #64748b; font-size: 0.82rem; font-weight: 600; font-family: 'IBM Plex Mono', monospace; }
+.rank-trader { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.rank-trader-name { font-weight: 600; font-size: 0.88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rank-ops { color: #94a3b8; font-size: 0.82rem; text-align: center; }
+.rank-profit { font-weight: 700; font-size: 0.85rem; font-family: 'IBM Plex Mono', monospace; color: #10b981; }
+.rank-wr { color: #60a5fa; font-size: 0.82rem; text-align: center; font-weight: 600; }
+.rank-loading, .rank-empty { padding: 40px 20px; text-align: center; color: #64748b; font-size: 0.88rem; }
+
+/* ── CTA ─────────────────────────────────────────────────── */
+.rank-cta {
+  text-align: center;
+  background: linear-gradient(135deg, rgba(96,165,250,0.06), rgba(16,185,129,0.04));
+  border: 1px solid rgba(96,165,250,0.12);
+  border-radius: 20px;
+  padding: 40px 24px;
+  margin-bottom: 40px;
+}
+.rank-cta-icon { font-size: 2rem; margin-bottom: 12px; }
+.rank-cta-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
+.rank-cta-body { color: #94a3b8; font-size: 0.9rem; max-width: 400px; margin: 0 auto 20px; }
+.rank-cta-btn {
+  display: inline-block;
+  background: #60a5fa;
+  color: #0a0e1a;
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 10px 24px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+.rank-cta-btn:hover { opacity: 0.88; }
+
+/* ── Mobile ──────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .rank-table-header { grid-template-columns: 32px 1fr 72px 80px; }
+  .rank-table-header .rh-ops { display: none; }
+  .rank-row { grid-template-columns: 32px 1fr 72px 80px; }
+  .rank-ops { display: none; }
+  .rank-podium { gap: 6px; }
+  .podium-base { width: 72px; }
+}
+</style>
+
+<script src="/config.js"></script>
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function() {
+      navigator.serviceWorker.register("/sw.js")
+        .catch(function(err) { console.warn("[SW] Falha:", err); });
+    });
+  }
+</script>
+  <script type="module" src="/src/public-pages.js"></script>
+</body>
+</html>

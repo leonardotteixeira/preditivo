@@ -8,6 +8,7 @@ export default {
     './suitability.html',
     './admin.html',
     './about.html',
+    './ranking.html',
     './how-it-works.html',
     './terms.html',
     './privacidade.html',

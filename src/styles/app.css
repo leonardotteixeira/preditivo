@@ -605,7 +605,7 @@
 
   /* ── Sections ── */
   .section {
-    @apply relative z-10 mx-auto hidden max-w-[1440px] px-4 pb-20 pt-8 md:px-6;
+    @apply relative z-10 mx-auto hidden max-w-[1440px] px-4 pb-10 pt-4 md:px-6;
   }
 
   .section.active {
@@ -2708,7 +2708,7 @@ header {
   grid-template-columns: 58% 42%;
   gap: 40px;
   align-items: center;
-  padding: 40px 8px 32px;
+  padding: 20px 8px 16px;
   max-width: none;
   margin-left: 0;
   margin-right: 0;
@@ -2871,7 +2871,7 @@ header {
 }
 
 /* ── MARKETS SECTION ────────────────────────────────────────────────────── */
-.markets-section { padding: 24px 8px 48px; max-width: none; margin-left: 0; margin-right: 0; }
+.markets-section { padding: 8px 8px 40px; max-width: none; margin-left: 0; margin-right: 0; }
 
 .market-filters {
   display: flex;

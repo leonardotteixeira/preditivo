@@ -32,7 +32,10 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 /* ── HEADER ── */
 header{position:sticky;top:0;z-index:100;background:rgba(3,3,3,0.9);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:0 24px}
 .header-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;height:64px;gap:16px}
-.logo{font-size:1.25rem;font-weight:700;letter-spacing:-0.5px;background:linear-gradient(135deg,var(--green),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none}
+.logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+.logo-bull{width:26px;height:26px;flex-shrink:0}
+.logo-word{font-size:1.2rem;font-weight:800;letter-spacing:0.02em;color:#fff}
+.logo-dot{color:#60a5fa}
 .header-title{font-size:0.82rem;color:var(--muted);margin-left:4px;padding-left:16px;border-left:1px solid var(--border2)}
 .header-badges{margin-left:auto;display:flex;gap:8px;align-items:center}
 .reg-badge{padding:3px 10px;border-radius:6px;font-size:0.68rem;font-weight:700;letter-spacing:.5px;border:1px solid}

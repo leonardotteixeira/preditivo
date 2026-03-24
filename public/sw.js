@@ -1,5 +1,5 @@
 // ── Futoro Service Worker v2.0 ────────────────────────────────────────────────
-const CACHE_NAME = 'futoro-v4';
+const CACHE_NAME = 'futoro-v5';
 const OFFLINE_URL = '/offline.html';
 
 // Assets estáticos que sempre ficam em cache (cache-first)
@@ -110,7 +110,7 @@ self.addEventListener('push', (event) => {
       body: data.body || '',
       icon: '/icons/icon-192.png',
       badge: '/icons/icon-192.png',
-      tag: data.tag || 'bubuya-notification',
+      tag: data.tag || 'futoro-notification',
       data: { url: data.url || '/' },
       vibrate: [200, 100, 200],
     })

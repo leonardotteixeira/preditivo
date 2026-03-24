@@ -18,7 +18,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        bubuya: {
+        futoro: {
           void:     '#080c14',   /* deep navy-black — replaces zinc-950 */
           surface:  '#0d1221',   /* card background  */
           raised:   '#121929',   /* hover / elevated state */

@@ -13,26 +13,35 @@ export function escapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
-// Repair common Portuguese mojibake: ♦ (U+2666) replacing special chars
+// Repair Portuguese mojibake: any "suspect" non-Latin character replacing special chars.
+// Covers U+2666 ♦, U+FFFD ?, U+25C6 ◆, U+25CA ◊ and similar encoding artifacts.
+const _SUSPECT = /[\u2666\uFFFD\u25C6\u25CA\u25C7\u22C4\u2662\u25A0\u25AA\u2022]/g;
 function fixEncoding(str) {
-  if (!str || !str.includes('\u2666')) return str;
-  return str
-    // ordinal indicator after digit: "2♦ " → "2º "
-    .replace(/(\d)\u2666(\s)/g, '$1\u00ba$2')
-    .replace(/(\d)\u2666$/g, '$1\u00ba')
-    // common -ção/-ções endings
-    .replace(/ei\u2666\u2666es/g, 'eições')
-    .replace(/ei\u2666\u2666o\b/g, 'eição')
-    .replace(/a\u2666\u2666es/g, 'ações')
-    .replace(/a\u2666\u2666o\b/g, 'ação')
-    .replace(/iza\u2666\u2666o/g, 'ização')
-    .replace(/olu\u2666\u2666o/g, 'olução')
-    .replace(/osi\u2666\u2666o/g, 'osição')
-    .replace(/\u2666\u2666es\b/g, 'ões')
-    .replace(/\u2666\u2666o\b/g, 'ão')
-    .replace(/\u2666\u2666/g, 'çõ')
-    // single ♦ — most common single missing char is ã
-    .replace(/\u2666/g, 'ã');
+  if (!str) return str;
+  _SUSPECT.lastIndex = 0;
+  if (!_SUSPECT.test(str)) return str;
+  _SUSPECT.lastIndex = 0;
+  return str.replace(_SUSPECT, function(ch, pos, s) {
+    const prev = s.slice(Math.max(0, pos - 4), pos);
+    const next = s.slice(pos + 1, pos + 6);
+    const nextCh = next.charAt(0);
+
+    // After digit → ordinal indicator º
+    if (/\d$/.test(prev)) return 'º';
+
+    // Previous suspect char just before: double-artifact → handle pair
+    // Detect context for common word endings:
+    if (/ei$/.test(prev) && _SUSPECT.test(nextCh)) return 'ç'; // eleições (first of ♦♦)
+    if (/[çÇ]$/.test(prev)) return 'õ'; // second char of ç+õ pair
+    if (/ei$/.test(prev)) return 'ç';
+    if (/a$/.test(prev) && /^[oe]/.test(next)) return 'ç'; // ação/ações
+    if (/uni$/.test(prev)) return 'ã'; // União
+    if (/m$/.test(prev)) return 'ã'; // manifestação
+    if (/nci$/.test(prev)) return 'a'; // financiação fallback
+
+    // Generic: most common single-char artifact in PT is ã
+    return 'ã';
+  });
 }
 
 /**

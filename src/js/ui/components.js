@@ -69,10 +69,12 @@ export function buildMarketCard(m) {
   const title = escapeHtml(fixEncoding(m.title));
   const vol = (parseFloat(m.volume) || 0).toLocaleString('pt-BR', { maximumFractionDigits: 0 });
   const id  = escapeHtml(m.id);
-  const q   = encodeURIComponent(m.id);
+  const href = m.slug
+    ? 'market.html?slug=' + encodeURIComponent(m.slug)
+    : 'market.html?id=' + encodeURIComponent(m.id);
 
   return `
-    <article class="mcard ${catClass}" data-market-id="${id}" onclick="window.location.href='market.html?id=${q}'" role="button" tabindex="0">
+    <article class="mcard ${catClass}" data-market-id="${id}" onclick="window.location.href='${href}'" role="button" tabindex="0">
       <div class="mcard-cat">${catLabel}</div>
       <div class="mcard-q">${title}</div>
       <div class="mcard-bar">

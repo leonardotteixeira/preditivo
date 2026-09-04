@@ -1,13 +1,13 @@
 # Bubuya — Frontend
 
-> Plataforma brasileira de **mercados de previsão** (estilo Polymarket/Kalshi): contratos SIM/NÃO sobre eventos reais, precificados por um AMM. Este repositório é a interface web; a API está em [`preditivo-backend`](https://github.com/leonardotteixeira/preditivo-backend).
+> Projeto de estudo sobre **mercados de previsão** (estilo Polymarket/Kalshi): contratos SIM/NÃO sobre eventos reais, precificados por um AMM. Este repositório é a interface web; a API está em [`preditivo-backend`](https://github.com/leonardotteixeira/preditivo-backend).
 
 [![CI](https://github.com/leonardotteixeira/preditivo/actions/workflows/ci.yml/badge.svg)](https://github.com/leonardotteixeira/preditivo/actions/workflows/ci.yml)
 ![Vite](https://img.shields.io/badge/Vite-6-646CFF?logo=vite&logoColor=white)
 ![Tailwind](https://img.shields.io/badge/Tailwind_CSS-3-06B6D4?logo=tailwindcss&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-offline--ready-5A0FC8)
 
-**Status:** experimental / domínio atualmente inativo — o domínio `bubuya.com.br` não está ativo no momento. Deploy configurado na Vercel · API no Railway.
+**Status:** projeto de estudo — o domínio `bubuya.com.br` não está ativo no momento. Deploy configurado na Vercel · API no Railway.
 
 ---
 
@@ -82,17 +82,15 @@ scripts/               utilitários de build (extração de CSS, patches de HTML
 docs/                  políticas de compliance (PLD/FT, proteção ao investidor)
 ```
 
-## Roadmap
+## Ideias que não cheguei a implementar
 
 - Migrar as páginas de maior interação (mercado, perfil) para React + TypeScript, reaproveitando o design system.
 - Testes end-to-end do fluxo de negociação com Playwright.
-- Mercados com resolução automática por fonte de dados (câmeras/APIs públicas) — protótipo em andamento.
-
-Este roadmap reflete ideias exploradas durante o desenvolvimento, não um plano de produto em execução — o projeto está parado no estágio atual.
+- Mercados com resolução automática por fonte de dados (câmeras/APIs públicas) — cheguei a esboçar, não finalizei.
 
 ## Status
 
-Experimental / domínio atualmente inativo. O projeto foi desenvolvido como uma exploração de produto e tecnologia (mercados de previsão, precificação via AMM, KYC/PIX) e permanece como parte do meu portfólio. O domínio `bubuya.com.br` não está atualmente ativo.
+Projeto de estudo sobre produto e tecnologia — mercados de previsão, precificação via AMM, KYC/PIX — mantido aqui como parte do meu portfólio. O domínio `bubuya.com.br` não está atualmente ativo.
 
 ## Licença
 

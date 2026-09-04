@@ -82,10 +82,6 @@ scripts/               utilitários de build (extração de CSS, patches de HTML
 docs/                  políticas de compliance (PLD/FT, proteção ao investidor)
 ```
 
-## Desenvolvimento com IA
-
-Construído com **Claude Code** como par de programação: geração das páginas a partir do design, refatoração de estilos inline para classes do design system, correção de bugs de encoding em produção e revisão de segurança do fluxo de saque. Cerca de 115 commits carregam `Co-Authored-By: Claude`. Convenções em [`CLAUDE.md`](CLAUDE.md).
-
 ## Roadmap
 
 - Migrar as páginas de maior interação (mercado, perfil) para React + TypeScript, reaproveitando o design system.

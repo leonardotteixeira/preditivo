@@ -7,7 +7,7 @@
 ![Tailwind](https://img.shields.io/badge/Tailwind_CSS-3-06B6D4?logo=tailwindcss&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-offline--ready-5A0FC8)
 
-**Produção:** [bubuya.com.br](https://www.bubuya.com.br) · Deploy na Vercel · API no Railway
+**Status:** experimental / domínio atualmente inativo — o domínio `bubuya.com.br` não está ativo no momento. Deploy configurado na Vercel · API no Railway.
 
 ---
 
@@ -87,6 +87,12 @@ docs/                  políticas de compliance (PLD/FT, proteção ao investido
 - Migrar as páginas de maior interação (mercado, perfil) para React + TypeScript, reaproveitando o design system.
 - Testes end-to-end do fluxo de negociação com Playwright.
 - Mercados com resolução automática por fonte de dados (câmeras/APIs públicas) — protótipo em andamento.
+
+Este roadmap reflete ideias exploradas durante o desenvolvimento, não um plano de produto em execução — o projeto está parado no estágio atual.
+
+## Status
+
+Experimental / domínio atualmente inativo. O projeto foi desenvolvido como uma exploração de produto e tecnologia (mercados de previsão, precificação via AMM, KYC/PIX) e permanece como parte do meu portfólio. O domínio `bubuya.com.br` não está atualmente ativo.
 
 ## Licença
 
